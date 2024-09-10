@@ -4,6 +4,13 @@
   "description": "",
   "type": "module",
   "main": "index.js",
+  "exports": {
+    "*": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "test": "jest",
     "dev": "tsup --watch",
