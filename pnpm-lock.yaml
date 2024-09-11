@@ -8,9 +8,6 @@ dependencies:
   colord:
     specifier: ^2.9.3
     version: 2.9.3
-  lodash:
-    specifier: ^4.17.21
-    version: 4.17.21
   node-html-parser:
     specifier: ^6.1.13
     version: 6.1.13
@@ -3794,11 +3791,6 @@ packages:
     resolution:
       { integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA== }
     dev: true
-
-  /lodash@4.17.21:
-    resolution:
-      { integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg== }
-    dev: false
 
   /log-update@6.1.0:
     resolution:
