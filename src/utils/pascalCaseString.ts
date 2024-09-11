@@ -1,5 +1,3 @@
-import camelCase from 'lodash/camelCase'
-import upperFirst from 'lodash/upperFirst'
 import { PascalCase } from 'type-fest'
 
 /**
@@ -8,6 +6,9 @@ import { PascalCase } from 'type-fest'
  * @param {string} str - The string to convert to PascalCase.
  * @returns {PascalCase<string>} The PascalCase version of the input string.
  */
-export const pascalCaseString = (str: string) => {
-  return upperFirst(camelCase(str)) as PascalCase<string>
+export const pascalCaseString = (str: string): PascalCase<string> => {
+  return str
+    .split(/[\s_-]+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join('') as PascalCase<string>
 }

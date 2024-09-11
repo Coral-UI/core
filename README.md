@@ -5,7 +5,7 @@ A collection of utility classes and components for building Coral UI.
 ## Installation
 
 ```bash
-npm install @reallygoodwork/coral-core
+npm install @reallygoodwork/coral-core colord node-html-parser
 ```
 
 ## Utilities
