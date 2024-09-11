@@ -1,0 +1,11 @@
+.husky
+src/
+.git/
+node_modules/
+pnpm-lock.yaml
+jest.config.ts
+tsconfig.json
+.prettierignore
+eslint.config.mjs
+prettier.config.mjs
+tsup.config.ts

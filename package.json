@@ -1,15 +1,23 @@
 {
-  "name": "core",
+  "name": "@reallygoodwork/coral-core",
   "version": "1.0.0",
-  "description": "",
+  "description": "Core utility library for UI layers and tooling ecosystem",
   "type": "module",
-  "main": "index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "exports": {
     "*": {
       "types": "./dist/index.d.ts",
       "require": "./dist/index.js",
       "import": "./dist/index.js"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Coral-UI/core.git"
   },
   "scripts": {
     "test": "jest",
@@ -20,8 +28,16 @@
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "ui",
+    "core",
+    "utility",
+    "library",
+    "reallygoodwork",
+    "design-to-code",
+    ""
+  ],
+  "author": "Really Good Work Inc. <hey@reallygood.work> (https://reallygood.work)",
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.9.1",

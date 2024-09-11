@@ -6,6 +6,7 @@ export default defineConfig((options) => ({
   dts: true,
   sourcemap: true,
   clean: true,
+  treeshake: true,
   external: ['react', 'rimraf'],
   minify: !options.watch,
   ...options,
