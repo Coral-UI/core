@@ -1,10 +1,10 @@
 export const fontStyle = {
   italic: {
-    property: 'font-style',
+    property: 'fontStyle',
     value: 'italic',
   },
   'not-italic': {
-    property: 'font-style',
+    property: 'fontStyle',
     value: 'normal',
   },
 }

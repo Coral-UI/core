@@ -1,11 +1,11 @@
 export const textOverflow = {
   truncate: [
     {
-      property: 'text-overflow',
+      property: 'textOverflow',
       value: 'ellipsis',
     },
     {
-      property: 'white-space',
+      property: 'whiteSpace',
       value: 'nowrap',
     },
     {
@@ -14,11 +14,11 @@ export const textOverflow = {
     },
   ],
   'text-clip': {
-    property: 'text-overflow',
+    property: 'textOverflow',
     value: 'clip',
   },
   'text-ellipsis': {
-    property: 'text-overflow',
+    property: 'textOverflow',
     value: 'ellipsis',
   },
 }

@@ -1,26 +1,26 @@
 export const alignSelf = {
   'self-auto': {
-    property: 'align-self',
+    property: 'alignSelf',
     value: 'auto',
   },
   'self-start': {
-    property: 'align-self',
+    property: 'alignSelf',
     value: 'flex-start',
   },
   'self-end': {
-    property: 'align-self',
+    property: 'alignSelf',
     value: 'flex-end',
   },
   'self-center': {
-    property: 'align-self',
+    property: 'alignSelf',
     value: 'center',
   },
   'self-baseline': {
-    property: 'align-self',
+    property: 'alignSelf',
     value: 'baseline',
   },
   'self-stretch': {
-    property: 'align-self',
+    property: 'alignSelf',
     value: 'stretch',
   },
 }

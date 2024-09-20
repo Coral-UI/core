@@ -1,19 +1,19 @@
 export const margin = {
   'mx-auto': [
     {
-      property: 'margin-inline-start',
+      property: 'marginInlineStart',
       value: 'auto',
     },
     {
-      property: 'margin-inline-end',
+      property: 'marginInlineEnd',
       value: 'auto',
     },
   ],
-  'm-': ['margin-inline-start', 'margin-inline-end', 'margin-block-start', 'margin-block-end'],
-  'my-': ['margin-block-start', 'margin-block-end'],
-  'mx-': ['margin-inline-start', 'margin-inline-end'],
-  'ml-': ['margin-inline-start'],
-  'mr-': ['margin-inline-end'],
-  'mt-': ['margin-block-start'],
-  'mb-': ['margin-block-end'],
+  'm-': ['marginInlineStart', 'marginInlineEnd', 'marginBlockStart', 'marginBlockEnd'],
+  'my-': ['marginBlockStart', 'marginBlockEnd'],
+  'mx-': ['marginInlineStart', 'marginInlineEnd'],
+  'ml-': ['marginInlineStart'],
+  'mr-': ['marginInlineEnd'],
+  'mt-': ['marginBlockStart'],
+  'mb-': ['marginBlockEnd'],
 }

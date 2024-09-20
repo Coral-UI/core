@@ -1,115 +1,115 @@
 export const backgrounds = {
   'bg-fixed': {
-    property: 'background-attachment',
+    property: 'backgroundAttachment',
     value: 'fixed',
   },
   'bg-local': {
-    property: 'background-attachment',
+    property: 'backgroundAttachment',
     value: 'local',
   },
   'bg-scroll': {
-    property: 'background-attachment',
+    property: 'backgroundAttachment',
     value: 'scroll',
   },
   'bg-clip-border': {
-    property: 'background-clip',
+    property: 'backgroundClip',
     value: 'border-box',
   },
   'bg-clip-padding': {
-    property: 'background-clip',
+    property: 'backgroundClip',
     value: 'padding-box',
   },
   'bg-clip-content': {
-    property: 'background-clip',
+    property: 'backgroundClip',
     value: 'content-box',
   },
   'bg-clip-text': {
-    property: 'background-clip',
+    property: 'backgroundClip',
     value: 'text',
   },
   'bg-origin-border': {
-    property: 'background-origin',
+    property: 'backgroundOrigin',
     value: 'border-box',
   },
   'bg-origin-padding': {
-    property: 'background-origin',
+    property: 'backgroundOrigin',
     value: 'padding-box',
   },
   'bg-origin-content': {
-    property: 'background-origin',
+    property: 'backgroundOrigin',
     value: 'content-box',
   },
   'bg-bottom': {
-    property: 'background-position',
+    property: 'backgroundPosition',
     value: 'bottom',
   },
   'bg-center': {
-    property: 'background-position',
+    property: 'backgroundPosition',
     value: 'center',
   },
   'bg-left': {
-    property: 'background-position',
+    property: 'backgroundPosition',
     value: 'left',
   },
   'bg-left-bottom': {
-    property: 'background-position',
+    property: 'backgroundPosition',
     value: 'left bottom',
   },
   'bg-left-top': {
-    property: 'background-position',
+    property: 'backgroundPosition',
     value: 'left top',
   },
   'bg-right': {
-    property: 'background-position',
+    property: 'backgroundPosition',
     value: 'right',
   },
   'bg-right-bottom': {
-    property: 'background-position',
+    property: 'backgroundPosition',
     value: 'right bottom',
   },
   'bg-right-top': {
-    property: 'background-position',
+    property: 'backgroundPosition',
     value: 'right top',
   },
   'bg-top': {
-    property: 'background-position',
+    property: 'backgroundPosition',
     value: 'top',
   },
   'bg-repeat': {
-    property: 'background-repeat',
+    property: 'backgroundRepeat',
     value: 'repeat',
   },
   'bg-repeat-x': {
-    property: 'background-repeat',
+    property: 'backgroundRepeat',
     value: 'repeat-x',
   },
   'bg-repeat-y': {
-    property: 'background-repeat',
+    property: 'backgroundRepeat',
     value: 'repeat-y',
   },
   'bg-repeat-round': {
-    property: 'background-repeat',
+    property: 'backgroundRepeat',
     value: 'round',
   },
   'bg-repeat-space': {
-    property: 'background-repeat',
+    property: 'backgroundRepeat',
     value: 'space',
   },
   'bg-no-repeat': {
-    property: 'background-repeat',
+    property: 'backgroundRepeat',
     value: 'no-repeat',
   },
   'bg-auto': {
-    property: 'background-size',
+    property: 'backgroundSize',
     value: 'auto',
   },
   'bg-cover': {
-    property: 'background-size',
+    property: 'backgroundSize',
     value: 'cover',
   },
   'bg-contain': {
-    property: 'background-size',
+    property: 'backgroundSize',
     value: 'contain',
   },
-  'bg-': ['background-color'],
+  'bg-': ['backgroundColor'],
 }

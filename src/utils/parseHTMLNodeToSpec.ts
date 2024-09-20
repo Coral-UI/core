@@ -18,8 +18,6 @@ export const parseHTMLNodeToSpec = (node: HTMLElement): BaseNode => {
     },
   }
 
-  // console.log(tailwindToCSS(node.getAttribute('class') || ''))
-
   // If the node has attributes, add them to the spec
   if (Object.keys(node.attributes).length) {
     const { class: _className, style: _styles, ...attributes } = node.attributes

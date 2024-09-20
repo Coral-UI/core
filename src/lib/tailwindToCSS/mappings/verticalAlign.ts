@@ -1,34 +1,34 @@
 export const verticalAlign = {
   'align-baseline': {
-    property: 'vertical-align',
+    property: 'verticalAlign',
     value: 'baseline',
   },
   'align-top': {
-    property: 'vertical-align',
+    property: 'verticalAlign',
     value: 'top',
   },
   'align-middle': {
-    property: 'vertical-align',
+    property: 'verticalAlign',
     value: 'middle',
   },
   'align-bottom': {
-    property: 'vertical-align',
+    property: 'verticalAlign',
     value: 'bottom',
   },
   'align-text-top': {
-    property: 'vertical-align',
+    property: 'verticalAlign',
     value: 'text-top',
   },
   'align-text-bottom': {
-    property: 'vertical-align',
+    property: 'verticalAlign',
     value: 'text-bottom',
   },
   'align-sub': {
-    property: 'vertical-align',
+    property: 'verticalAlign',
     value: 'sub',
   },
   'align-super': {
-    property: 'vertical-align',
+    property: 'verticalAlign',
     value: 'super',
   },
 }

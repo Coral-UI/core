@@ -1,4 +1,4 @@
-import { UISpec } from '../config/UISpec'
+import { UISpec } from '@/config/UISpec'
 
 export const testConfig: UISpec = {
   elementType: 'div',

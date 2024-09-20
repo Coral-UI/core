@@ -1,18 +1,18 @@
 export const gridAutoColumns = {
   'auto-cols-auto': {
-    property: 'grid-auto-columns',
+    property: 'gridAutoColumns',
     value: 'auto',
   },
   'auto-cols-min': {
-    property: 'grid-auto-columns',
+    property: 'gridAutoColumns',
     value: 'min-content',
   },
   'auto-cols-max': {
-    property: 'grid-auto-columns',
+    property: 'gridAutoColumns',
     value: 'max-content',
   },
   'auto-cols-fr': {
-    property: 'grid-auto-columns',
+    property: 'gridAutoColumns',
     value: 'minmax(0, 1fr)',
   },
 }

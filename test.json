@@ -1,0 +1,85 @@
+{
+  "name": "Div",
+  "elementType": "div",
+  "styles": {
+    "background-color": {
+      "hex": "#f0fdf4",
+      "rgb": {
+        "r": 240,
+        "g": 253,
+        "b": 244,
+        "a": 1
+      },
+      "hsl": {
+        "h": 138,
+        "s": 76,
+        "l": 97,
+        "a": 1
+      }
+    },
+    "padding-inline-start": 24,
+    "padding-inline-end": 24,
+    "padding-block-start": 96,
+    "padding-block-end": 96,
+    "sm": {
+      "focus": {
+        "padding-block-start": 128,
+        "padding-block-end": 128
+      }
+    },
+    "lg": {
+      "padding-inline-start": 32,
+      "padding-inline-end": 32
+    }
+  },
+  "children": [
+    {
+      "name": "Div",
+      "elementType": "div",
+      "styles": {
+        "margin-inline-start": "auto",
+        "margin-inline-end": "auto",
+        "max-width": "42rem",
+        "text-align": "center"
+      },
+      "children": [
+        {
+          "name": "P",
+          "elementType": "p",
+          "styles": {
+            "font-size": 16,
+            "line-height": 28,
+            "font-weight": 600
+          },
+          "textContent": "Get the help you need"
+        },
+        {
+          "name": "H2",
+          "elementType": "h2",
+          "styles": {
+            "margin-block-start": 8,
+            "font-size": 36,
+            "line-height": 40,
+            "font-weight": 700,
+            "letter-spacing": "-0.025em",
+            "sm": {
+              "font-size": 60,
+              "line-height": 60
+            }
+          },
+          "textContent": "Support center"
+        },
+        {
+          "name": "P",
+          "elementType": "p",
+          "styles": {
+            "margin-block-start": 24,
+            "font-size": 18,
+            "line-height": 32
+          },
+          "textContent": "Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat aliqua."
+        }
+      ]
+    }
+  ]
+}

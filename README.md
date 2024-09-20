@@ -8,6 +8,10 @@ A collection of utility classes and components for building Coral UI.
 npm install @reallygoodwork/coral-core colord node-html-parser
 ```
 
+## What is Coral UI?
+
+CoralUI is a toolkit for building UI components in a declarative way. The goal is to provide a set of tools that make it easy to create and maintain UI components.
+
 ## Utilities
 
 ### `parseUISpec`
@@ -45,4 +49,14 @@ A utility for converting Tailwind CSS to a basic style object.
 import { tailwindToCSS } from '@reallygoodwork/coral-core'
 
 const styles = tailwindToCSS('bg-red-500 text-white')
+```
+
+### `transformReactComponentToSpec`
+
+A utility for transforming a React component to a Coral specification.
+
+```typescript
+import { transformReactComponentToSpec } from '@reallygoodwork/coral-core'
+
+const spec = transformReactComponentToSpec('<MyComponent />')
 ```

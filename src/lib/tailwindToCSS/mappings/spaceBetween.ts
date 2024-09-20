@@ -1,4 +1,4 @@
 export const spaceBetween = {
-  'space-x-': ['margin-inline-start'],
-  'space-y-': ['margin-block-start'],
+  'space-x-': ['marginInlineStart'],
+  'space-y-': ['marginBlockStart'],
 }

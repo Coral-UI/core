@@ -1,22 +1,22 @@
 export const textDecorationStyle = {
   'decoration-solid': {
-    property: 'text-decoration-style',
+    property: 'textDecorationStyle',
     value: 'solid',
   },
   'decoration-double': {
-    property: 'text-decoration-style',
+    property: 'textDecorationStyle',
     value: 'line-through',
   },
   'decoration-dotted': {
-    property: 'text-decoration-style',
+    property: 'textDecorationStyle',
     value: 'dotted',
   },
   'decoration-dashed': {
-    property: 'text-decoration-style',
+    property: 'textDecorationStyle',
     value: 'dashed',
   },
   'decoration-wavy': {
-    property: 'text-decoration-style',
+    property: 'textDecorationStyle',
     value: 'wavy',
   },
 }

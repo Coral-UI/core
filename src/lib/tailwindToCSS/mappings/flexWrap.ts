@@ -1,14 +1,14 @@
 export const flexWrap = {
   'flex-wrap': {
-    property: 'flex-wrap',
+    property: 'flexWrap',
     value: 'wrap',
   },
   'flex-nowrap': {
-    property: 'flex-wrap',
+    property: 'flexWrap',
     value: 'nowrap',
   },
   'flex-wrap-reverse': {
-    property: 'flex-wrap',
+    property: 'flexWrap',
     value: 'wrap-reverse',
   },
 }

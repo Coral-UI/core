@@ -1,3 +1,3 @@
 export const textIndent = {
-  indent: ['text-indent'],
+  indent: ['textIndent'],
 }

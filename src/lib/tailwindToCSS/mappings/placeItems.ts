@@ -1,22 +1,22 @@
 export const placeItems = {
   'place-items-start': {
-    property: 'place-items',
+    property: 'placeItems',
     value: 'start',
   },
   'place-items-end': {
-    property: 'place-items',
+    property: 'placeItems',
     value: 'end',
   },
   'place-items-center': {
-    property: 'place-items',
+    property: 'placeItems',
     value: 'center',
   },
   'place-items-baseline': {
-    property: 'place-items',
+    property: 'placeItems',
     value: 'baseline',
   },
   'place-items-stretch': {
-    property: 'place-items',
+    property: 'placeItems',
     value: 'stretch',
   },
 }

@@ -1,22 +1,22 @@
 export const objectFit = {
   'object-contain': {
-    property: 'object-fit',
+    property: 'objectFit',
     value: 'contain',
   },
   'object-cover': {
-    property: 'object-fit',
+    property: 'objectFit',
     value: 'cover',
   },
   'object-fill': {
-    property: 'object-fit',
+    property: 'objectFit',
     value: 'fill',
   },
   'object-none': {
-    property: 'object-fit',
+    property: 'objectFit',
     value: 'none',
   },
   'object-scale-down': {
-    property: 'object-fit',
+    property: 'objectFit',
     value: 'scale-down',
   },
 }

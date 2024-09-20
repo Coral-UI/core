@@ -1,18 +1,18 @@
 export const flexDirection = {
   'flex-row': {
-    property: 'flex-direction',
+    property: 'flexDirection',
     value: 'row',
   },
   'flex-row-reverse': {
-    property: 'flex-direction',
+    property: 'flexDirection',
     value: 'row-reverse',
   },
   'flex-column': {
-    property: 'flex-direction',
+    property: 'flexDirection',
     value: 'column',
   },
   'flex-column-reverse': {
-    property: 'flex-direction',
+    property: 'flexDirection',
     value: 'column-reverse',
   },
 }

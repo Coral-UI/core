@@ -1,22 +1,22 @@
 export const alignItems = {
   'items-start': {
-    property: 'align-items',
+    property: 'alignItems',
     value: 'flex-start',
   },
   'items-end': {
-    property: 'align-items',
+    property: 'alignItems',
     value: 'flex-end',
   },
   'items-center': {
-    property: 'align-items',
+    property: 'alignItems',
     value: 'center',
   },
   'items-baseline': {
-    property: 'align-items',
+    property: 'alignItems',
     value: 'baseline',
   },
   'items-stretch': {
-    property: 'align-items',
+    property: 'alignItems',
     value: 'stretch',
   },
 }

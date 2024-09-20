@@ -1,26 +1,26 @@
 export const textUnderlineOffset = {
   'underline-offset-auto': {
-    property: 'text-underline-offset',
+    property: 'textUnderlineOffset',
     value: 'auto',
   },
   'underline-offset-0': {
-    property: 'text-underline-offset',
+    property: 'textUnderlineOffset',
     value: 0,
   },
   'underline-offset-1': {
-    property: 'text-underline-offset',
+    property: 'textUnderlineOffset',
     value: 1,
   },
   'underline-offset-2': {
-    property: 'text-underline-offset',
+    property: 'textUnderlineOffset',
     value: 2,
   },
   'underline-offset-4': {
-    property: 'text-underline-offset',
+    property: 'textUnderlineOffset',
     value: 4,
   },
   'underline-offset-8': {
-    property: 'text-underline-offset',
+    property: 'textUnderlineOffset',
     value: 8,
   },
 }

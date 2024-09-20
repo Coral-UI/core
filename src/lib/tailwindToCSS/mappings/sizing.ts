@@ -156,62 +156,62 @@ export const height = {
 
 export const minHeight = {
   'min-h-svh': {
-    property: 'min-height',
+    property: 'minHeight',
     value: '100svh',
   },
   'min-h-lvh': {
-    property: 'min-height',
+    property: 'minHeight',
     value: '100lvh',
   },
   'min-h-dvh': {
-    property: 'min-height',
+    property: 'minHeight',
     value: '100dvh',
   },
   'min-h-min': {
-    property: 'min-height',
+    property: 'minHeight',
     value: 'min-content',
   },
   'min-h-max': {
-    property: 'min-height',
+    property: 'minHeight',
     value: 'max-content',
   },
   'min-h-fit': {
-    property: 'min-height',
+    property: 'minHeight',
     value: 'fit-content',
   },
   'min-h-full': {
-    property: 'min-height',
+    property: 'minHeight',
     value: '100%',
   },
-  'min-h': ['min-height'],
+  'min-h': ['minHeight'],
 }
 
 export const maxHeight = {
   'max-h-svh': {
-    property: 'max-height',
+    property: 'maxHeight',
     value: '100svh',
   },
   'max-h-lvh': {
-    property: 'max-height',
+    property: 'maxHeight',
     value: '100lvh',
   },
   'max-h-dvh': {
-    property: 'max-height',
+    property: 'maxHeight',
     value: '100dvh',
   },
   'max-h-min': {
-    property: 'max-height',
+    property: 'maxHeight',
     value: 'min-content',
   },
   'max-h-max': {
-    property: 'max-height',
+    property: 'maxHeight',
     value: 'max-content',
   },
   'max-h-fit': {
-    property: 'max-height',
+    property: 'maxHeight',
     value: 'fit-content',
   },
-  'max-h': ['max-height'],
+  'max-h': ['maxHeight'],
 }
 
 export const size = {

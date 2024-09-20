@@ -1,30 +1,30 @@
 export const textDecorationThickness = {
   'decoration-auto': {
-    property: 'text-decoration-thickness',
+    property: 'textDecorationThickness',
     value: 'auto',
   },
   'decoration-from-font': {
-    property: 'text-decoration-thickness',
+    property: 'textDecorationThickness',
     value: 'from-font',
   },
   'decoration-0': {
-    property: 'text-decoration-thickness',
+    property: 'textDecorationThickness',
     value: 0,
   },
   'decoration-1': {
-    property: 'text-decoration-thickness',
+    property: 'textDecorationThickness',
     value: 1,
   },
   'decoration-2': {
-    property: 'text-decoration-thickness',
+    property: 'textDecorationThickness',
     value: 2,
   },
   'decoration-4': {
-    property: 'text-decoration-thickness',
+    property: 'textDecorationThickness',
     value: 4,
   },
   'decoration-8': {
-    property: 'text-decoration-thickness',
+    property: 'textDecorationThickness',
     value: 8,
   },
 }

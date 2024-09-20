@@ -1,38 +1,38 @@
 export const fontVariantNumeric = {
   'normal-nums': {
-    property: 'font-variant-numeric',
+    property: 'fontVariantNumeric',
     value: 'normal',
   },
   ordinal: {
-    property: 'font-variant-numeric',
+    property: 'fontVariantNumeric',
     value: 'ordinal',
   },
   'slashed-zero': {
-    property: 'font-variant-numeric',
+    property: 'fontVariantNumeric',
     value: 'slashed-zero',
   },
   'lining-nums': {
-    property: 'font-variant-numeric',
+    property: 'fontVariantNumeric',
     value: 'lining-nums',
   },
   'oldstyle-nums': {
-    property: 'font-variant-numeric',
+    property: 'fontVariantNumeric',
     value: 'oldstyle-nums',
   },
   'proportional-nums': {
-    property: 'font-variant-numeric',
+    property: 'fontVariantNumeric',
     value: 'proportional-nums',
   },
   'tabular-nums': {
-    property: 'font-variant-numeric',
+    property: 'fontVariantNumeric',
     value: 'tabular-nums',
   },
   'diagonal-fractions': {
-    property: 'font-variant-numeric',
+    property: 'fontVariantNumeric',
     value: 'diagonal-fractions',
   },
   'stacked-fractions': {
-    property: 'font-variant-numeric',
+    property: 'fontVariantNumeric',
     value: 'stacked-fractions',
   },
 }
