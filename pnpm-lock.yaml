@@ -22,6 +22,9 @@ dependencies:
     version: 6.1.13
 
 devDependencies:
+  '@babel/types':
+    specifier: ^7.25.6
+    version: 7.25.6
   '@eslint/js':
     specifier: ^9.9.1
     version: 9.9.1
