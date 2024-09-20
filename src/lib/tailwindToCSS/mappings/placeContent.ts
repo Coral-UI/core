@@ -1,34 +1,34 @@
 export const placeContent = {
   'place-content-center': {
-    property: 'place-content',
+    property: 'placeContent',
     value: 'center',
   },
   'place-content-start': {
-    property: 'place-content',
+    property: 'placeContent',
     value: 'flex-start',
   },
   'place-content-end': {
-    property: 'place-content',
+    property: 'placeContent',
     value: 'flex-end',
   },
   'place-content-between': {
-    property: 'place-content',
+    property: 'placeContent',
     value: 'space-between',
   },
   'place-content-around': {
-    property: 'place-content',
+    property: 'placeContent',
     value: 'space-around',
   },
   'place-content-evenly': {
-    property: 'place-content',
+    property: 'placeContent',
     value: 'space-evenly',
   },
   'place-content-baseline': {
-    property: 'place-content',
+    property: 'placeContent',
     value: 'baseline',
   },
   'place-content-stretch': {
-    property: 'place-content',
+    property: 'placeContent',
     value: 'stretch',
   },
 }

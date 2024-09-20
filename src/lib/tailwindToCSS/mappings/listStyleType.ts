@@ -1,14 +1,14 @@
 export const listStyleType = {
   'list-none': {
-    property: 'list-style-type',
+    property: 'listStyleType',
     value: 'none',
   },
   'list-disc': {
-    property: 'list-style-type',
+    property: 'listStyleType',
     value: 'disc',
   },
   'list-decimal': {
-    property: 'list-style-type',
+    property: 'listStyleType',
     value: 'decimal',
   },
 }

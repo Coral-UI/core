@@ -1,131 +1,131 @@
 export const fontSize = {
   'text-xs': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 12,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 16,
     },
   ],
   'text-sm': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 14,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 20,
     },
   ],
   'text-base': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 16,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 24,
     },
   ],
   'text-lg': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 18,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 28,
     },
   ],
   'text-xl': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 20,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 28,
     },
   ],
   'text-2xl': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 24,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 32,
     },
   ],
   'text-3xl': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 30,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 36,
     },
   ],
   'text-4xl': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 36,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 40,
     },
   ],
   'text-5xl': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 48,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 48,
     },
   ],
   'text-6xl': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 60,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 60,
     },
   ],
   'text-7xl': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 72,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 72,
     },
   ],
   'text-8xl': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 96,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 96,
     },
   ],
   'text-9xl': [
     {
-      property: 'font-size',
+      property: 'fontSize',
       value: 128,
     },
     {
-      property: 'line-height',
+      property: 'lineHeight',
       value: 128,
     },
   ],

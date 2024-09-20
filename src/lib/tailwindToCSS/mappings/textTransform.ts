@@ -1,18 +1,18 @@
 export const textTransform = {
   uppercase: {
-    property: 'text-transform',
+    property: 'textTransform',
     value: 'uppercase',
   },
   lowercase: {
-    property: 'text-transform',
+    property: 'textTransform',
     value: 'lowercase',
   },
   capitalize: {
-    property: 'text-transform',
+    property: 'textTransform',
     value: 'capitalize',
   },
   'normal-case': {
-    property: 'text-transform',
+    property: 'textTransform',
     value: 'none',
   },
 }

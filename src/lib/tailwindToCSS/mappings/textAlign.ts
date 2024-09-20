@@ -1,26 +1,26 @@
 export const textAlign = {
   'text-left': {
-    property: 'text-align',
+    property: 'textAlign',
     value: 'left',
   },
   'text-right': {
-    property: 'text-align',
+    property: 'textAlign',
     value: 'right',
   },
   'text-center': {
-    property: 'text-align',
+    property: 'textAlign',
     value: 'center',
   },
   'text-justify': {
-    property: 'text-align',
+    property: 'textAlign',
     value: 'justify',
   },
   'text-start': {
-    property: 'text-align',
+    property: 'textAlign',
     value: 'start',
   },
   'text-end': {
-    property: 'text-align',
+    property: 'textAlign',
     value: 'end',
   },
 }

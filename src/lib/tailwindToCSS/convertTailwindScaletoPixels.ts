@@ -11,9 +11,8 @@
  * convertTailwindScaletoPixels('[10px_20px]') // returns '10px 20px'
  */
 
+import { colors } from '@/lib/tailwindToCSS/colors'
 import { colord } from 'colord'
-
-import { colors } from './colors'
 
 export const convertTailwindScaletoPixels = (scale?: string) => {
   if (!scale) {

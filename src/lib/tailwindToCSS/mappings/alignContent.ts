@@ -1,38 +1,38 @@
 export const alignContent = {
   'content-normal': {
-    property: 'align-content',
+    property: 'alignContent',
     value: 'normal',
   },
   'content-center': {
-    property: 'align-content',
+    property: 'alignContent',
     value: 'center',
   },
   'content-between': {
-    property: 'align-content',
+    property: 'alignContent',
     value: 'space-between',
   },
   'content-around': {
-    property: 'align-content',
+    property: 'alignContent',
     value: 'space-around',
   },
   'content-start': {
-    property: 'align-content',
+    property: 'alignContent',
     value: 'flex-start',
   },
   'content-end': {
-    property: 'align-content',
+    property: 'alignContent',
     value: 'flex-end',
   },
   'content-stretch': {
-    property: 'align-content',
+    property: 'alignContent',
     value: 'stretch',
   },
   'content-baseline': {
-    property: 'align-content',
+    property: 'alignContent',
     value: 'baseline',
   },
   'content-evenly': {
-    property: 'align-content',
+    property: 'alignContent',
     value: 'space-evenly',
   },
 }

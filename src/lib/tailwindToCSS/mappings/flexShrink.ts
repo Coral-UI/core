@@ -1,10 +1,10 @@
 export const flexShrink = {
   shrink: {
-    property: 'flex-shrink',
+    property: 'flexShrink',
     value: '1',
   },
   'shrink-0': {
-    property: 'flex-shrink',
+    property: 'flexShrink',
     value: '0',
   },
 }

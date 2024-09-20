@@ -1,6 +1,5 @@
+import { mappings } from '@/lib/tailwindToCSS/mappings'
 import { convertTailwindScaletoPixels } from '@lib/tailwindToCSS/convertTailwindScaletoPixels'
-
-import { mappings } from './mappings'
 
 type Styles = {
   paddingInlineStart?: string
@@ -68,10 +67,14 @@ const createStyleObject = (styles: StylesWithModifiers, className: string) => {
   } else {
     const splitName = className.split('-')
     const property = splitName[0]
-    const rest = splitName.slice(1).join('-')
-    if (Array.isArray(mappings[`${property}-`])) {
+    const subProperty = splitName[1]
+    const rest = splitName.slice(2).join('-')
+    if (Array.isArray(mappings[`${property}-`]) || Array.isArray(mappings[`${property}-${subProperty}-`])) {
+      const mappingKey = Array.isArray(mappings[`${property}-${subProperty}-`])
+        ? `${property}-${subProperty}-`
+        : `${property}-`
       const classes = {
-        ...(mappings[`${property}-`] as string[])?.reduce(
+        ...(mappings[mappingKey] as string[])?.reduce(
           (acc, name) => ({
             ...acc,
             [name]: convertTailwindScaletoPixels(rest),
@@ -80,12 +83,7 @@ const createStyleObject = (styles: StylesWithModifiers, className: string) => {
         ),
       }
 
-      const el = {
-        ...styles,
-        ...classes,
-      }
-
-      return el
+      return { ...styles, ...classes }
     }
 
     return styles
@@ -101,28 +99,24 @@ export const tailwindToCSS = (tailwind: string) => {
     const parts = className.split(':')
     if (parts.length > 1) {
       const propertyClass = parts.pop() || ''
-      const modifierClassName = parts[0] ?? ''
-      const otherModifiers = parts.slice(1)
+      const modifiers = parts
 
-      if (otherModifiers.length > 0) {
-        otherModifiers.forEach((modifier) => {
-          styles[modifierClassName] = {
-            ...styles[modifierClassName],
-            [`${modifier}`]: createStyleObject(styles, modifier),
-          }
-        })
-      } else {
-        if (Object.prototype.hasOwnProperty.call(styles, modifierClassName)) {
-          styles[modifierClassName] = { ...createStyleObject(styles, propertyClass || '') }
-        } else {
-          styles = {
-            ...styles,
-            [`${modifierClassName}`]: { ...createStyleObject(styles[modifierClassName] || {}, propertyClass || '') },
-          }
+      let currentLevel = styles
+      modifiers.forEach((modifier, index) => {
+        if (!currentLevel[modifier]) {
+          currentLevel[modifier] = {}
         }
-      }
+        if (index === modifiers.length - 1) {
+          currentLevel[modifier] = {
+            ...currentLevel[modifier],
+            ...createStyleObject({}, propertyClass),
+          }
+        } else {
+          currentLevel = currentLevel[modifier] as StylesWithModifiers
+        }
+      })
     } else {
-      styles = { ...createStyleObject(styles, className) }
+      styles = { ...styles, ...createStyleObject({}, className) }
     }
   })
 

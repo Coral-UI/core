@@ -7,7 +7,7 @@
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": ["./node_modules/@types", "./types/babel__traverse.d.ts"],
     "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "bundler",

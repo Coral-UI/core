@@ -8,6 +8,7 @@ import {
   SquaresPlusIcon,
 } from '@heroicons/react/24/outline'
 import { useState } from 'react'
+import React from 'react'
 
 const solutions = [
   { name: 'Analytics', description: 'Get a better understanding of your traffic', href: '#', icon: ChartPieIcon },
@@ -22,7 +23,7 @@ const callsToAction = [
 ]
 
 export default function Example({ children, textValue }: { children: React.ReactNode, textValue: string }) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState<Boolean>(false)
 
   const handleClick = () => {
     setIsOpen(!isOpen)
@@ -31,7 +32,7 @@ export default function Example({ children, textValue }: { children: React.React
   return (
     <PopoverButton onClick={handleClick} active={textValue} className="inline-flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
 
-        <span>Solutions</span>
+        <span onClick={handleClick}>Solutions</span>
         <ChevronDownIcon aria-hidden="true" className="h-5 w-5" />
       </PopoverButton>
   )

@@ -1,6 +1,6 @@
 export const listStyleImage = {
   none: {
-    property: 'list-style-image',
+    property: 'listStyleImage',
     value: 'none',
   },
 }

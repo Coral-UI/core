@@ -1,18 +1,18 @@
 export const textWrap = {
   'text-wrap': {
-    property: 'text-wrap',
+    property: 'textWrap',
     value: 'wrap',
   },
   'text-balance': {
-    property: 'text-wrap',
+    property: 'textWrap',
     value: 'balance',
   },
   'text-nowrap': {
-    property: 'text-wrap',
+    property: 'textWrap',
     value: 'nowrap',
   },
   'text-pretty': {
-    property: 'text-wrap',
+    property: 'textWrap',
     value: 'pretty',
   },
 }

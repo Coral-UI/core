@@ -1,43 +1,43 @@
 export const borderRadius = {
   'rounded-none': {
-    property: 'border-radius',
+    property: 'borderRadius',
     value: 0,
   },
   'rounded-sm': {
-    property: 'border-radius',
+    property: 'borderRadius',
     value: 2,
   },
   rounded: {
-    property: 'border-radius',
+    property: 'borderRadius',
     value: 4,
   },
   'rounded-md': {
-    property: 'border-radius',
+    property: 'borderRadius',
     value: 6,
   },
   'rounded-lg': {
-    property: 'border-radius',
+    property: 'borderRadius',
     value: 8,
   },
   'rounded-xl': {
-    property: 'border-radius',
+    property: 'borderRadius',
     value: 12,
   },
   'rounded-2xl': {
-    property: 'border-radius',
+    property: 'borderRadius',
     value: 16,
   },
   'rounded-3xl': {
-    property: 'border-radius',
+    property: 'borderRadius',
     value: 24,
   },
   'rounded-full': {
-    property: 'border-radius',
+    property: 'borderRadius',
     value: 9999,
   },
   'rounded-t-none': {
-    property: 'border-top-left-radius',
+    property: 'borderTopLeftRadius',
     value: 0,
   },
-  'rounded-': ['border-radius'],
+  'rounded-': ['borderRadius'],
 }

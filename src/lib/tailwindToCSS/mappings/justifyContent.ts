@@ -1,34 +1,34 @@
 export const justifyContent = {
   'justify-normal': {
-    property: 'justify-content',
+    property: 'justifyContent',
     value: 'normal',
   },
   'justify-start': {
-    property: 'justify-content',
+    property: 'justifyContent',
     value: 'flex-start',
   },
   'justify-end': {
-    property: 'justify-content',
+    property: 'justifyContent',
     value: 'flex-end',
   },
   'justify-center': {
-    property: 'justify-content',
+    property: 'justifyContent',
     value: 'center',
   },
   'justify-between': {
-    property: 'justify-content',
+    property: 'justifyContent',
     value: 'space-between',
   },
   'justify-around': {
-    property: 'justify-content',
+    property: 'justifyContent',
     value: 'space-around',
   },
   'justify-evenly': {
-    property: 'justify-content',
+    property: 'justifyContent',
     value: 'space-evenly',
   },
   'justify-stretch': {
-    property: 'justify-content',
+    property: 'justifyContent',
     value: 'stretch',
   },
 }

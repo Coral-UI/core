@@ -1,3 +1,3 @@
 export const flexBasis = {
-  basis: ['flex-basis'],
+  basis: ['flexBasis'],
 }

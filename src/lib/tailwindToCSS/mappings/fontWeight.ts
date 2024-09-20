@@ -1,38 +1,38 @@
 export const fontWeight = {
   'font-thin': {
-    property: 'font-weight',
+    property: 'fontWeight',
     value: 100,
   },
   'font-extralight': {
-    property: 'font-weight',
+    property: 'fontWeight',
     value: 200,
   },
   'font-light': {
-    property: 'font-weight',
+    property: 'fontWeight',
     value: 300,
   },
   'font-normal': {
-    property: 'font-weight',
+    property: 'fontWeight',
     value: 400,
   },
   'font-medium': {
-    property: 'font-weight',
+    property: 'fontWeight',
     value: 500,
   },
   'font-semibold': {
-    property: 'font-weight',
+    property: 'fontWeight',
     value: 600,
   },
   'font-bold': {
-    property: 'font-weight',
+    property: 'fontWeight',
     value: 700,
   },
   'font-extrabold': {
-    property: 'font-weight',
+    property: 'fontWeight',
     value: 800,
   },
   'font-black': {
-    property: 'font-weight',
+    property: 'fontWeight',
     value: 900,
   },
 }

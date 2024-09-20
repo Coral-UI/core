@@ -1,18 +1,18 @@
 export const textDecoration = {
   underline: {
-    property: 'text-decoration-line',
+    property: 'textDecorationLine',
     value: 'underline',
   },
   'line-through': {
-    property: 'text-decoration-line',
+    property: 'textDecorationLine',
     value: 'line-through',
   },
   'no-underline': {
-    property: 'text-decoration-line',
+    property: 'textDecorationLine',
     value: 'none',
   },
   overline: {
-    property: 'text-decoration-line',
+    property: 'textDecorationLine',
     value: 'overline',
   },
 }

@@ -1,5 +1,5 @@
 export const gap = {
   'gap-': ['gap'],
-  'gap-x-': ['column-gap'],
-  'gap-y-': ['row-gap'],
+  'gap-x-': ['columnGap'],
+  'gap-y-': ['rowGap'],
 }

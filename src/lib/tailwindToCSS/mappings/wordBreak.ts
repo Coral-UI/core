@@ -1,24 +1,24 @@
 export const wordBreak = {
   'break-normal': [
     {
-      property: 'word-break',
+      property: 'wordBreak',
       value: 'normal',
     },
     {
-      property: 'overflow-wrap',
+      property: 'overflowWrap',
       value: 'normal',
     },
   ],
   'break-words': {
-    property: 'overflow-wrap',
+    property: 'overflowWrap',
     value: 'break-word',
   },
   'break-all': {
-    property: 'word-break',
+    property: 'wordBreak',
     value: 'break-all',
   },
   'break-keep': {
-    property: 'word-break',
+    property: 'wordBreak',
     value: 'keep-all',
   },
 }

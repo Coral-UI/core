@@ -6,13 +6,13 @@ const borderWidthMappings: Record<string, unknown> = {}
 
 borderClassnames.forEach((classname) => {
   borderWidthMappings[classname] = {
-    property: 'border-width',
+    property: 'borderWidth',
     value: 1,
   }
   borderScale.forEach((scale) => {
     if (scale !== 1) {
       borderWidthMappings[`${classname}-${scale}`] = {
-        property: 'border-width',
+        property: 'borderWidth',
         value: scale,
       }
     }

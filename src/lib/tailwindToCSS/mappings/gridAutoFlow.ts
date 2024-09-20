@@ -1,22 +1,22 @@
 export const gridAutoFlow = {
   'grid-flow-row': {
-    property: 'grid-auto-flow',
+    property: 'gridAutoFlow',
     value: 'row',
   },
   'grid-flow-col': {
-    property: 'grid-auto-flow',
+    property: 'gridAutoFlow',
     value: 'column',
   },
   'grid-flow-dense': {
-    property: 'grid-auto-flow',
+    property: 'gridAutoFlow',
     value: 'dense',
   },
   'grid-flow-row-dense': {
-    property: 'grid-auto-flow',
+    property: 'gridAutoFlow',
     value: 'row dense',
   },
   'grid-flow-col-dense': {
-    property: 'grid-auto-flow',
+    property: 'gridAutoFlow',
     value: 'column dense',
   },
 }

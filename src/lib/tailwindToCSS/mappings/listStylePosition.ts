@@ -1,10 +1,10 @@
 export const listStylePosition = {
   inside: {
-    property: 'list-style-position',
+    property: 'listStylePosition',
     value: 'inside',
   },
   outside: {
-    property: 'list-style-position',
+    property: 'listStylePosition',
     value: 'outside',
   },
 }

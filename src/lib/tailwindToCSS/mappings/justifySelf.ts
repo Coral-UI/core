@@ -1,22 +1,22 @@
 export const justifySelf = {
   'justify-self-auto': {
-    property: 'justify-self',
+    property: 'justifySelf',
     value: 'auto',
   },
   'justify-self-start': {
-    property: 'justify-self',
+    property: 'justifySelf',
     value: 'flex-start',
   },
   'justify-self-end': {
-    property: 'justify-self',
+    property: 'justifySelf',
     value: 'flex-end',
   },
   'justify-self-center': {
-    property: 'justify-self',
+    property: 'justifySelf',
     value: 'center',
   },
   'justify-self-stretch': {
-    property: 'justify-self',
+    property: 'justifySelf',
     value: 'stretch',
   },
 }

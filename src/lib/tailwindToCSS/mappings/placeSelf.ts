@@ -1,22 +1,22 @@
 export const placeSelf = {
   'place-self-auto': {
-    property: 'place-self',
+    property: 'placeSelf',
     value: 'auto',
   },
   'place-self-start': {
-    property: 'place-self',
+    property: 'placeSelf',
     value: 'start',
   },
   'place-self-end': {
-    property: 'place-self',
+    property: 'placeSelf',
     value: 'end',
   },
   'place-self-center': {
-    property: 'place-self',
+    property: 'placeSelf',
     value: 'center',
   },
   'place-self-stretch': {
-    property: 'place-self',
+    property: 'placeSelf',
     value: 'stretch',
   },
 }

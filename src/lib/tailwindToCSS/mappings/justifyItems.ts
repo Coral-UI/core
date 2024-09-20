@@ -1,18 +1,18 @@
 export const justifyItems = {
   'justify-items-start': {
-    property: 'justify-items',
+    property: 'justifyItems',
     value: 'flex-start',
   },
   'justify-items-end': {
-    property: 'justify-items',
+    property: 'justifyItems',
     value: 'flex-end',
   },
   'justify-items-center': {
-    property: 'justify-items',
+    property: 'justifyItems',
     value: 'center',
   },
   'justify-items-stretch': {
-    property: 'justify-items',
+    property: 'justifyItems',
     value: 'stretch',
   },
 }

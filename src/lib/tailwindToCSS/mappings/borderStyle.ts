@@ -1,26 +1,26 @@
 export const borderStyle = {
   'border-solid': {
-    property: 'border-style',
+    property: 'borderStyle',
     value: 'solid',
   },
   'border-dashed': {
-    property: 'border-style',
+    property: 'borderStyle',
     value: 'dashed',
   },
   'border-dotted': {
-    property: 'border-style',
+    property: 'borderStyle',
     value: 'dotted',
   },
   'border-double': {
-    property: 'border-style',
+    property: 'borderStyle',
     value: 'double',
   },
   'border-hidden': {
-    property: 'border-style',
+    property: 'borderStyle',
     value: 'hidden',
   },
   'border-none': {
-    property: 'border-style',
+    property: 'borderStyle',
     value: 'none',
   },
 }
