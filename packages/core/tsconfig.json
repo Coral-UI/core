@@ -1,15 +1,22 @@
 {
-  "exclude": ["dist/*", "node_modules", "**/eslint.config.mjs"],
+  "exclude": ["dist", "node_modules", "**/eslint.config.mjs"],
+  "include": ["packages/core/tsup.config.ts", "src/**/*.ts"],
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "UISpecCore",
   "compilerOptions": {
-    "outDir": "./dist",
-    "allowJs": true,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
+    "typeRoots": ["./node_modules/@types", "./types/babel__traverse.d.ts"],
+    "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@config/*": ["./src/config/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@lib/*": ["./src/lib/*"]
+    },
     "target": "ES2022",
     "incremental": false,
     "isolatedModules": true,
