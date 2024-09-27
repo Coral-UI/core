@@ -1,21 +1,33 @@
 {
   "name": "@reallygoodwork/coral-playground",
-  "version": "0.0.0-development",
+  "version": "0.0.0",
+  "type": "module",
   "description": "Playground for Coral UI",
   "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-json": "^6.0.1",
     "@codemirror/language": "^6.10.3",
     "@iconify-json/ph": "^1.2.0",
     "@reallygoodwork/coral-core": "workspace:*",
     "@uiw/react-codemirror": "^4.23.3",
     "clsx": "^2.1.1",
+    "colord": "^2.9.3",
     "cva": "1.0.0-beta.1",
     "node-html-parser": "^6.1.13",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.2"
   },
   "devDependencies": {
+    "@reallygoodwork/coral-eslint-config": "workspace:*",
+    "@reallygoodwork/coral-typescript-config": "workspace:*",
     "@tailwindcss/vite": "4.0.0-alpha.25",
     "@types/react": "^18.3.9",
     "@types/react-dom": "^18.3.0",

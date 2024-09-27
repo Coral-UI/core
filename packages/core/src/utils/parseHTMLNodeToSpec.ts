@@ -7,7 +7,6 @@ import { HTMLElement, TextNode } from 'node-html-parser'
 
 export const parseHTMLNodeToSpec = (node: HTMLElement): BaseNode => {
   const hasText = node.childNodes.some((child) => child.nodeType === 3 && !(child as TextNode).isWhitespace)
-
   // Create the spec object
   const spec: BaseNode = {
     name: pascalCaseString(node.rawTagName),

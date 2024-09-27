@@ -1,6 +1,6 @@
 {
-  "exclude": ["dist", "node_modules", "**/eslint.config.mjs"],
-  "include": ["packages/core/tsup.config.ts", "src/**/*.ts"],
+  "exclude": ["dist", "node_modules", "./eslint.config.mjs"],
+  "include": ["tsup.config.ts", "src/**/*.ts"],
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "UISpecCore",
   "compilerOptions": {

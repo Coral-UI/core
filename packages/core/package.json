@@ -11,21 +11,13 @@
     ".": {
       "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
+      "import": "./dist/index.mjs"
     }
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Coral-UI/core.git"
   },
   "scripts": {
     "test": "jest",
     "dev": "tsup --watch",
     "build": "tsup",
-    "prepare": "husky",
     "semantic-release": "semantic-release"
   },
   "lint-staged": {
@@ -45,6 +37,8 @@
   "devDependencies": {
     "@babel/types": "^7.25.6",
     "@eslint/js": "^9.11.1",
+    "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
+    "@reallygoodwork/coral-typescript-config": "workspace:*",
     "@types/jest": "^29.5.12",
     "@types/lodash": "^4.17.7",
     "@types/node": "^22.5.4",

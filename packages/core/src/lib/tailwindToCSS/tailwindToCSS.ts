@@ -73,17 +73,34 @@ const createStyleObject = (styles: StylesWithModifiers, className: string) => {
       const mappingKey = Array.isArray(mappings[`${property}-${subProperty}-`])
         ? `${property}-${subProperty}-`
         : `${property}-`
-      const classes = {
-        ...(mappings[mappingKey] as string[])?.reduce(
-          (acc, name) => ({
-            ...acc,
-            [name]: convertTailwindScaletoPixels(rest),
-          }),
-          {},
-        ),
-      }
+      if (property === 'bg') {
+        return {
+          ...styles,
+          backgroundColor: convertTailwindScaletoPixels(`${subProperty}-${rest}`),
+        }
+      } else {
+        const classes = {
+          ...(mappings[mappingKey] as string[])?.reduce(
+            (acc, name) => ({
+              ...acc,
+              [name]: convertTailwindScaletoPixels(rest.length > 0 ? rest : subProperty),
+            }),
+            {},
+          ),
+        }
 
-      return { ...styles, ...classes }
+        return { ...styles, ...classes }
+      }
+    } else {
+      if (
+        property === 'text' &&
+        (convertTailwindScaletoPixels(`${subProperty}-${rest}`) || convertTailwindScaletoPixels(rest))
+      ) {
+        return {
+          ...styles,
+          color: convertTailwindScaletoPixels(`${subProperty}-${rest}`) || convertTailwindScaletoPixels(rest),
+        }
+      }
     }
 
     return styles

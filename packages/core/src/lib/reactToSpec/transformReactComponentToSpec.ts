@@ -61,7 +61,7 @@ export const transformReactComponentToSpec = (component: string) => {
 
   let componentDepth = 0
 
-  traverse.default(ast, {
+  traverse(ast, {
     // Identify imports
     ImportDeclaration(path: NodePath<t.ImportDeclaration>) {
       result.imports.push({
