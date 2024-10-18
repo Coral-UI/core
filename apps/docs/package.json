@@ -2,5 +2,15 @@
   "name": "@reallygoodwork/coral-docs",
   "version": "0.0.0-development",
   "description": "Documentation for Coral UI",
-  "private": true
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.28.3",
+    "astro": "^4.15.12"
+  }
 }

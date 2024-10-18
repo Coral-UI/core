@@ -1,0 +1,58 @@
+---
+title: Motivation
+description: Learn more about my project in this docs site built with Starlight.
+
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Coral UI is an ecosystem of tools that helps anyone build beautiful and accessible digital products whether you have experience in design or development. The tools are designed to work together, but you can use them individually as well.
+
+The idea of Coral UI is to completely remove the often redundant process of design handoff to developers. Often, the same design is built the same way over and over again, with minor tweaks to make it "yours".
+
+For example, a button is a button is a button. We know the states that exist on a button (hover, focus, active, disabled, loading, etc.) and we know the different types of buttons (primary, secondary, tertiary, etc.) and we know the different types of button styles (outline, text, etc.).
+
+In HTML, we have a semantic button element that we can use to create a button. Depending on the framework that you're using, you will apply interactions and styles to that button element per the framework's guidelines. However, the core functionality and markup stays the same.
+
+<Tabs>
+<TabItem value="html" label="HTML">
+```html title="Generic Button"
+<button onclick="alert('Hello World')">Click me</button>
+```
+</TabItem>
+
+<TabItem value="react" label="React">
+```js title="React Button"
+export const Button = () => {
+  return <button onClick={() => alert('Hello World')}>Click me</button>
+}
+```
+</TabItem>
+
+<TabItem value="vue" label="Vue">
+```vue title="Vue Button"
+<template>
+  <button @click="handleClick">Click me</button>
+</template>
+
+<script>
+export default {
+  name: 'Button',
+  methods: {
+    handleClick() {
+      alert('Hello World')
+    }
+  }
+}
+</script>
+```
+</TabItem>
+</Tabs>
+
+## Why Coral UI?
+
+What if you could just design your components, generate the code, and move on? What if you didn't have to think about styling and focus on what truly matters?
+
+That's where Coral UI comes in. Coral UI is a set of tools that connect design tools to code through a common file format. Instead of having esoteric design handoff practices, Coral UI allows you to export your designs as components in Figma and import them into your codebase. If changes are needed, you can update the component in Figma and export it again.
+
+Conversely, you can build your components first in code and export them to a design tool like Figma so that designers can work on the component from there. The file format serves as the source of truth for both design and code.

@@ -1,6 +1,12 @@
 {
   "exclude": ["dist", "node_modules", "./eslint.config.mjs"],
-  "include": ["tsup.config.ts", "src/**/*.ts"],
+  "include": [
+    "tsup.config.ts",
+    "src/**/*.ts",
+    "../tailwindToCSS/src/convertTailwindScaletoPixels.ts",
+    "../tailwindToCSS/src/colors.ts",
+    "../tailwindToCSS/tailwindToCSS.ts"
+  ],
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "UISpecCore",
   "compilerOptions": {
@@ -13,7 +19,7 @@
     "moduleResolution": "bundler",
     "paths": {
       "@/*": ["./src/*"],
-      "@config/*": ["./src/config/*"],
+      "@structures/*": ["./src/structures/*"],
       "@utils/*": ["./src/utils/*"],
       "@lib/*": ["./src/lib/*"]
     },

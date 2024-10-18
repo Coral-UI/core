@@ -9,8 +9,6 @@ export default defineConfig({
     extensions: ['.mjs', '.js', '.json', '.jsx', '.ts', '.tsx'],
   },
   plugins: [
-    react(),
-    tailwindcss(),
     nodePolyfills({
       globals: {
         Buffer: true, // can also be 'build', 'dev', or false
@@ -18,5 +16,7 @@ export default defineConfig({
         process: true,
       },
     }),
+    react(),
+    tailwindcss(),
   ],
 })

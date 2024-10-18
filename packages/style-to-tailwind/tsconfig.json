@@ -1,0 +1,32 @@
+{
+  "exclude": ["dist", "node_modules", "./eslint.config.mjs"],
+  "include": [
+    "tsup.config.ts",
+    "src/**/*.ts",
+    "src/convertTailwindScaletoPixels.ts",
+    "src/colors.ts",
+    "../tailwindToCSS/tailwindToCSS.ts"
+  ],
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "CoralTailwindToCSS",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "typeRoots": ["./node_modules/@types"],
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "target": "ES2022",
+    "incremental": false,
+    "isolatedModules": true,
+    "lib": ["es2022", "DOM", "DOM.Iterable"],
+    "noUncheckedIndexedAccess": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true
+  }
+}

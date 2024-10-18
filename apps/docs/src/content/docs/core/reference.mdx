@@ -1,0 +1,65 @@
+---
+title: Reference
+description: Learn more about my project in this docs site built with Starlight.
+---
+
+# Common Properties
+
+## Quick API Reference
+```ts
+type CoralNode = {
+  name: string
+  type?: 'node' | 'component' | 'componentSet'
+  figmaNodeRef?: string
+  elementType: string
+  elementAttributes?: Record<string, string | number | boolean | string[]> | null | undefined
+  description?: string
+  hasBackgroundImage?: boolean
+  isComponent?: boolean
+  componentProperties?: ComponentProperty | null
+  styles: Styles
+  variants?: Array<Variant>
+  tsType?: TS_TYPES
+  textContent?: string | null
+  children?: Array<CoralNode>
+  methods?: Array<Method>
+  stateHooks?: Array<StateHook>
+  imports?: Array<Import>
+  importSource?: string
+  componentName?: string
+  config?: Record<string, unknown>
+  dependencies?: Array<Dependency>
+  designTokens?: Record<string, DesignToken>
+}
+```
+
+### `name`
+__Type: `string`__
+```json
+{
+  "name": "Button"
+}
+```
+The name of the component. This is used to identify the component in the file format and in the code. This name should be unique within a collection of Coral Nodes. This name is also used as the component name in the generated code.
+
+### `description`
+__Type: `string`__
+```json
+{
+  "description": "A button component"
+}
+```
+The description of the component. This is used as a general description of the component and can be used to provide more context about the component in the generated code.
+
+### `type`
+
+- __Type: `'node' | 'component' | 'componentSet' | undefined`__
+- __Default: `undefined`__
+- __Required: `false`__
+
+```json
+{
+  "type": "component"
+}
+```
+Used to identify the type of the Coral Node. This is used to determine how the node should be processed. If the node is a component, it will be processed as a component. If the node is a componentSet, it will be processed as a componentSet that features variants of the component. If the node is a node, it will be processed as a generic node. This value is used for some children

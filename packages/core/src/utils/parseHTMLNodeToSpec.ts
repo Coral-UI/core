@@ -1,16 +1,18 @@
-import { BaseNode } from '@/config/UISpec'
-import { tailwindToCSS } from '@/lib/tailwindToCSS/tailwindToCSS'
 import { createAttributesObject } from '@/utils/createAttributesObject'
 import { pascalCaseString } from '@/utils/pascalCaseString'
 import { styleAttributeToObject } from '@/utils/styleAttributeToObject'
 import { HTMLElement, TextNode } from 'node-html-parser'
 
-export const parseHTMLNodeToSpec = (node: HTMLElement): BaseNode => {
+import { tailwindToCSS } from '@reallygoodwork/coral-tw2css'
+
+import { CoralRootNode } from '../structures/coral'
+
+export const parseHTMLNodeToSpec = (node: HTMLElement): CoralRootNode => {
   const hasText = node.childNodes.some((child) => child.nodeType === 3 && !(child as TextNode).isWhitespace)
   // Create the spec object
-  const spec: BaseNode = {
+  const spec: CoralRootNode = {
     name: pascalCaseString(node.rawTagName),
-    elementType: node.rawTagName.toLowerCase() as BaseNode['elementType'],
+    elementType: node.rawTagName.toLowerCase() as CoralRootNode['elementType'],
     styles: {
       ...styleAttributeToObject(node.getAttribute('style')),
       ...tailwindToCSS(node.getAttribute('class') || ''),

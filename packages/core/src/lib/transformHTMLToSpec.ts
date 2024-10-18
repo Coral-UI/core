@@ -1,8 +1,8 @@
-import { BaseNode } from '@/config/UISpec'
+import { CoralRootNode } from '@/structures/coral'
 import { parseHTMLNodeToSpec } from '@utils/parseHTMLNodeToSpec'
 import { HTMLElement, parse } from 'node-html-parser'
 
-export const transformHTMLToSpec = (html: string): BaseNode => {
+export const transformHTMLToSpec = (html: string): CoralRootNode => {
   const root = parse(html)
 
   if (!root) {

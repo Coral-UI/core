@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --font-family-sans: "Satoshi", "sans-serif";
+  --color-code-bg: #282C34;
+  --color-figma-bg: #2C2C2C;
+}
+
+
+.editor {
+  background-color: var(--color-code-bg);
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: var(--color-code-bg);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #374151;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background-color: var(--color-code-bg);
+  }
+}
