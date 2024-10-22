@@ -37,8 +37,8 @@ export const generateNode = async (node: SceneNode): Promise<CoralRootNode | Cor
 
   if (node.type === 'COMPONENT') {
     const componentNode = node as ComponentNode
-    nodeData.type = 'COMPONENT'
-    nodeData.componentProperties = Object.entries(componentNode.variantProperties ?? {}).reduce<
+    nodeData.type = 'COMPONENT' // Correctly assign the type
+    ;(nodeData as any).componentProperties = Object.entries(componentNode.variantProperties ?? {}).reduce<
       Record<string, { type: string; value: string }>
     >((acc, [key, value]) => {
       acc[normalizeName(key)] = {

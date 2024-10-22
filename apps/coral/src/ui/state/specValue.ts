@@ -7,6 +7,7 @@ interface SpecValue {
 
 export const useSpecValue = create<SpecValue>((set) => ({
   value: `{
+  "$schema": "https://coral.design/schema.json",
   "elementType": "div",
   "componentProperties": {},
   "elementAttributes": {},

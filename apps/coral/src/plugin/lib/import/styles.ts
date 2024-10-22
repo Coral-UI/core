@@ -1,6 +1,6 @@
-import { CoralColorType, CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
+import { CoralColorType, CoralNode, CoralRootNode, CoralStyleType } from '@reallygoodwork/coral-core'
 
-import { buildNodeText, isTextNode, nodeHasTextChildren } from './importSpec'
+import { isTextNode, nodeHasTextChildren, textAlign } from './importSpec'
 
 const shouldApplyAutoLayout = (node: CoralNode | CoralRootNode) => {
   if (node.textContent && nodeHasTextChildren(node)) {
@@ -67,10 +67,24 @@ export const applyMaxWidth = (element: ElementWithOptionalText, node: CoralNode 
   }
 }
 
-type Element = FrameNode | ComponentNode | InstanceNode | TextNode
+export type Element = FrameNode | ComponentNode | InstanceNode | TextNode
 type ElementWithOptionalText = FrameNode | ComponentNode | InstanceNode
 
-export const applyStyles = async (element: Element, node: CoralNode | CoralRootNode, addTextAlign: boolean = false) => {
+export const applyStyles = async (
+  element: Element,
+  // importedStyles: Record<string, unknown> | CoralStyleType,
+  node: CoralNode | CoralRootNode,
+  addTextAlign?: textAlign,
+) => {
+  // let styles = importedStyles
+  // if (nodeHasTextChildren(node)) {
+  //   if (node.styles) {
+  //     styles = node.styles
+  //   }
+
+  //   // return styles
+  // }
+
   if (!nodeHasTextChildren(node) && (childRequiresAutoLayout(node) || shouldApplyAutoLayout(node))) {
     applyAutoLayout(element as ElementWithOptionalText)
 
@@ -79,49 +93,77 @@ export const applyStyles = async (element: Element, node: CoralNode | CoralRootN
     applyMaxWidth(element as ElementWithOptionalText, node)
   }
 
-  if (isTextNode(node) || nodeHasTextChildren(node)) {
-    await applyTypographyStyles(element as TextNode, node)
+  if (isTextNode(node)) {
+    await applyTypographyStyles(element as TextNode, node, addTextAlign)
+    // styles = {}
+    // Apply layoutSizingHorizontal if shouldHugHorizontal is true
   }
 
   if (shouldApplyAutoLayout(node) && node.styles?.['textAlign']) {
-    // console.log(node)
-    element.counterAxisAlignItems = 'CENTER'
+    if ('counterAxisAlignItems' in element) {
+      element.counterAxisAlignItems = 'CENTER'
+    }
   } else if (addTextAlign && isTextNode(node) && node.styles?.['textAlign']) {
     ;(element as TextNode).textAlignHorizontal = node.styles?.['textAlign'] as TextNode['textAlignHorizontal']
   }
 
   if (node.styles) {
-    // Object.entries(node.styles).forEach(async ([key, value]) => {
-    // switch (key) {
-    //   case 'backgroundColor':
-    //     console.log(value)
-    //     // solidPaint((value as CoralColorType).hex, element)
-    //     // element.fills[0] = [{ type: 'SOLID', color: (value as CoralColorType).rgb }]
-    //     break
-    //   case 'color':
-    //     // solidPaint((value as CoralColorType).hex, element)
-    //     break
-    //   case 'paddingInlineStart':
-    //     element.paddingLeft = value as number
-    //     break
-    //   case 'paddingInlineEnd':
-    //     element.paddingRight = value as number
-    //     break
-    //   case 'paddingBlockStart':
-    //     element.paddingTop = value as number
-    //     break
-    //   case 'paddingBlockEnd':
-    //     element.paddingBottom = value as number
-    //     break
-    //   default:
-    //     console.warn(`Unsupported style property: ${key}`)
-    //     break
-    // }
-    // })
+    Object.entries(node.styles).forEach(([key]) => {
+      if (key === 'backgroundColor') {
+        if (!nodeHasTextChildren(node)) {
+          applyPaint(element, node)
+        }
+      }
+
+      if (key === 'color' && isTextNode(node)) {
+        applyPaint(element, node)
+        // console.log('color', value)
+      }
+    })
   }
 }
 
-const transformFontWeightToFigmaFontStyle = (fontWeight: number) => {
+// TODO: fix this
+function clone(val: any): any {
+  const type = typeof val
+  if (val === null) {
+    return null
+  } else if (type === 'undefined' || type === 'number' || type === 'string' || type === 'boolean') {
+    return val
+  } else if (type === 'object') {
+    if (val instanceof Array) {
+      return val.map((x) => clone(x))
+    } else if (val instanceof Uint8Array) {
+      return new Uint8Array(val)
+    } else {
+      const o = {}
+      for (const key in val) {
+        o[key] = clone(val[key])
+      }
+      return o
+    }
+  }
+  throw 'unknown'
+}
+
+const applyPaint = (element: Element, node: CoralNode | CoralRootNode) => {
+  const backgroundColor = node.styles?.['backgroundColor'] as CoralColorType
+  const color = node.styles?.['color'] as CoralColorType
+
+  const fills = clone(element.fills)
+
+  if (backgroundColor) {
+    fills[0] = figma.util.solidPaint(backgroundColor.hex, fills[0])
+    element.fills = fills
+  }
+
+  if (color) {
+    fills[0] = figma.util.solidPaint(color.hex, fills[0])
+    element.fills = fills
+  }
+}
+
+export const transformFontWeightToFigmaFontStyle = (fontWeight: number) => {
   switch (fontWeight) {
     case 100:
       return 'Thin'
@@ -146,23 +188,18 @@ const transformFontWeightToFigmaFontStyle = (fontWeight: number) => {
   }
 }
 
-const applyTypographyStyles = async (element: TextNode, node: CoralNode | CoralRootNode) => {
-  const fontFamily = (node.styles?.['fontFamily'] as string) ?? 'Inter'
-  const fontWeight = (node.styles?.['fontWeight'] as number) ?? 400
-  // const fontStyle = (node.styles?.['fontStyle'] as string) ?? 'Regular'
-
+export const loadFont = async (fontFamily: string, fontStyle: string) => {
   try {
     await figma.loadFontAsync({
       family: fontFamily,
-      style: 'Regular',
+      style: fontStyle,
     })
   } catch (error) {
-    console.error(`Failed to load font: ${fontFamily} ${fontWeight}`, error)
+    console.error(`Failed to load font: ${fontFamily} ${fontStyle}`, error)
   }
+}
 
-  element.name = buildNodeText(node)
-  // element.layoutSizingHorizontal = 'HUG'
-
+const applyTypographyStyles = async (element: TextNode, node: CoralNode | CoralRootNode, textAlign?: textAlign) => {
   if (node.styles?.['fontSize']) {
     element.fontSize = node.styles?.['fontSize'] as number
   }
@@ -183,9 +220,20 @@ const applyTypographyStyles = async (element: TextNode, node: CoralNode | CoralR
 
   if (node.styles?.['textAlign']) {
     element.textAlignHorizontal = node.styles?.['textAlign'] as TextNode['textAlignHorizontal']
+  } else if (textAlign) {
+    element.textAlignHorizontal = textAlign.toUpperCase() as TextNode['textAlignHorizontal']
   }
 
   if (node.styles?.['textDecoration']) {
     element.textDecoration = node.styles?.['textDecoration'] as TextNode['textDecoration']
   }
+
+  // if (!node.styles?.['width']) {
+  //   const width = (element.parent as FrameNode).width
+  //   // element.layoutSizingHorizontal = 'FILL'
+  //   element.resize(width, element.height)
+  // } else {
+  //   // element.layoutSizingHorizontal = 'FILL'
+  //   element.resize(node.styles?.['width'] as number, element.height)
+  // }
 }

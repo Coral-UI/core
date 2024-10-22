@@ -19,5 +19,6 @@ export const generateComponentSet = async (node: ComponentSetNode): Promise<Cora
     dependencies: [],
     figmaType: node.type,
     numberOfVariants: node.children.length,
+    $schema: 'https://coral.design/schema.json',
   }
 }

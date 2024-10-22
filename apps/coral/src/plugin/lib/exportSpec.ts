@@ -71,7 +71,7 @@ export async function exportSpec(): Promise<CoralRootNode | null> {
       return null
     }
 
-    return { ...schema, designTokens }
+    return { ...schema, designTokens, $schema: 'https://coral.design/schema.json' }
   } catch (error) {
     console.error('Error exporting schema:', error)
     return null
