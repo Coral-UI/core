@@ -1,6 +1,7 @@
-import { CoralColorType, CoralNode, CoralRootNode, CoralStyleType } from '@reallygoodwork/coral-core'
+import { CoralColorType, CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
-import { isTextNode, nodeHasTextChildren, textAlign } from './importSpec'
+import { isTextNode, nodeHasTextChildren } from './importSpec'
+import { textAlign } from './styleText'
 
 const shouldApplyAutoLayout = (node: CoralNode | CoralRootNode) => {
   if (node.textContent && nodeHasTextChildren(node)) {
@@ -199,7 +200,11 @@ export const loadFont = async (fontFamily: string, fontStyle: string) => {
   }
 }
 
-const applyTypographyStyles = async (element: TextNode, node: CoralNode | CoralRootNode, textAlign?: textAlign) => {
+export const applyTypographyStyles = async (
+  element: TextNode,
+  node: CoralNode | CoralRootNode,
+  textAlign?: textAlign,
+) => {
   if (node.styles?.['fontSize']) {
     element.fontSize = node.styles?.['fontSize'] as number
   }

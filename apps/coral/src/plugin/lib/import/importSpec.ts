@@ -1,8 +1,7 @@
 import { CoralNode, CoralRootNode, CoralStyleType } from '@reallygoodwork/coral-core'
 
 import { applyStyles, loadFont, transformFontWeightToFigmaFontStyle } from './styles'
-
-export type textAlign = 'left' | 'center' | 'right' | 'justify' | 'start' | 'end'
+import { applyTypographyStyles, textAlign } from './styleText'
 
 export const isTextNode = (node: CoralNode | CoralRootNode): node is CoralNode | CoralRootNode => {
   return node.textContent !== undefined
@@ -43,9 +42,14 @@ async function createElement(
 ): Promise<SceneNode> {
   let element: SceneNode
 
-  const combinedStyles = { ...parentStyles, ...node.styles }
+  const combinedStyles =
+    'styles' in node && node.styles
+      ? isTextNode(node)
+        ? { ...parentStyles, ...node.styles }
+        : node.styles
+      : parentStyles
 
-  if (node.type === 'COMPONENT') {
+  if ('type' in node && node.type === 'COMPONENT') {
     element = await createComponent(node)
   } else if (isTextNode(node)) {
     element = await createText(node, combinedStyles, textAlign)
@@ -77,6 +81,7 @@ async function createElement(
       if (childElement.type === 'TEXT' && 'layoutMode' in element) {
         try {
           childElement.layoutSizingHorizontal = 'FILL'
+          await applyTypographyStyles(childElement as TextNode, combinedStyles)
         } catch (error) {
           console.warn('Could not apply layoutSizingHorizontal to text node:', error)
         }
@@ -116,10 +121,7 @@ async function createText(spec: CoralNode, styles: CoralStyleType, textAlign: te
     style: fontStyle,
   }
 
-  await applyStyles(text, spec, textAlign)
-
-  // Remove this line as we'll handle it in createElement
-  // text.layoutSizingHorizontal = 'FILL'
+  // await applyStyles(text, spec, textAlign)
 
   text.characters = spec.textContent ?? ''
 
