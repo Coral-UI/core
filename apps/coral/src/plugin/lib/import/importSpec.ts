@@ -1,7 +1,7 @@
 import { CoralNode, CoralRootNode, CoralStyleType } from '@reallygoodwork/coral-core'
 
-import { applyStyles, loadFont, transformFontWeightToFigmaFontStyle } from './styles'
-import { applyTypographyStyles, textAlign } from './styleText'
+import { applyStyles } from './styles'
+import { applyTypographyStyles, loadFont, textAlign, transformFontWeightToFigmaFontStyle } from './styleText'
 
 export const isTextNode = (node: CoralNode | CoralRootNode): node is CoralNode | CoralRootNode => {
   return node.textContent !== undefined
@@ -81,7 +81,6 @@ async function createElement(
       if (childElement.type === 'TEXT' && 'layoutMode' in element) {
         try {
           childElement.layoutSizingHorizontal = 'FILL'
-          await applyTypographyStyles(childElement as TextNode, combinedStyles)
         } catch (error) {
           console.warn('Could not apply layoutSizingHorizontal to text node:', error)
         }
@@ -107,7 +106,7 @@ async function createComponent(spec: CoralNode) {
   return component
 }
 
-async function createText(spec: CoralNode, styles: CoralStyleType, textAlign: textAlign | undefined = undefined) {
+async function createText(spec: CoralNode, styles: CoralStyleType, textAlign?: textAlign) {
   const text = figma.createText()
   text.name = spec.name
   const fontFamily = (styles?.['fontFamily'] as string) ?? 'Inter'
@@ -116,12 +115,7 @@ async function createText(spec: CoralNode, styles: CoralStyleType, textAlign: te
 
   await loadFont(fontFamily, fontStyle)
 
-  text.fontName = {
-    family: fontFamily,
-    style: fontStyle,
-  }
-
-  // await applyStyles(text, spec, textAlign)
+  await applyTypographyStyles(text as TextNode, styles, textAlign)
 
   text.characters = spec.textContent ?? ''
 
