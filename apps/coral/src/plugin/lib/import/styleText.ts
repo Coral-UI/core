@@ -1,16 +1,12 @@
 import { CoralStyleType } from '@reallygoodwork/coral-core'
 
-import { applyBackground, applyColor } from './applyPaint'
+import { applyColor } from './applyPaint'
 
-export const loadFont = async (fontFamily: string, fontStyle: string) => {
-  try {
-    await figma.loadFontAsync({
-      family: fontFamily,
-      style: fontStyle,
-    })
-  } catch (error) {
-    console.error(`Failed to load font: ${fontFamily} ${fontStyle}`, error)
-  }
+export const loadFont = (fontFamily: string, fontStyle: string) => {
+  return figma.loadFontAsync({
+    family: fontFamily,
+    style: fontStyle,
+  })
 }
 
 export const transformFontWeightToFigmaFontStyle = (fontWeight: number) => {

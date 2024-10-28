@@ -174,10 +174,11 @@ export const transformReactComponentToSpec = (component: string) => {
     [key: string]: unknown
   }
   const obj: CoralRootNode = {
+    $schema: 'https://coral.design/schema.json',
     elementType: (result.rootElement?.elementType as CoralElementType) || 'div',
     componentProperties: otherProps as CoralComponentPropertyType,
     elementAttributes: {},
-    isComponent: result.rootElement?.isComponent || false,
+    isComponentSet: result.rootElement?.isComponent || false,
     name: result.componentName,
     methods: result.methods.map((method) => ({
       ...method,

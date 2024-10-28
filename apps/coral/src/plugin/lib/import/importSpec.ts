@@ -78,13 +78,13 @@ async function createElement(
       }
 
       // Apply layoutSizingHorizontal = 'FILL' only if parent has layoutMode
-      if (childElement.type === 'TEXT' && 'layoutMode' in element) {
-        try {
-          childElement.layoutSizingHorizontal = 'FILL'
-        } catch (error) {
-          console.warn('Could not apply layoutSizingHorizontal to text node:', error)
-        }
-      }
+      // if (childElement.type === 'TEXT' && 'layoutMode' in element) {
+      //   try {
+      //     childElement.layoutSizingHorizontal = 'FILL'
+      //   } catch (error) {
+      //     console.warn('Could not apply layoutSizingHorizontal to text node:', error)
+      //   }
+      // }
     }
   }
 
@@ -107,17 +107,18 @@ async function createComponent(spec: CoralNode) {
 }
 
 async function createText(spec: CoralNode, styles: CoralStyleType, textAlign?: textAlign) {
-  const text = figma.createText()
-  text.name = spec.name
   const fontFamily = (styles?.['fontFamily'] as string) ?? 'Inter'
   const fontWeight = (styles?.['fontWeight'] as number) ?? 400
   const fontStyle = transformFontWeightToFigmaFontStyle(fontWeight)
-
+  const text = figma.createText()
+  text.name = spec.name
   await loadFont(fontFamily, fontStyle)
 
-  await applyTypographyStyles(text as TextNode, styles, textAlign)
+  setTimeout(async () => {
+    await applyTypographyStyles(text as TextNode, styles, textAlign)
+    text.characters = spec.textContent ?? ''
+  }, 500)
 
-  text.characters = spec.textContent ?? ''
-
+  console.log(styles)
   return text
 }

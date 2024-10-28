@@ -12,6 +12,7 @@ export const transformUIElementToBaseNode = (element: UIElement): CoralRootNode 
     }) ?? {}
 
   const node: CoralRootNode = {
+    $schema: 'https://coral.design/schema.json',
     elementType: element.elementType as CoralElementType,
     componentProperties: otherProps as CoralComponentPropertyType,
     // isComponent: element.isComponent,

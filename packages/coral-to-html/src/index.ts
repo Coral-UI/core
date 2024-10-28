@@ -1,7 +1,7 @@
 import * as parserHtml from 'prettier/parser-html'
 import * as prettier from 'prettier/standalone'
 
-import type { CoralRootNode } from '@reallygoodwork/coral-core'
+import type { CoralNodeWithChildren, CoralRootNode } from '@reallygoodwork/coral-core'
 
 // List of self-closing HTML elements
 const selfClosingTags = [
@@ -21,7 +21,7 @@ const selfClosingTags = [
   'wbr',
 ]
 
-const nodeToHTML = (node: CoralRootNode): string => {
+const nodeToHTML = (node: CoralNodeWithChildren): string => {
   const attributes = node.elementAttributes ? ` ${node.elementAttributes}` : ''
   const children = node.children ? node.children.map(nodeToHTML).join('') : ''
 
