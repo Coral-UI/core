@@ -1,8 +1,8 @@
-import { CoralColorType, CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
+import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 import { applyPaint } from './applyPaint'
 import { isTextNode, nodeHasTextChildren } from './importSpec'
-import { applyTypographyStyles, textAlign } from './styleText'
+import { applyTypographyStyles, textAlign, transformFontWeightToFigmaFontStyle } from './styleText'
 
 const shouldApplyAutoLayout = (node: CoralNode | CoralRootNode) => {
   if (node.textContent && nodeHasTextChildren(node)) {
@@ -25,9 +25,12 @@ const childRequiresAutoLayout = (node: CoralNode | CoralRootNode) => {
   return node.children?.some((child) => shouldApplyAutoLayout(child)) ?? false
 }
 
-const applyAutoLayout = (element: ElementWithOptionalText) => {
+const applyAutoLayout = (element: ElementWithOptionalText, shouldFill: boolean = false) => {
+  // Step 3: Enable autoLayout (must happen after children are added)
   element.layoutMode = 'VERTICAL'
-  element.layoutSizingHorizontal = 'HUG'
+
+  // Step 4 & 5: Set sizing (must happen after autoLayout)
+  element.layoutSizingHorizontal = shouldFill ? 'FILL' : 'HUG'
   element.layoutSizingVertical = 'HUG'
 
   return element
@@ -61,6 +64,24 @@ const applyPadding = (element: ElementWithOptionalText, node: CoralNode | CoralR
   }
 }
 
+const applyMarginToFrame = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
+  if (node.styles?.['marginInlineStart']) {
+    element.paddingLeft = node.styles?.['marginInlineStart'] as number
+  }
+
+  if (node.styles?.['marginInlineEnd']) {
+    element.paddingRight = node.styles?.['marginInlineEnd'] as number
+  }
+
+  if (node.styles?.['marginBlockStart']) {
+    element.paddingTop = node.styles?.['marginBlockStart'] as number
+  }
+
+  if (node.styles?.['marginBlockEnd']) {
+    element.paddingBottom = node.styles?.['marginBlockEnd'] as number
+  }
+}
+
 export const applyMaxWidth = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
   if (node.styles?.['maxWidth']) {
     // element.layoutSizingHorizontal = 'HUG'
@@ -72,9 +93,65 @@ export const applyMaxWidth = (element: ElementWithOptionalText, node: CoralNode 
 export type Element = FrameNode | ComponentNode | InstanceNode | TextNode
 type ElementWithOptionalText = FrameNode | ComponentNode | InstanceNode
 
+// Add this new function
+export const createFrameWithFillingText = async (node: CoralNode) => {
+  const styles = {
+    ...node.styles,
+  }
+
+  const textContent = node.children?.find((child) => 'textContent' in child)?.textContent
+
+  // Step 1: Create the frame
+  const frame = figma.createFrame()
+
+  const fontFamily = (styles?.['fontFamily'] as string) ?? 'Inter'
+  const fontWeight = (styles?.['fontWeight'] as number) ?? 400
+  const fontStyle = transformFontWeightToFigmaFontStyle(fontWeight)
+
+  // Step 2: Create and immediately append the text node
+  const textNode = figma.createText()
+
+  if (fontStyle !== 'Regular' || fontFamily !== 'Inter') {
+    await figma.loadFontAsync({ family: fontFamily, style: fontStyle })
+  } else {
+    await figma.loadFontAsync({ family: 'Inter', style: 'Regular' })
+  }
+
+  textNode.fontName = { family: fontFamily, style: fontStyle }
+
+  textNode.characters = textContent ?? ''
+
+  frame.appendChild(textNode)
+
+  // await wait(2000)
+  setTimeout(() => {
+    frame.layoutSizingHorizontal = 'FILL'
+    textNode.layoutSizingHorizontal = 'FILL'
+    textNode.textAlignHorizontal = 'CENTER'
+    frame.layoutSizingVertical = 'HUG'
+  }, 2000)
+
+  applyMarginToFrame(frame, node)
+  applyTypographyStyles(textNode, styles)
+  textNode.textAlignHorizontal = 'LEFT'
+
+  return { frame, textNode }
+}
+
+// Modify applyStyles to handle this special case
 export const applyStyles = async (element: Element, node: CoralNode | CoralRootNode, addTextAlign?: textAlign) => {
+  // Special case for text nodes that should fill
+  if (isTextNode(node) && node.styles?.['width'] === '100%') {
+    element.layoutSizingHorizontal = 'FILL'
+    return
+  }
+
+  // Step 1 & 2 happen before this function is called (frame creation and child appending)
+
   if (!nodeHasTextChildren(node) && (childRequiresAutoLayout(node) || shouldApplyAutoLayout(node))) {
-    applyAutoLayout(element as ElementWithOptionalText)
+    // Step 3, 4, 5: Apply autoLayout and sizing
+    const shouldFill = node.styles?.['width'] === '100%' || node.styles?.['width'] === 'fill'
+    applyAutoLayout(element as ElementWithOptionalText, shouldFill)
 
     applyFlexDirection(element as ElementWithOptionalText, node)
     applyPadding(element as ElementWithOptionalText, node)

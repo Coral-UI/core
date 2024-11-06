@@ -68,7 +68,7 @@ export const zCoralNodeWithChildrenSchema: z.ZodType<CoralNodeWithChildren> = zC
 
 export const zCoralRootSchema = zCoralNodeWithChildrenSchema.and(
   z.object({
-    $schema: z.literal('https://coral.design/schema.json').describe('The schema of the Coral Component'),
+    $schema: z.literal('https://coral.design/schema.json').optional().describe('The schema of the Coral Component'),
     componentName: zCoralNameSchema
       .optional()
       .describe('The name of the Coral Component. Will override the name of the Coral Component if provided.'),

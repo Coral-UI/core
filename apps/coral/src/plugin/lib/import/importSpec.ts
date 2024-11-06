@@ -1,8 +1,9 @@
 import { CoralNode, CoralRootNode, CoralStyleType } from '@reallygoodwork/coral-core'
 
-import { applyStyles } from './styles'
-import { applyTypographyStyles, loadFont, textAlign, transformFontWeightToFigmaFontStyle } from './styleText'
+import { applyStyles, createFrameWithFillingText } from './styles'
+import { textAlign } from './styleText'
 
+export const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 export const isTextNode = (node: CoralNode | CoralRootNode): node is CoralNode | CoralRootNode => {
   return node.textContent !== undefined
 }
@@ -39,26 +40,35 @@ async function createElement(
   node: CoralNode | CoralRootNode,
   textAlign?: textAlign,
   parentStyles: CoralStyleType = {},
-): Promise<SceneNode> {
+): Promise<SceneNode | null> {
+  // Skip text nodes entirely
+  if (isTextNode(node)) {
+    return null
+  }
+
+  const currentNode = node as CoralNode
+
   let element: SceneNode
 
   const combinedStyles =
-    'styles' in node && node.styles
-      ? isTextNode(node)
-        ? { ...parentStyles, ...node.styles }
-        : node.styles
+    'styles' in currentNode && currentNode.styles
+      ? 'textContent' in node
+        ? { ...parentStyles, ...currentNode.styles }
+        : currentNode.styles
       : parentStyles
 
-  if ('type' in node && node.type === 'COMPONENT') {
+  const hasTextContentChild = currentNode.children?.some(
+    (child) => 'textContent' in child && child.textContent !== undefined,
+  )
+
+  if (hasTextContentChild) {
+    const { frame } = await createTextandWrapper(node)
+    element = frame
+  } else if ('type' in node && currentNode.type === 'COMPONENT') {
     element = await createComponent(node)
-  } else if (isTextNode(node)) {
-    element = await createText(node, combinedStyles, textAlign)
   } else {
     element = await createFrame(node)
   }
-
-  // Check if any child has a textContent property
-  const hasTextContentChild = node.children?.some((child) => 'textContent' in child && child.textContent !== undefined)
 
   // Apply layout settings if a child with textContent exists and element supports layoutMode
   if (hasTextContentChild && 'layoutMode' in element) {
@@ -70,26 +80,29 @@ async function createElement(
     element.counterAxisAlignItems = 'MIN'
   }
 
-  if ('children' in node && node.children) {
-    for (const child of node.children) {
-      const childElement = await createElement(child, textAlign, combinedStyles)
-      if ('appendChild' in element) {
-        element.appendChild(childElement)
-      }
-
-      // Apply layoutSizingHorizontal = 'FILL' only if parent has layoutMode
-      // if (childElement.type === 'TEXT' && 'layoutMode' in element) {
-      //   try {
-      //     childElement.layoutSizingHorizontal = 'FILL'
-      //   } catch (error) {
-      //     console.warn('Could not apply layoutSizingHorizontal to text node:', error)
-      //   }
-      // }
+  if ('children' in node && currentNode.children) {
+    // Process children in sequence to maintain order
+    for (const child of currentNode.children) {
+      await new Promise<void>((resolve) => {
+        createElement(child, textAlign, combinedStyles).then((childElement) => {
+          if (childElement && 'appendChild' in element) {
+            element.appendChild(childElement)
+          }
+          resolve()
+        })
+      })
+      // Give the event loop a chance to breathe
+      await wait(100)
     }
   }
 
   await applyStyles(element, node, textAlign)
   return element
+}
+
+async function createTextandWrapper(spec: CoralNode) {
+  const { frame, textNode } = await createFrameWithFillingText(spec)
+  return { frame, textNode }
 }
 
 async function createFrame(spec: CoralNode) {
@@ -104,21 +117,4 @@ async function createComponent(spec: CoralNode) {
   component.name = spec.name
   await applyStyles(component, spec)
   return component
-}
-
-async function createText(spec: CoralNode, styles: CoralStyleType, textAlign?: textAlign) {
-  const fontFamily = (styles?.['fontFamily'] as string) ?? 'Inter'
-  const fontWeight = (styles?.['fontWeight'] as number) ?? 400
-  const fontStyle = transformFontWeightToFigmaFontStyle(fontWeight)
-  const text = figma.createText()
-  text.name = spec.name
-  await loadFont(fontFamily, fontStyle)
-
-  setTimeout(async () => {
-    await applyTypographyStyles(text as TextNode, styles, textAlign)
-    text.characters = spec.textContent ?? ''
-  }, 500)
-
-  console.log(styles)
-  return text
 }

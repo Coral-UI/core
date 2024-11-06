@@ -1,5 +1,6 @@
 import { javascript } from '@codemirror/lang-javascript'
 import { json } from '@codemirror/lang-json'
+import { githubDark } from '@uiw/codemirror-theme-github'
 import CodeMirror from '@uiw/react-codemirror'
 
 import { useSpecValue } from '../state/specValue'
@@ -19,16 +20,17 @@ export const Editor = ({ language = 'javascript', className, handleChange = () =
   }
 
   return (
-    <CodeMirror
-      value={value}
-      onChange={onChangeHandler}
-      extensions={[language === 'javascript' ? javascript() : json()]}
-      className={className}
-      theme={'dark'}
-      height="100%"
-      width="100%"
-      maxWidth="600"
-      maxHeight="430"
-    />
+    <div className="overflow-hidden rounded-lg border border-border">
+      <CodeMirror
+        value={value}
+        onChange={onChangeHandler}
+        extensions={[language === 'javascript' ? javascript() : json()]}
+        className={className}
+        theme={githubDark}
+        height={`680px`}
+        width="100%"
+        maxWidth="600"
+      />
+    </div>
   )
 }

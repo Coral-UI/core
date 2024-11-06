@@ -63,9 +63,11 @@ export const applyTypographyStyles = async (element: TextNode, styles: CoralStyl
     element.textAlignHorizontal = styles['textAlign'] as TextNode['textAlignHorizontal']
   } else if (textAlign) {
     element.textAlignHorizontal = textAlign.toUpperCase() as TextNode['textAlignHorizontal']
+  } else {
+    element.textAlignHorizontal = 'LEFT'
   }
 
-  if (styles['textDecoration']) {
-    element.textDecoration = styles['textDecoration'] as TextNode['textDecoration']
-  }
+  // if (styles['textDecoration']) {
+  //   element.textDecoration = styles['textDecoration'] as TextNode['textDecoration']
+  // }
 }

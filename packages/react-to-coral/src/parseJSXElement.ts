@@ -12,6 +12,7 @@ export const parseJSXElement = (node: t.JSXElement, result: Result): UIElement =
 
   const componentProperties: CoralComponentPropertyType = {}
   const children: UIElement[] = []
+  let textContent: string | undefined = undefined
 
   // Parse props
   node.openingElement.attributes.forEach((attr) => {
@@ -30,15 +31,10 @@ export const parseJSXElement = (node: t.JSXElement, result: Result): UIElement =
     } else if (t.isJSXText(child)) {
       const text = child.value.trim()
       if (text) {
-        children.push({
-          elementType: 'text',
-          isComponent: false,
-          textContent: text,
-          children: [],
-        })
+        textContent = text
       }
     }
   })
 
-  return { elementType: elementName, isComponent, importSource, componentProperties, children }
+  return { elementType: elementName, isComponent, importSource, componentProperties, children, textContent }
 }

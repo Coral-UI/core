@@ -52,6 +52,9 @@
     "zustand": "5.0.0-rc.2"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.7",
+    "@uiw/codemirror-theme-copilot": "^4.23.6",
+    "@uiw/codemirror-theme-github": "^4.23.6",
     "colord": "^2.9.3"
   }
 }

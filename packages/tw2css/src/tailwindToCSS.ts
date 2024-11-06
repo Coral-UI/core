@@ -92,13 +92,29 @@ const createStyleObject = (styles: StylesWithModifiers, className: string) => {
         return { ...styles, ...classes }
       }
     } else {
-      if (
-        property === 'text' &&
-        (convertTailwindScaletoPixels(`${subProperty}-${rest}`) || convertTailwindScaletoPixels(rest))
-      ) {
-        return {
-          ...styles,
-          color: convertTailwindScaletoPixels(`${subProperty}-${rest}`) || convertTailwindScaletoPixels(rest),
+      if (property === 'text') {
+        // Check for line-height via slash syntax
+        const [fontSize, lineHeight] = subProperty?.split('/') || []
+        if (lineHeight) {
+          const fontSizeValue = mappings[`text-${fontSize}`] as { property: string; value: string | number }[]
+          const lineHeightValue = mappings[`leading-${lineHeight}`] as {
+            property: string
+            value: string | number
+          }
+
+          console.log(fontSizeValue, lineHeightValue)
+          return {
+            ...styles,
+            ...fontSizeValue
+              ?.map((item) => ({ [item.property]: item.value }))
+              .reduce((acc, item) => ({ ...acc, ...item }), {}),
+            lineHeight: lineHeightValue?.value,
+          }
+        } else if (convertTailwindScaletoPixels(`${subProperty}-${rest}`) || convertTailwindScaletoPixels(rest)) {
+          return {
+            ...styles,
+            color: convertTailwindScaletoPixels(`${subProperty}-${rest}`) || convertTailwindScaletoPixels(rest),
+          }
         }
       }
     }

@@ -22,9 +22,9 @@ const App = () => {
   }, [])
 
   return (
-    <div className="flex flex-col h-full bg-figma-bg antialiased">
+    <div className="flex flex-col h-full bg-background antialiased">
       <Header />
-      <div className="flex flex-col flex-1 bg-figma-bg">
+      <div className="flex flex-col flex-1">
         {route === 'import' && <Import />}
         {route === 'export' && <Export />}
         {route === 'preview' && <Preview />}

@@ -20,6 +20,7 @@
     "@reallygoodwork/coral-core": "workspace:*",
     "@reallygoodwork/coral-to-html": "workspace:*",
     "@reallygoodwork/react-to-coral": "workspace:*",
+    "@uiw/codemirror-theme-github": "^4.23.6",
     "@uiw/react-codemirror": "^4.23.3",
     "clsx": "^2.1.1",
     "colord": "^2.9.3",

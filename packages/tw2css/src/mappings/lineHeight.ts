@@ -1,7 +1,7 @@
 export const lineHeight = {
   'leading-none': {
     property: 'lineHeight',
-    value: 1,
+    value: '1em',
   },
   'leading-3': {
     property: 'lineHeight',
@@ -37,23 +37,23 @@ export const lineHeight = {
   },
   'leading-tight': {
     property: 'lineHeight',
-    value: 1.25,
+    value: '1.25em',
   },
   'leading-snug': {
     property: 'lineHeight',
-    value: 1.375,
+    value: '1.375em',
   },
   'leading-normal': {
     property: 'lineHeight',
-    value: 1.5,
+    value: '1.5em',
   },
   'leading-relaxed': {
     property: 'lineHeight',
-    value: 1.625,
+    value: '1.625em',
   },
   'leading-loose': {
     property: 'lineHeight',
-    value: 2,
+    value: '2em',
   },
   leading: ['lineHeight'],
 }
