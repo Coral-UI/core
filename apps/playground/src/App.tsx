@@ -60,9 +60,8 @@ function App() {
       } else {
         setSpecValue('')
       }
-    } catch (error) {
-      console.log(error.toString())
-      addToast(error.toString(), 'error')
+    } catch (error: unknown) {
+      addToast((error as Error).toString(), 'error')
     }
   }
 
