@@ -21,6 +21,7 @@
     "@reallygoodwork/coral-to-html": "workspace:*",
     "@reallygoodwork/react-to-coral": "workspace:*",
     "@uiw/codemirror-theme-github": "^4.23.6",
+    "@uiw/codemirror-themes-all": "^4.23.6",
     "@uiw/react-codemirror": "^4.23.3",
     "clsx": "^2.1.1",
     "colord": "^2.9.3",
@@ -28,7 +29,8 @@
     "node-html-parser": "^6.1.13",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "tailwind-merge": "^2.5.2"
+    "tailwind-merge": "^2.5.2",
+    "zustand": "5.0.0-rc.2"
   },
   "devDependencies": {
     "@reallygoodwork/coral-eslint-config": "workspace:*",

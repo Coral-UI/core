@@ -40,11 +40,44 @@ type Styles = {
   opacity?: string
 }
 
+const screenReaderOnly = {
+  'sr-only': {
+    position: 'absolute',
+    width: 1,
+    height: 1,
+    padding: 0,
+    margin: -1,
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    whiteSpace: 'nowrap',
+    border: 0,
+  },
+}
+
+const notScreenReaderOnly = {
+  'not-sr-only': {
+    position: 'static',
+    width: 'auto',
+    height: 'auto',
+    padding: 0,
+    margin: 0,
+    overflow: 'visible',
+    clip: 'auto',
+    whiteSpace: 'normal',
+  },
+}
+
 type StylesWithModifiers = Styles & {
   [key: string]: Styles
 }
 
 const createStyleObject = (styles: StylesWithModifiers, className: string) => {
+  if (className === 'sr-only') {
+    return { ...styles, ...screenReaderOnly }
+  } else if (className === 'not-sr-only') {
+    return { ...styles, ...notScreenReaderOnly }
+  }
+
   if (Object.prototype.hasOwnProperty.call(mappings, className)) {
     if (Array.isArray(mappings[className])) {
       return {
@@ -101,8 +134,6 @@ const createStyleObject = (styles: StylesWithModifiers, className: string) => {
             property: string
             value: string | number
           }
-
-          console.log(fontSizeValue, lineHeightValue)
           return {
             ...styles,
             ...fontSizeValue
@@ -123,6 +154,14 @@ const createStyleObject = (styles: StylesWithModifiers, className: string) => {
   }
 }
 
+const breakpoints = {
+  sm: '(min-width: 640px)',
+  md: '(min-width: 768px)',
+  lg: '(min-width: 1024px)',
+  xl: '(min-width: 1280px)',
+  '2xl': '(min-width: 1536px)',
+}
+
 export const tailwindToCSS = (tailwind: string) => {
   const classes = tailwind.split(' ')
   let styles: StylesWithModifiers = {}
@@ -136,16 +175,22 @@ export const tailwindToCSS = (tailwind: string) => {
 
       let currentLevel = styles
       modifiers.forEach((modifier, index) => {
+        if (modifier in breakpoints) {
+          modifier = `${breakpoints[modifier as keyof typeof breakpoints]}`
+        } else {
+          modifier = `:${modifier}`
+        }
+
         if (!currentLevel[modifier]) {
-          currentLevel[modifier] = {}
+          currentLevel[`${modifier}`] = {}
         }
         if (index === modifiers.length - 1) {
-          currentLevel[modifier] = {
-            ...currentLevel[modifier],
+          currentLevel[`${modifier}`] = {
+            ...currentLevel[`${modifier}`],
             ...createStyleObject({}, propertyClass),
           }
         } else {
-          currentLevel = currentLevel[modifier] as StylesWithModifiers
+          currentLevel = currentLevel[`${modifier}`] as StylesWithModifiers
         }
       })
     } else {

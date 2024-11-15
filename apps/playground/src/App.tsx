@@ -1,6 +1,6 @@
 import { javascript } from '@codemirror/lang-javascript'
 import { json } from '@codemirror/lang-json'
-import { githubDark } from '@uiw/codemirror-theme-github'
+import { xcodeDark } from '@uiw/codemirror-themes-all'
 import CodeMirror from '@uiw/react-codemirror'
 import clsx from 'clsx'
 import React from 'react'
@@ -8,6 +8,8 @@ import React from 'react'
 import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
 import { coralToHTML } from '@reallygoodwork/coral-to-html'
 import { transformReactComponentToSpec } from '@reallygoodwork/react-to-coral'
+
+import { Toasts, useToasts } from './components/Toasts'
 
 // import { TabButtons } from './components/TabButtons'
 
@@ -23,8 +25,10 @@ const NavButton = ({
   return (
     <button
       className={clsx(
-        'hover:text-foreground/80 font-semibold tracking-tight text-xs text-foreground/60 py-1.5 px-4 rounded-md hover:bg-primary/5 transition-colors',
-        isActive && 'text-primary bg-primary/20 hover:bg-primary/20 hover:text-primary',
+        'hover:text-foreground/80 font-medium tracking-tight text-sm uppercase py-1.5 px-4 hover:bg-primary/5 transition-colors font-mono border border-transparent rounded-full',
+        isActive
+          ? 'text-primary-light dark:text-primary-dark bg-primary-dark/20 hover:bg-primary-dark/20 hover:text-primary-light dark:hover:text-primary-dark border-border-dark/20 dark:border-border-light/20'
+          : 'text-muted-light dark:text-muted-dark border-border-light dark:border-border-dark hover:border-border-dark dark:hover:border-border-light',
       )}
       onClick={onClick}
     >
@@ -37,22 +41,28 @@ function App() {
   const [inputValue, setInputValue] = React.useState<string>('')
   const [specValue, setSpecValue] = React.useState<string>('')
   const [_outputValue, setOutputValue] = React.useState<string>('')
-  const [selectedLanguage, setSelectedLanguage] = React.useState<string>('react')
+  const [selectedLanguage, setSelectedLanguage] = React.useState<string>('html')
+  const { addToast } = useToasts()
 
   const handleInputChange = async (value: string) => {
-    setInputValue(value.length > 0 ? value : '')
-    if (selectedLanguage === 'html' && value.length > 0) {
-      const spec = transformHTMLToSpec(value)
-      const html = await coralToHTML(spec)
-      setOutputValue(html)
-      setSpecValue(JSON.stringify(spec, null, 2))
-    } else if (selectedLanguage === 'react' && value.length > 0) {
-      const spec = transformReactComponentToSpec(value)
-      setSpecValue(JSON.stringify(spec, null, 2))
-      const html = await coralToHTML(spec)
-      setOutputValue(html)
-    } else {
-      setSpecValue('')
+    try {
+      setInputValue(value.length > 0 ? value : '')
+      if (selectedLanguage === 'html' && value.length > 0) {
+        const spec = transformHTMLToSpec(value)
+        const html = await coralToHTML(spec)
+        setOutputValue(html)
+        setSpecValue(JSON.stringify(spec, null, 2))
+      } else if (selectedLanguage === 'react' && value.length > 0) {
+        const spec = transformReactComponentToSpec(value)
+        setSpecValue(JSON.stringify(spec, null, 2))
+        const html = await coralToHTML(spec)
+        setOutputValue(html)
+      } else {
+        setSpecValue('')
+      }
+    } catch (error) {
+      console.log(error.toString())
+      addToast(error.toString(), 'error')
     }
   }
 
@@ -63,32 +73,37 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background antialiased">
-      <header className="flex items-center justify-between p-4 border-b border-border h-14">
-        <h1 className="text-xl font-medium text-white">🪸 CoralUI Playground</h1>
+    <div className="flex flex-col h-screen bg-background-light dark:bg-background-dark antialiased">
+      <div className="px-4">
+        <header className="flex items-center justify-between py-4 border-b border-border-light dark:border-border-dark h-20">
+          <h1 className="text-2xl font-medium text-primary-light dark:text-primary-dark">🪸 CoralUI Playground</h1>
 
-        <div className="flex items-center text-sm gap-1">
-          <NavButton isActive={selectedLanguage === 'html'} onClick={() => handleLanguageChange('html')}>
-            HTML
-          </NavButton>
-          <NavButton isActive={selectedLanguage === 'react'} onClick={() => handleLanguageChange('react')}>
-            React
-          </NavButton>
-        </div>
-      </header>
+          <div className="flex items-center text-sm gap-1">
+            <NavButton isActive={selectedLanguage === 'html'} onClick={() => handleLanguageChange('html')}>
+              HTML
+            </NavButton>
+            <NavButton isActive={selectedLanguage === 'react'} onClick={() => handleLanguageChange('react')}>
+              React
+            </NavButton>
+          </div>
+        </header>
+      </div>
 
       <div className="flex flex-col flex-1 max-h-[100dvh]">
         <div className="grid grid-cols-2 h-full overflow-hidden ">
           <div className="flex flex-col overflow-auto">
-            <header className="flex items-center justify-between mt-8 pb-2 border-b border-border px-4">
-              <h2 className="text-xl font-semibold tracking-tight text-primary">
-                Input <span className="text-muted-foreground uppercase text-sm">{selectedLanguage}</span>
+            <header className="flex items-center justify-between mt-8 px-4">
+              <h2 className="text-xl font-medium tracking-tight text-primary-light dark:text-primary-dark">
+                Input{' '}
+                <span className="text-muted-light dark:text-muted-dark uppercase text-sm font-mono">
+                  {selectedLanguage}
+                </span>
               </h2>
             </header>
-            <div className="px-4 my-6 flex flex-col flex-1 max-h-[80dvh] ">
-              <div className="flex-1 flex flex-col shrink-0 overflow-hidden rounded-lg border border-border">
+            <div className="px-4 mt-2 mb-6 flex flex-col flex-1 max-h-[80dvh] ">
+              <div className="flex-1 flex flex-col shrink-0 overflow-hidden rounded-sm border border-border-light dark:border-border-dark">
                 <CodeMirror
-                  theme={githubDark}
+                  theme={xcodeDark}
                   height="100%"
                   value={inputValue}
                   onChange={handleInputChange}
@@ -99,13 +114,15 @@ function App() {
             </div>
           </div>
           <div className="flex flex-col overflow-auto">
-            <header className="flex items-center justify-between mt-8 pb-2 border-b border-border px-4">
-              <h2 className="text-xl font-semibold tracking-tight text-primary">Converted Spec</h2>
+            <header className="flex items-center justify-between mt-8 px-4">
+              <h2 className="text-xl font-medium tracking-tight text-primary-light dark:text-primary-dark">
+                Converted Spec
+              </h2>
             </header>
-            <div className="px-4 my-6 flex flex-col flex-1 max-h-[80dvh] border-l border-border">
-              <div className="flex-1 flex flex-col shrink-0 overflow-hidden rounded-lg border border-border">
+            <div className="px-4 mt-2 mb-6 flex flex-col flex-1 max-h-[80dvh] border-l border-border-light dark:border-border-dark">
+              <div className="flex-1 flex flex-col shrink-0 overflow-hidden rounded-sm border border-border-light dark:border-border-dark">
                 <CodeMirror
-                  theme={githubDark}
+                  theme={xcodeDark}
                   height="100%"
                   value={specValue}
                   onChange={setSpecValue}
@@ -130,6 +147,7 @@ function App() {
           </div> */}
         </div>
       </div>
+      <Toasts />
     </div>
   )
 }

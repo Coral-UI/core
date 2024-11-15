@@ -28,6 +28,7 @@ import { gridRowStartEnd } from '@/mappings/gridRowStartEnd'
 import { gridTemplateColumns } from '@/mappings/gridTemplateColumns'
 import { gridTemplateRows } from '@/mappings/gridTemplateRows'
 import { hyphens } from '@/mappings/hyphens'
+import { isolate } from '@/mappings/isolate'
 import { justifyContent } from '@/mappings/justifyContent'
 import { justifyItems } from '@/mappings/justifyItems'
 import { justifySelf } from '@/mappings/justifySelf'
@@ -39,6 +40,8 @@ import { listStylePosition } from '@/mappings/listStylePosition'
 import { listStyleType } from '@/mappings/listStyleType'
 import { margin } from '@/mappings/margin'
 import { objectFit } from '@/mappings/objectFit'
+import { objectPosition } from '@/mappings/objectPosition'
+import { opacity } from '@/mappings/opacity'
 import { order } from '@/mappings/order'
 import { overflow } from '@/mappings/overflow'
 import { padding } from '@/mappings/padding'
@@ -101,6 +104,7 @@ export const mappings: Mapping = {
   ...gridTemplateRows,
   ...height,
   ...hyphens,
+  ...isolate,
   ...justifyContent,
   ...justifyItems,
   ...justifySelf,
@@ -114,6 +118,7 @@ export const mappings: Mapping = {
   ...objectFit,
   ...order,
   ...overflow,
+  ...objectPosition,
   ...padding,
   ...placeContent,
   ...placeItems,
@@ -139,4 +144,5 @@ export const mappings: Mapping = {
   ...minHeight,
   ...maxHeight,
   ...size,
+  ...opacity,
 }

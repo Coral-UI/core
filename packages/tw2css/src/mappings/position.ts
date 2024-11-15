@@ -15,6 +15,13 @@ export const position = {
     property: 'position',
     value: 'sticky',
   },
+  'top-': ['top'],
+  'bottom-': ['bottom'],
+  'left-': ['left'],
+  'right-': ['right'],
+  'inset-': ['inset'],
+  'inset-x-': ['left', 'right'],
+  'inset-y-': ['top', 'bottom'],
 }
 
 export const positionValues = {
