@@ -72,10 +72,15 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background-light dark:bg-background-dark antialiased">
+    <div className="flex flex-col h-screen bg-background-dark antialiased">
       <div className="px-4">
-        <header className="flex items-center justify-between py-4 border-b border-border-light dark:border-border-dark h-20">
-          <h1 className="text-2xl font-medium text-primary-light dark:text-primary-dark">🪸 CoralUI Playground</h1>
+        <header className="flex items-center justify-between py-4 border-b border-border-dark h-20">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-medium text-primary-dark">🪸 CoralUI Playground</h1>
+            <p className="text-muted-dark text-sm font-mono uppercase bg-primary-dark/20 rounded-full px-2 py-1">
+              Beta
+            </p>
+          </div>
 
           <div className="flex items-center text-sm gap-1">
             <NavButton isActive={selectedLanguage === 'html'} onClick={() => handleLanguageChange('html')}>
@@ -88,19 +93,27 @@ function App() {
         </header>
       </div>
 
+      <div className="px-4 py-3 max-w-3xl mt-4 bg-primary-dark/5 rounded-lg mx-4">
+        <p className="text-muted-dark">
+          This is a playground for CoralUI. It allows you to convert HTML and React to CoralUI spec and vice versa. To
+          learn more about CoralUI, visit the{' '}
+          <a href="https://coralui.com" className="underline">
+            CoralUI website
+          </a>
+          .
+        </p>
+      </div>
+
       <div className="flex flex-col flex-1 max-h-[100dvh]">
-        <div className="grid grid-cols-2 h-full overflow-hidden ">
+        <div className="grid grid-cols-1 md:grid-cols-2  h-full overflow-hidden ">
           <div className="flex flex-col overflow-auto">
             <header className="flex items-center justify-between mt-8 px-4">
-              <h2 className="text-xl font-medium tracking-tight text-primary-light dark:text-primary-dark">
-                Input{' '}
-                <span className="text-muted-light dark:text-muted-dark uppercase text-sm font-mono">
-                  {selectedLanguage}
-                </span>
+              <h2 className="text-xl font-medium tracking-tight text-primary-dark">
+                Input <span className="text-muted-dark uppercase text-sm font-mono">{selectedLanguage}</span>
               </h2>
             </header>
             <div className="px-4 mt-2 mb-6 flex flex-col flex-1 max-h-[80dvh] ">
-              <div className="flex-1 flex flex-col shrink-0 overflow-hidden rounded-sm border border-border-light dark:border-border-dark">
+              <div className="flex-1 flex flex-col shrink-0 overflow-hidden rounded-sm border border-border-dark">
                 <CodeMirror
                   theme={xcodeDark}
                   height="100%"
@@ -113,13 +126,11 @@ function App() {
             </div>
           </div>
           <div className="flex flex-col overflow-auto">
-            <header className="flex items-center justify-between mt-8 px-4">
-              <h2 className="text-xl font-medium tracking-tight text-primary-light dark:text-primary-dark">
-                Converted Spec
-              </h2>
+            <header className="flex items-center justify-between mt-4 md:mt-8 px-4">
+              <h2 className="text-xl font-medium tracking-tight text-primary-dark">Converted Spec</h2>
             </header>
-            <div className="px-4 mt-2 mb-6 flex flex-col flex-1 max-h-[80dvh] border-l border-border-light dark:border-border-dark">
-              <div className="flex-1 flex flex-col shrink-0 overflow-hidden rounded-sm border border-border-light dark:border-border-dark">
+            <div className="px-4 mt-2 mb-6 flex flex-col flex-1 max-h-[80dvh] border-l border-border-dark">
+              <div className="flex-1 flex flex-col shrink-0 overflow-hidden rounded-sm border border-border-dark">
                 <CodeMirror
                   theme={xcodeDark}
                   height="100%"
@@ -146,6 +157,14 @@ function App() {
           </div> */}
         </div>
       </div>
+      <footer className="px-4 py-3">
+        <p className="font-mono text-sm text-muted-dark">
+          Made with ❤️ by{' '}
+          <a href="https://reallygood.work" className="font-medium underline underline-offset-2">
+            The Really Good Work Internet Company
+          </a>
+        </p>
+      </footer>
       <Toasts />
     </div>
   )
