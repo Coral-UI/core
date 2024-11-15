@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Node Library",
+  "extends": "./node.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "incremental": false,
+    "lib": ["es2022", "DOM", "DOM.Iterable"],
+  }
+}

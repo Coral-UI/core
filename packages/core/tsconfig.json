@@ -1,0 +1,35 @@
+{
+  "exclude": ["dist", "node_modules", "./eslint.config.mjs"],
+  "include": [
+    "tsup.config.ts",
+    "src/**/*.ts",
+    "../tailwindToCSS/src/convertTailwindScaletoPixels.ts",
+    "../tailwindToCSS/src/colors.ts",
+    "../tailwindToCSS/tailwindToCSS.ts"
+  ],
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "UISpecCore",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "typeRoots": ["./node_modules/@types", "./types/babel__traverse.d.ts"],
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@structures/*": ["./src/structures/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@lib/*": ["./src/lib/*"]
+    },
+    "target": "ES2022",
+    "incremental": false,
+    "isolatedModules": true,
+    "lib": ["es2022", "DOM", "DOM.Iterable"],
+    "noUncheckedIndexedAccess": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true
+  }
+}

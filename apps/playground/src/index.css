@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+html {
+  color-scheme: dark;
+}
+
+@theme {
+  --font-family-sans: "Satoshi", "sans-serif";
+  --font-family-mono: "JetBrains Mono", "monospace";
+  --color-code-bg: #282C34;
+  --color-figma-bg: #2C2C2C;
+  --letter-spacing-tight: -0.0125em;
+
+  /* --color-background-primary: hsla(240, 10%, 3.9%, 1);
+  --color-primary-foreground: hsla(240, 5.9%, 95%, 1);
+  --color-foreground: hsla(0, 0%, 98%, 1);
+  --color-primary: hsla(240, 5.9%, 95%, 1); */
+
+  --color-background-dark: hsl(0, 0%, 8%);
+  --color-background-light: hsl(65, 23%, 90%);
+  --color-foreground: hsla(0, 0%, 98%, 1);
+  --color-muted: hsla(240, 4%, 16%, 1);
+  --color-muted-foreground: hsla(240, 5%, 65%, 1);
+
+  --color-border-light: hsl(0, 0%, 90%);
+  --color-border-dark: hsla(70, 23%, 90%, 0.12);
+
+  --color-input: hsl(0, 0%, 22%);
+  --color-card: hsl(0, 0%, 100%);
+  --color-card-foreground: hsl(222.2, 47.4%, 11.2%);
+
+  --color-primary-dark: hsl(70, 23%, 90%);
+  --color-primary-light: hsl(0, 0%, 14%);
+
+  --color-muted-dark: hsl(68, 7%, 78%);
+  --color-muted-light: hsl(0, 0%, 14%);
+
+  --color-primary-foreground: hsla(240, 6%, 10%, 1);
+  --color-secondary: hsla(240, 4%, 15.9%, 1);
+  --color-secondary-foreground: hsla(0, 0%, 98%, 1);
+  --color-accent: hsla(240, 4%, 15.9%, 1);
+  --color-accent-foreground: hsla(0, 0%, 98%, 1);
+
+  --color-destructive: hsla(0, 63%, 31%, 1);
+  --color-destructive-foreground: hsla(0, 0%, 98%, 1);
+
+  --color-ring: hsla(215, 20.2%, 65.1%, 1);
+
+  --radius-base: 0.5rem;
+
+  --color-error: hsl(0, 65%, 48%);
+  --color-success: hsl(162, 88%, 26%);
+  --color-info: hsl(210, 100%, 40%);
+}
+
+
+.editor {
+  background-color: var(--color-code-bg);
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: var(--color-code-bg);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #374151;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background-color: var(--color-code-bg);
+  }
+}

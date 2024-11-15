@@ -1,0 +1,48 @@
+{
+  "name": "@reallygoodwork/coral-playground",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Playground for Coral UI",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "author": "Really Good Work Inc. <hey@reallygood.work> (https://reallygood.work)",
+  "license": "MIT",
+  "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/language": "^6.10.3",
+    "@iconify-json/ph": "^1.2.0",
+    "@reallygoodwork/coral-core": "workspace:*",
+    "@reallygoodwork/coral-to-html": "workspace:*",
+    "@reallygoodwork/react-to-coral": "workspace:*",
+    "@uiw/codemirror-theme-github": "^4.23.6",
+    "@uiw/codemirror-themes-all": "^4.23.6",
+    "@uiw/react-codemirror": "^4.23.3",
+    "clsx": "^2.1.1",
+    "colord": "^2.9.3",
+    "cva": "1.0.0-beta.1",
+    "node-html-parser": "^6.1.13",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.2",
+    "zustand": "5.0.0-rc.2"
+  },
+  "devDependencies": {
+    "@reallygoodwork/coral-eslint-config": "workspace:*",
+    "@reallygoodwork/coral-typescript-config": "workspace:*",
+    "@tailwindcss/vite": "4.0.0-alpha.25",
+    "@types/react": "^18.3.9",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.9.1",
+    "tailwindcss": "4.0.0-alpha.25",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.7",
+    "vite-plugin-node-polyfills": "^0.17.0"
+  }
+}

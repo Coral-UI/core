@@ -1,0 +1,80 @@
+---
+title: Coral UI File Format
+description: Learn more about my project in this docs site built with Starlight.
+---
+
+The Coral UI file format is a JSON format that is used to store Coral UI components. It is used to store the component's name, description, states, styles and interactions.
+
+The Coral UI file is a platform and framework agnostic file format. This means that it can be used with any frontend framework and any design tool through the use of Coral UI's plugin system.
+
+## Example Coral UI File
+```json
+{
+  "name": "Button",
+  "description": "A button component",
+  "figmaNodeRef": "1234564:1234",
+  "elementType": "button",
+  "children": [{
+    "name": "container",
+    "description": "A container for the button",
+    "figmaNodeRef": "1234564:1234",
+    "elementType": "div",
+    "children": [],
+    "styles": {
+      "backgroundColor": "#000000",
+      "borderRadius": "8px",
+      "borderWidth": "1px",
+    }
+  }],
+  "styles": {
+    "backgroundColor": "#000000",
+    "borderRadius": "8px",
+    "borderWidth": "1px",
+    "borderColor": "#000000",
+    "fontSize": "16px",
+    "fontWeight": "bold",
+    "padding": "12px 24px"
+  },
+  "designTokens": {
+    "primaryColor": {
+      "value": "#000000",
+      "type": "color"
+    }
+  },
+  "stateHooks": [
+    {
+      "name": "isHovered",
+      "setterName": "setIsHovered",
+      "initialValue": "false",
+      "tsType": "boolean"
+    }
+  ],
+  "imports": [
+    {
+      "source": "react",
+      "specifiers": [
+        {
+          "name": "React",
+          "isDefault": true,
+          "version": "18.3.1"
+        }
+      ]
+    }
+  ],
+  "methods": [
+    {
+      "name": "handleClick",
+      "params": [{
+        name: "event",
+        tsType: "MouseEvent",
+        defaultValue: "null"
+      }],
+      "body": "console.log('Hello World')",
+      "stateInteractions": {
+        "reads": [],
+        "writes": []
+      }
+    }
+  ]
+}
+```
