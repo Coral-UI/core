@@ -1,5 +1,14 @@
 # huh
 
-### Created with Turborepo Generators
+Packages to move
 
-Read the docs at [turbo.build](https://turbo.build/repo/docs/core-concepts/monorepos/code-generation).
+- core
+- react-to-coral
+- tw2css
+- style-to-tailwind
+- coral-to-html
+
+Packages to make
+
+- coral-to-react
+- figma-to-coral

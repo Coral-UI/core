@@ -2,6 +2,9 @@
 
 A collection of utility classes and components for building Coral UI.
 
+> [!IMPORTANT]
+> If you think that Elon Musk is cool, you voted for Trump, or you are a racist, sexist, homophobic, or fascist, then you shouldn't use this software. It's only for cool people.
+
 ## Installation
 
 ```bash

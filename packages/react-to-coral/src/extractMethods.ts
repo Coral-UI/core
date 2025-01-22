@@ -13,8 +13,8 @@ import type { CoralMethodType, CoralStateType } from '@reallygoodwork/coral-core
 export const extractMethods = (
   path: NodePath<t.VariableDeclarator>,
   result: {
-    methods: Array<CoralMethodType>
-    stateHooks: Array<CoralStateType>
+    methods?: Array<CoralMethodType>
+    stateHooks?: Array<CoralStateType>
   },
 ) => {
   if (t.isArrowFunctionExpression(path.node.init) || t.isFunctionExpression(path.node.init)) {
@@ -22,9 +22,10 @@ export const extractMethods = (
       const methodName = path.node.id.name
       const parameters = path.node.init.params.map(getParamName)
       const body = generate.default(path.node.init.body).code
-      const stateInteractions = analyzeStateInteractions(path.node.init.body, result.stateHooks)
+      const stateInteractions = analyzeStateInteractions(path.node.init.body, result.stateHooks || [])
 
-      if (!result.methods.some((m) => m.name === methodName)) {
+      if (!result.methods?.some((m) => m.name === methodName)) {
+        if (!result.methods) result.methods = []
         result.methods.push({ name: methodName, parameters, body, stateInteractions })
       }
     }

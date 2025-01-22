@@ -34,10 +34,10 @@ export interface PropReference {
 }
 
 export interface Result {
-  imports: Array<CoralImportType>
-  methods: Array<CoralMethodType>
-  stateHooks: Array<CoralStateType>
-  componentProperties: Array<CoralComponentPropertyType>
+  imports?: Array<CoralImportType>
+  methods?: Array<CoralMethodType>
+  stateHooks?: Array<CoralStateType>
+  componentProperties?: Array<CoralComponentPropertyType>
 }
 
 export const transformReactComponentToSpec = (component: string) => {
@@ -47,20 +47,20 @@ export const transformReactComponentToSpec = (component: string) => {
   })
 
   const result: {
-    imports: Array<CoralImportType>
+    imports?: Array<CoralImportType>
     componentName: string
-    componentProperties: Array<CoralComponentPropertyType>
+    componentProperties?: Array<CoralComponentPropertyType>
     type: 'ArrowFunction' | 'Function'
-    stateHooks: Array<CoralStateType>
-    methods: Array<CoralMethodType>
+    stateHooks?: Array<CoralStateType>
+    methods?: Array<CoralMethodType>
     rootElement: UIElement | null
   } = {
-    imports: [],
+    // imports: [],
     componentName: '',
-    componentProperties: [],
+    // componentProperties: [],
     type: 'ArrowFunction',
-    stateHooks: [],
-    methods: [],
+    // stateHooks: [],
+    // methods: [],
     rootElement: null,
   }
 
@@ -69,6 +69,7 @@ export const transformReactComponentToSpec = (component: string) => {
   traverse(ast, {
     // Identify imports
     ImportDeclaration(path: NodePath<t.ImportDeclaration>) {
+      if (!result.imports) result.imports = []
       result.imports.push({
         source: path.node.source.value,
         version: 'latest', // Add this line
@@ -94,7 +95,8 @@ export const transformReactComponentToSpec = (component: string) => {
         result.type = 'Function'
         const props = extractProps(path.node.declaration.params[0])
         if (props) {
-          result.componentProperties = { ...result.componentProperties, ...props }
+          if (!result.componentProperties) result.componentProperties = []
+          result.componentProperties.push(props)
         }
         componentDepth++
         path.traverse({
@@ -119,7 +121,8 @@ export const transformReactComponentToSpec = (component: string) => {
         result.type = 'Function'
         const props = extractProps(path.node.params[0])
         if (props) {
-          result.componentProperties = { ...result.componentProperties, ...props }
+          if (!result.componentProperties) result.componentProperties = []
+          result.componentProperties.push(props)
         }
         componentDepth++
         path.traverse({
@@ -146,7 +149,8 @@ export const transformReactComponentToSpec = (component: string) => {
         result.type = 'ArrowFunction'
         const props = extractProps(path.node.init.params[0])
         if (props) {
-          result.componentProperties = { ...result.componentProperties, ...props }
+          if (!result.componentProperties) result.componentProperties = []
+          result.componentProperties.push(props)
         }
         componentDepth++
         path.get('init').traverse({
@@ -180,11 +184,20 @@ export const transformReactComponentToSpec = (component: string) => {
     elementAttributes: {},
     isComponentSet: result.rootElement?.isComponent || false,
     name: result.componentName,
-    methods: result.methods.map((method) => ({
+    methods: result.methods?.map((method) => ({
       ...method,
       parameters: method.parameters.map((param) => (typeof param === 'string' ? param : param.name)),
     })),
-    stateHooks: result.stateHooks.map((hook) => ({
+    componentName: result.componentName,
+    styles: {
+      ...(styles ? styles : {}),
+      ...tailwindToCSS(className || ''),
+    },
+    children: result.rootElement?.children.map(transformUIElementToBaseNode) || [],
+  }
+
+  if (result.stateHooks && result.stateHooks.length > 0) {
+    obj.stateHooks = result.stateHooks.map((hook) => ({
       ...hook,
       initialValue:
         hook.initialValue === undefined
@@ -194,13 +207,7 @@ export const transformReactComponentToSpec = (component: string) => {
             : Array.isArray(hook.initialValue)
               ? 'array'
               : (typeof hook.initialValue as 'string' | 'number' | 'boolean' | 'object' | 'function'),
-    })),
-    componentName: result.componentName,
-    styles: {
-      ...(styles ? styles : {}),
-      ...tailwindToCSS(className || ''),
-    },
-    children: result.rootElement?.children.map(transformUIElementToBaseNode) || [],
+    }))
   }
 
   return obj
