@@ -3,7 +3,7 @@
 A collection of utility classes and components for building Coral UI.
 
 > [!IMPORTANT]
-> If you think that Elon Musk is cool, you voted for Trump, or you are a racist, sexist, are homophobic, transphobic or a fascist, then you shouldn't use this software. It's only for cool people and you're not cool. You're a loser.
+> If you think that Elon Musk is cool, you are a racist, sexist, are homophobic, transphobic or a fascist, then you shouldn't use this software. It's only for cool people and you're not cool. You're a loser.
 
 ## Installation
 
