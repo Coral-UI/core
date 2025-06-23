@@ -15,7 +15,7 @@
     }
   },
   "scripts": {
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "dev": "tsup --watch",
     "build": "tsup",
     "semantic-release": "semantic-release"

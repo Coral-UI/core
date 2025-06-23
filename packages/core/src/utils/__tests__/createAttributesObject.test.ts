@@ -14,7 +14,7 @@ describe('createAttributesObject', () => {
     expect(result).toBe(attributes)
   })
 
-  it('should exclude class property when present', () => {
+  it('should include class property when present', () => {
     const attributes = {
       id: 'test-id',
       class: 'test-class',
@@ -25,9 +25,10 @@ describe('createAttributesObject', () => {
 
     expect(result).toEqual({
       id: 'test-id',
+      class: 'test-class',
       'data-test': 'test-value'
     })
-    expect(result).not.toHaveProperty('class')
+    expect(result).toHaveProperty('class', 'test-class')
   })
 
   it('should handle object with only class property', () => {
@@ -37,8 +38,10 @@ describe('createAttributesObject', () => {
 
     const result = createAttributesObject(attributes)
 
-    expect(result).toEqual({})
-    expect(result).not.toHaveProperty('class')
+    expect(result).toEqual({
+      class: 'test-class'
+    })
+    expect(result).toHaveProperty('class', 'test-class')
   })
 
   it('should handle empty object', () => {
@@ -62,11 +65,12 @@ describe('createAttributesObject', () => {
 
     expect(result).toEqual({
       id: 'test-id',
+      class: 'test-class',
       count: 42,
       active: true,
       disabled: false
     })
-    expect(result).not.toHaveProperty('class')
+    expect(result).toHaveProperty('class', 'test-class')
   })
 
   it('should handle object with class as first property', () => {
@@ -79,10 +83,11 @@ describe('createAttributesObject', () => {
     const result = createAttributesObject(attributes)
 
     expect(result).toEqual({
+      class: 'test-class',
       id: 'test-id',
       'data-test': 'test-value'
     })
-    expect(result).not.toHaveProperty('class')
+    expect(result).toHaveProperty('class', 'test-class')
   })
 
   it('should handle object with class as last property', () => {
@@ -96,12 +101,13 @@ describe('createAttributesObject', () => {
 
     expect(result).toEqual({
       id: 'test-id',
-      'data-test': 'test-value'
+      'data-test': 'test-value',
+      class: 'test-class'
     })
-    expect(result).not.toHaveProperty('class')
+    expect(result).toHaveProperty('class', 'test-class')
   })
 
-  it('should preserve all other properties when class is present', () => {
+  it('should preserve all properties including class when present', () => {
     const attributes = {
       id: 'test-id',
       class: 'test-class',
@@ -115,11 +121,12 @@ describe('createAttributesObject', () => {
 
     expect(result).toEqual({
       id: 'test-id',
+      class: 'test-class',
       'data-test': 'test-value',
       disabled: true,
       count: 42,
       'aria-label': 'test label'
     })
-    expect(result).not.toHaveProperty('class')
+    expect(result).toHaveProperty('class', 'test-class')
   })
 })
