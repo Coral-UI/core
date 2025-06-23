@@ -3,7 +3,7 @@ import { parseJSXAttributeValue } from '@/parseJSXAttributeValue'
 import { Result, UIElement } from '@/transformReactComponentToSpec'
 import * as t from '@babel/types'
 
-import type { CoralComponentPropertyType } from '@reallygoodwork/coral-core'
+import type { CoralComponentPropertyType, CoralMethodType, CoralStateType } from '@reallygoodwork/coral-core'
 
 export const parseJSXElement = (node: t.JSXElement, result: Result): UIElement => {
   const elementName = (node.openingElement.name as t.JSXIdentifier).name
@@ -17,7 +17,11 @@ export const parseJSXElement = (node: t.JSXElement, result: Result): UIElement =
   // Parse props
   node.openingElement.attributes.forEach((attr) => {
     if (t.isJSXAttribute(attr) && t.isJSXIdentifier(attr.name)) {
-      const value = parseJSXAttributeValue(attr.value, result)
+      const value = parseJSXAttributeValue(attr.value, result as {
+        methods: Array<CoralMethodType>;
+        stateHooks: Array<CoralStateType>;
+        componentProperties: Array<CoralComponentPropertyType>;
+      })
       if (value !== null) {
         componentProperties[attr.name.name] = value
       }

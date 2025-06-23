@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { zCoralComponentPropertySchema } from './componentProperty'
 import { zCoralDependencySchema } from './dependency'
@@ -13,7 +13,7 @@ import { zCoralNameSchema, zElementSchema } from './utilities'
 export const zCoralSchema = z.object({
   componentParentFigmaNodeRef: z.string().optional().describe('The parent of the Coral Component'),
   description: z.string().optional().describe('The description of the Coral Component'),
-  elementType: zElementSchema.describe('The type of the element to be created'),
+  elementType: zElementSchema.describe('The type of the element to be created').default('div'),
   figmaType: z.string().optional().describe('The type of the Figma node to be created'),
   elementAttributes: z
     .union([z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.array(z.string())])), z.undefined()])
@@ -27,6 +27,7 @@ export const zCoralSchema = z.object({
   styles: zCoralStyleSchema.optional(),
   textContent: z.string().optional().describe('The text content of the element'),
   tsType: z.string().optional().describe('The TypeScript type of the Coral Component'),
+
   type: z
     .union([z.literal('COMPONENT'), z.literal('INSTANCE'), z.literal('COMPONENT_SET'), z.literal('NODE')])
     .default('NODE')
@@ -44,29 +45,15 @@ export const zCoralSchema = z.object({
     .describe(
       'The variant properties of the Coral Component variant. Connects to the component properties of the Component Set or Component',
     ),
+  get children() {
+    return z.array(zCoralSchema).nullish().describe('The children of the Coral Component')
+  },
+  get variants() {
+    return z.array(zCoralSchema).nullish().describe('The variants of the Coral Component')
+  },
 })
 
-// Add this interface definition
-export interface CoralNodeWithChildren extends z.infer<typeof zCoralSchema> {
-  children?: CoralNodeWithChildren[] | null
-  variants?: CoralNodeWithChildren[] | null
-}
-
-// Define a recursive type for the children
-export const zCoralNodeWithChildrenSchema: z.ZodType<CoralNodeWithChildren> = zCoralSchema
-  .extend({
-    children: z.lazy(() => z.array(zCoralNodeWithChildrenSchema).nullish()),
-    variants: z
-      .lazy(() => z.array(zCoralNodeWithChildrenSchema).nullish())
-      .optional()
-      .describe('The variants of the Coral Component'),
-  })
-  .transform((data) => ({
-    ...data,
-    elementType: data.elementType ?? 'div', // Provide a default value if undefined
-  }))
-
-export const zCoralRootSchema = zCoralNodeWithChildrenSchema.and(
+export const zCoralRootSchema = zCoralSchema.and(
   z.object({
     $schema: z.literal('https://coral.design/schema.json').optional().describe('The schema of the Coral Component'),
     componentName: zCoralNameSchema
@@ -92,5 +79,5 @@ export const zCoralRootSchema = zCoralNodeWithChildrenSchema.and(
   }),
 )
 
-export type CoralNode = z.infer<typeof zCoralNodeWithChildrenSchema>
+export type CoralNode = z.infer<typeof zCoralSchema>
 export type CoralRootNode = z.infer<typeof zCoralRootSchema>

@@ -1,7 +1,7 @@
 export { parseUISpec } from '@utils/parseUISpec'
 export { transformHTMLToSpec } from '@lib/transformHTMLToSpec'
 
-export type { CoralNode, CoralRootNode, CoralNodeWithChildren } from '@structures/coral'
+export type { CoralNode, CoralRootNode } from '@structures/coral'
 export type { CoralColorType } from '@structures/color'
 export type { CoralComponentPropertyType } from '@structures/componentProperty'
 export type { CoralDependencyType } from '@structures/dependency'

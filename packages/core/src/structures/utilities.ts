@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 export const zTS_TYPES = z
   .union([
@@ -64,6 +64,6 @@ export const zElementSchema = z.union([
   z.literal('source'),
   z.literal('canvas'),
   z.literal('text'),
-])
+]).default('div')
 
 export type CoralElementType = z.infer<typeof zElementSchema>
