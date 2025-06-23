@@ -21,8 +21,24 @@ const selfClosingTags = [
   'wbr',
 ]
 
+// Helper function to convert elementAttributes object to HTML attribute string
+const formatAttributes = (attributes: Record<string, string | number | boolean | string[]>): string => {
+  return Object.entries(attributes)
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return `${key}="${value.join(' ')}"`
+      }
+      if (typeof value === 'boolean') {
+        return value ? key : ''
+      }
+      return `${key}="${value}"`
+    })
+    .filter(Boolean)
+    .join(' ')
+}
+
 const nodeToHTML = (node: CoralNode): string => {
-  const attributes = node.elementAttributes ? ` ${node.elementAttributes}` : ''
+  const attributes = node.elementAttributes ? ` ${formatAttributes(node.elementAttributes)}` : ''
   const children = node.children ? (node.children as CoralNode[]).map(nodeToHTML).join('') : ''
 
   // Check if the element is self-closing
