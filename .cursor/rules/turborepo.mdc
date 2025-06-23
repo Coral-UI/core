@@ -1,0 +1,171 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+----------------------------------------
+
+TITLE: Installing Internal Package Dependencies
+DESCRIPTION: Demonstrates how to add an internal monorepo package as a dependency in an application's package.json file using different package manager syntaxes (pnpm, yarn, npm, bun). The `workspace:*` or `*` syntax tells the package manager to link the local package source instead of fetching from a registry.
+SOURCE: https://github.com/vercel/turborepo/blob/main/docs/site/content/docs/core-concepts/internal-packages.mdx#_snippet_0
+
+LANGUAGE: json
+CODE:
+```
+{
+  "dependencies": {
+    "@repo/ui": "workspace:*"
+  }
+}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+  "dependencies": {
+    "@repo/ui": "*"
+  }
+}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+  "dependencies": {
+    "@repo/ui": "*"
+  }
+}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+  "dependencies": {
+    "@repo/ui": "workspace:*"
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Turborepo Tasks in turbo.json
+DESCRIPTION: This snippet shows example configurations for the `turbo.json` file, defining tasks like `build`, `check-types`, and `dev` for different frameworks (Next.js and Vite). It specifies task dependencies, outputs for caching, and persistence/caching behavior for development tasks.
+SOURCE: https://github.com/vercel/turborepo/blob/main/docs/site/content/docs/getting-started/add-to-existing-repository.mdx#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    }
+  }
+}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "tasks": {
+    "build": {
+      "outputs": ["dist/**"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Specify Task Outputs for Caching in turbo.json
+DESCRIPTION: List file glob patterns relative to the package's root directory that should be cached upon successful task completion. These cached outputs can be restored in subsequent runs, speeding up builds.
+SOURCE: https://github.com/vercel/turborepo/blob/main/docs/site/content/docs/reference/configuration.mdx#_snippet_13
+
+LANGUAGE: json
+CODE:
+```
+{
+  "tasks": {
+    "build": {
+      "outputs": ["dist/**"]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Standard Turborepo Build Pipeline in turbo.json
+DESCRIPTION: This `turbo.json` snippet defines a basic `build` pipeline task. The `dependsOn: ["^build"]` configuration ensures that the `build` task of any workspace's dependencies is executed before the workspace's own `build` task, establishing the correct build order in the monorepo.
+SOURCE: https://github.com/vercel/turborepo/blob/main/docs/site/content/blog/turbo-1-4-0.mdx#_snippet_1
+
+LANGUAGE: jsonc
+CODE:
+```
+{
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"]
+    }
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Specify Package Manager in Root package.json
+DESCRIPTION: Add the `packageManager` field to the root `package.json` file. This ensures consistency among developers and allows Turborepo to optimize based on the lockfile.
+SOURCE: https://github.com/vercel/turborepo/blob/main/docs/site/content/docs/guides/migrating-from-nx.mdx#_snippet_8
+
+LANGUAGE: json
+CODE:
+```
+{
+  "packageManager": "pnpm@9.0.0"
+}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+  "packageManager": "yarn@1.22.19"
+}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+  "packageManager": "npm@10.0.0"
+}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+  "packageManager": "bun@1.2.0"
+}
+```
