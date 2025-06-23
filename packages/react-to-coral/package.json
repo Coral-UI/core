@@ -15,7 +15,10 @@
     }
   },
   "scripts": {
-    "test": "jest --passWithNoTests",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:verbose": "jest --verbose",
     "dev": "tsup --watch",
     "build": "tsup",
     "lint": "eslint src --cache --cache-location node_modules/.cache/.eslintcache",

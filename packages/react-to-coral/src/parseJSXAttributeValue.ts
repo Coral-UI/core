@@ -21,7 +21,7 @@ export const parseJSXAttributeValue = (
     if (t.isIdentifier(value.expression)) {
       return createPropReference(value.expression.name, result)
     } else if (t.isCallExpression(value.expression)) {
-      return `{${generate.default(value.expression).code}}`
+      return `{${generate(value.expression).code}}`
     }
   }
   return null

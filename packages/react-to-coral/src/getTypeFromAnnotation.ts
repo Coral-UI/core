@@ -11,6 +11,10 @@ export const getTypeFromAnnotation = (annotation: t.TypeAnnotation | t.TSTypeAnn
       return 'boolean' as CoralTSTypes
     } else if (t.isTSNumberKeyword(typeAnnotation)) {
       return 'number' as CoralTSTypes
+    } else if (t.isTSArrayType(typeAnnotation)) {
+      return 'array' as CoralTSTypes
+    } else if (t.isTSFunctionType(typeAnnotation)) {
+      return 'function' as CoralTSTypes
     } else if (t.isTSTypeReference(typeAnnotation) && t.isIdentifier(typeAnnotation.typeName)) {
       return typeAnnotation.typeName.name as CoralTSTypes
     }

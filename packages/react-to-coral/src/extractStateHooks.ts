@@ -1,4 +1,4 @@
-import { getTypeFromTypeParameters } from '@/getTypeFromTypeParameters'
+import { getTypeFromTypeParameters } from './getTypeFromTypeParameters'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import generate from '@babel/generator'

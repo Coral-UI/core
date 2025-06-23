@@ -1,4 +1,4 @@
-import { getTypeFromAnnotation } from '@/getTypeFromAnnotation'
+import { getTypeFromAnnotation } from './getTypeFromAnnotation'
 import * as t from '@babel/types'
 
 import type { CoralComponentPropertyType, CoralTSTypes } from '@reallygoodwork/coral-core'
