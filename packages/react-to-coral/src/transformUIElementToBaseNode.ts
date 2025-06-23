@@ -12,14 +12,14 @@ export const transformUIElementToBaseNode = (element: UIElement): CoralRootNode 
     }) ?? {}
 
   const elementAttributes: Record<string, string | number | boolean | string[]> = {}
-  
+
   // Add other props as element attributes, filtering to allowed types
   Object.entries(otherProps).forEach(([key, value]) => {
     if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || Array.isArray(value)) {
       elementAttributes[key] = value as string | number | boolean | string[]
     }
   })
-  
+
   if (className) {
     elementAttributes.class = className
   }

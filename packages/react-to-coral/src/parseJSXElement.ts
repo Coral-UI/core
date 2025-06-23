@@ -17,11 +17,14 @@ export const parseJSXElement = (node: t.JSXElement, result: Result): UIElement =
   // Parse props
   node.openingElement.attributes.forEach((attr) => {
     if (t.isJSXAttribute(attr) && t.isJSXIdentifier(attr.name)) {
-      const value = parseJSXAttributeValue(attr.value, result as {
-        methods: Array<CoralMethodType>;
-        stateHooks: Array<CoralStateType>;
-        componentProperties: Array<CoralComponentPropertyType>;
-      })
+      const value = parseJSXAttributeValue(
+        attr.value,
+        result as {
+          methods: Array<CoralMethodType>
+          stateHooks: Array<CoralStateType>
+          componentProperties: Array<CoralComponentPropertyType>
+        },
+      )
       if (value !== null) {
         componentProperties[attr.name.name] = value
       }

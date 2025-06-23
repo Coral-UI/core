@@ -1,6 +1,8 @@
-import { UISpec } from '@/config/UISpec'
+import { RootNode } from '@/config/UISpec'
 
-export const testConfig: UISpec = {
+export const testConfig: RootNode = {
+  name: 'TestConfig',
   elementType: 'div',
+  styles: null,
   children: [],
 }

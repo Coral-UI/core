@@ -1,5 +1,4 @@
 import { transformHTMLToSpec } from '../transformHTMLToSpec'
-import type { CoralRootNode } from '@structures/coral'
 
 describe('transformHTMLToSpec', () => {
   it('should transform simple HTML to coral spec', () => {
@@ -19,7 +18,7 @@ describe('transformHTMLToSpec', () => {
     expect(result.elementAttributes).toEqual({
       id: 'test',
       class: 'container',
-      'data-test': 'value'
+      'data-test': 'value',
     })
     expect(result.textContent).toBe('Content')
   })
@@ -50,7 +49,7 @@ describe('transformHTMLToSpec', () => {
     expect(result.elementType).toBe('img')
     expect(result.elementAttributes).toEqual({
       src: 'image.jpg',
-      alt: 'Description'
+      alt: 'Description',
     })
   })
 
@@ -66,14 +65,14 @@ describe('transformHTMLToSpec', () => {
     expect(result.elementType).toBe('form')
     expect(result.elementAttributes).toEqual({
       action: '/submit',
-      method: 'post'
+      method: 'post',
     })
     expect(result.children).toHaveLength(3)
     expect(result.children?.[0]?.elementType).toBe('input')
     expect(result.children?.[0]?.elementAttributes).toEqual({
       type: 'text',
       name: 'username',
-      placeholder: 'Enter username'
+      placeholder: 'Enter username',
     })
   })
 
@@ -134,7 +133,7 @@ describe('transformHTMLToSpec', () => {
 
     expect(result.elementType).toBe('div')
     expect(result.elementAttributes).toEqual({
-      class: 'test'
+      class: 'test',
     })
     expect(result.children).toHaveLength(1)
     expect(result.children?.[0]?.elementType).toBe('span')
@@ -158,7 +157,7 @@ describe('transformHTMLToSpec', () => {
 
     expect(result.elementType).toBe('section')
     expect(result.elementAttributes).toEqual({
-      class: 'hero-section bg-blue-500'
+      class: 'hero-section bg-blue-500',
     })
     expect(result.textContent).toBe('Content')
   })

@@ -18,6 +18,9 @@
     "test": "jest --passWithNoTests",
     "dev": "tsup --watch",
     "build": "tsup",
+    "lint": "eslint src --cache --cache-location node_modules/.cache/.eslintcache",
+    "lint:fix": "eslint src --fix --cache --cache-location node_modules/.cache/.eslintcache",
+    "typecheck": "tsc --noEmit",
     "semantic-release": "semantic-release"
   },
   "lint-staged": {

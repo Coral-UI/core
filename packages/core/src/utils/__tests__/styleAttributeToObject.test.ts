@@ -8,7 +8,7 @@ describe('styleAttributeToObject', () => {
     expect(result).toEqual({
       color: 'red',
       'background-color': 'blue',
-      'font-size': '16px'
+      'font-size': '16px',
     })
   })
 
@@ -19,7 +19,7 @@ describe('styleAttributeToObject', () => {
     expect(result).toEqual({
       color: 'red',
       'background-color': 'blue',
-      'font-size': '16px'
+      'font-size': '16px',
     })
   })
 
@@ -28,7 +28,7 @@ describe('styleAttributeToObject', () => {
     const result = styleAttributeToObject(style)
 
     expect(result).toEqual({
-      color: 'red'
+      color: 'red',
     })
   })
 
@@ -48,7 +48,7 @@ describe('styleAttributeToObject', () => {
 
     expect(result).toEqual({
       color: 'red',
-      'background-color': 'blue'
+      'background-color': 'blue',
     })
   })
 
@@ -58,7 +58,7 @@ describe('styleAttributeToObject', () => {
 
     expect(result).toEqual({
       background: 'linear-gradient(to right, red, blue)',
-      color: 'white'
+      color: 'white',
     })
   })
 
@@ -69,7 +69,7 @@ describe('styleAttributeToObject', () => {
     expect(result).toEqual({
       color: 'red',
       border: '',
-      'background-color': 'blue'
+      'background-color': 'blue',
     })
   })
 
@@ -79,7 +79,7 @@ describe('styleAttributeToObject', () => {
 
     expect(result).toEqual({
       color: 'red',
-      'background-color': 'blue'
+      'background-color': 'blue',
     })
   })
 
@@ -89,7 +89,7 @@ describe('styleAttributeToObject', () => {
 
     expect(result).toEqual({
       'box-shadow': '0 2px 4px rgba(0,0,0,0.1)',
-      transform: 'translateX(10px) rotate(45deg)'
+      transform: 'translateX(10px) rotate(45deg)',
     })
   })
 })

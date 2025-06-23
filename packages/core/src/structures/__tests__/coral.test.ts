@@ -1,5 +1,4 @@
-import { zCoralSchema, zCoralRootSchema } from '../coral'
-import type { CoralRootNode } from '../coral'
+import { zCoralRootSchema, zCoralSchema } from '../coral'
 
 describe('Coral Schemas', () => {
   describe('zCoralSchema', () => {
@@ -8,7 +7,7 @@ describe('Coral Schemas', () => {
         name: 'TestComponent',
         elementType: 'div',
         elementAttributes: {},
-        children: []
+        children: [],
       }
 
       const result = zCoralSchema.safeParse(validNode)
@@ -23,17 +22,17 @@ describe('Coral Schemas', () => {
         figmaType: 'FRAME',
         elementAttributes: {
           id: 'test-id',
-          'data-test': 'test-value'
+          'data-test': 'test-value',
         },
         figmaNodeRef: 'figma-node-ref',
         hasBackgroundImage: true,
         isComponentInstance: false,
         options: {
-          variant: 'primary'
+          variant: 'primary',
         },
         styles: {
           color: 'red',
-          'background-color': 'blue'
+          'background-color': 'blue',
         },
         textContent: 'Hello World',
         tsType: 'string',
@@ -41,10 +40,10 @@ describe('Coral Schemas', () => {
         variantProperties: {
           size: {
             type: 'string',
-            value: 'large'
-          }
+            value: 'large',
+          },
         },
-        children: []
+        children: [],
       }
 
       const result = zCoralSchema.safeParse(completeNode)
@@ -56,7 +55,7 @@ describe('Coral Schemas', () => {
         name: 'TestComponent',
         elementType: 'invalid-element',
         elementAttributes: {},
-        children: []
+        children: [],
       }
 
       const result = zCoralSchema.safeParse(invalidNode)
@@ -67,7 +66,7 @@ describe('Coral Schemas', () => {
       const invalidNode = {
         elementType: 'div',
         elementAttributes: {},
-        children: []
+        children: [],
       }
 
       const result = zCoralSchema.safeParse(invalidNode)
@@ -78,7 +77,7 @@ describe('Coral Schemas', () => {
       const invalidNode = {
         name: 'TestComponent',
         elementAttributes: {},
-        children: []
+        children: [],
       }
 
       const result = zCoralSchema.safeParse(invalidNode)
@@ -97,7 +96,7 @@ describe('Coral Schemas', () => {
         elementType: 'div',
         componentName: 'TestComponent',
         elementAttributes: {},
-        children: []
+        children: [],
       }
 
       const result = zCoralRootSchema.safeParse(validRootNode)
@@ -113,25 +112,25 @@ describe('Coral Schemas', () => {
         description: 'A test component',
         elementAttributes: {
           id: 'test-id',
-          'data-test': 'test-value'
+          'data-test': 'test-value',
         },
         children: [],
         config: {
-          theme: 'dark'
+          theme: 'dark',
         },
         dependencies: [
           {
             name: 'react',
             version: '18.0.0',
-            path: 'react'
-          }
+            path: 'react',
+          },
         ],
         designTokens: {
           primaryColor: {
             property: 'color',
             tokenName: 'primary',
-            fallbackValue: '#007bff'
-          }
+            fallbackValue: '#007bff',
+          },
         },
         imports: [
           {
@@ -141,10 +140,10 @@ describe('Coral Schemas', () => {
               {
                 name: 'useState',
                 isDefault: false,
-                as: 'useState'
-              }
-            ]
-          }
+                as: 'useState',
+              },
+            ],
+          },
         ],
         isComponentSet: false,
         methods: [
@@ -152,18 +151,18 @@ describe('Coral Schemas', () => {
             name: 'handleClick',
             parameters: ['event'],
             body: 'console.log(event)',
-            description: 'Handle click event'
-          }
+            description: 'Handle click event',
+          },
         ],
         stateHooks: [
           {
             name: 'count',
             setterName: 'setCount',
             initialValue: 0,
-            tsType: 'number'
-          }
+            tsType: 'number',
+          },
         ],
-        numberOfVariants: 3
+        numberOfVariants: 3,
       }
 
       const result = zCoralRootSchema.safeParse(completeRootNode)
@@ -176,7 +175,7 @@ describe('Coral Schemas', () => {
         elementType: 'div',
         componentName: 'TestComponent',
         elementAttributes: {},
-        children: []
+        children: [],
       }
 
       const result = zCoralRootSchema.safeParse(rootNodeWithoutSchema)
@@ -190,7 +189,7 @@ describe('Coral Schemas', () => {
         elementType: 'div',
         componentName: 'TestComponent',
         elementAttributes: {},
-        children: []
+        children: [],
       }
 
       const result = zCoralRootSchema.safeParse(invalidRootNode)
@@ -208,13 +207,13 @@ describe('Coral Schemas', () => {
         componentProperties: {
           title: {
             type: 'string',
-            defaultValue: 'Default Title'
+            defaultValue: 'Default Title',
           },
           count: {
             type: 'number',
-            defaultValue: 0
-          }
-        }
+            defaultValue: 0,
+          },
+        },
       }
 
       const result = zCoralRootSchema.safeParse(rootNodeWithProps)

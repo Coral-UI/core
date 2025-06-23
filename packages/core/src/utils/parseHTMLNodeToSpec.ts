@@ -33,14 +33,12 @@ export const parseHTMLNodeToSpec = (node: HTMLElement): CoralRootNode => {
 
   // Get direct text nodes (not from child elements)
   const directTextNodes = node.childNodes.filter(
-    (childNode) => childNode.nodeType === 3 && !(childNode as TextNode).isWhitespace
+    (childNode) => childNode.nodeType === 3 && !(childNode as TextNode).isWhitespace,
   )
 
   // Set text content only from direct text nodes
   if (directTextNodes.length > 0) {
-    spec.textContent = directTextNodes
-      .map((childNode) => (childNode as TextNode).text.trim())
-      .join(' ')
+    spec.textContent = directTextNodes.map((childNode) => (childNode as TextNode).text.trim()).join(' ')
   }
 
   // Parse child elements and add them to children

@@ -17,9 +17,7 @@ export const transformHTMLToSpec = (html: string): CoralRootNode => {
   }
 
   // Find the first element child (skip text nodes, comments, etc.)
-  const firstElementChild = root.childNodes.find(
-    (child) => child instanceof HTMLElement
-  ) as HTMLElement
+  const firstElementChild = root.childNodes.find((child) => child instanceof HTMLElement) as HTMLElement
 
   if (!firstElementChild) {
     throw new Error('Invalid HTML')

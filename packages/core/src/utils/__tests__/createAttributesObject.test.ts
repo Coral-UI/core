@@ -5,7 +5,7 @@ describe('createAttributesObject', () => {
     const attributes = {
       id: 'test-id',
       'data-test': 'test-value',
-      disabled: true
+      disabled: true,
     }
 
     const result = createAttributesObject(attributes)
@@ -18,7 +18,7 @@ describe('createAttributesObject', () => {
     const attributes = {
       id: 'test-id',
       class: 'test-class',
-      'data-test': 'test-value'
+      'data-test': 'test-value',
     }
 
     const result = createAttributesObject(attributes)
@@ -26,20 +26,20 @@ describe('createAttributesObject', () => {
     expect(result).toEqual({
       id: 'test-id',
       class: 'test-class',
-      'data-test': 'test-value'
+      'data-test': 'test-value',
     })
     expect(result).toHaveProperty('class', 'test-class')
   })
 
   it('should handle object with only class property', () => {
     const attributes = {
-      class: 'test-class'
+      class: 'test-class',
     }
 
     const result = createAttributesObject(attributes)
 
     expect(result).toEqual({
-      class: 'test-class'
+      class: 'test-class',
     })
     expect(result).toHaveProperty('class', 'test-class')
   })
@@ -58,7 +58,7 @@ describe('createAttributesObject', () => {
       class: 'test-class',
       count: 42,
       active: true,
-      disabled: false
+      disabled: false,
     }
 
     const result = createAttributesObject(attributes)
@@ -68,7 +68,7 @@ describe('createAttributesObject', () => {
       class: 'test-class',
       count: 42,
       active: true,
-      disabled: false
+      disabled: false,
     })
     expect(result).toHaveProperty('class', 'test-class')
   })
@@ -77,7 +77,7 @@ describe('createAttributesObject', () => {
     const attributes = {
       class: 'test-class',
       id: 'test-id',
-      'data-test': 'test-value'
+      'data-test': 'test-value',
     }
 
     const result = createAttributesObject(attributes)
@@ -85,7 +85,7 @@ describe('createAttributesObject', () => {
     expect(result).toEqual({
       class: 'test-class',
       id: 'test-id',
-      'data-test': 'test-value'
+      'data-test': 'test-value',
     })
     expect(result).toHaveProperty('class', 'test-class')
   })
@@ -94,7 +94,7 @@ describe('createAttributesObject', () => {
     const attributes = {
       id: 'test-id',
       'data-test': 'test-value',
-      class: 'test-class'
+      class: 'test-class',
     }
 
     const result = createAttributesObject(attributes)
@@ -102,7 +102,7 @@ describe('createAttributesObject', () => {
     expect(result).toEqual({
       id: 'test-id',
       'data-test': 'test-value',
-      class: 'test-class'
+      class: 'test-class',
     })
     expect(result).toHaveProperty('class', 'test-class')
   })
@@ -114,7 +114,7 @@ describe('createAttributesObject', () => {
       'data-test': 'test-value',
       disabled: true,
       count: 42,
-      'aria-label': 'test label'
+      'aria-label': 'test label',
     }
 
     const result = createAttributesObject(attributes)
@@ -125,7 +125,7 @@ describe('createAttributesObject', () => {
       'data-test': 'test-value',
       disabled: true,
       count: 42,
-      'aria-label': 'test label'
+      'aria-label': 'test label',
     })
     expect(result).toHaveProperty('class', 'test-class')
   })

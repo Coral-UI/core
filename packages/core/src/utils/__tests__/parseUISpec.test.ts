@@ -1,5 +1,4 @@
 import { parseUISpec } from '../parseUISpec'
-import type { CoralRootNode } from '@structures/coral'
 
 describe('parseUISpec', () => {
   it('should parse a valid UI specification', async () => {
@@ -9,7 +8,7 @@ describe('parseUISpec', () => {
       elementType: 'div',
       componentName: 'TestComponent',
       elementAttributes: {},
-      children: []
+      children: [],
     }
 
     const result = await parseUISpec(validSpec)
@@ -27,20 +26,20 @@ describe('parseUISpec', () => {
       componentName: 'ComplexComponent',
       elementAttributes: {
         id: 'test-id',
-        'data-test': 'test-value'
+        'data-test': 'test-value',
       },
       children: [
         {
           name: 'ChildComponent',
           elementType: 'span',
           elementAttributes: {},
-          children: []
-        }
+          children: [],
+        },
       ],
       styles: {
         color: 'red',
-        'background-color': 'blue'
-      }
+        'background-color': 'blue',
+      },
     }
 
     const result = await parseUISpec(complexSpec)
@@ -63,13 +62,13 @@ describe('parseUISpec', () => {
       componentProperties: {
         title: {
           type: 'string',
-          defaultValue: 'Default Title'
+          defaultValue: 'Default Title',
         },
         count: {
           type: 'number',
-          defaultValue: 0
-        }
-      }
+          defaultValue: 0,
+        },
+      },
     }
 
     const result = await parseUISpec(specWithProps)
@@ -90,9 +89,9 @@ describe('parseUISpec', () => {
           name: 'count',
           setterName: 'setCount',
           initialValue: 0,
-          tsType: 'number'
-        }
-      ]
+          tsType: 'number',
+        },
+      ],
     }
 
     const result = await parseUISpec(specWithState)
@@ -113,9 +112,9 @@ describe('parseUISpec', () => {
           name: 'handleClick',
           parameters: ['event'],
           body: 'console.log(event)',
-          description: 'Handle click event'
-        }
-      ]
+          description: 'Handle click event',
+        },
+      ],
     }
 
     const result = await parseUISpec(specWithMethods)
@@ -127,7 +126,7 @@ describe('parseUISpec', () => {
     const invalidSpec = {
       name: 123, // Invalid: name should be a string
       elementType: 'invalid-element-type', // Invalid element type
-      children: []
+      children: [],
     }
 
     await expect(parseUISpec(invalidSpec)).rejects.toThrow()
@@ -140,7 +139,7 @@ describe('parseUISpec', () => {
       elementType: 'invalid-element-type', // Invalid element type
       componentName: 'InvalidComponent',
       elementAttributes: {},
-      children: []
+      children: [],
     }
 
     await expect(parseUISpec(invalidSpec)).rejects.toThrow()
@@ -152,7 +151,7 @@ describe('parseUISpec', () => {
       elementType: 'div',
       componentName: 'TestComponent',
       elementAttributes: {},
-      children: []
+      children: [],
     }
 
     const result = await parseUISpec(specWithoutSchema)
@@ -174,9 +173,9 @@ describe('parseUISpec', () => {
           name: 'primary',
           elementType: 'div',
           elementAttributes: {},
-          children: []
-        }
-      ]
+          children: [],
+        },
+      ],
     }
 
     const result = await parseUISpec(specWithVariants)

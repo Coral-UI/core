@@ -4,7 +4,7 @@ export const tailwindToCSS = jest.fn((className: string) => {
   return {
     [className]: {
       color: 'red',
-      'background-color': 'blue'
-    }
+      'background-color': 'blue',
+    },
   }
 })
