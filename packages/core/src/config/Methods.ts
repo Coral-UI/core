@@ -1,5 +1,5 @@
 import { zTS_TYPES } from '@config/TSTypes'
-import z from 'zod'
+import { z } from 'zod/v4'
 
 export const zMethod = z.object({
   name: z.string(),
