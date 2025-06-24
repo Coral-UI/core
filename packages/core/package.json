@@ -4,15 +4,27 @@
   "description": "Core utility library for UI layers and tooling ecosystem",
   "files": [
     "dist",
+    "schemas",
+    "bin",
     "README.md",
     "LICENSE"
   ],
+  "bin": {
+    "coral-schemas": "bin/coral-schemas.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
-    }
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "require": "./dist/node.cjs",
+      "import": "./dist/node.mjs"
+    },
+    "./schemas": "./schemas/index.schema.json",
+    "./schemas/*": "./schemas/*.schema.json"
   },
   "scripts": {
     "test": "jest",
@@ -20,7 +32,8 @@
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",
     "dev": "tsup --watch",
-    "build": "tsup",
+    "build": "tsup && npm run schemas:generate",
+    "schemas:generate": "node scripts/generate-schemas.js",
     "lint": "eslint src --cache --cache-location node_modules/.cache/.eslintcache",
     "lint:fix": "eslint src --fix --cache --cache-location node_modules/.cache/.eslintcache",
     "typecheck": "tsc --noEmit",
@@ -36,7 +49,7 @@
     "library",
     "reallygoodwork",
     "design-to-code",
-    ""
+    "json-schema"
   ],
   "author": "Really Good Work Inc. <hey@reallygood.work> (https://reallygood.work)",
   "license": "MIT",
@@ -68,12 +81,13 @@
   },
   "peerDependencies": {
     "colord": "^2.9.3",
-    "node-html-parser": "^6.1.13"
+    "node-html-parser": "^7.0.1"
   },
   "dependencies": {
     "@babel/generator": "^7.27.4",
     "@babel/parser": "^7.27.4",
     "@babel/traverse": "^7.27.4",
-    "@reallygoodwork/coral-tw2css": "workspace:*"
+    "@reallygoodwork/coral-tw2css": "workspace:*",
+    "commander": "^12.0.0"
   }
 }

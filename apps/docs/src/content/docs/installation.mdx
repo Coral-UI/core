@@ -1,0 +1,258 @@
+---
+title: Installation
+description: Detailed installation guide for all Coral UI packages
+---
+
+import { Card, CardGrid, Tabs, TabItem, Aside } from '@astrojs/starlight/components'
+
+This guide covers everything you need to know about installing and setting up Coral UI packages in your project.
+
+## Package Overview
+
+Coral UI consists of several packages that can be used independently or together:
+
+<CardGrid>
+  <Card title="@reallygoodwork/coral-core" icon="star">
+    **Core package** - Required for all functionality
+    
+    Contains schemas, utilities, and transformation functions
+  </Card>
+  <Card title="@reallygoodwork/react-to-coral" icon="react">
+    **React Parser** - Optional
+    
+    Parse React components into Coral specifications
+  </Card>
+  <Card title="@reallygoodwork/coral-to-html" icon="document">
+    **HTML Generator** - Optional
+    
+    Generate HTML from Coral specifications
+  </Card>
+  <Card title="@reallygoodwork/tw2css" icon="styles">
+    **Tailwind Converter** - Optional
+    
+    Convert Tailwind classes to CSS objects
+  </Card>
+</CardGrid>
+
+## Quick Install
+
+For most use cases, install the core package and any additional packages you need:
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install @reallygoodwork/coral-core
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```bash
+    yarn add @reallygoodwork/coral-core
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```bash
+    pnpm add @reallygoodwork/coral-core
+    ```
+  </TabItem>
+</Tabs>
+
+## Full Installation
+
+To install all packages at once:
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install @reallygoodwork/coral-core \
+                @reallygoodwork/react-to-coral \
+                @reallygoodwork/coral-to-html \
+                @reallygoodwork/tw2css \
+                @reallygoodwork/style-to-tailwind \
+                colord node-html-parser
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```bash
+    yarn add @reallygoodwork/coral-core \
+             @reallygoodwork/react-to-coral \
+             @reallygoodwork/coral-to-html \
+             @reallygoodwork/tw2css \
+             @reallygoodwork/style-to-tailwind \
+             colord node-html-parser
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```bash
+    pnpm add @reallygoodwork/coral-core \
+             @reallygoodwork/react-to-coral \
+             @reallygoodwork/coral-to-html \
+             @reallygoodwork/tw2css \
+             @reallygoodwork/style-to-tailwind \
+             colord node-html-parser
+    ```
+  </TabItem>
+</Tabs>
+
+## Peer Dependencies
+
+Some packages require peer dependencies that must be installed separately:
+
+### Required Peer Dependencies
+
+```bash
+npm install colord node-html-parser
+```
+
+- **colord**: Color manipulation library used for color transformations
+- **node-html-parser**: HTML parsing library used for HTML to Coral spec conversion
+
+<Aside type="tip">
+  Peer dependencies are not automatically installed to avoid version conflicts. Make sure to install the versions that are compatible with your project.
+</Aside>
+
+## Package-Specific Installation
+
+### Core Package Only
+
+If you only need the core functionality:
+
+```bash
+npm install @reallygoodwork/coral-core colord node-html-parser
+```
+
+### React Development
+
+For React component transformation:
+
+```bash
+npm install @reallygoodwork/coral-core @reallygoodwork/react-to-coral
+```
+
+### HTML Generation
+
+For HTML output generation:
+
+```bash
+npm install @reallygoodwork/coral-core @reallygoodwork/coral-to-html node-html-parser
+```
+
+### Style Conversion
+
+For Tailwind and CSS style conversion:
+
+```bash
+npm install @reallygoodwork/coral-core @reallygoodwork/tw2css colord
+```
+
+## TypeScript Support
+
+All packages include full TypeScript definitions. No additional `@types` packages are required.
+
+```typescript
+// Types are automatically available
+import type { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
+```
+
+## Version Compatibility
+
+| Package | Node.js | TypeScript | React |
+|---------|---------|------------|-------|
+| coral-core | ≥16.0.0 | ≥4.5.0 | N/A |
+| react-to-coral | ≥16.0.0 | ≥4.5.0 | ≥16.8.0 |
+| coral-to-html | ≥16.0.0 | ≥4.5.0 | N/A |
+| tw2css | ≥16.0.0 | ≥4.5.0 | N/A |
+
+## Verification
+
+After installation, verify that everything is working correctly:
+
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+// This should not throw any errors
+const spec = parseUISpec({
+  elementType: 'div',
+  children: ['Hello, Coral UI!']
+})
+
+console.log('Installation successful!', spec)
+```
+
+## Bundle Size
+
+Package sizes (minified + gzipped):
+
+- **coral-core**: ~45KB
+- **react-to-coral**: ~28KB
+- **coral-to-html**: ~12KB
+- **tw2css**: ~35KB
+- **style-to-tailwind**: ~8KB
+
+<Aside type="note">
+  Bundle sizes may vary depending on which features you use. Tree-shaking is supported in all packages.
+</Aside>
+
+## Development Setup
+
+For development with Coral UI:
+
+1. **Install packages** as shown above
+2. **Configure TypeScript** (if using TypeScript):
+
+   ```json
+   // tsconfig.json
+   {
+     "compilerOptions": {
+       "moduleResolution": "node",
+       "esModuleInterop": true,
+       "allowSyntheticDefaultImports": true
+     }
+   }
+   ```
+
+3. **Import and use**:
+
+   ```typescript
+   import { parseUISpec, transformHTMLToSpec } from '@reallygoodwork/coral-core'
+   
+   // Your code here
+   ```
+
+## Troubleshooting
+
+### Common Installation Issues
+
+**Package not found:**
+```bash
+npm ERR! 404 Not Found - GET https://registry.npmjs.org/@reallygoodwork/coral-core
+```
+Make sure you're using the correct package names and that you have access to the registry.
+
+**Peer dependency warnings:**
+```bash
+npm WARN coral-core@1.0.0 requires a peer of colord@^2.9.3
+```
+Install the required peer dependencies as shown above.
+
+**TypeScript errors:**
+```typescript
+Cannot find module '@reallygoodwork/coral-core'
+```
+Make sure TypeScript can resolve the module paths. Check your `tsconfig.json` configuration.
+
+### Getting Help
+
+If you encounter installation issues:
+
+1. Check the [GitHub Issues](https://github.com/Coral-UI/core/issues)
+2. Verify your Node.js and npm versions
+3. Try clearing npm cache: `npm cache clean --force`
+4. Delete `node_modules` and `package-lock.json`, then reinstall
+
+## Next Steps
+
+Now that you have Coral UI installed, check out:
+
+- [Quick Start Guide](/quick-start/) - Get up and running quickly
+- [Core Concepts](/concepts/overview/) - Understanding the fundamentals
+- [API Reference](/api/core-functions/) - Complete function documentation

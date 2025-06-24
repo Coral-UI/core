@@ -25,7 +25,7 @@ export const zCoralSchema: z.ZodType<CoralNode> = z.lazy(() =>
     hasBackgroundImage: z.boolean().optional().describe('Whether the element has a background image'),
     isComponentInstance: z.boolean().optional().describe('Whether the element is a component instance'),
     name: zCoralNameSchema.describe('The name of the Coral Component'),
-    options: z.record(z.string(), z.any()).nullish().describe('The options of the variant'),
+    options: z.record(z.string(), z.unknown()).nullish().describe('The options of the variant'),
     styles: zCoralStyleSchema.optional(),
     textContent: z.string().optional().describe('The text content of the element'),
     tsType: z.string().optional().describe('The TypeScript type of the Coral Component'),
@@ -40,7 +40,7 @@ export const zCoralSchema: z.ZodType<CoralNode> = z.lazy(() =>
         zCoralNameSchema,
         z.object({
           type: z.union([zCoralTSTypesSchema, z.array(zCoralTSTypesSchema).describe('An array of types used as or')]),
-          value: z.any().describe('The value of the variant property'),
+          value: z.unknown().describe('The value of the variant property'),
         }),
       )
       .optional()
@@ -49,7 +49,7 @@ export const zCoralSchema: z.ZodType<CoralNode> = z.lazy(() =>
       ),
     children: z.array(zCoralSchema).nullish().describe('The children of the Coral Component'),
     variants: z.array(zCoralSchema).nullish().describe('The variants of the Coral Component'),
-  })
+  }),
 )
 
 export const zCoralRootSchema = zCoralSchema.and(
@@ -62,7 +62,7 @@ export const zCoralRootSchema = zCoralSchema.and(
       .optional()
       .describe('The component properties of the Coral Component'),
     config: z
-      .record(z.string(), z.any())
+      .record(z.string(), z.unknown())
       .nullish()
       .describe('The configuration of the Coral Component. Can be used to pass additional data to the component'),
     dependencies: z.array(zCoralDependencySchema).optional().describe('The dependencies of the Coral Component'),
@@ -89,12 +89,15 @@ export type CoralNode = {
   hasBackgroundImage?: boolean
   isComponentInstance?: boolean
   name: string
-  options?: Record<string, any> | null
+  options?: Record<string, unknown> | null
   styles?: z.infer<typeof zCoralStyleSchema>
   textContent?: string
   tsType?: string
   type?: 'COMPONENT' | 'INSTANCE' | 'COMPONENT_SET' | 'NODE'
-  variantProperties?: Record<string, { type: z.infer<typeof zCoralTSTypesSchema> | z.infer<typeof zCoralTSTypesSchema>[]; value: any }>
+  variantProperties?: Record<
+    string,
+    { type: z.infer<typeof zCoralTSTypesSchema> | z.infer<typeof zCoralTSTypesSchema>[]; value: unknown }
+  >
   children?: CoralNode[] | null
   variants?: CoralNode[] | null
 }
@@ -103,7 +106,7 @@ export type CoralRootNode = CoralNode & {
   $schema?: 'https://coral.design/schema.json'
   componentName?: string
   componentProperties?: z.infer<typeof zCoralComponentPropertySchema>
-  config?: Record<string, any> | null
+  config?: Record<string, unknown> | null
   dependencies?: z.infer<typeof zCoralDependencySchema>[]
   designTokens?: Record<string, z.infer<typeof zCoralDesignTokenSchema>>
   imports?: z.infer<typeof zCoralImportSchema>[]

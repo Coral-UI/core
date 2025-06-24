@@ -1,0 +1,378 @@
+---
+title: '@reallygoodwork/coral-core'
+description: Core utility library providing schemas, validation, and transformation functions for the Coral UI ecosystem
+---
+
+import { Card, CardGrid, Tabs, TabItem, Badge, Aside } from '@astrojs/starlight/components'
+
+The core package is the foundation of the Coral UI ecosystem, providing essential utilities, schemas, and transformation functions.
+
+<Badge text="Required" variant="tip" size="large" />
+
+## Overview
+
+`@reallygoodwork/coral-core` contains:
+
+- **JSON Schemas** for component validation
+- **Transformation utilities** for converting between formats
+- **Type definitions** for TypeScript support
+- **Validation functions** for spec correctness
+- **CLI tools** for schema management
+
+## Installation
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install @reallygoodwork/coral-core colord node-html-parser
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```bash
+    yarn add @reallygoodwork/coral-core colord node-html-parser
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```bash
+    pnpm add @reallygoodwork/coral-core colord node-html-parser
+    ```
+  </TabItem>
+</Tabs>
+
+### Peer Dependencies
+
+- **colord** `^2.9.3` - Color manipulation library
+- **node-html-parser** `^6.1.13` - HTML parsing functionality
+
+## API Reference
+
+### Core Functions
+
+#### `parseUISpec(spec: unknown): CoralNode`
+
+Validates and parses a UI specification against the Coral schema.
+
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+const spec = {
+  elementType: 'button',
+  name: 'PrimaryButton',
+  children: ['Click me'],
+  styles: {
+    backgroundColor: '#3b82f6',
+    color: '#ffffff',
+    padding: '12px 24px',
+    borderRadius: '6px'
+  }
+}
+
+const validatedSpec = parseUISpec(spec)
+// Returns: CoralNode with validated structure
+```
+
+**Parameters:**
+- `spec` - Raw specification object to validate
+
+**Returns:** `CoralNode` - Validated Coral specification
+
+**Throws:** Validation error if spec is invalid
+
+#### `transformHTMLToSpec(html: string): CoralRootNode`
+
+Converts HTML markup into a Coral specification.
+
+```typescript
+import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
+
+const html = `
+<div class="card bg-white p-6 rounded-lg shadow-md">
+  <h2 class="text-xl font-bold mb-4">Card Title</h2>
+  <p class="text-gray-600">Card description goes here.</p>
+  <button class="bg-blue-500 text-white px-4 py-2 rounded mt-4">
+    Action Button
+  </button>
+</div>
+`
+
+const coralSpec = transformHTMLToSpec(html)
+// Returns: CoralRootNode with component hierarchy
+```
+
+**Parameters:**
+- `html` - HTML string to transform
+
+**Returns:** `CoralRootNode` - Complete Coral specification
+
+### Schema Management
+
+#### `exportSchemaToJSON(schemaName: string): object`
+
+Exports a specific JSON schema for external use.
+
+```typescript
+import { exportSchemaToJSON } from '@reallygoodwork/coral-core'
+
+const coralSchema = exportSchemaToJSON('coral')
+const stateSchema = exportSchemaToJSON('state')
+const stylesSchema = exportSchemaToJSON('styles')
+```
+
+#### `exportAllSchemas(): Record<string, object>`
+
+Exports all available JSON schemas.
+
+```typescript
+import { exportAllSchemas } from '@reallygoodwork/coral-core'
+
+const allSchemas = exportAllSchemas()
+console.log(Object.keys(allSchemas))
+// ['coral', 'state', 'styles', 'variant', 'method', ...]
+```
+
+## Type Definitions
+
+### Core Types
+
+#### `CoralNode`
+
+The main interface for component specifications:
+
+```typescript
+interface CoralNode {
+  elementType: string
+  name?: string
+  children?: (CoralNode | string)[]
+  styles?: Record<string, any>
+  attributes?: Record<string, any>
+  props?: Record<string, any>
+  variants?: CoralVariantType[]
+  state?: CoralStateType[]
+  methods?: CoralMethodType[]
+  imports?: CoralImportType[]
+}
+```
+
+#### `CoralRootNode`
+
+Root-level specification with metadata:
+
+```typescript
+interface CoralRootNode extends CoralNode {
+  version: string
+  metadata?: {
+    createdAt?: string
+    updatedAt?: string
+    author?: string
+    description?: string
+  }
+}
+```
+
+### Specialized Types
+
+<CardGrid>
+  <Card title="CoralColorType" icon="palette">
+    Color specifications with hex, rgb, hsl support
+  </Card>
+  <Card title="CoralStyleType" icon="styles">
+    CSS property definitions and responsive styles
+  </Card>
+  <Card title="CoralStateType" icon="setting">
+    Component state management definitions
+  </Card>
+  <Card title="CoralVariantType" icon="puzzle">
+    Style variant configurations
+  </Card>
+</CardGrid>
+
+```typescript
+// Import specific types
+import type { 
+  CoralColorType,
+  CoralStyleType,
+  CoralStateType,
+  CoralVariantType,
+  CoralMethodType,
+  CoralImportType
+} from '@reallygoodwork/coral-core'
+```
+
+## JSON Schemas
+
+The package includes comprehensive JSON schemas for validation:
+
+### Available Schemas
+
+- **coral.schema.json** - Main component specification
+- **state.schema.json** - State management definitions
+- **styles.schema.json** - CSS styling properties
+- **variant.schema.json** - Component variants
+- **method.schema.json** - Component methods
+- **import.schema.json** - Import dependencies
+- **design-token.schema.json** - Design system tokens
+
+### Using Schemas
+
+```typescript
+import { SCHEMA_EXPORTS } from '@reallygoodwork/coral-core'
+
+// Get schema file paths
+console.log(SCHEMA_EXPORTS)
+// {
+//   coral: '/path/to/coral.schema.json',
+//   state: '/path/to/state.schema.json',
+//   ...
+// }
+```
+
+## CLI Tools
+
+The package includes CLI tools for schema management:
+
+```bash
+# Generate all schemas
+npx coral-schemas generate
+
+# Export specific schema
+npx coral-schemas export --schema=coral --output=./schemas/
+```
+
+## Advanced Usage
+
+### Custom Validation
+
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+function validateCustomComponent(spec: unknown) {
+  try {
+    const validatedSpec = parseUISpec(spec)
+    
+    // Additional custom validation
+    if (!validatedSpec.name) {
+      throw new Error('Component name is required')
+    }
+    
+    return validatedSpec
+  } catch (error) {
+    console.error('Validation failed:', error.message)
+    throw error
+  }
+}
+```
+
+### Batch Processing
+
+```typescript
+import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
+
+async function processHTMLFiles(htmlFiles: string[]) {
+  const specs = await Promise.all(
+    htmlFiles.map(async (html) => {
+      try {
+        return transformHTMLToSpec(html)
+      } catch (error) {
+        console.warn(`Failed to process HTML: ${error.message}`)
+        return null
+      }
+    })
+  )
+  
+  return specs.filter(Boolean)
+}
+```
+
+### Integration with Build Tools
+
+```typescript
+// webpack.config.js
+import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
+
+const coralLoader = {
+  test: /\.html$/,
+  use: {
+    loader: 'coral-loader',
+    options: {
+      transform: transformHTMLToSpec
+    }
+  }
+}
+```
+
+## Performance Tips
+
+<Aside type="tip" title="Optimization">
+- Cache parsed specifications in production
+- Use schema validation during development only
+- Implement incremental parsing for large component trees
+- Consider using workers for heavy transformations
+</Aside>
+
+### Recommended Patterns
+
+```typescript
+// Cache validated specs
+const specCache = new Map()
+
+function getCachedSpec(key: string, spec: unknown) {
+  if (specCache.has(key)) {
+    return specCache.get(key)
+  }
+  
+  const validatedSpec = parseUISpec(spec)
+  specCache.set(key, validatedSpec)
+  return validatedSpec
+}
+```
+
+## Error Handling
+
+The package provides detailed error messages for debugging:
+
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+try {
+  const spec = parseUISpec(invalidSpec)
+} catch (error) {
+  if (error.name === 'ValidationError') {
+    console.error('Schema validation failed:')
+    error.errors.forEach(err => {
+      console.error(`  - ${err.path}: ${err.message}`)
+    })
+  }
+}
+```
+
+## Migration Guide
+
+### From v0.x to v1.x
+
+Key changes in the latest version:
+
+- **Schema updates** - New validation rules
+- **Type improvements** - Better TypeScript support
+- **API changes** - Some function signatures updated
+
+```typescript
+// Old (v0.x)
+import { validateSpec } from '@reallygoodwork/coral-core'
+
+// New (v1.x)
+import { parseUISpec } from '@reallygoodwork/coral-core'
+```
+
+## Related Packages
+
+- [`@reallygoodwork/react-to-coral`](/packages/react-to-coral/) - React component parsing
+- [`@reallygoodwork/coral-to-html`](/packages/coral-to-html/) - HTML generation
+- [`@reallygoodwork/tw2css`](/packages/tw2css/) - Tailwind CSS conversion
+
+## Examples
+
+Check out practical examples:
+
+- [Basic Usage](/examples/basic-usage/) - Simple component specs
+- [HTML Conversion](/examples/html-generation/) - Transform HTML to specs
+- [Schema Validation](/advanced/schema-validation/) - Custom validation patterns

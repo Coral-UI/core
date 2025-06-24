@@ -1,0 +1,365 @@
+---
+title: Quick Start
+description: Get up and running with Coral UI in minutes with practical examples
+---
+
+import { Card, CardGrid, Tabs, TabItem, Code, Aside } from '@astrojs/starlight/components'
+
+Get started with Coral UI in just a few minutes. This guide will walk you through the most common use cases with practical examples.
+
+## Prerequisites
+
+Make sure you have Coral UI installed:
+
+```bash
+npm install @reallygoodwork/coral-core colord node-html-parser
+```
+
+## 5-Minute Tutorial
+
+### Step 1: Create Your First Coral Spec
+
+Let's start by creating a simple button component specification:
+
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+const buttonSpec = {
+  elementType: 'button',
+  name: 'PrimaryButton',
+  children: ['Click me!'],
+  styles: {
+    backgroundColor: '#3b82f6',
+    color: '#ffffff',
+    padding: '12px 24px',
+    borderRadius: '8px',
+    border: 'none',
+    fontSize: '16px',
+    fontWeight: '500',
+    cursor: 'pointer'
+  },
+  attributes: {
+    type: 'button',
+    'data-variant': 'primary'
+  }
+}
+
+// Validate and parse the specification
+const validatedSpec = parseUISpec(buttonSpec)
+console.log('✅ Valid button spec created!')
+```
+
+### Step 2: Transform HTML to Coral Spec
+
+Convert existing HTML into a Coral specification:
+
+```typescript
+import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
+
+const htmlString = `
+<div class="card bg-white rounded-lg shadow-md p-6 max-w-sm">
+  <img src="/api/placeholder/300/200" alt="Card image" class="w-full h-48 object-cover rounded-md mb-4">
+  <h3 class="text-xl font-semibold text-gray-800 mb-2">Card Title</h3>
+  <p class="text-gray-600 mb-4">This is a description of the card content that explains what this card is about.</p>
+  <div class="flex gap-2">
+    <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+      Primary
+    </button>
+    <button class="border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-50">
+      Secondary
+    </button>
+  </div>
+</div>
+`
+
+const cardSpec = transformHTMLToSpec(htmlString)
+console.log('✅ HTML converted to Coral spec!')
+console.log(JSON.stringify(cardSpec, null, 2))
+```
+
+### Step 3: Work with Tailwind CSS
+
+Convert Tailwind classes to CSS properties:
+
+```typescript
+import { tailwindToCSS } from '@reallygoodwork/tw2css'
+
+// Convert common Tailwind patterns
+const buttonStyles = tailwindToCSS('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded')
+const cardStyles = tailwindToCSS('bg-white shadow-lg rounded-lg p-6 max-w-sm mx-auto')
+const textStyles = tailwindToCSS('text-xl font-semibold text-gray-800 mb-2')
+
+console.log('Button styles:', buttonStyles)
+console.log('Card styles:', cardStyles)
+console.log('Text styles:', textStyles)
+```
+
+## Real-World Examples
+
+### Example 1: Form Component
+
+Create a complete form component specification:
+
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+const formSpec = parseUISpec({
+  elementType: 'form',
+  name: 'ContactForm',
+  attributes: {
+    method: 'POST',
+    action: '/api/contact'
+  },
+  styles: {
+    maxWidth: '480px',
+    margin: '0 auto',
+    padding: '24px',
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+  },
+  children: [
+    {
+      elementType: 'div',
+      styles: { marginBottom: '16px' },
+      children: [
+        {
+          elementType: 'label',
+          attributes: { htmlFor: 'name' },
+          styles: {
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '4px'
+          },
+          children: ['Full Name']
+        },
+        {
+          elementType: 'input',
+          attributes: {
+            type: 'text',
+            id: 'name',
+            name: 'name',
+            required: true
+          },
+          styles: {
+            width: '100%',
+            padding: '8px 12px',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            fontSize: '16px'
+          }
+        }
+      ]
+    },
+    {
+      elementType: 'button',
+      attributes: { type: 'submit' },
+      styles: {
+        width: '100%',
+        backgroundColor: '#3b82f6',
+        color: '#ffffff',
+        padding: '12px',
+        borderRadius: '6px',
+        border: 'none',
+        fontSize: '16px',
+        fontWeight: '500',
+        cursor: 'pointer'
+      },
+      children: ['Send Message']
+    }
+  ]
+})
+
+console.log('✅ Contact form spec created!')
+```
+
+### Example 2: Navigation Component
+
+Transform a navigation bar from HTML:
+
+```typescript
+import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
+
+const navHTML = `
+<nav class="bg-white shadow-sm border-b">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <div class="flex items-center">
+        <img class="h-8 w-auto" src="/logo.svg" alt="Company">
+        <span class="ml-2 text-xl font-semibold text-gray-900">Coral UI</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="/docs" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+          Docs
+        </a>
+        <a href="/examples" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+          Examples
+        </a>
+        <a href="/github" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+`
+
+const navSpec = transformHTMLToSpec(navHTML)
+console.log('✅ Navigation spec created!')
+```
+
+### Example 3: Style Utilities
+
+Work with complex style transformations:
+
+```typescript
+import { tailwindToCSS } from '@reallygoodwork/tw2css'
+
+// Hero section styles
+const heroStyles = tailwindToCSS(`
+  relative bg-gradient-to-r from-purple-600 to-blue-600 
+  text-white py-24 px-6 text-center
+`)
+
+// Card grid styles
+const gridStyles = tailwindToCSS(`
+  grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 
+  gap-6 max-w-6xl mx-auto p-6
+`)
+
+// Responsive button styles
+const responsiveButtonStyles = tailwindToCSS(`
+  w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 
+  text-white font-medium py-2 px-4 rounded-lg 
+  transition duration-150 ease-in-out
+`)
+
+console.log('Hero styles:', heroStyles)
+console.log('Grid styles:', gridStyles)
+console.log('Button styles:', responsiveButtonStyles)
+```
+
+## Common Patterns
+
+### Working with Component Variants
+
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+const buttonWithVariants = parseUISpec({
+  elementType: 'button',
+  name: 'Button',
+  variants: [
+    {
+      name: 'primary',
+      styles: {
+        backgroundColor: '#3b82f6',
+        color: '#ffffff'
+      }
+    },
+    {
+      name: 'secondary',
+      styles: {
+        backgroundColor: '#6b7280',
+        color: '#ffffff'
+      }
+    },
+    {
+      name: 'outline',
+      styles: {
+        backgroundColor: 'transparent',
+        color: '#3b82f6',
+        border: '1px solid #3b82f6'
+      }
+    }
+  ],
+  children: ['Button Text']
+})
+```
+
+### Adding State Management
+
+```typescript
+const interactiveComponent = parseUISpec({
+  elementType: 'div',
+  name: 'Counter',
+  state: [
+    {
+      name: 'count',
+      type: 'number',
+      defaultValue: 0
+    }
+  ],
+  methods: [
+    {
+      name: 'increment',
+      parameters: [],
+      returnType: 'void'
+    },
+    {
+      name: 'decrement',
+      parameters: [],
+      returnType: 'void'
+    }
+  ],
+  children: [
+    {
+      elementType: 'span',
+      children: ['Count: {count}']
+    },
+    {
+      elementType: 'button',
+      attributes: {
+        onClick: 'increment'
+      },
+      children: ['+']
+    }
+  ]
+})
+```
+
+## Next Steps
+
+Now that you've seen the basics, explore these areas:
+
+<CardGrid>
+  <Card title="Core Concepts" icon="open-book">
+    Understand the Coral specification format and transformation pipeline
+    
+    [Learn concepts →](/concepts/overview/)
+  </Card>
+  <Card title="Package Documentation" icon="puzzle">
+    Detailed guides for each package in the ecosystem
+    
+    [Browse packages →](/packages/core/)
+  </Card>
+  <Card title="Advanced Examples" icon="laptop">
+    Complex use cases and integration patterns
+    
+    [View examples →](/examples/basic-usage/)
+  </Card>
+  <Card title="API Reference" icon="list-format">
+    Complete function and type documentation
+    
+    [Explore API →](/api/core-functions/)
+  </Card>
+</CardGrid>
+
+## Tips for Success
+
+<Aside type="tip" title="Best Practices">
+- Always validate specs with `parseUISpec()` before using them
+- Use TypeScript for better development experience
+- Start with simple components and gradually add complexity
+- Leverage existing HTML/CSS when possible with `transformHTMLToSpec()`
+</Aside>
+
+<Aside type="note" title="Performance">
+- Coral UI is optimized for build-time transformations
+- Consider caching parsed specs in production applications
+- Use tree-shaking to include only the functions you need
+</Aside>
+
+Ready to build something amazing? Check out our [examples section](/examples/basic-usage/) for more inspiration!

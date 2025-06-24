@@ -1,0 +1,838 @@
+---
+title: JSON Schema Validation
+description: Complete guide to Coral UI's JSON schema system for validation, type safety, and specification correctness
+---
+
+import { Card, CardGrid, Tabs, TabItem, Badge, Aside } from '@astrojs/starlight/components'
+
+Coral UI uses comprehensive JSON schemas to ensure specification correctness, provide type safety, and enable robust validation across the entire ecosystem.
+
+## Overview
+
+The schema system provides:
+
+- **Validation** - Ensure specifications are well-formed and complete
+- **Type Safety** - Generate TypeScript types from schemas
+- **Documentation** - Self-documenting specification format
+- **IDE Support** - Autocomplete and error detection
+- **Interoperability** - Standard JSON Schema format
+
+## Available Schemas
+
+<CardGrid>
+  <Card title="coral.schema.json" icon="star">
+    **Main Component Schema**
+    
+    Defines the core CoralNode structure with all properties and validation rules.
+  </Card>
+  <Card title="coral-root.schema.json" icon="document">
+    **Root Schema**
+    
+    Extends the core schema with root-level properties like imports and metadata.
+  </Card>
+  <Card title="styles.schema.json" icon="palette">
+    **Styles Schema**
+    
+    Validates CSS properties, colors, gradients, and responsive styles.
+  </Card>
+  <Card title="state.schema.json" icon="setting">
+    **State Schema**
+    
+    Defines React hooks, state management, and component lifecycle.
+  </Card>
+</CardGrid>
+
+### Complete Schema List
+
+| Schema | Purpose | Key Properties |
+|--------|---------|----------------|
+| `coral.schema.json` | Core component definition | `elementType`, `name`, `children`, `styles` |
+| `coral-root.schema.json` | Root-level specification | `imports`, `dependencies`, `designTokens` |
+| `styles.schema.json` | CSS styling properties | Colors, gradients, responsive styles |
+| `state.schema.json` | State management | React hooks, lifecycle methods |
+| `method.schema.json` | Component methods | Function signatures, parameters |
+| `import.schema.json` | Import statements | Module imports, dependencies |
+| `variant.schema.json` | Component variants | Style variations, properties |
+| `design-token.schema.json` | Design system tokens | Colors, spacing, typography |
+| `component-property.schema.json` | Component properties | Props, configuration |
+| `dependency.schema.json` | Package dependencies | NPM packages, versions |
+| `ts-types.schema.json` | TypeScript types | Type definitions, generics |
+
+## Using Schemas
+
+### Validation with Core Functions
+
+The primary way to validate specifications is through the core validation functions:
+
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+const spec = {
+  elementType: 'button',
+  name: 'MyButton',
+  children: ['Click me']
+}
+
+try {
+  const validatedSpec = parseUISpec(spec)
+  console.log('✅ Specification is valid')
+} catch (error) {
+  console.error('❌ Validation failed:', error.message)
+}
+```
+
+### Direct Schema Access
+
+Access schemas directly for custom validation:
+
+```typescript
+import { exportSchemaToJSON, exportAllSchemas } from '@reallygoodwork/coral-core'
+
+// Get a specific schema
+const coralSchema = exportSchemaToJSON('coral')
+const stylesSchema = exportSchemaToJSON('styles')
+
+// Get all schemas
+const allSchemas = exportAllSchemas()
+console.log('Available schemas:', Object.keys(allSchemas))
+```
+
+### External Validation Libraries
+
+Use with popular JSON schema validation libraries:
+
+<Tabs>
+  <TabItem label="AJV">
+    ```typescript
+    import Ajv from 'ajv'
+    import { exportSchemaToJSON } from '@reallygoodwork/coral-core'
+
+    const ajv = new Ajv()
+    const coralSchema = exportSchemaToJSON('coral')
+    const validate = ajv.compile(coralSchema)
+
+    const spec = {
+      elementType: 'div',
+      name: 'MyComponent'
+    }
+
+    if (validate(spec)) {
+      console.log('✅ Valid specification')
+    } else {
+      console.error('❌ Validation errors:', validate.errors)
+    }
+    ```
+  </TabItem>
+  <TabItem label="JSON Schema Validator">
+    ```typescript
+    import { Validator } from 'jsonschema'
+    import { exportSchemaToJSON } from '@reallygoodwork/coral-core'
+
+    const validator = new Validator()
+    const coralSchema = exportSchemaToJSON('coral')
+
+    const result = validator.validate(spec, coralSchema)
+
+    if (result.valid) {
+      console.log('✅ Valid specification')
+    } else {
+      console.error('❌ Validation errors:', result.errors)
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## Schema Structure Deep Dive
+
+### Core Schema Properties
+
+#### Required Properties
+
+```json
+{
+  "required": ["elementType", "name"],
+  "properties": {
+    "elementType": {
+      "type": "string",
+      "description": "The type of element to create",
+      "anyOf": [
+        { "const": "div" },
+        { "const": "button" },
+        { "const": "input" },
+        // ... all supported HTML elements
+      ]
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-zA-Z_$][0-9a-zA-Z_$]*$",
+      "description": "Valid JavaScript identifier"
+    }
+  }
+}
+```
+
+#### Optional Properties
+
+```json
+{
+  "properties": {
+    "children": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": { "$ref": "#" }
+        },
+        { "type": "null" }
+      ],
+      "description": "Child components or elements"
+    },
+    "textContent": {
+      "type": "string",
+      "description": "Direct text content"
+    },
+    "description": {
+      "type": "string", 
+      "description": "Human-readable description"
+    }
+  }
+}
+```
+
+### Styles Schema
+
+The styles schema supports multiple value types:
+
+```json
+{
+  "type": "object",
+  "propertyNames": {
+    "type": "string",
+    "description": "CSS property name"
+  },
+  "additionalProperties": {
+    "anyOf": [
+      { "type": "string" },
+      { "type": "number" },
+      {
+        "type": "object",
+        "description": "Color object",
+        "properties": {
+          "hex": { "type": "string" },
+          "rgb": {
+            "type": "object",
+            "properties": {
+              "r": { "type": "number", "minimum": 0, "maximum": 255 },
+              "g": { "type": "number", "minimum": 0, "maximum": 255 },
+              "b": { "type": "number", "minimum": 0, "maximum": 255 },
+              "a": { "type": "number", "minimum": 0, "maximum": 1 }
+            },
+            "required": ["r", "g", "b", "a"]
+          },
+          "hsl": {
+            "type": "object",
+            "properties": {
+              "h": { "type": "number", "minimum": 0, "maximum": 360 },
+              "s": { "type": "number", "minimum": 0, "maximum": 100 },
+              "l": { "type": "number", "minimum": 0, "maximum": 100 },
+              "a": { "type": "number", "minimum": 0, "maximum": 1 }
+            },
+            "required": ["h", "s", "l", "a"]
+          }
+        },
+        "required": ["hex", "rgb", "hsl"]
+      },
+      {
+        "type": "object",
+        "description": "Gradient object",
+        "properties": {
+          "type": {
+            "enum": ["linear", "radial", "LINEAR", "RADIAL"]
+          },
+          "angle": { "type": "number" },
+          "colors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "color": { "$ref": "#/definitions/color" },
+                "position": { "type": "number" }
+              },
+              "required": ["color", "position"]
+            }
+          }
+        },
+        "required": ["type", "angle", "colors"]
+      }
+    ]
+  }
+}
+```
+
+### State Schema
+
+Defines React hooks and state management:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-zA-Z_$][0-9a-zA-Z_$]*$",
+      "description": "State variable name"
+    },
+    "setterName": {
+      "type": "string", 
+      "pattern": "^[a-zA-Z_$][0-9a-zA-Z_$]*$",
+      "description": "Setter function name"
+    },
+    "initialValue": {
+      "description": "Initial state value"
+    },
+    "tsType": {
+      "anyOf": [
+        { "$ref": "#/definitions/tsType" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/tsType" }
+        }
+      ],
+      "description": "TypeScript type"
+    },
+    "hookType": {
+      "enum": [
+        "useState", 
+        "useEffect", 
+        "useReducer", 
+        "useContext", 
+        "useMemo", 
+        "useCallback"
+      ],
+      "description": "React hook type"
+    },
+    "dependencies": {
+      "type": "string",
+      "description": "Hook dependencies"
+    },
+    "reducer": {
+      "type": "string",
+      "description": "Reducer function for useReducer"
+    }
+  },
+  "required": ["name", "setterName", "tsType"]
+}
+```
+
+## Validation Examples
+
+### Basic Validation
+
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+// Valid specification
+const validSpec = {
+  elementType: 'button',
+  name: 'SubmitButton',
+  children: ['Submit'],
+  styles: {
+    backgroundColor: '#3b82f6',
+    color: '#ffffff',
+    padding: '12px 24px',
+    borderRadius: '6px'
+  }
+}
+
+try {
+  const validated = parseUISpec(validSpec)
+  console.log('✅ Validation successful')
+} catch (error) {
+  console.error('❌ Validation failed:', error.message)
+}
+```
+
+### Handling Validation Errors
+
+```typescript
+// Invalid specification - missing required properties
+const invalidSpec = {
+  // Missing elementType and name
+  children: ['Button text']
+}
+
+try {
+  parseUISpec(invalidSpec)
+} catch (error) {
+  if (error.name === 'ValidationError') {
+    console.error('Validation failed with errors:')
+    error.errors.forEach(err => {
+      console.error(`- ${err.path}: ${err.message}`)
+    })
+  }
+}
+```
+
+### Complex Validation
+
+```typescript
+// Complex specification with multiple features
+const complexSpec = {
+  elementType: 'div',
+  name: 'UserProfile',
+  description: 'User profile component with avatar and details',
+  
+  styles: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '16px',
+    backgroundColor: {
+      hex: '#ffffff',
+      rgb: { r: 255, g: 255, b: 255, a: 1 },
+      hsl: { h: 0, s: 0, l: 100, a: 1 }
+    },
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px'
+  },
+  
+  children: [
+    {
+      elementType: 'img',
+      name: 'Avatar',
+      elementAttributes: {
+        src: '{user.avatar}',
+        alt: '{user.name}',
+        width: 48,
+        height: 48
+      },
+      styles: {
+        borderRadius: '50%',
+        marginRight: '12px'
+      }
+    },
+    {
+      elementType: 'div',
+      name: 'UserInfo',
+      children: [
+        {
+          elementType: 'h3',
+          name: 'UserName',
+          children: ['{user.name}'],
+          styles: {
+            fontSize: '16px',
+            fontWeight: '600',
+            marginBottom: '4px'
+          }
+        },
+        {
+          elementType: 'p',
+          name: 'UserEmail',
+          children: ['{user.email}'],
+          styles: {
+            fontSize: '14px',
+            color: '#6b7280'
+          }
+        }
+      ]
+    }
+  ],
+  
+  stateHooks: [
+    {
+      name: 'isLoading',
+      setterName: 'setIsLoading',
+      initialValue: false,
+      tsType: 'boolean',
+      hookType: 'useState'
+    }
+  ],
+  
+  methods: [
+    {
+      name: 'handleUserClick',
+      parameters: [
+        { name: 'userId', type: 'string' }
+      ],
+      returnType: 'void'
+    }
+  ]
+}
+
+try {
+  const validated = parseUISpec(complexSpec)
+  console.log('✅ Complex specification validated successfully')
+} catch (error) {
+  console.error('❌ Complex validation failed:', error.message)
+}
+```
+
+## Custom Validation
+
+### Extending Schemas
+
+Create custom validation rules:
+
+```typescript
+import Ajv from 'ajv'
+import { exportSchemaToJSON } from '@reallygoodwork/coral-core'
+
+function createCustomValidator() {
+  const ajv = new Ajv()
+  
+  // Add custom format for CSS values
+  ajv.addFormat('css-length', {
+    type: 'string',
+    validate: (value: string) => {
+      return /^\d+(px|em|rem|%|vh|vw)$/.test(value)
+    }
+  })
+  
+  // Add custom keyword for design system tokens
+  ajv.addKeyword({
+    keyword: 'designToken',
+    type: 'string',
+    compile: (schema: any) => {
+      return (value: string) => {
+        return value.startsWith('$') || value.startsWith('--')
+      }
+    }
+  })
+  
+  const baseSchema = exportSchemaToJSON('coral')
+  
+  // Extend schema with custom rules
+  const customSchema = {
+    ...baseSchema,
+    properties: {
+      ...baseSchema.properties,
+      styles: {
+        ...baseSchema.properties.styles,
+        properties: {
+          ...baseSchema.properties.styles.properties,
+          // Add custom validation for specific CSS properties
+          fontSize: {
+            type: 'string',
+            format: 'css-length'
+          },
+          color: {
+            type: 'string',
+            designToken: true
+          }
+        }
+      }
+    }
+  }
+  
+  return ajv.compile(customSchema)
+}
+
+const customValidate = createCustomValidator()
+
+const spec = {
+  elementType: 'p',
+  name: 'Text',
+  styles: {
+    fontSize: '16px',    // ✅ Valid CSS length
+    color: '$primary'    // ✅ Valid design token
+  }
+}
+
+if (customValidate(spec)) {
+  console.log('✅ Custom validation passed')
+} else {
+  console.error('❌ Custom validation failed:', customValidate.errors)
+}
+```
+
+### Validation Middleware
+
+Create validation middleware for different contexts:
+
+```typescript
+interface ValidationContext {
+  framework?: 'react' | 'vue' | 'angular'
+  target?: 'web' | 'mobile' | 'email'
+  strict?: boolean
+}
+
+function createContextualValidator(context: ValidationContext) {
+  const baseSchema = exportSchemaToJSON('coral')
+  
+  // Modify schema based on context
+  let contextualSchema = { ...baseSchema }
+  
+  if (context.framework === 'react') {
+    // Add React-specific validations
+    contextualSchema.properties.stateHooks = {
+      type: 'array',
+      items: { $ref: '#/definitions/stateHook' }
+    }
+  }
+  
+  if (context.target === 'email') {
+    // Restrict to email-safe CSS properties
+    contextualSchema.properties.styles.properties = {
+      // Only allow email-safe properties
+      backgroundColor: { type: 'string' },
+      color: { type: 'string' },
+      fontSize: { type: 'string' },
+      fontFamily: { type: 'string' },
+      padding: { type: 'string' },
+      margin: { type: 'string' }
+    }
+  }
+  
+  if (context.strict) {
+    // Enable strict mode validations
+    contextualSchema.additionalProperties = false
+    contextualSchema.required = [...contextualSchema.required, 'description']
+  }
+  
+  const ajv = new Ajv()
+  return ajv.compile(contextualSchema)
+}
+
+// Usage examples
+const reactValidator = createContextualValidator({ 
+  framework: 'react', 
+  target: 'web' 
+})
+
+const emailValidator = createContextualValidator({ 
+  target: 'email', 
+  strict: true 
+})
+```
+
+## IDE Integration
+
+### VS Code Schema Setup
+
+Configure VS Code for autocomplete and validation:
+
+```json
+// .vscode/settings.json
+{
+  "json.schemas": [
+    {
+      "fileMatch": ["*.coral.json"],
+      "url": "./node_modules/@reallygoodwork/coral-core/schemas/coral.schema.json"
+    },
+    {
+      "fileMatch": ["*.coral-root.json"],
+      "url": "./node_modules/@reallygoodwork/coral-core/schemas/coral-root.schema.json"
+    }
+  ]
+}
+```
+
+### TypeScript Integration
+
+Generate TypeScript types from schemas:
+
+```typescript
+// types/coral.d.ts (auto-generated)
+import type { 
+  CoralNode, 
+  CoralRootNode, 
+  CoralStyleType,
+  CoralStateType 
+} from '@reallygoodwork/coral-core'
+
+// Your additional type definitions
+export interface MyCustomComponent extends CoralNode {
+  elementType: 'MyCustomComponent'
+  customProperty?: string
+}
+```
+
+## Error Handling Best Practices
+
+### Structured Error Reporting
+
+```typescript
+interface ValidationResult {
+  valid: boolean
+  errors?: ValidationError[]
+  warnings?: ValidationWarning[]
+}
+
+function validateWithDetails(spec: unknown): ValidationResult {
+  try {
+    const validated = parseUISpec(spec)
+    return { valid: true }
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      return {
+        valid: false,
+        errors: error.errors.map(err => ({
+          path: err.path,
+          message: err.message,
+          value: err.value,
+          severity: 'error'
+        }))
+      }
+    }
+    
+    return {
+      valid: false,
+      errors: [{
+        path: 'root',
+        message: error.message,
+        severity: 'error'
+      }]
+    }
+  }
+}
+```
+
+### Progressive Validation
+
+```typescript
+function progressiveValidation(spec: unknown) {
+  const results = []
+  
+  // Step 1: Basic structure validation
+  try {
+    validateBasicStructure(spec)
+    results.push({ stage: 'structure', status: 'passed' })
+  } catch (error) {
+    results.push({ stage: 'structure', status: 'failed', error })
+    return results // Stop on critical errors
+  }
+  
+  // Step 2: Property validation
+  try {
+    validateProperties(spec)
+    results.push({ stage: 'properties', status: 'passed' })
+  } catch (error) {
+    results.push({ stage: 'properties', status: 'failed', error })
+  }
+  
+  // Step 3: Semantic validation
+  try {
+    validateSemantics(spec)
+    results.push({ stage: 'semantics', status: 'passed' })
+  } catch (error) {
+    results.push({ stage: 'semantics', status: 'failed', error })
+  }
+  
+  return results
+}
+```
+
+## Performance Considerations
+
+### Schema Caching
+
+```typescript
+class SchemaCache {
+  private static cache = new Map<string, any>()
+  
+  static getSchema(name: string) {
+    if (!this.cache.has(name)) {
+      const schema = exportSchemaToJSON(name)
+      this.cache.set(name, schema)
+    }
+    return this.cache.get(name)
+  }
+  
+  static clearCache() {
+    this.cache.clear()
+  }
+}
+```
+
+### Validation Optimization
+
+```typescript
+// Pre-compile validators for better performance
+const validators = {
+  coral: (() => {
+    const ajv = new Ajv()
+    return ajv.compile(exportSchemaToJSON('coral'))
+  })(),
+  
+  styles: (() => {
+    const ajv = new Ajv()
+    return ajv.compile(exportSchemaToJSON('styles'))
+  })(),
+  
+  state: (() => {
+    const ajv = new Ajv()
+    return ajv.compile(exportSchemaToJSON('state'))
+  })()
+}
+
+function fastValidate(spec: unknown, schemaName: string) {
+  const validator = validators[schemaName]
+  if (!validator) {
+    throw new Error(`Unknown schema: ${schemaName}`)
+  }
+  
+  return validator(spec)
+}
+```
+
+## Testing with Schemas
+
+### Validation Test Cases
+
+```typescript
+describe('Coral Specification Validation', () => {
+  test('validates minimal spec', () => {
+    const spec = {
+      elementType: 'div',
+      name: 'TestComponent'
+    }
+    
+    expect(() => parseUISpec(spec)).not.toThrow()
+  })
+  
+  test('rejects invalid element type', () => {
+    const spec = {
+      elementType: 'invalid-element',
+      name: 'TestComponent'
+    }
+    
+    expect(() => parseUISpec(spec)).toThrow()
+  })
+  
+  test('validates complex nested structure', () => {
+    const spec = {
+      elementType: 'div',
+      name: 'ComplexComponent',
+      children: [
+        {
+          elementType: 'h1',
+          name: 'Title',
+          children: ['Hello World']
+        }
+      ]
+    }
+    
+    expect(() => parseUISpec(spec)).not.toThrow()
+  })
+})
+```
+
+## Best Practices
+
+<Aside type="tip" title="Validation Strategy">
+- **Validate early** - Check specifications as soon as they're created
+- **Use progressive validation** - Check structure before detailed properties  
+- **Cache validators** - Pre-compile schemas for better performance
+- **Provide clear errors** - Help developers understand what went wrong
+</Aside>
+
+<Aside type="note" title="Schema Design">
+- **Keep schemas focused** - Each schema should have a single responsibility
+- **Use references** - Avoid duplicating schema definitions
+- **Document thoroughly** - Include descriptions for all properties
+- **Version schemas** - Plan for backward compatibility
+</Aside>
+
+## Next Steps
+
+- [API Reference](/api/core-functions/) - Explore validation functions
+- [Custom Transformations](/advanced/custom-transformations/) - Build schema-aware transformers
+- [Package Documentation](/packages/core/) - Learn about schema exports and utilities

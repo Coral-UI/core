@@ -1,0 +1,768 @@
+---
+title: Coral Specification Format
+description: Complete reference for the Coral specification format including all properties, structure, and usage patterns
+---
+
+import { Card, CardGrid, Tabs, TabItem, Badge, Aside } from '@astrojs/starlight/components'
+
+The Coral specification is a JSON-based format that describes UI components in a universal, framework-agnostic way. This format serves as the foundation for all transformations in the Coral UI ecosystem.
+
+## Overview
+
+A Coral specification defines a component with its structure, styling, behavior, and metadata. It's designed to be:
+
+- **Framework-agnostic** - Works with React, Vue, Angular, or plain HTML
+- **Type-safe** - Validated against JSON schemas
+- **Extensible** - Supports custom properties and metadata
+- **Composable** - Components can contain other components
+
+## Basic Structure
+
+Every Coral specification has this minimal structure:
+
+```typescript
+interface CoralNode {
+  elementType: string    // Required: HTML element or component name
+  name: string          // Required: Component identifier
+  // ... additional optional properties
+}
+```
+
+### Minimal Example
+
+```json
+{
+  "elementType": "button",
+  "name": "SimpleButton"
+}
+```
+
+## Core Properties
+
+### Required Properties
+
+#### `elementType` <Badge text="Required" variant="danger" />
+
+The HTML element type or custom component name to create.
+
+```typescript
+elementType: string
+```
+
+**Supported HTML Elements:**
+- Semantic: `div`, `section`, `article`, `header`, `footer`, `nav`, `main`, `aside`
+- Typography: `h1`-`h6`, `p`, `span`, `strong`, `em`, `code`, `pre`, `blockquote`
+- Interactive: `button`, `input`, `textarea`, `select`, `option`, `form`, `label`
+- Media: `img`, `audio`, `video`, `source`, `canvas`
+- Lists: `ul`, `ol`, `li`
+- Tables: `table`, `tr`, `td`, `th`
+- Other: `a`, `hr`, `br`, `figure`, `figcaption`, `fieldset`, `legend`
+
+**Custom Components:**
+```json
+{
+  "elementType": "MyCustomButton",
+  "name": "CustomButton"
+}
+```
+
+#### `name` <Badge text="Required" variant="danger" />
+
+A valid JavaScript identifier for the component.
+
+```typescript
+name: string  // Pattern: ^[a-zA-Z_$][0-9a-zA-Z_$]*$
+```
+
+**Examples:**
+```json
+{
+  "name": "PrimaryButton",     // ✅ Valid
+  "name": "nav_item",          // ✅ Valid
+  "name": "Button2",           // ✅ Valid
+  "name": "2Button",           // ❌ Invalid - starts with number
+  "name": "my-button"          // ❌ Invalid - contains hyphen
+}
+```
+
+### Content Properties
+
+#### `textContent` <Badge text="Optional" variant="tip" />
+
+Direct text content for the element.
+
+```typescript
+textContent?: string
+```
+
+```json
+{
+  "elementType": "p",
+  "name": "Paragraph",
+  "textContent": "This is paragraph text content."
+}
+```
+
+#### `children` <Badge text="Optional" variant="tip" />
+
+Child components or text nodes.
+
+```typescript
+children?: (CoralNode | string)[] | null
+```
+
+**Examples:**
+
+Text children:
+```json
+{
+  "elementType": "button",
+  "name": "Button",
+  "children": ["Click me!"]
+}
+```
+
+Component children:
+```json
+{
+  "elementType": "div",
+  "name": "Card",
+  "children": [
+    {
+      "elementType": "h2",
+      "name": "CardTitle",
+      "children": ["Card Title"]
+    },
+    {
+      "elementType": "p", 
+      "name": "CardContent",
+      "children": ["Card description"]
+    }
+  ]
+}
+```
+
+Mixed children:
+```json
+{
+  "elementType": "div",
+  "name": "MixedContent",
+  "children": [
+    "Some text",
+    {
+      "elementType": "strong",
+      "name": "BoldText",
+      "children": ["bold text"]
+    },
+    " and more text."
+  ]
+}
+```
+
+### Styling Properties
+
+#### `styles` <Badge text="Optional" variant="tip" />
+
+CSS styles for the component.
+
+```typescript
+styles?: Record<string, StyleValue>
+
+type StyleValue = string | number | CoralColor | CoralGradient | Record<string, StyleValue>
+```
+
+**Basic styles:**
+```json
+{
+  "elementType": "button",
+  "name": "StyledButton",
+  "styles": {
+    "backgroundColor": "#3b82f6",
+    "color": "#ffffff",
+    "padding": "12px 24px",
+    "borderRadius": "6px",
+    "fontSize": 16,
+    "fontWeight": "500"
+  }
+}
+```
+
+**Nested styles (pseudo-classes, media queries):**
+```json
+{
+  "elementType": "button",
+  "name": "InteractiveButton",
+  "styles": {
+    "backgroundColor": "#3b82f6",
+    "color": "#ffffff",
+    "transition": "all 0.2s ease",
+    ":hover": {
+      "backgroundColor": "#2563eb",
+      "transform": "translateY(-1px)"
+    },
+    ":active": {
+      "transform": "translateY(0)"
+    },
+    "@media (max-width: 768px)": {
+      "fontSize": "14px",
+      "padding": "8px 16px"
+    }
+  }
+}
+```
+
+**Color objects:**
+```json
+{
+  "styles": {
+    "backgroundColor": {
+      "hex": "#3b82f6",
+      "rgb": { "r": 59, "g": 130, "b": 246, "a": 1 },
+      "hsl": { "h": 217, "s": 91, "l": 60, "a": 1 }
+    }
+  }
+}
+```
+
+**Gradient objects:**
+```json
+{
+  "styles": {
+    "background": {
+      "type": "linear",
+      "angle": 45,
+      "colors": [
+        {
+          "color": {
+            "hex": "#3b82f6",
+            "rgb": { "r": 59, "g": 130, "b": 246, "a": 1 },
+            "hsl": { "h": 217, "s": 91, "l": 60, "a": 1 }
+          },
+          "position": 0
+        },
+        {
+          "color": {
+            "hex": "#8b5cf6", 
+            "rgb": { "r": 139, "g": 92, "b": 246, "a": 1 },
+            "hsl": { "h": 258, "s": 90, "l": 66, "a": 1 }
+          },
+          "position": 1
+        }
+      ]
+    }
+  }
+}
+```
+
+#### `elementAttributes` <Badge text="Optional" variant="tip" />
+
+HTML attributes for the element.
+
+```typescript
+elementAttributes?: Record<string, string | number | boolean | string[]>
+```
+
+```json
+{
+  "elementType": "input",
+  "name": "EmailInput",
+  "elementAttributes": {
+    "type": "email",
+    "placeholder": "Enter your email",
+    "required": true,
+    "maxlength": 100,
+    "class": ["form-input", "email-field"],
+    "data-testid": "email-input"
+  }
+}
+```
+
+### Component System Properties
+
+#### `variants` <Badge text="Optional" variant="tip" />
+
+Different style variants of the same component.
+
+```typescript
+variants?: CoralNode[] | null
+```
+
+```json
+{
+  "elementType": "button",
+  "name": "Button",
+  "variants": [
+    {
+      "elementType": "button",
+      "name": "PrimaryButton",
+      "styles": {
+        "backgroundColor": "#3b82f6",
+        "color": "#ffffff"
+      }
+    },
+    {
+      "elementType": "button", 
+      "name": "SecondaryButton",
+      "styles": {
+        "backgroundColor": "#6b7280",
+        "color": "#ffffff"
+      }
+    }
+  ]
+}
+```
+
+#### `variantProperties` <Badge text="Optional" variant="tip" />
+
+Properties that control variant behavior.
+
+```typescript
+variantProperties?: Record<string, {
+  type: TypeDefinition | TypeDefinition[]
+  value: unknown
+}>
+```
+
+```json
+{
+  "elementType": "button",
+  "name": "VariantButton",
+  "variantProperties": {
+    "size": {
+      "type": "string",
+      "value": "medium"
+    },
+    "variant": {
+      "type": ["string"],
+      "value": "primary"
+    }
+  }
+}
+```
+
+## Root-Level Properties
+
+For root Coral specifications (`CoralRootNode`), additional properties are available:
+
+### Metadata Properties
+
+#### `$schema` <Badge text="Optional" variant="tip" />
+
+Schema reference for validation.
+
+```json
+{
+  "$schema": "https://coral.design/schema.json"
+}
+```
+
+#### `componentName` <Badge text="Optional" variant="tip" />
+
+Override name for the component.
+
+```typescript
+componentName?: string
+```
+
+#### `description` <Badge text="Optional" variant="tip" />
+
+Human-readable description of the component.
+
+```typescript
+description?: string
+```
+
+### Configuration Properties
+
+#### `config` <Badge text="Optional" variant="tip" />
+
+Custom configuration data.
+
+```typescript
+config?: Record<string, unknown> | null
+```
+
+```json
+{
+  "config": {
+    "theme": "dark",
+    "responsive": true,
+    "animations": {
+      "duration": 200,
+      "easing": "ease-in-out"
+    }
+  }
+}
+```
+
+### Dependencies and Imports
+
+#### `imports` <Badge text="Optional" variant="tip" />
+
+Import statements for the component.
+
+```typescript
+imports?: CoralImport[]
+
+interface CoralImport {
+  name: string
+  from: string
+  type?: 'default' | 'named' | 'namespace'
+}
+```
+
+```json
+{
+  "imports": [
+    {
+      "name": "React",
+      "from": "react",
+      "type": "default"
+    },
+    {
+      "name": "{ useState, useEffect }",
+      "from": "react", 
+      "type": "named"
+    }
+  ]
+}
+```
+
+#### `dependencies` <Badge text="Optional" variant="tip" />
+
+Package dependencies.
+
+```typescript
+dependencies?: CoralDependency[]
+
+interface CoralDependency {
+  name: string
+  version: string
+  type?: 'production' | 'development'
+}
+```
+
+### State and Behavior
+
+#### `stateHooks` <Badge text="Optional" variant="tip" />
+
+React state hooks and other stateful behavior.
+
+```typescript
+stateHooks?: CoralState[]
+
+interface CoralState {
+  name: string
+  setterName: string
+  initialValue?: unknown
+  tsType: TypeDefinition | TypeDefinition[]
+  hookType?: 'useState' | 'useEffect' | 'useReducer' | 'useContext' | 'useMemo' | 'useCallback'
+  dependencies?: string
+  reducer?: string
+}
+```
+
+```json
+{
+  "stateHooks": [
+    {
+      "name": "count",
+      "setterName": "setCount",
+      "initialValue": 0,
+      "tsType": "number",
+      "hookType": "useState"
+    },
+    {
+      "name": "data",
+      "setterName": "setData",
+      "initialValue": null,
+      "tsType": ["object", "null"],
+      "hookType": "useState"
+    }
+  ]
+}
+```
+
+#### `methods` <Badge text="Optional" variant="tip" />
+
+Component methods and event handlers.
+
+```typescript
+methods?: CoralMethod[]
+
+interface CoralMethod {
+  name: string
+  parameters: { name: string; type: string }[]
+  returnType: string
+  async?: boolean
+}
+```
+
+```json
+{
+  "methods": [
+    {
+      "name": "handleClick",
+      "parameters": [
+        { "name": "event", "type": "MouseEvent" }
+      ],
+      "returnType": "void"
+    },
+    {
+      "name": "fetchData",
+      "parameters": [
+        { "name": "id", "type": "string" }
+      ],
+      "returnType": "Promise<Data>",
+      "async": true
+    }
+  ]
+}
+```
+
+### Design System Integration
+
+#### `designTokens` <Badge text="Optional" variant="tip" />
+
+Design system tokens and values.
+
+```typescript
+designTokens?: Record<string, CoralDesignToken>
+
+interface CoralDesignToken {
+  value: unknown
+  type: string
+  description?: string
+}
+```
+
+```json
+{
+  "designTokens": {
+    "primary-500": {
+      "value": "#3b82f6",
+      "type": "color",
+      "description": "Primary brand color"
+    },
+    "spacing-md": {
+      "value": "16px",
+      "type": "dimension",
+      "description": "Medium spacing unit"
+    }
+  }
+}
+```
+
+#### `componentProperties` <Badge text="Optional" variant="tip" />
+
+Properties for component sets and variants.
+
+```typescript
+componentProperties?: Record<string, ComponentProperty>
+```
+
+### Figma Integration
+
+#### `figmaNodeRef` <Badge text="Optional" variant="tip" />
+
+Reference to the original Figma node.
+
+```typescript
+figmaNodeRef?: string
+```
+
+#### `figmaType` <Badge text="Optional" variant="tip" />
+
+Figma node type.
+
+```typescript
+figmaType?: string
+```
+
+#### `type` <Badge text="Optional" variant="tip" />
+
+Component type in the design system.
+
+```typescript
+type?: 'COMPONENT' | 'INSTANCE' | 'COMPONENT_SET' | 'NODE'
+```
+
+## Complete Example
+
+Here's a comprehensive example showing many properties:
+
+```json
+{
+  "$schema": "https://coral.design/schema.json",
+  "elementType": "div",
+  "name": "UserCard",
+  "componentName": "UserCard",
+  "description": "A card component for displaying user information",
+  
+  "styles": {
+    "backgroundColor": "#ffffff",
+    "borderRadius": "8px",
+    "padding": "24px",
+    "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.1)",
+    "maxWidth": "400px"
+  },
+  
+  "children": [
+    {
+      "elementType": "img",
+      "name": "Avatar",
+      "elementAttributes": {
+        "src": "{user.avatar}",
+        "alt": "{user.name}",
+        "width": 64,
+        "height": 64
+      },
+      "styles": {
+        "borderRadius": "50%",
+        "marginBottom": "16px"
+      }
+    },
+    {
+      "elementType": "h3",
+      "name": "UserName",
+      "children": ["{user.name}"],
+      "styles": {
+        "fontSize": "20px",
+        "fontWeight": "600",
+        "marginBottom": "8px",
+        "color": "#1f2937"
+      }
+    },
+    {
+      "elementType": "p",
+      "name": "UserEmail", 
+      "children": ["{user.email}"],
+      "styles": {
+        "fontSize": "14px",
+        "color": "#6b7280",
+        "marginBottom": "16px"
+      }
+    },
+    {
+      "elementType": "button",
+      "name": "ContactButton",
+      "children": ["Contact"],
+      "elementAttributes": {
+        "onClick": "handleContact"
+      },
+      "styles": {
+        "backgroundColor": "#3b82f6",
+        "color": "#ffffff",
+        "padding": "8px 16px",
+        "borderRadius": "4px",
+        "border": "none",
+        "cursor": "pointer"
+      }
+    }
+  ],
+  
+  "imports": [
+    {
+      "name": "React",
+      "from": "react",
+      "type": "default"
+    }
+  ],
+  
+  "stateHooks": [
+    {
+      "name": "isLoading",
+      "setterName": "setIsLoading", 
+      "initialValue": false,
+      "tsType": "boolean",
+      "hookType": "useState"
+    }
+  ],
+  
+  "methods": [
+    {
+      "name": "handleContact",
+      "parameters": [],
+      "returnType": "void"
+    }
+  ],
+  
+  "designTokens": {
+    "card-bg": {
+      "value": "#ffffff",
+      "type": "color"
+    },
+    "card-padding": {
+      "value": "24px",
+      "type": "dimension"
+    }
+  }
+}
+```
+
+## Best Practices
+
+<Aside type="tip" title="Naming Conventions">
+- Use **PascalCase** for component names (`UserCard`, `PrimaryButton`)
+- Use **camelCase** for methods and state (`handleClick`, `isLoading`)
+- Use **kebab-case** for design tokens (`primary-500`, `spacing-md`)
+- Make names descriptive and specific
+</Aside>
+
+<Aside type="note" title="Structure Guidelines">
+- Keep components focused on a single responsibility
+- Use variants for different visual states
+- Leverage design tokens for consistency
+- Document complex components with descriptions
+</Aside>
+
+### Component Composition
+
+```json
+{
+  "elementType": "form",
+  "name": "ContactForm",
+  "children": [
+    {
+      "elementType": "FormField",
+      "name": "NameField"
+    },
+    {
+      "elementType": "FormField", 
+      "name": "EmailField"
+    },
+    {
+      "elementType": "SubmitButton",
+      "name": "Submit"
+    }
+  ]
+}
+```
+
+### Responsive Design
+
+```json
+{
+  "styles": {
+    "display": "grid",
+    "gridTemplateColumns": "1fr",
+    "gap": "16px",
+    "@media (min-width: 768px)": {
+      "gridTemplateColumns": "1fr 1fr"
+    },
+    "@media (min-width: 1024px)": {
+      "gridTemplateColumns": "1fr 1fr 1fr"
+    }
+  }
+}
+```
+
+## Validation
+
+All Coral specifications are validated against JSON schemas. See the [Schemas documentation](/concepts/schemas/) for detailed validation rules and error handling.
+
+## Next Steps
+
+- [Transformations](/concepts/transformations/) - Learn how specs are converted between formats
+- [Schemas](/concepts/schemas/) - Understand validation and type safety
+- [API Reference](/api/core-functions/) - Explore functions for working with specs

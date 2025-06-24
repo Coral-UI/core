@@ -1,0 +1,584 @@
+---
+title: Core Functions API
+description: Complete API reference for all core functions in the Coral UI ecosystem
+---
+
+import { Card, CardGrid, Tabs, TabItem, Badge, Aside } from '@astrojs/starlight/components'
+
+Complete reference for all functions available in the Coral UI core package.
+
+## Transformation Functions
+
+### `parseUISpec(spec: unknown): CoralNode`
+
+<Badge text="@reallygoodwork/coral-core" variant="note" />
+
+Validates and parses a raw UI specification against the Coral schema.
+
+**Signature:**
+```typescript
+function parseUISpec(spec: unknown): CoralNode
+```
+
+**Parameters:**
+- `spec: unknown` - Raw specification object to validate
+
+**Returns:** `CoralNode` - Validated and typed Coral specification
+
+**Throws:** 
+- `ValidationError` - When spec doesn't match schema
+- `TypeError` - When spec is not an object
+
+**Example:**
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+const rawSpec = {
+  elementType: 'button',
+  name: 'PrimaryButton',
+  children: ['Click me'],
+  styles: {
+    backgroundColor: '#3b82f6',
+    color: '#ffffff',
+    padding: '12px 24px'
+  }
+}
+
+try {
+  const validatedSpec = parseUISpec(rawSpec)
+  console.log('✅ Spec is valid:', validatedSpec.name)
+} catch (error) {
+  console.error('❌ Validation failed:', error.message)
+}
+```
+
+**Error Handling:**
+```typescript
+// Detailed error information
+try {
+  parseUISpec(invalidSpec)
+} catch (error) {
+  if (error.name === 'ValidationError') {
+    error.errors.forEach(err => {
+      console.log(`Path: ${err.path}`)
+      console.log(`Message: ${err.message}`)
+      console.log(`Value: ${err.value}`)
+    })
+  }
+}
+```
+
+---
+
+### `transformHTMLToSpec(html: string): CoralRootNode`
+
+<Badge text="@reallygoodwork/coral-core" variant="note" />
+
+Converts HTML markup into a complete Coral specification.
+
+**Signature:**
+```typescript
+function transformHTMLToSpec(html: string): CoralRootNode
+```
+
+**Parameters:**
+- `html: string` - HTML markup to transform
+
+**Returns:** `CoralRootNode` - Complete Coral specification with metadata
+
+**Throws:**
+- `ParseError` - When HTML is malformed
+- `TransformError` - When transformation fails
+
+**Example:**
+```typescript
+import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
+
+const html = `
+<article class="card bg-white p-6 rounded-lg shadow-md max-w-md">
+  <header class="mb-4">
+    <h2 class="text-xl font-bold text-gray-800">Article Title</h2>
+    <time class="text-sm text-gray-500" datetime="2024-01-15">
+      January 15, 2024
+    </time>
+  </header>
+  <div class="prose">
+    <p class="text-gray-600 leading-relaxed">
+      Article content goes here with some descriptive text.
+    </p>
+  </div>
+  <footer class="mt-6 pt-4 border-t border-gray-200">
+    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+      Read More
+    </button>
+  </footer>
+</article>
+`
+
+const coralSpec = transformHTMLToSpec(html)
+
+console.log('Generated spec:', {
+  name: coralSpec.name,
+  elementType: coralSpec.elementType,
+  childrenCount: coralSpec.children?.length
+})
+```
+
+**Advanced Options:**
+```typescript
+// With custom parsing options
+const spec = transformHTMLToSpec(html, {
+  preserveComments: true,
+  extractClassNames: true,
+  generateNames: true
+})
+```
+
+---
+
+## Schema Functions
+
+### `exportSchemaToJSON(schemaName: string): object`
+
+<Badge text="@reallygoodwork/coral-core" variant="note" />
+
+Exports a specific JSON schema for external validation or documentation.
+
+**Signature:**
+```typescript
+function exportSchemaToJSON(schemaName: string): object
+```
+
+**Parameters:**
+- `schemaName: string` - Name of the schema to export
+
+**Available Schemas:**
+- `'coral'` - Main component schema
+- `'state'` - State management schema
+- `'styles'` - CSS styles schema
+- `'variant'` - Component variants schema
+- `'method'` - Component methods schema
+- `'import'` - Import dependencies schema
+- `'design-token'` - Design tokens schema
+
+**Returns:** `object` - JSON schema object
+
+**Example:**
+```typescript
+import { exportSchemaToJSON } from '@reallygoodwork/coral-core'
+
+// Export main component schema
+const coralSchema = exportSchemaToJSON('coral')
+
+// Use with a JSON schema validator
+import Ajv from 'ajv'
+const ajv = new Ajv()
+const validate = ajv.compile(coralSchema)
+
+const isValid = validate(mySpec)
+if (!isValid) {
+  console.log('Validation errors:', validate.errors)
+}
+```
+
+**Usage with OpenAPI:**
+```typescript
+// Generate OpenAPI documentation
+const schemas = {
+  CoralNode: exportSchemaToJSON('coral'),
+  CoralState: exportSchemaToJSON('state'),
+  CoralStyles: exportSchemaToJSON('styles')
+}
+
+const openApiSpec = {
+  openapi: '3.0.0',
+  components: { schemas }
+}
+```
+
+---
+
+### `exportAllSchemas(): Record<string, object>`
+
+<Badge text="@reallygoodwork/coral-core" variant="note" />
+
+Exports all available JSON schemas in a single object.
+
+**Signature:**
+```typescript
+function exportAllSchemas(): Record<string, object>
+```
+
+**Returns:** `Record<string, object>` - Object containing all schemas
+
+**Example:**
+```typescript
+import { exportAllSchemas } from '@reallygoodwork/coral-core'
+
+const allSchemas = exportAllSchemas()
+
+// List available schemas
+console.log('Available schemas:', Object.keys(allSchemas))
+
+// Use specific schema
+const coralSchema = allSchemas.coral
+const stateSchema = allSchemas.state
+```
+
+**File Export:**
+```typescript
+import fs from 'fs'
+import { exportAllSchemas } from '@reallygoodwork/coral-core'
+
+const schemas = exportAllSchemas()
+
+// Export each schema to separate files
+Object.entries(schemas).forEach(([name, schema]) => {
+  fs.writeFileSync(
+    `./schemas/${name}.schema.json`,
+    JSON.stringify(schema, null, 2)
+  )
+})
+```
+
+---
+
+### `SCHEMA_EXPORTS`
+
+<Badge text="@reallygoodwork/coral-core" variant="note" />
+
+Constant object containing paths to all schema files.
+
+**Type:**
+```typescript
+const SCHEMA_EXPORTS: Record<string, string>
+```
+
+**Example:**
+```typescript
+import { SCHEMA_EXPORTS } from '@reallygoodwork/coral-core'
+
+console.log('Schema file paths:', SCHEMA_EXPORTS)
+// {
+//   coral: '/path/to/schemas/coral.schema.json',
+//   state: '/path/to/schemas/state.schema.json',
+//   ...
+// }
+
+// Use in build tools
+import webpack from 'webpack'
+
+const config = {
+  resolve: {
+    alias: {
+      '@coral-schemas': SCHEMA_EXPORTS.coral
+    }
+  }
+}
+```
+
+---
+
+## Utility Functions
+
+### `tailwindToCSS(classes: string): Record<string, string>`
+
+<Badge text="@reallygoodwork/tw2css" variant="caution" />
+
+Converts Tailwind CSS classes to CSS property objects.
+
+**Signature:**
+```typescript
+function tailwindToCSS(classes: string): Record<string, string>
+```
+
+**Parameters:**
+- `classes: string` - Space-separated Tailwind class names
+
+**Returns:** `Record<string, string>` - CSS properties object
+
+**Example:**
+```typescript
+import { tailwindToCSS } from '@reallygoodwork/tw2css'
+
+// Basic conversion
+const styles = tailwindToCSS('bg-blue-500 text-white px-4 py-2 rounded')
+console.log(styles)
+// {
+//   backgroundColor: '#3b82f6',
+//   color: '#ffffff',
+//   paddingLeft: '1rem',
+//   paddingRight: '1rem',
+//   paddingTop: '0.5rem',
+//   paddingBottom: '0.5rem',
+//   borderRadius: '0.25rem'
+// }
+
+// Complex responsive classes
+const responsiveStyles = tailwindToCSS('w-full md:w-1/2 lg:w-1/3 xl:w-1/4')
+console.log(responsiveStyles)
+// {
+//   width: '100%',
+//   '@media (min-width: 768px)': { width: '50%' },
+//   '@media (min-width: 1024px)': { width: '33.333333%' },
+//   '@media (min-width: 1280px)': { width: '25%' }
+// }
+```
+
+**Supported Features:**
+- ✅ Colors (bg, text, border)
+- ✅ Spacing (margin, padding)
+- ✅ Sizing (width, height)
+- ✅ Typography (font, text)
+- ✅ Layout (display, position)
+- ✅ Flexbox and Grid
+- ✅ Responsive variants
+- ✅ Hover states
+- ⚠️ Custom values (limited)
+
+---
+
+## React Integration Functions
+
+### `transformReactComponentToSpec(source: string): CoralRootNode`
+
+<Badge text="@reallygoodwork/react-to-coral" variant="success" />
+
+Parses React component source code into a Coral specification.
+
+**Signature:**
+```typescript
+function transformReactComponentToSpec(source: string): CoralRootNode
+```
+
+**Parameters:**
+- `source: string` - React component source code
+
+**Returns:** `CoralRootNode` - Parsed Coral specification
+
+**Example:**
+```typescript
+import { transformReactComponentToSpec } from '@reallygoodwork/react-to-coral'
+
+const reactSource = `
+import React, { useState } from 'react'
+
+interface ButtonProps {
+  variant?: 'primary' | 'secondary'
+  size?: 'sm' | 'md' | 'lg'
+  children: React.ReactNode
+  onClick?: () => void
+}
+
+export default function Button({ 
+  variant = 'primary', 
+  size = 'md', 
+  children, 
+  onClick 
+}: ButtonProps) {
+  const [isPressed, setIsPressed] = useState(false)
+  
+  const baseClasses = 'font-medium rounded focus:outline-none'
+  const variantClasses = {
+    primary: 'bg-blue-500 hover:bg-blue-600 text-white',
+    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+  }
+  const sizeClasses = {
+    sm: 'px-3 py-1 text-sm',
+    md: 'px-4 py-2',
+    lg: 'px-6 py-3 text-lg'
+  }
+  
+  return (
+    <button
+      className={\`\${baseClasses} \${variantClasses[variant]} \${sizeClasses[size]}\`}
+      onClick={onClick}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+    >
+      {children}
+    </button>
+  )
+}
+`
+
+const coralSpec = transformReactComponentToSpec(reactSource)
+
+console.log('Parsed component:', {
+  name: coralSpec.name,
+  props: coralSpec.variants?.map(v => v.name),
+  state: coralSpec.state?.map(s => s.name),
+  methods: coralSpec.methods?.map(m => m.name)
+})
+```
+
+**Features:**
+- ✅ TypeScript support
+- ✅ Props and state extraction
+- ✅ Event handlers
+- ✅ Component variants
+- ✅ Import analysis
+- ✅ JSX to element conversion
+
+---
+
+## HTML Generation Functions
+
+### `transformSpecToHTML(spec: CoralNode): string`
+
+<Badge text="@reallygoodwork/coral-to-html" variant="tip" />
+
+Generates HTML markup from a Coral specification.
+
+**Signature:**
+```typescript
+function transformSpecToHTML(spec: CoralNode, options?: HTMLOptions): string
+```
+
+**Parameters:**
+- `spec: CoralNode` - Coral specification to convert
+- `options?: HTMLOptions` - Configuration options
+
+**Options:**
+```typescript
+interface HTMLOptions {
+  indent?: string        // Indentation string (default: '  ')
+  selfClosing?: boolean  // Use self-closing tags (default: true)
+  attributeOrder?: string[]  // Custom attribute ordering
+  styleMode?: 'inline' | 'class' | 'both'  // How to handle styles
+}
+```
+
+**Returns:** `string` - Generated HTML markup
+
+**Example:**
+```typescript
+import { transformSpecToHTML } from '@reallygoodwork/coral-to-html'
+
+const spec = {
+  elementType: 'div',
+  name: 'Card',
+  styles: {
+    backgroundColor: '#ffffff',
+    padding: '24px',
+    borderRadius: '8px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+  },
+  children: [
+    {
+      elementType: 'h2',
+      styles: { fontSize: '24px', marginBottom: '16px' },
+      children: ['Card Title']
+    },
+    {
+      elementType: 'p',
+      styles: { color: '#666', lineHeight: '1.5' },
+      children: ['Card description text goes here.']
+    }
+  ]
+}
+
+const html = transformSpecToHTML(spec, {
+  indent: '  ',
+  styleMode: 'inline'
+})
+
+console.log(html)
+// <div style="background-color: #ffffff; padding: 24px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)">
+//   <h2 style="font-size: 24px; margin-bottom: 16px">Card Title</h2>
+//   <p style="color: #666; line-height: 1.5">Card description text goes here.</p>
+// </div>
+```
+
+---
+
+## Error Types
+
+### `ValidationError`
+
+Thrown when schema validation fails.
+
+```typescript
+interface ValidationError extends Error {
+  name: 'ValidationError'
+  errors: Array<{
+    path: string
+    message: string
+    value: any
+  }>
+}
+```
+
+### `ParseError`
+
+Thrown when parsing fails.
+
+```typescript
+interface ParseError extends Error {
+  name: 'ParseError'
+  line?: number
+  column?: number
+  source?: string
+}
+```
+
+### `TransformError`
+
+Thrown when transformation fails.
+
+```typescript
+interface TransformError extends Error {
+  name: 'TransformError'
+  stage: 'parse' | 'validate' | 'transform' | 'generate'
+  originalError?: Error
+}
+```
+
+---
+
+## Performance Considerations
+
+<Aside type="tip" title="Optimization Tips">
+- Cache validated specifications in production
+- Use batch processing for multiple transformations
+- Consider using web workers for heavy operations
+- Implement incremental parsing for large component trees
+</Aside>
+
+### Benchmarking
+
+```typescript
+import { parseUISpec, transformHTMLToSpec } from '@reallygoodwork/coral-core'
+
+function benchmark(fn: () => void, iterations = 1000) {
+  const start = performance.now()
+  for (let i = 0; i < iterations; i++) {
+    fn()
+  }
+  const end = performance.now()
+  return (end - start) / iterations
+}
+
+// Benchmark spec validation
+const avgValidationTime = benchmark(() => {
+  parseUISpec(complexSpec)
+})
+
+// Benchmark HTML transformation
+const avgTransformTime = benchmark(() => {
+  transformHTMLToSpec(complexHTML)
+})
+
+console.log(`Average validation time: ${avgValidationTime.toFixed(2)}ms`)
+console.log(`Average transform time: ${avgTransformTime.toFixed(2)}ms`)
+```
+
+---
+
+## Type Definitions Reference
+
+For complete type definitions, see:
+
+- [Type Definitions](/api/types/) - All TypeScript interfaces
+- [Schema Reference](/api/schemas/) - JSON schema documentation
+- [Package Documentation](/packages/core/) - Detailed package guide

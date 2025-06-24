@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "An object representing an import of a dependency in a Coral Component",
+  "type": "object",
+  "properties": {
+    "source": {
+      "description": "The source of the import",
+      "type": "string"
+    },
+    "version": {
+      "description": "The version of the import",
+      "default": "latest",
+      "type": "string"
+    },
+    "specifiers": {
+      "description": "The specifiers of the import",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "as": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "source",
+    "version",
+    "specifiers"
+  ],
+  "additionalProperties": false,
+  "$id": "https://schemas.coral.design/v0.0.0/schema.json",
+  "version": "0.0.0"
+}
