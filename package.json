@@ -13,8 +13,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "lint-staged": "^15.2.10",
-    "prettier": "^3.3.3",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.6.0",
     "turbo": "latest"
   },
   "scripts": {

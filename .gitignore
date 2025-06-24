@@ -9,3 +9,5 @@ vite.config.ts.timestamp-*
 .vite
 
 apps/docs/.astro
+
+*.tsbuildinfo
