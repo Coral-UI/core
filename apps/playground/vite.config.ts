@@ -23,14 +23,4 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  build: {
-    rollupOptions: {
-      external: [
-        // Externalize problematic polyfill shims
-        'vite-plugin-node-polyfills/shims/global',
-        'vite-plugin-node-polyfills/shims/buffer',
-        'vite-plugin-node-polyfills/shims/process',
-      ],
-    },
-  },
 })
