@@ -1,15 +1,17 @@
-name: Release
+name: CI
 
 on:
-  push:
+  pull_request:
     branches:
+      - main
+      - next
+  push:
+    branches-ignore:
       - main
       - next
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+  contents: read
 
 jobs:
   quality-check:
@@ -45,10 +47,34 @@ jobs:
       - name: Workspace lint check
         run: pnpm run lint:ws
 
-  build-and-release:
-    name: Build and Release
+  test:
+    name: Tests
     runs-on: ubuntu-latest
-    needs: quality-check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.12.0'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run tests
+        run: pnpm run test
+
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    needs: [quality-check, test]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -72,9 +98,3 @@ jobs:
 
       - name: Security audit
         run: pnpm audit signatures
-
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release

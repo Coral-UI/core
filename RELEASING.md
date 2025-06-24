@@ -23,9 +23,20 @@ semantic-release uses [Conventional Commits](https://www.conventionalcommits.org
 ### 2. Merge to `main`
 All release-triggering commits must be merged to the `main` branch. Releases are only created from `main`.
 
-### 3. CI/CD Runs semantic-release
+### 3. Automated Quality Checks
+Before any release is created, the following quality checks are automatically run:
+
+- **Type checking** (`pnpm run typecheck`) - Ensures all TypeScript types are valid
+- **Linting** (`pnpm run lint`) - Checks code style and catches potential issues
+- **Format checking** (`pnpm run format`) - Verifies code formatting consistency
+- **Workspace validation** (`pnpm run lint:ws`) - Ensures workspace dependencies are consistent
+
+**If any quality check fails, the release will be blocked** until the issues are resolved.
+
+### 4. CI/CD Runs semantic-release
 On every push to `main`, the GitHub Actions workflow `.github/workflows/release.yml` will:
 
+- Run quality checks (typecheck, lint, format, workspace validation)
 - Run tests and build
 - Run `semantic-release` to:
   - Analyze commits
@@ -34,7 +45,7 @@ On every push to `main`, the GitHub Actions workflow `.github/workflows/release.
   - Create a GitHub release
   - Publish packages to npm (if configured)
 
-### 4. Check the Release
+### 5. Check the Release
 - The new release will appear on the [GitHub Releases](../../releases) page.
 - Packages will be published to npm if configured.
 - Changelogs will be updated in the repository.
@@ -71,21 +82,38 @@ semantic-release determines the type of version bump based on your commit messag
 
 > **Tip:** You can combine `feat:` or `fix:` with `BREAKING CHANGE:` to indicate a breaking feature or fix.
 
+## Quality Checks on Pull Requests
+
+The CI workflow (`.github/workflows/ci.yml`) also runs quality checks on:
+- All pull requests to `main` or `next` branches
+- Pushes to feature branches
+
+This ensures issues are caught early in the development process.
+
 ## Manual Release (if needed)
 If you need to trigger a release manually (e.g., after fixing a failed release):
 
 1. Ensure your local `main` is up to date.
-2. Run the following locally:
-
+2. Run the quality checks locally first:
+   ```sh
+   pnpm run typecheck
+   pnpm run lint
+   pnpm run format
+   pnpm run lint:ws
+   ```
+3. If all checks pass, run the release:
    ```sh
    pnpm install
    pnpm run build
    npx semantic-release
    ```
-
-3. Push any changes if prompted.
+4. Push any changes if prompted.
 
 ## Troubleshooting
+- **Quality checks fail:**
+  - Run the failing command locally to see the specific issues
+  - Fix the issues and commit the changes
+  - The release will retry automatically on the next push to `main`
 - **No release is created:**
   - Ensure your commits follow Conventional Commits.
   - Check that the GitHub Actions workflow ran successfully.
