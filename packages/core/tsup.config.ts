@@ -10,5 +10,7 @@ export default defineConfig((options) => ({
   treeshake: true,
   external: ['colord', 'node-html-parser'],
   minify: !options.watch,
+  esModuleInterop: true,
+  outExtension: ({ format }) => (format === 'esm' ? { js: '.mjs' } : { js: '.cjs' }),
   ...options,
 }))

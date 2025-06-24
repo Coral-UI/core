@@ -11,6 +11,7 @@ describe('coralToHTML', () => {
       },
       children: [
         {
+          name: 'p',
           elementType: 'p',
           textContent: 'Hello, World!'
         }
@@ -29,6 +30,7 @@ describe('coralToHTML', () => {
       elementType: 'div',
       children: [
         {
+          name: 'img',
           elementType: 'img',
           elementAttributes: {
             src: 'test.jpg',
@@ -36,6 +38,7 @@ describe('coralToHTML', () => {
           }
         },
         {
+          name: 'br',
           elementType: 'br'
         }
       ]
@@ -52,6 +55,7 @@ describe('coralToHTML', () => {
       elementType: 'div',
       children: [
         {
+          name: 'p',
           elementType: 'p',
           textContent: 'Plain text'
         }
@@ -69,13 +73,16 @@ describe('coralToHTML', () => {
       elementType: 'div',
       children: [
         {
+          name: 'section',
           elementType: 'section',
           children: [
             {
+              name: 'h1',
               elementType: 'h1',
               textContent: 'Title'
             },
             {
+              name: 'p',
               elementType: 'p',
               textContent: 'Content'
             }
@@ -97,6 +104,7 @@ describe('coralToHTML', () => {
       elementType: 'div',
       children: [
         {
+          name: 'p',
           elementType: 'p',
           textContent: 'Test'
         }

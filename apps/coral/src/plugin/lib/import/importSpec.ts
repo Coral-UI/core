@@ -13,19 +13,19 @@ export const nodeHasTextChildren = (node: CoralNode | CoralRootNode) => {
 }
 
 export const buildNodeText = (node: CoralNode | CoralRootNode) => {
-  return node.children?.map((child) => child.textContent).join(' ') ?? ''
+  return node.children?.map((child) => child['textContent']).join(' ') ?? ''
 }
 
 export const nodeHasChildrenWithMargin = (node: CoralNode | CoralRootNode) => {
   return (
-    node.children?.some((child) => child.styles?.['marginInlineStart']) ||
-    node.children?.some((child) => child.styles?.['marginInlineEnd']) ||
-    node.children?.some((child) => child.styles?.['marginBlockStart']) ||
-    node.children?.some((child) => child.styles?.['marginBlockEnd']) ||
-    node.children?.some((child) => child.styles?.['paddingInlineStart']) ||
-    node.children?.some((child) => child.styles?.['paddingInlineEnd']) ||
-    node.children?.some((child) => child.styles?.['paddingBlockStart']) ||
-    node.children?.some((child) => child.styles?.['paddingBlockEnd'])
+    node.children?.some((child) => (child['styles'] as CoralStyleType)?.['marginInlineStart']) ||
+    node.children?.some((child) => (child['styles'] as CoralStyleType)?.['marginInlineEnd']) ||
+    node.children?.some((child) => (child['styles'] as CoralStyleType)?.['marginBlockStart']) ||
+    node.children?.some((child) => (child['styles'] as CoralStyleType)?.['marginBlockEnd']) ||
+    node.children?.some((child) => (child['styles'] as CoralStyleType)?.['paddingInlineStart']) ||
+    node.children?.some((child) => (child['styles'] as CoralStyleType)?.['paddingInlineEnd']) ||
+    node.children?.some((child) => (child['styles'] as CoralStyleType)?.['paddingBlockStart']) ||
+    node.children?.some((child) => (child['styles'] as CoralStyleType)?.['paddingBlockEnd'])
   )
 }
 
@@ -58,7 +58,7 @@ async function createElement(
       : parentStyles
 
   const hasTextContentChild = currentNode.children?.some(
-    (child) => 'textContent' in child && child.textContent !== undefined,
+    (child) => 'textContent' in child && child['textContent'] !== undefined,
   )
 
   if (hasTextContentChild) {

@@ -1,7 +1,7 @@
 {
   "name": "@reallygoodwork/coral-ui",
   "private": true,
-  "packageManager": "pnpm@9.1.0",
+  "packageManager": "pnpm@10.12.3",
   "engines": {
     "node": ">=20.12.0"
   },

@@ -9,5 +9,7 @@ export default defineConfig((options) => ({
   clean: true,
   treeshake: true,
   minify: !options.watch,
+  esModuleInterop: true,
+  outExtension: ({ format }) => (format === 'esm' ? { js: '.mjs' } : { js: '.cjs' }),
   ...options,
 }))

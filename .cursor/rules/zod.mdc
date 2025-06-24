@@ -7,6 +7,7 @@ alwaysApply: false
 
 Enforce best practices for Zod v4 schema validation and type safety across the project.
 
+
 ## Rules
 
 ### zod-imports
@@ -313,6 +314,56 @@ z.number().safe() // deprecated, use z.int() instead
 - `**/build/**`
 - `**/*.test.ts`
 - `**/*.spec.ts`
+
+TITLE: Define Mutually Recursive Object Types - Zod v4 - JavaScript
+DESCRIPTION: Shows how to define mutually recursive Zod object types, where one schema references another and vice versa, using getters for the recursive properties. This allows for complex, interconnected data structures.
+SOURCE: https://zod.dev/v4/v4
+
+LANGUAGE: JavaScript
+CODE:
+```
+const User = z.object({\n  email: z.email(),\n  get posts(){\n    return z.array(Post)\n  }\n});\n\nconst Post = z.object({\n  title: z.string(),\n  get author(){\n    return User\n  }\n});
+```
+
+----------------------------------------
+
+TITLE: Use Standard Zod Methods on Recursive Schemas - Zod v4 - JavaScript
+DESCRIPTION: Illustrates that recursive Zod schemas created with the new v4 pattern are regular `ZodObject` instances and fully support standard methods like `pick()`, `partial()`, and `extend()` for schema manipulation.
+SOURCE: https://zod.dev/v4/v4
+
+LANGUAGE: JavaScript
+CODE:
+```
+Post.pick({ title: true })\nPost.partial();\nPost.extend({ publishDate: z.date() });
+```
+
+----------------------------------------
+
+TITLE: Define Recursive Object Type - Zod v4 - JavaScript
+DESCRIPTION: Demonstrates the new Zod v4 pattern for defining recursive object types using a getter for the recursive property. Shows how to infer the TypeScript type from the schema. This approach eliminates the need for type casting used in previous versions.
+SOURCE: https://zod.dev/v4/v4
+
+LANGUAGE: JavaScript
+CODE:
+```
+const Category = z.object({\n  name: z.string(),\n  get subcategories(){\n    return z.array(Category)\n  }\n});\n\ntype Category = z.infer<typeof Category>;\n// { name: string; subcategories: Category[] }
+```
+
+----------------------------------------
+
+TITLE: Type Inference for z.array().nonempty() in Zod v4
+DESCRIPTION: Illustrates the change in inferred type for `z.array().nonempty()` in Zod v4, which now infers `string[]` instead of `[string, ...string[]]`, aligning it with `z.array().min(1)`.
+SOURCE: https://zod.dev/v4/v4/changelog
+
+LANGUAGE: TypeScript
+CODE:
+```
+const NonEmpty = z.array(z.string()).nonempty();
+
+type NonEmpty = z.infer<typeof NonEmpty>;
+// Zod 3: [string, ...string[]]
+// Zod 4: string[]
+```
 
 ## Zod v4 Features
 
