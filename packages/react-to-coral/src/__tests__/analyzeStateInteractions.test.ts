@@ -1,7 +1,8 @@
-import { analyzeStateInteractions } from '../analyzeStateInteractions'
-import * as t from '@babel/types'
 import { parse } from '@babel/parser'
 import traverse, { NodePath } from '@babel/traverse'
+import * as t from '@babel/types'
+
+import { analyzeStateInteractions } from '../analyzeStateInteractions'
 
 type Interactions = { reads: string[]; writes: string[] }
 

@@ -4,23 +4,23 @@ export const tailwindToCSS = jest.fn((className: string) => {
   if (className === 'container') {
     return {
       'max-width': '1200px',
-      'margin': '0 auto',
+      margin: '0 auto',
     }
   }
   if (className === 'flex') {
     return {
-      'display': 'flex',
+      display: 'flex',
     }
   }
   if (className === 'text-red-500') {
     return {
-      'color': '#ef4444',
+      color: '#ef4444',
     }
   }
   // Default fallback
   return {
     [className]: {
-      'color': 'inherit',
+      color: 'inherit',
     },
   }
 })

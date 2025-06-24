@@ -1,5 +1,5 @@
-import { transformUIElementToBaseNode } from '../transformUIElementToBaseNode'
 import type { UIElement } from '../transformReactComponentToSpec'
+import { transformUIElementToBaseNode } from '../transformUIElementToBaseNode'
 
 describe('transformUIElementToBaseNode', () => {
   it('should transform a simple HTML element', () => {
@@ -7,9 +7,9 @@ describe('transformUIElementToBaseNode', () => {
       elementType: 'div',
       isComponent: false,
       componentProperties: {
-        className: 'container'
+        className: 'container',
       },
-      children: []
+      children: [],
     }
 
     const result = transformUIElementToBaseNode(element)
@@ -29,9 +29,9 @@ describe('transformUIElementToBaseNode', () => {
         alt: 'Test image',
         width: 100,
         height: 200,
-        loading: 'lazy'
+        loading: 'lazy',
       },
-      children: []
+      children: [],
     }
 
     const result = transformUIElementToBaseNode(element)
@@ -55,16 +55,16 @@ describe('transformUIElementToBaseNode', () => {
           isComponent: false,
           componentProperties: {},
           children: [],
-          textContent: 'Title'
+          textContent: 'Title',
         },
         {
           elementType: 'p',
           isComponent: false,
           componentProperties: {},
           children: [],
-          textContent: 'Paragraph'
-        }
-      ]
+          textContent: 'Paragraph',
+        },
+      ],
     }
 
     const result = transformUIElementToBaseNode(element)
@@ -82,7 +82,7 @@ describe('transformUIElementToBaseNode', () => {
       isComponent: false,
       componentProperties: {},
       children: [],
-      textContent: 'Hello, World!'
+      textContent: 'Hello, World!',
     }
 
     const result = transformUIElementToBaseNode(element)
@@ -95,9 +95,9 @@ describe('transformUIElementToBaseNode', () => {
       elementType: 'div',
       isComponent: false,
       componentProperties: {
-        className: 'container'
+        className: 'container',
       },
-      children: []
+      children: [],
     }
 
     const result = transformUIElementToBaseNode(element)
@@ -116,10 +116,10 @@ describe('transformUIElementToBaseNode', () => {
         className: 'flex',
         styles: {
           padding: '16px',
-          'border-radius': '8px'
-        }
+          'border-radius': '8px',
+        },
       },
-      children: []
+      children: [],
     }
 
     const result = transformUIElementToBaseNode(element)
@@ -139,9 +139,9 @@ describe('transformUIElementToBaseNode', () => {
         type: 'checkbox',
         checked: true,
         disabled: false,
-        required: true
+        required: true,
       },
-      children: []
+      children: [],
     }
 
     const result = transformUIElementToBaseNode(element)
@@ -157,9 +157,9 @@ describe('transformUIElementToBaseNode', () => {
       elementType: 'select',
       isComponent: false,
       componentProperties: {
-        'data-options': ['option1', 'option2', 'option3']
+        'data-options': ['option1', 'option2', 'option3'],
       },
-      children: []
+      children: [],
     }
 
     const result = transformUIElementToBaseNode(element)
@@ -177,9 +177,9 @@ describe('transformUIElementToBaseNode', () => {
         validBoolean: true,
         validArray: ['a', 'b'],
         invalidObject: { nested: 'object' },
-        invalidFunction: () => 'test'
+        invalidFunction: () => 'test',
       },
-      children: []
+      children: [],
     }
 
     const result = transformUIElementToBaseNode(element)
@@ -197,7 +197,7 @@ describe('transformUIElementToBaseNode', () => {
       elementType: 'article',
       isComponent: false,
       componentProperties: {
-        className: 'article-container'
+        className: 'article-container',
       },
       children: [
         {
@@ -210,9 +210,9 @@ describe('transformUIElementToBaseNode', () => {
               isComponent: false,
               componentProperties: { className: 'title' },
               children: [],
-              textContent: 'Article Title'
-            }
-          ]
+              textContent: 'Article Title',
+            },
+          ],
         },
         {
           elementType: 'section',
@@ -224,11 +224,11 @@ describe('transformUIElementToBaseNode', () => {
               isComponent: false,
               componentProperties: {},
               children: [],
-              textContent: 'Article content goes here.'
-            }
-          ]
-        }
-      ]
+              textContent: 'Article content goes here.',
+            },
+          ],
+        },
+      ],
     }
 
     const result = transformUIElementToBaseNode(element)
@@ -236,10 +236,10 @@ describe('transformUIElementToBaseNode', () => {
     expect(result.elementType).toBe('article')
     expect(result.children).toHaveLength(2)
 
-        const header = result.children?.[0]
+    const header = result.children?.[0]
     expect(header?.elementType).toBe('header')
     expect(header?.children).toHaveLength(1)
-        if (header?.children && Array.isArray(header.children) && header.children.length > 0) {
+    if (header?.children && Array.isArray(header.children) && header.children.length > 0) {
       expect(header.children[0]?.elementType).toBe('h1')
       expect(header.children[0]?.textContent).toBe('Article Title')
     }

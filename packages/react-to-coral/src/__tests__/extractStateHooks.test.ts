@@ -1,4 +1,3 @@
-import { extractStateHooks } from '../extractStateHooks'
 import { parse } from '@babel/parser'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -6,6 +5,8 @@ import traverse, { NodePath } from '@babel/traverse'
 import * as t from '@babel/types'
 
 import type { CoralStateType } from '@reallygoodwork/coral-core'
+
+import { extractStateHooks } from '../extractStateHooks'
 
 const extractStateHooksFromCode = (code: string): Array<CoralStateType> => {
   const ast = parse(code, {
@@ -18,7 +19,7 @@ const extractStateHooksFromCode = (code: string): Array<CoralStateType> => {
   traverse(ast, {
     CallExpression(path: NodePath<t.CallExpression>) {
       extractStateHooks(path, result)
-    }
+    },
   })
 
   return result.stateHooks || []

@@ -1,5 +1,6 @@
-import { getTypeFromAnnotation } from '../getTypeFromAnnotation'
 import * as t from '@babel/types'
+
+import { getTypeFromAnnotation } from '../getTypeFromAnnotation'
 
 describe('getTypeFromAnnotation', () => {
   it('should return "string" for a TSStringKeyword', () => {
@@ -27,9 +28,7 @@ describe('getTypeFromAnnotation', () => {
   })
 
   it('should return "function" for a TSFunctionType', () => {
-    const annotation = t.tsTypeAnnotation(
-      t.tsFunctionType(null, [t.identifier('param1')]),
-    )
+    const annotation = t.tsTypeAnnotation(t.tsFunctionType(null, [t.identifier('param1')]))
     const result = getTypeFromAnnotation(annotation)
     expect(result).toBe('function')
   })

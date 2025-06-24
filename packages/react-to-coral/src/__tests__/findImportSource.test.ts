@@ -1,5 +1,5 @@
-import { findImportSource } from '../findImportSource'
 import type { Result } from '../transformReactComponentToSpec'
+import { findImportSource } from '../findImportSource'
 
 describe('findImportSource', () => {
   it('should find the import source for a given component name', () => {

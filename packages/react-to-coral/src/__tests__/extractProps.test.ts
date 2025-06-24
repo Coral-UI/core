@@ -1,9 +1,10 @@
-import { extractProps } from '../extractProps'
 import { parse } from '@babel/parser'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import traverse, { NodePath } from '@babel/traverse'
 import * as t from '@babel/types'
+
+import { extractProps } from '../extractProps'
 
 const getParamFromFunction = (functionCode: string): t.Node | null => {
   const ast = parse(functionCode, {
@@ -22,7 +23,7 @@ const getParamFromFunction = (functionCode: string): t.Node | null => {
       if (path.node.params.length > 0) {
         param = path.node.params[0] || null
       }
-    }
+    },
   })
 
   return param

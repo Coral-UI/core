@@ -1,16 +1,17 @@
-import { parseJSXElement } from '../parseJSXElement'
 import { parse } from '@babel/parser'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import traverse, { NodePath } from '@babel/traverse'
 import * as t from '@babel/types'
+
 import type { Result } from '../transformReactComponentToSpec'
+import { parseJSXElement } from '../parseJSXElement'
 
 const createMockResult = (): Result => ({
   imports: [],
   methods: [],
   stateHooks: [],
-  componentProperties: []
+  componentProperties: [],
 })
 
 const parseJSXFromString = (jsx: string): t.JSXElement => {
@@ -25,7 +26,7 @@ const parseJSXFromString = (jsx: string): t.JSXElement => {
       if (!jsxElement) {
         jsxElement = path.node
       }
-    }
+    },
   })
 
   if (!jsxElement) {

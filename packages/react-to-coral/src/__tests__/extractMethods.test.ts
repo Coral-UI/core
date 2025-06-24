@@ -1,4 +1,3 @@
-import { extractMethods } from '../extractMethods'
 import { parse } from '@babel/parser'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -6,6 +5,8 @@ import traverse, { NodePath } from '@babel/traverse'
 import * as t from '@babel/types'
 
 import type { CoralMethodType, CoralStateType } from '@reallygoodwork/coral-core'
+
+import { extractMethods } from '../extractMethods'
 
 const extractMethodsFromCode = (code: string): Array<CoralMethodType> => {
   const ast = parse(code, {
@@ -18,13 +19,13 @@ const extractMethodsFromCode = (code: string): Array<CoralMethodType> => {
     stateHooks?: Array<CoralStateType>
   } = {
     methods: [],
-    stateHooks: []
+    stateHooks: [],
   }
 
   traverse(ast, {
     VariableDeclarator(path: NodePath<t.VariableDeclarator>) {
       extractMethods(path, result)
-    }
+    },
   })
 
   return result.methods || []
@@ -102,11 +103,11 @@ describe('extractMethods', () => {
           body: 'console.log("first")',
           stateInteractions: {
             reads: [],
-            writes: []
-          }
-        }
+            writes: [],
+          },
+        },
       ],
-      stateHooks: []
+      stateHooks: [],
     }
 
     const code = `
@@ -121,7 +122,7 @@ describe('extractMethods', () => {
     traverse(ast, {
       VariableDeclarator(path: NodePath<t.VariableDeclarator>) {
         extractMethods(path, result)
-      }
+      },
     })
 
     // Should not add the duplicate method
@@ -159,9 +160,9 @@ describe('extractMethods', () => {
           name: 'count',
           setterName: 'setCount',
           initialValue: 0,
-          tsType: 'number'
-        }
-      ]
+          tsType: 'number',
+        },
+      ],
     }
 
     const ast = parse(code, {
@@ -172,7 +173,7 @@ describe('extractMethods', () => {
     traverse(ast, {
       VariableDeclarator(path: NodePath<t.VariableDeclarator>) {
         extractMethods(path, result)
-      }
+      },
     })
 
     expect(result.methods).toHaveLength(1)

@@ -1,7 +1,7 @@
 declare module '@babel/generator' {
   import * as t from '@babel/types'
 
-  interface GeneratorOptions {
+  export interface GeneratorOptions {
     auxiliaryCommentBefore?: string
     auxiliaryCommentAfter?: string
     shouldPrintComment?: (comment: string) => boolean
@@ -16,13 +16,28 @@ declare module '@babel/generator' {
     sourceMaps?: boolean
     sourceRoot?: string
     sourceFileName?: string
+    jsescOption?: {
+      quotes?: 'single' | 'double'
+      numbers?: 'binary' | 'octal' | 'decimal' | 'hexadecimal'
+      wrap?: boolean
+      es6?: boolean
+    }
+    jsonCompatibleStrings?: boolean
+    decoratorsBeforeExport?: boolean
+    topicToken?: string
   }
 
-  interface GeneratorResult {
+  export interface GeneratorResult {
     code: string
-    map?: any
+    map?: object
+    rawMappings?: object[]
   }
 
-  function generate(ast: t.Node, options?: GeneratorOptions): GeneratorResult
+  export interface Generator {
+    generate(): GeneratorResult
+  }
+
+  function generate(ast: t.Node, options?: GeneratorOptions, source?: string): GeneratorResult
   export default generate
+  export { generate }
 }

@@ -1,5 +1,6 @@
-import { isNode } from '../isNode'
 import * as t from '@babel/types'
+
+import { isNode } from '../isNode'
 
 describe('isNode', () => {
   it('should return true for a valid Babel node', () => {

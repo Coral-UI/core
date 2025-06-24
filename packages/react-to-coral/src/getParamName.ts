@@ -7,7 +7,7 @@ export const getParamName = (param: t.Identifier | t.Pattern | t.RestElement): s
   }
   if (t.isObjectPattern(param)) {
     const props = param.properties
-      .map(prop => {
+      .map((prop) => {
         if (t.isObjectProperty(prop) && t.isIdentifier(prop.key)) {
           return prop.key.name
         }
@@ -21,7 +21,7 @@ export const getParamName = (param: t.Identifier | t.Pattern | t.RestElement): s
   }
   if (t.isArrayPattern(param)) {
     const elements = param.elements
-      .map(element => {
+      .map((element) => {
         if (element === null) return '?'
         if (t.isIdentifier(element)) return element.name
         if (t.isRestElement(element) && t.isIdentifier(element.argument)) {

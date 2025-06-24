@@ -1,9 +1,10 @@
-import { parseJSXAttributeValue } from '../parseJSXAttributeValue'
-import { createPropReference } from '../createPropReference'
-import * as t from '@babel/types'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import generate from '@babel/generator'
+import * as t from '@babel/types'
+
+import { createPropReference } from '../createPropReference'
+import { parseJSXAttributeValue } from '../parseJSXAttributeValue'
 
 jest.mock('@babel/generator', () => ({
   __esModule: true,

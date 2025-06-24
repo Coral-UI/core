@@ -14,6 +14,9 @@ export const zCoralStateSchema = z.object({
   tsType: z
     .union([zCoralTSTypesSchema, z.array(zCoralTSTypesSchema)])
     .describe('The types of the state property. Can be a single type or an array of types'),
+  hookType: z.enum(['useState', 'useEffect', 'useReducer', 'useContext', 'useMemo', 'useCallback']).optional().describe('The type of React hook used'),
+  dependencies: z.string().optional().describe('Dependencies array for hooks like useEffect, useMemo, useCallback'),
+  reducer: z.string().optional().describe('Reducer function for useReducer hook'),
 })
 
 export type CoralStateType = z.infer<typeof zCoralStateSchema>

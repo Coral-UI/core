@@ -1,12 +1,10 @@
-import { getTypeFromTypeParameters } from '../getTypeFromTypeParameters'
 import * as t from '@babel/types'
+
+import { getTypeFromTypeParameters } from '../getTypeFromTypeParameters'
 
 describe('getTypeFromTypeParameters', () => {
   it('should return the name of the first type parameter', () => {
-    const typeParams = t.tsTypeParameterInstantiation([
-      t.tsTypeReference(t.identifier('MyType')),
-      t.tsNumberKeyword(),
-    ])
+    const typeParams = t.tsTypeParameterInstantiation([t.tsTypeReference(t.identifier('MyType')), t.tsNumberKeyword()])
     const result = getTypeFromTypeParameters(typeParams)
     expect(result).toBe('MyType')
   })
