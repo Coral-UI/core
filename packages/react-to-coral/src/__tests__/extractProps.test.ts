@@ -15,12 +15,12 @@ const getParamFromFunction = (functionCode: string): t.Node | null => {
   traverse(ast, {
     FunctionDeclaration(path: NodePath<t.FunctionDeclaration>) {
       if (path.node.params.length > 0) {
-        param = path.node.params[0]
+        param = path.node.params[0] || null
       }
     },
     ArrowFunctionExpression(path: NodePath<t.ArrowFunctionExpression>) {
       if (path.node.params.length > 0) {
-        param = path.node.params[0]
+        param = path.node.params[0] || null
       }
     }
   })

@@ -20,7 +20,10 @@ export const extractMethods = (
       const methodName = path.node.id.name
       const parameters = path.node.init.params.map(getParamName)
       const body = generate(path.node.init.body).code
-      const stateInteractions = analyzeStateInteractions(path.node.init.body, result.stateHooks || [])
+      const stateInteractions = analyzeStateInteractions(
+        (path as any).get('init.body'),
+        result.stateHooks || [],
+      )
 
       if (!result.methods?.some((m) => m.name === methodName)) {
         if (!result.methods) result.methods = []

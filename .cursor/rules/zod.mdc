@@ -1,5 +1,5 @@
 ---
-description:
+description: Useful when typing schemas in json
 globs:
 alwaysApply: false
 ---

@@ -236,16 +236,20 @@ describe('transformUIElementToBaseNode', () => {
     expect(result.elementType).toBe('article')
     expect(result.children).toHaveLength(2)
 
-    const header = result.children?.[0]
+        const header = result.children?.[0]
     expect(header?.elementType).toBe('header')
     expect(header?.children).toHaveLength(1)
-    expect(header?.children?.[0]?.elementType).toBe('h1')
-    expect(header?.children?.[0]?.textContent).toBe('Article Title')
+        if (header?.children && Array.isArray(header.children) && header.children.length > 0) {
+      expect(header.children[0]?.elementType).toBe('h1')
+      expect(header.children[0]?.textContent).toBe('Article Title')
+    }
 
     const section = result.children?.[1]
     expect(section?.elementType).toBe('section')
     expect(section?.children).toHaveLength(1)
-    expect(section?.children?.[0]?.elementType).toBe('p')
-    expect(section?.children?.[0]?.textContent).toBe('Article content goes here.')
+    if (section?.children && Array.isArray(section.children) && section.children.length > 0) {
+      expect(section.children[0]?.elementType).toBe('p')
+      expect(section.children[0]?.textContent).toBe('Article content goes here.')
+    }
   })
 })

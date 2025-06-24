@@ -1,5 +1,5 @@
 ---
-description:
+description: Performing operations across multiple packages in a monorepo context
 globs:
 alwaysApply: false
 ---

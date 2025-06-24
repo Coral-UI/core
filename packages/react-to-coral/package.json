@@ -41,7 +41,7 @@
   "author": "Really Good Work Inc. <hey@reallygood.work> (https://reallygood.work)",
   "license": "MIT",
   "devDependencies": {
-    "@babel/types": "^7.25.6",
+    "@babel/types": "^7.27.4",
     "@eslint/js": "^9.11.1",
     "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
     "@reallygoodwork/coral-typescript-config": "workspace:*",
@@ -65,9 +65,9 @@
     "typescript-eslint": "^8.35.0"
   },
   "dependencies": {
-    "@babel/generator": "^7.25.6",
-    "@babel/parser": "^7.25.6",
-    "@babel/traverse": "^7.25.6",
+    "@babel/generator": "^7.27.4",
+    "@babel/parser": "^7.27.4",
+    "@babel/traverse": "^7.27.4",
     "@reallygoodwork/coral-core": "workspace:*",
     "@reallygoodwork/coral-tw2css": "workspace:*"
   }

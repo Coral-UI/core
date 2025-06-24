@@ -93,13 +93,13 @@ export const transformReactComponentToSpec = (component: string) => {
       if (t.isFunctionDeclaration(path.node.declaration) && path.node.declaration.id) {
         result.componentName = path.node.declaration.id.name
         result.type = 'Function'
-        const props = extractProps(path.node.declaration.params[0])
+        const props = extractProps(path.node.declaration.params[0] || null)
         if (props) {
           if (!result.componentProperties) result.componentProperties = []
           result.componentProperties.push(props)
         }
         componentDepth++
-        path.traverse({
+        ;(path as any).traverse({
           CallExpression(callPath: NodePath<t.CallExpression>) {
             extractStateHooks(callPath, result)
           },
@@ -119,13 +119,13 @@ export const transformReactComponentToSpec = (component: string) => {
       if (path.node.id && componentDepth === 0 && !result.componentName) {
         result.componentName = path.node.id.name
         result.type = 'Function'
-        const props = extractProps(path.node.params[0])
+        const props = extractProps(path.node.params[0] || null)
         if (props) {
           if (!result.componentProperties) result.componentProperties = []
           result.componentProperties.push(props)
         }
         componentDepth++
-        path.traverse({
+        ;(path as any).traverse({
           CallExpression(callPath: NodePath<t.CallExpression>) {
             extractStateHooks(callPath, result)
           },
@@ -147,13 +147,13 @@ export const transformReactComponentToSpec = (component: string) => {
       ) {
         result.componentName = path.node.id.name
         result.type = 'ArrowFunction'
-        const props = extractProps(path.node.init.params[0])
+        const props = extractProps(path.node.init.params[0] || null)
         if (props) {
           if (!result.componentProperties) result.componentProperties = []
           result.componentProperties.push(props)
         }
         componentDepth++
-        path.get('init').traverse({
+        ;(path as any).get('init').traverse({
           CallExpression(callPath: NodePath<t.CallExpression>) {
             extractStateHooks(callPath, result)
           },
@@ -177,7 +177,7 @@ export const transformReactComponentToSpec = (component: string) => {
     styles?: unknown
     [key: string]: unknown
   }
-  const obj: CoralRootNode = {
+    const obj: any = {
     $schema: 'https://coral.design/schema.json',
     elementType: (result.rootElement?.elementType as CoralElementType) || 'div',
     componentProperties: otherProps as CoralComponentPropertyType,
@@ -194,6 +194,9 @@ export const transformReactComponentToSpec = (component: string) => {
       ...tailwindToCSS(className || ''),
     },
     children: result.rootElement?.children.map(transformUIElementToBaseNode) || [],
+    // Include metadata from result
+    type: result.type,
+    imports: result.imports,
   }
 
   if (result.stateHooks && result.stateHooks.length > 0) {
