@@ -8,7 +8,7 @@ export default defineConfig((options) => ({
   sourcemap: true,
   clean: true,
   treeshake: true,
-  external: ['colord'],
+  external: ['colord', 'prettier/standalone', 'prettier/parser-html'],
   minify: !options.watch,
   esModuleInterop: true,
   outExtension: ({ format }) => (format === 'esm' ? { js: '.mjs' } : { js: '.cjs' }),
