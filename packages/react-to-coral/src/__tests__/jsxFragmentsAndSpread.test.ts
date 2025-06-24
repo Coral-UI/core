@@ -22,7 +22,7 @@ describe('JSX Fragments and Spread Operators', () => {
     expect(result.componentName).toBe('FragmentComponent')
     expect(result.elementType).toBe('React.Fragment')
     expect(result.children).toBeDefined()
-    expect(result.children?.length).toBe(2)
+    expect(Array.isArray(result.children) ? result.children.length : 0).toBe(2)
   })
 
   it('should handle React.Fragment syntax', () => {
@@ -46,7 +46,7 @@ describe('JSX Fragments and Spread Operators', () => {
     expect(result.componentName).toBe('FragmentComponent')
     expect(result.elementType).toBe('React.Fragment')
     expect(result.children).toBeDefined()
-    expect(result.children?.length).toBe(2)
+    expect(Array.isArray(result.children) ? result.children.length : 0).toBe(2)
   })
 
   it('should handle spread attributes in JSX', () => {
@@ -71,7 +71,7 @@ describe('JSX Fragments and Spread Operators', () => {
     expect(result.componentProperties).toBeDefined()
 
     // Check that spread attributes are captured
-    const props = result.componentProperties as any
+    const props = result.componentProperties as Record<string, unknown>
     expect(Object.keys(props)).toContain('...commonProps')
     expect(Object.keys(props)).toContain('...restProps')
     // className is moved to styles, not componentProperties
@@ -101,12 +101,15 @@ describe('JSX Fragments and Spread Operators', () => {
     expect(result.componentName).toBe('ExpressionComponent')
     expect(result.elementType).toBe('div')
     expect(result.children).toBeDefined()
-    expect(result.children?.length).toBeGreaterThan(0)
+    expect(Array.isArray(result.children) ? result.children.length : 0).toBeGreaterThan(0)
 
     // Check that JSX expressions are captured
-    const expressionChildren = result.children?.filter((child: any) => child.elementType === 'jsx-expression')
+    const children = Array.isArray(result.children) ? result.children : []
+    const expressionChildren = children.filter(
+      (child: Record<string, unknown>) => child.elementType === 'jsx-expression',
+    )
     expect(expressionChildren).toBeDefined()
-    expect(expressionChildren?.length).toBeGreaterThan(0)
+    expect(expressionChildren.length).toBeGreaterThan(0)
   })
 
   it('should handle nested fragments', () => {
@@ -134,12 +137,14 @@ describe('JSX Fragments and Spread Operators', () => {
     expect(result.componentName).toBe('NestedFragmentComponent')
     expect(result.elementType).toBe('React.Fragment')
     expect(result.children).toBeDefined()
-    expect(result.children?.length).toBe(3) // h1, nested fragment, footer
+    expect(Array.isArray(result.children) ? result.children.length : 0).toBe(3) // h1, nested fragment, footer
 
     // Check nested fragment
-    const nestedFragment = result.children?.find((child: any) => child.elementType === 'React.Fragment')
+    const children = Array.isArray(result.children) ? result.children : []
+    const nestedFragment = children.find((child: Record<string, unknown>) => child.elementType === 'React.Fragment')
     expect(nestedFragment).toBeDefined()
-    expect(nestedFragment?.children?.length).toBe(2) // h2, p
+    const nestedChildren = Array.isArray(nestedFragment?.children) ? nestedFragment.children : []
+    expect(nestedChildren.length).toBe(2) // h2, p
   })
 
   it('should handle complex prop spreading with objects', () => {
@@ -148,10 +153,10 @@ describe('JSX Fragments and Spread Operators', () => {
 
       const ComplexSpreadComponent = ({ style, ...props }) => {
         const additionalProps = { 'data-testid': 'component', role: 'button' };
-        
+
         return (
-          <button 
-            {...props} 
+          <button
+            {...props}
             {...additionalProps}
             style={{ ...style, padding: '10px' }}
             onClick={() => console.log('clicked')}
@@ -169,7 +174,7 @@ describe('JSX Fragments and Spread Operators', () => {
     expect(result.componentName).toBe('ComplexSpreadComponent')
     expect(result.elementType).toBe('button')
 
-    const props = result.componentProperties as any
+    const props = result.componentProperties as Record<string, unknown>
     expect(Object.keys(props)).toContain('...props')
     expect(Object.keys(props)).toContain('...additionalProps')
     expect(props.style).toContain('...style')

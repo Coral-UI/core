@@ -1,4 +1,5 @@
 import type { CoralRootNode } from '@reallygoodwork/coral-core'
+
 import { coralToHTML } from '../index'
 
 describe('coralToHTML', () => {
@@ -7,15 +8,15 @@ describe('coralToHTML', () => {
       name: 'div',
       elementType: 'div',
       elementAttributes: {
-        class: 'container'
+        class: 'container',
       },
       children: [
         {
           name: 'p',
           elementType: 'p',
-          textContent: 'Hello, World!'
-        }
-      ]
+          textContent: 'Hello, World!',
+        },
+      ],
     }
 
     const result = await coralToHTML(coralSpec)
@@ -34,14 +35,14 @@ describe('coralToHTML', () => {
           elementType: 'img',
           elementAttributes: {
             src: 'test.jpg',
-            alt: 'Test'
-          }
+            alt: 'Test',
+          },
         },
         {
           name: 'br',
-          elementType: 'br'
-        }
-      ]
+          elementType: 'br',
+        },
+      ],
     }
 
     const result = await coralToHTML(coralSpec)
@@ -57,9 +58,9 @@ describe('coralToHTML', () => {
         {
           name: 'p',
           elementType: 'p',
-          textContent: 'Plain text'
-        }
-      ]
+          textContent: 'Plain text',
+        },
+      ],
     }
 
     const result = await coralToHTML(coralSpec)
@@ -79,16 +80,16 @@ describe('coralToHTML', () => {
             {
               name: 'h1',
               elementType: 'h1',
-              textContent: 'Title'
+              textContent: 'Title',
             },
             {
               name: 'p',
               elementType: 'p',
-              textContent: 'Content'
-            }
-          ]
-        }
-      ]
+              textContent: 'Content',
+            },
+          ],
+        },
+      ],
     }
 
     const result = await coralToHTML(coralSpec)
@@ -106,9 +107,9 @@ describe('coralToHTML', () => {
         {
           name: 'p',
           elementType: 'p',
-          textContent: 'Test'
-        }
-      ]
+          textContent: 'Test',
+        },
+      ],
     }
 
     const result = await coralToHTML(coralSpec)

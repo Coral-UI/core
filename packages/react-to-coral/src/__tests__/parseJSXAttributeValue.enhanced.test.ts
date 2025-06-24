@@ -11,7 +11,7 @@ describe('parseJSXAttributeValue - Enhanced Expression Support', () => {
       plugins: ['jsx', 'typescript'],
     })
 
-    let attributeValue: any = null
+    let attributeValue: unknown = null
     const result = { methods: [], stateHooks: [], componentProperties: [] }
 
     traverse(ast, {

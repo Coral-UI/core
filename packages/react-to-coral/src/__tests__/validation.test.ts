@@ -6,11 +6,11 @@ describe('Input Validation and Error Handling', () => {
     it('should validate a correct React component', () => {
       const component = `
         import React from 'react';
-        
+
         const ValidComponent = () => {
           return <div>Hello World</div>;
         };
-        
+
         export default ValidComponent;
       `
 
@@ -29,7 +29,7 @@ describe('Input Validation and Error Handling', () => {
     })
 
     it('should reject null/undefined input', () => {
-      const result = validateReactComponent(null as any)
+      const result = validateReactComponent(null as unknown as string)
 
       expect(result.isValid).toBe(false)
       expect(result.errors).toHaveLength(1)
@@ -77,7 +77,7 @@ describe('Input Validation and Error Handling', () => {
     it('should warn about class components', () => {
       const component = `
         import React from 'react';
-        
+
         class Component extends React.Component {
           render() {
             return <div>Hello</div>;
@@ -93,9 +93,9 @@ describe('Input Validation and Error Handling', () => {
     it('should warn about advanced React features', () => {
       const component = `
         import React, { Suspense, lazy } from 'react';
-        
+
         const LazyComponent = lazy(() => import('./Other'));
-        
+
         const Component = () => {
           return (
             <Suspense fallback={<div>Loading...</div>}>
@@ -138,7 +138,7 @@ describe('Input Validation and Error Handling', () => {
     it('should throw error when no component found', () => {
       const noComponent = `
         import React from 'react';
-        
+
         const notAComponent = "just a string";
       `
 
@@ -150,11 +150,11 @@ describe('Input Validation and Error Handling', () => {
     it('should throw error when no JSX found', () => {
       const noJSX = `
         import React from 'react';
-        
+
         const Component = () => {
           return "just a string";
         };
-        
+
         export default Component;
       `
 
@@ -178,16 +178,16 @@ describe('Input Validation and Error Handling', () => {
     it('should handle edge case with complex nested structures', () => {
       const complexComponent = `
         import React, { useState, useEffect } from 'react';
-        
+
         const ComplexComponent = ({ data = [], onUpdate }) => {
           const [state, setState] = useState({ loading: false, error: null });
-          
+
           useEffect(() => {
             if (data.length > 0) {
               setState(prev => ({ ...prev, loading: true }));
             }
           }, [data]);
-          
+
           const handleClick = async (id) => {
             try {
               await onUpdate(id);
@@ -196,7 +196,7 @@ describe('Input Validation and Error Handling', () => {
               setState({ loading: false, error: err.message });
             }
           };
-          
+
           return (
             <>
               {state.loading && <div>Loading...</div>}
@@ -211,7 +211,7 @@ describe('Input Validation and Error Handling', () => {
             </>
           );
         };
-        
+
         export default ComplexComponent;
       `
 

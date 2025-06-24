@@ -12,6 +12,7 @@ export default [
           allowInterfaces: 'always',
         },
       ],
+      '@typescript-eslint/no-explicit-any': 'error',
     },
   },
 ]

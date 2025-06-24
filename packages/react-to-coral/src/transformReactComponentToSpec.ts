@@ -13,6 +13,7 @@ import type {
   CoralElementType,
   CoralImportType,
   CoralMethodType,
+  CoralRootNode,
   CoralStateType,
 } from '@reallygoodwork/coral-core'
 import { tailwindToCSS } from '@reallygoodwork/coral-tw2css'
@@ -38,7 +39,10 @@ export interface Result {
   componentProperties?: Array<CoralComponentPropertyType>
 }
 
-export const transformReactComponentToSpec = (component: string, options?: { skipValidation?: boolean }) => {
+export const transformReactComponentToSpec = (
+  component: string,
+  options?: { skipValidation?: boolean },
+): CoralRootNode => {
   // Validate input if not skipped
   if (!options?.skipValidation) {
     const validation = validateReactComponent(component)
@@ -213,7 +217,7 @@ export const transformReactComponentToSpec = (component: string, options?: { ski
       styles?: unknown
       [key: string]: unknown
     }
-    const obj: any = {
+    const obj: CoralRootNode = {
       $schema: 'https://coral.design/schema.json',
       elementType: (result.rootElement?.elementType as CoralElementType) || 'div',
       componentProperties: otherProps as CoralComponentPropertyType,
@@ -231,7 +235,7 @@ export const transformReactComponentToSpec = (component: string, options?: { ski
       },
       children: result.rootElement?.children.map(transformUIElementToBaseNode) || [],
       // Include metadata from result
-      type: result.type,
+      type: result.type === 'ArrowFunction' ? 'COMPONENT' : 'INSTANCE',
       imports: result.imports,
     }
 

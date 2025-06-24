@@ -9,15 +9,14 @@ export const analyzeStateInteractions = (path: NodePath, stateHooks: Array<Coral
     writes: new Set<string>(),
   }
 
-  ;(path as any).traverse({
+  path.traverse({
     Identifier(identifierPath: NodePath<t.Identifier>) {
       const stateHook = stateHooks.find(
         (hook) => hook.name === identifierPath.node.name || hook.setterName === identifierPath.node.name,
       )
       if (stateHook) {
         const isWrite =
-          (identifierPath as any).parentPath.isCallExpression() &&
-          (identifierPath as any).parentPath.get('callee') === identifierPath
+          identifierPath.parentPath?.isCallExpression() && identifierPath.parentPath.get('callee') === identifierPath
 
         if (isWrite) {
           interactions.writes.add(stateHook.name)

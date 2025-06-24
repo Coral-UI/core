@@ -31,7 +31,7 @@ const extractUseState = (path: NodePath<t.CallExpression>, result: { stateHooks?
       el && t.isIdentifier(el) ? el.name : 'unknown',
     )
     const arg = path.node.arguments[0]
-    let initialValue: any = null
+    let initialValue: unknown = null
     let type: CoralTSTypes = 'any'
 
     if (arg) {

@@ -8,7 +8,7 @@ import { parseJSXAttributeValue } from '../parseJSXAttributeValue'
 
 jest.mock('@babel/generator', () => ({
   __esModule: true,
-  default: jest.fn((ast) => ({ code: '() => {}' })),
+  default: jest.fn((_ast) => ({ code: '() => {}' })),
 }))
 
 jest.mock('../createPropReference')
@@ -27,27 +27,27 @@ describe('parseJSXAttributeValue', () => {
   })
 
   it('should return null for an empty JSX expression', () => {
-    const attr = t.jSXExpressionContainer(t.jSXEmptyExpression())
+    const attr = t.jsxExpressionContainer(t.jsxEmptyExpression())
     const result = parseJSXAttributeValue(attr, mockResult)
     expect(result).toBeNull()
   })
 
   it('should handle call expressions', () => {
     const call = t.callExpression(t.identifier('myFunc'), [])
-    const attr = t.jSXExpressionContainer(call)
+    const attr = t.jsxExpressionContainer(call)
     const result = parseJSXAttributeValue(attr, mockResult)
     expect(result).toBe('{() => {}}')
     expect(generate).toHaveBeenCalledWith(call)
   })
 
   it('should return null for other jsx attribute types', () => {
-    const attr = t.jSXElement(t.jSXOpeningElement(t.jSXIdentifier('div'), [], false), null, [], false)
+    const attr = t.jsxElement(t.jsxOpeningElement(t.jsxIdentifier('div'), [], false), null, [], false)
     const result = parseJSXAttributeValue(attr, mockResult)
     expect(result).toBeNull()
   })
 
   it('should call createPropReference for identifiers', () => {
-    const attr = t.jSXExpressionContainer(t.identifier('myProp'))
+    const attr = t.jsxExpressionContainer(t.identifier('myProp'))
     parseJSXAttributeValue(attr, mockResult)
     expect(createPropReference).toHaveBeenCalledWith('myProp', mockResult)
   })

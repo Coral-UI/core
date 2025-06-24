@@ -82,7 +82,7 @@ describe('getParamName', () => {
 
   it('should return "param" for unsupported parameter types', () => {
     // Test with a TSParameterProperty or other unsupported type
-    const functionCode = 'const fn = (param: any) => {}'
+    const functionCode = 'const fn = (param: string) => {}'
     const param = getParamFromFunction(functionCode)
 
     expect(param).not.toBeNull()

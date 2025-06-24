@@ -4,7 +4,8 @@ import eslintPluginImportX from 'eslint-plugin-import-x'
 import EslintPluginPrettier from 'eslint-plugin-prettier/recommended'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
+/** @type {import('eslint').Linter.Config[]} */
+const config = tseslint.config(
     eslint.configs.recommended,
     eslintPluginImportX.flatConfigs.recommended,
     eslintPluginImportX.flatConfigs.typescript,
@@ -25,6 +26,7 @@ export default tseslint.config(
             allowInterfaces: 'always',
           },
         ],
+        '@typescript-eslint/no-explicit-any': 'error',
         '@typescript-eslint/no-unused-vars': [
           'error',
           {
@@ -47,3 +49,5 @@ export default tseslint.config(
     },
     EslintPluginPrettier,
   )
+
+export default config
