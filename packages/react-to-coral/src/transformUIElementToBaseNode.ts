@@ -11,6 +11,19 @@ export const transformUIElementToBaseNode = (element: UIElement): CoralRootNode 
       [key: string]: unknown
     }) ?? {}
 
+  const elementAttributes: Record<string, string | number | boolean | string[]> = {}
+
+  // Add other props as element attributes, filtering to allowed types
+  Object.entries(otherProps).forEach(([key, value]) => {
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || Array.isArray(value)) {
+      elementAttributes[key] = value as string | number | boolean | string[]
+    }
+  })
+
+  if (className) {
+    elementAttributes.class = className
+  }
+
   const node: CoralRootNode = {
     elementType: element.elementType as CoralElementType,
     componentProperties: otherProps as CoralComponentPropertyType,
@@ -24,7 +37,7 @@ export const transformUIElementToBaseNode = (element: UIElement): CoralRootNode 
       ...tailwindToCSS(className || ''),
     },
     children: element.children.map(transformUIElementToBaseNode),
-    elementAttributes: {}, // Add this line with appropriate attributes
+    elementAttributes,
   }
 
   if (element.textContent) {

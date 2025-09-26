@@ -1,4 +1,5 @@
-import z from 'zod'
+import { createAsyncFunctionSchema, functionSchema } from '@lib/zodFunctionSchema'
+import { z } from 'zod/v4'
 
 export const zComponentProperties = z.object({
   figmaNodeRef: z.string().nullish(),
@@ -12,7 +13,18 @@ export const zComponentProperties = z.object({
       z.boolean(),
       z.array(z.any()),
       z.record(z.string(), z.any()),
-      z.function(),
+      functionSchema(
+        z.function({
+          input: z.tuple([]),
+          output: z.any(),
+        }),
+      ),
+      createAsyncFunctionSchema(
+        z.function({
+          input: z.tuple([]),
+          output: z.any(),
+        }),
+      ),
       z.undefined(),
       z.null(),
     ])

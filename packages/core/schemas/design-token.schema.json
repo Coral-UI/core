@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "property": {
+      "description": "The CSS property of the design token",
+      "type": "string",
+      "pattern": "^[a-zA-Z_$][0-9a-zA-Z_$]*$"
+    },
+    "tokenName": {
+      "description": "The name of the design token",
+      "type": "string",
+      "pattern": "^[a-zA-Z_$][0-9a-zA-Z_$]*$"
+    },
+    "fallbackValue": {
+      "description": "The fallback value of the design token",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "hex": {
+              "type": "string"
+            },
+            "rgb": {
+              "type": "object",
+              "properties": {
+                "r": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 255
+                },
+                "g": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 255
+                },
+                "b": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 255
+                },
+                "a": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": ["r", "g", "b", "a"],
+              "additionalProperties": false
+            },
+            "hsl": {
+              "type": "object",
+              "properties": {
+                "h": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 360
+                },
+                "s": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "l": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "a": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": ["h", "s", "l", "a"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["hex", "rgb", "hsl"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "angle": {
+              "description": "The angle of the gradient",
+              "type": "number"
+            },
+            "type": {
+              "description": "The type of the gradient",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "linear"
+                },
+                {
+                  "type": "string",
+                  "const": "radial"
+                },
+                {
+                  "type": "string",
+                  "const": "LINEAR"
+                },
+                {
+                  "type": "string",
+                  "const": "RADIAL"
+                }
+              ]
+            },
+            "colors": {
+              "description": "The color stops of the gradient",
+              "type": "array",
+              "items": {
+                "description": "An object representing a single color stop in the gradient",
+                "type": "object",
+                "properties": {
+                  "color": {
+                    "type": "object",
+                    "properties": {
+                      "hex": {
+                        "type": "string"
+                      },
+                      "rgb": {
+                        "type": "object",
+                        "properties": {
+                          "r": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 255
+                          },
+                          "g": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 255
+                          },
+                          "b": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 255
+                          },
+                          "a": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          }
+                        },
+                        "required": ["r", "g", "b", "a"],
+                        "additionalProperties": false
+                      },
+                      "hsl": {
+                        "type": "object",
+                        "properties": {
+                          "h": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 360
+                          },
+                          "s": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 100
+                          },
+                          "l": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 100
+                          },
+                          "a": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          }
+                        },
+                        "required": ["h", "s", "l", "a"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": ["hex", "rgb", "hsl"],
+                    "additionalProperties": false
+                  },
+                  "position": {
+                    "description": "The position of the color in the gradient",
+                    "type": "number"
+                  }
+                },
+                "required": ["color", "position"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["angle", "type", "colors"],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "required": ["property", "tokenName", "fallbackValue"],
+  "additionalProperties": false,
+  "$id": "https://schemas.coral.design/v0.0.0/schema.json",
+  "version": "0.0.0"
+}

@@ -1,0 +1,685 @@
+---
+title: Basic Usage Examples
+description: Practical examples demonstrating core Coral UI functionality with real-world use cases
+---
+
+import { Card, CardGrid, Tabs, TabItem, Code, Aside } from '@astrojs/starlight/components'
+
+Learn Coral UI through practical examples that demonstrate common use cases and patterns.
+
+## Getting Started
+
+Before running these examples, make sure you have the necessary packages installed:
+
+```bash
+npm install @reallygoodwork/coral-core @reallygoodwork/tw2css colord node-html-parser
+```
+
+## Example 1: Creating Component Specifications
+
+### Simple Button Component
+
+Let's start with a basic button component specification:
+
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+// Define a simple button specification
+const buttonSpec = {
+  elementType: 'button',
+  name: 'SimpleButton',
+  children: ['Click me!'],
+  styles: {
+    backgroundColor: '#3b82f6',
+    color: '#ffffff',
+    padding: '8px 16px',
+    borderRadius: '4px',
+    border: 'none',
+    fontSize: '14px',
+    fontWeight: '500',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s ease'
+  },
+  attributes: {
+    type: 'button'
+  }
+}
+
+// Validate the specification
+try {
+  const validatedSpec = parseUISpec(buttonSpec)
+  console.log('✅ Button spec is valid!')
+  console.log('Component name:', validatedSpec.name)
+  console.log('Element type:', validatedSpec.elementType)
+} catch (error) {
+  console.error('❌ Validation failed:', error.message)
+}
+```
+
+### Button with Variants
+
+Create a more complex button with different style variants:
+
+```typescript
+const buttonWithVariants = parseUISpec({
+  elementType: 'button',
+  name: 'VariantButton',
+  children: ['Button Text'],
+  
+  // Base styles applied to all variants
+  styles: {
+    padding: '8px 16px',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: '500',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease-in-out'
+  },
+  
+  // Different style variants
+  variants: [
+    {
+      name: 'primary',
+      styles: {
+        backgroundColor: '#3b82f6',
+        color: '#ffffff'
+      },
+      pseudoStates: {
+        hover: {
+          backgroundColor: '#2563eb'
+        }
+      }
+    },
+    {
+      name: 'secondary',
+      styles: {
+        backgroundColor: '#6b7280',
+        color: '#ffffff'
+      },
+      pseudoStates: {
+        hover: {
+          backgroundColor: '#4b5563'
+        }
+      }
+    },
+    {
+      name: 'outline',
+      styles: {
+        backgroundColor: 'transparent',
+        color: '#3b82f6',
+        border: '1px solid #3b82f6'
+      },
+      pseudoStates: {
+        hover: {
+          backgroundColor: '#3b82f6',
+          color: '#ffffff'
+        }
+      }
+    }
+  ],
+  
+  attributes: {
+    type: 'button'
+  }
+})
+
+console.log('Variants available:', buttonWithVariants.variants?.map(v => v.name))
+```
+
+## Example 2: HTML to Coral Transformation
+
+### Converting a Card Component
+
+Transform existing HTML markup into a Coral specification:
+
+```typescript
+import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
+
+const cardHTML = `
+<div class="card bg-white rounded-lg shadow-md overflow-hidden max-w-sm">
+  <img 
+    src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400" 
+    alt="Product image" 
+    class="w-full h-48 object-cover"
+  >
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm font-medium text-blue-600 uppercase tracking-wide">
+        Technology
+      </span>
+      <span class="text-sm text-gray-500">
+        Dec 15, 2024
+      </span>
+    </div>
+    <h3 class="text-xl font-semibold text-gray-900 mb-2">
+      Modern Web Development
+    </h3>
+    <p class="text-gray-600 text-sm leading-relaxed mb-4">
+      Explore the latest trends and best practices in modern web development, 
+      including new frameworks and tools that are shaping the industry.
+    </p>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <img 
+          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32" 
+          alt="Author" 
+          class="w-8 h-8 rounded-full"
+        >
+        <span class="text-sm font-medium text-gray-900">John Doe</span>
+      </div>
+      <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md transition-colors">
+        Read More
+      </button>
+    </div>
+  </div>
+</div>
+`
+
+// Transform HTML to Coral spec
+const cardSpec = transformHTMLToSpec(cardHTML)
+
+console.log('Generated card spec:')
+console.log('- Element type:', cardSpec.elementType)
+console.log('- Children count:', cardSpec.children?.length)
+console.log('- Has styles:', !!cardSpec.styles)
+
+// The spec can now be used for further transformations
+```
+
+### Navigation Bar Example
+
+```typescript
+const navHTML = `
+<nav class="bg-white shadow-sm border-b sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo and brand -->
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <img class="h-8 w-8" src="/logo.svg" alt="Logo">
+        </div>
+        <div class="ml-3">
+          <h1 class="text-xl font-semibold text-gray-900">Coral UI</h1>
+        </div>
+      </div>
+      
+      <!-- Navigation links -->
+      <div class="hidden md:block">
+        <div class="ml-10 flex items-baseline space-x-4">
+          <a href="/" class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+            Home
+          </a>
+          <a href="/docs" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+            Documentation
+          </a>
+          <a href="/examples" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+            Examples
+          </a>
+          <a href="/api" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+            API
+          </a>
+        </div>
+      </div>
+      
+      <!-- CTA Button -->
+      <div class="flex items-center">
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+          Get Started
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+`
+
+const navSpec = transformHTMLToSpec(navHTML)
+console.log('Navigation spec created with', navSpec.children?.length, 'main sections')
+```
+
+## Example 3: Tailwind CSS Conversion
+
+### Basic Style Conversion
+
+Convert Tailwind classes to CSS properties:
+
+```typescript
+import { tailwindToCSS } from '@reallygoodwork/tw2css'
+
+// Convert common utility classes
+const examples = [
+  'bg-blue-500 text-white px-4 py-2 rounded-md',
+  'flex items-center justify-between w-full',
+  'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6',
+  'text-xl font-bold text-gray-800 mb-4',
+  'border border-gray-300 rounded-lg p-6 shadow-sm'
+]
+
+examples.forEach((classes, index) => {
+  const cssStyles = tailwindToCSS(classes)
+  console.log(`\nExample ${index + 1}: "${classes}"`)
+  console.log('CSS Output:', JSON.stringify(cssStyles, null, 2))
+})
+```
+
+### Responsive Design Patterns
+
+```typescript
+// Responsive grid layout
+const gridStyles = tailwindToCSS(`
+  grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6
+  gap-4 sm:gap-6 lg:gap-8
+`)
+
+console.log('Responsive grid styles:', gridStyles)
+
+// Responsive typography
+const textStyles = tailwindToCSS(`
+  text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl
+  font-normal sm:font-medium lg:font-semibold
+`)
+
+console.log('Responsive text styles:', textStyles)
+
+// Responsive spacing
+const spacingStyles = tailwindToCSS(`
+  p-2 sm:p-4 md:p-6 lg:p-8
+  m-1 sm:m-2 md:m-4 lg:m-6
+`)
+
+console.log('Responsive spacing styles:', spacingStyles)
+```
+
+## Example 4: Complex Component Patterns
+
+### Form Component with State
+
+Create a form component with state management:
+
+```typescript
+const contactFormSpec = parseUISpec({
+  elementType: 'form',
+  name: 'ContactForm',
+  
+  // Form state
+  state: [
+    {
+      name: 'formData',
+      type: 'object',
+      defaultValue: {
+        name: '',
+        email: '',
+        message: ''
+      }
+    },
+    {
+      name: 'isSubmitting',
+      type: 'boolean',
+      defaultValue: false
+    },
+    {
+      name: 'errors',
+      type: 'object',
+      defaultValue: {}
+    }
+  ],
+  
+  // Form methods
+  methods: [
+    {
+      name: 'handleInputChange',
+      parameters: [
+        { name: 'field', type: 'string' },
+        { name: 'value', type: 'string' }
+      ],
+      returnType: 'void'
+    },
+    {
+      name: 'validateForm',
+      parameters: [],
+      returnType: 'boolean'
+    },
+    {
+      name: 'handleSubmit',
+      parameters: [
+        { name: 'event', type: 'Event' }
+      ],
+      returnType: 'Promise<void>'
+    }
+  ],
+  
+  // Form attributes
+  attributes: {
+    method: 'POST',
+    noValidate: true
+  },
+  
+  // Form styles
+  styles: {
+    maxWidth: '500px',
+    margin: '0 auto',
+    padding: '24px',
+    backgroundColor: '#ffffff',
+    borderRadius: '8px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+  },
+  
+  // Form fields
+  children: [
+    {
+      elementType: 'div',
+      styles: { marginBottom: '20px' },
+      children: [
+        {
+          elementType: 'label',
+          attributes: { htmlFor: 'name' },
+          styles: {
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          },
+          children: ['Full Name *']
+        },
+        {
+          elementType: 'input',
+          attributes: {
+            type: 'text',
+            id: 'name',
+            name: 'name',
+            required: true,
+            value: '{formData.name}',
+            onChange: 'handleInputChange'
+          },
+          styles: {
+            width: '100%',
+            padding: '10px 12px',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            fontSize: '16px',
+            transition: 'border-color 0.2s ease'
+          }
+        }
+      ]
+    },
+    // ... more form fields would go here
+    {
+      elementType: 'button',
+      attributes: {
+        type: 'submit',
+        disabled: '{isSubmitting}'
+      },
+      styles: {
+        width: '100%',
+        backgroundColor: '#3b82f6',
+        color: '#ffffff',
+        padding: '12px',
+        borderRadius: '6px',
+        border: 'none',
+        fontSize: '16px',
+        fontWeight: '500',
+        cursor: 'pointer'
+      },
+      children: ['{isSubmitting ? "Submitting..." : "Send Message"}']
+    }
+  ]
+})
+
+console.log('Form component created with:')
+console.log('- State variables:', contactFormSpec.state?.map(s => s.name))
+console.log('- Methods:', contactFormSpec.methods?.map(m => m.name))
+```
+
+### Interactive Dashboard Widget
+
+```typescript
+const dashboardWidgetSpec = parseUISpec({
+  elementType: 'div',
+  name: 'DashboardWidget',
+  
+  // Widget props
+  props: {
+    title: { type: 'string', required: true },
+    value: { type: 'number', required: true },
+    change: { type: 'number', required: false },
+    icon: { type: 'string', required: false },
+    color: { 
+      type: 'string', 
+      required: false, 
+      default: 'blue',
+      enum: ['blue', 'green', 'red', 'yellow'] 
+    }
+  },
+  
+  // Widget state
+  state: [
+    {
+      name: 'isExpanded',
+      type: 'boolean',
+      defaultValue: false
+    }
+  ],
+  
+  // Widget methods
+  methods: [
+    {
+      name: 'toggleExpanded',
+      parameters: [],
+      returnType: 'void'
+    }
+  ],
+  
+  // Widget styles
+  styles: {
+    backgroundColor: '#ffffff',
+    borderRadius: '8px',
+    padding: '20px',
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+    border: '1px solid #e5e7eb',
+    transition: 'all 0.2s ease'
+  },
+  
+  // Widget variants for different colors
+  variants: [
+    {
+      name: 'blue',
+      styles: {
+        borderLeftColor: '#3b82f6',
+        borderLeftWidth: '4px'
+      }
+    },
+    {
+      name: 'green',
+      styles: {
+        borderLeftColor: '#10b981',
+        borderLeftWidth: '4px'
+      }
+    },
+    {
+      name: 'red',
+      styles: {
+        borderLeftColor: '#ef4444',
+        borderLeftWidth: '4px'
+      }
+    }
+  ],
+  
+  children: [
+    {
+      elementType: 'div',
+      styles: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: '12px'
+      },
+      children: [
+        {
+          elementType: 'h3',
+          styles: {
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#6b7280',
+            margin: '0'
+          },
+          children: ['{props.title}']
+        },
+        {
+          elementType: 'button',
+          attributes: {
+            onClick: 'toggleExpanded'
+          },
+          styles: {
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#9ca3af'
+          },
+          children: ['{isExpanded ? "−" : "+"}']
+        }
+      ]
+    },
+    {
+      elementType: 'div',
+      styles: {
+        fontSize: '32px',
+        fontWeight: '700',
+        color: '#111827',
+        marginBottom: '8px'
+      },
+      children: ['{props.value.toLocaleString()}']
+    }
+  ]
+})
+
+console.log('Dashboard widget created with:')
+console.log('- Props:', Object.keys(dashboardWidgetSpec.props || {}))
+console.log('- Variants:', dashboardWidgetSpec.variants?.map(v => v.name))
+```
+
+## Example 5: Real-World Integration
+
+### Build Tool Integration
+
+Here's how you might integrate Coral UI into a build process:
+
+```typescript
+// build-tools/coral-processor.ts
+import { transformHTMLToSpec, parseUISpec } from '@reallygoodwork/coral-core'
+import { tailwindToCSS } from '@reallygoodwork/tw2css'
+import fs from 'fs/promises'
+import path from 'path'
+
+interface ProcessingOptions {
+  inputDir: string
+  outputDir: string
+  convertTailwind: boolean
+}
+
+export async function processComponentFiles(options: ProcessingOptions) {
+  const { inputDir, outputDir, convertTailwind } = options
+  
+  try {
+    // Read all HTML files from input directory
+    const files = await fs.readdir(inputDir)
+    const htmlFiles = files.filter(file => file.endsWith('.html'))
+    
+    console.log(`Processing ${htmlFiles.length} HTML files...`)
+    
+    const results = []
+    
+    for (const file of htmlFiles) {
+      const filePath = path.join(inputDir, file)
+      const htmlContent = await fs.readFile(filePath, 'utf-8')
+      
+      try {
+        // Transform HTML to Coral spec
+        let spec = transformHTMLToSpec(htmlContent)
+        
+        // Convert Tailwind classes if requested
+        if (convertTailwind && spec.attributes?.class) {
+          const tailwindClasses = spec.attributes.class
+          const cssStyles = tailwindToCSS(tailwindClasses)
+          
+          // Merge converted styles
+          spec.styles = { ...spec.styles, ...cssStyles }
+          
+          // Remove class attribute
+          delete spec.attributes.class
+        }
+        
+        // Validate the final spec
+        const validatedSpec = parseUISpec(spec)
+        
+        // Write to output directory
+        const outputFile = file.replace('.html', '.coral.json')
+        const outputPath = path.join(outputDir, outputFile)
+        
+        await fs.writeFile(
+          outputPath, 
+          JSON.stringify(validatedSpec, null, 2)
+        )
+        
+        results.push({
+          file,
+          success: true,
+          outputFile
+        })
+        
+        console.log(`✅ Processed: ${file} → ${outputFile}`)
+        
+      } catch (error) {
+        console.error(`❌ Failed to process ${file}:`, error.message)
+        results.push({
+          file,
+          success: false,
+          error: error.message
+        })
+      }
+    }
+    
+    return results
+    
+  } catch (error) {
+    console.error('Processing failed:', error)
+    throw error
+  }
+}
+
+// Usage
+processComponentFiles({
+  inputDir: './src/components',
+  outputDir: './dist/specs',
+  convertTailwind: true
+}).then(results => {
+  const successful = results.filter(r => r.success).length
+  console.log(`\n🎉 Successfully processed ${successful}/${results.length} files`)
+})
+```
+
+## Best Practices
+
+<Aside type="tip" title="Development Tips">
+1. **Always validate specs** with `parseUISpec()` during development
+2. **Use TypeScript** for better development experience and type safety
+3. **Start simple** and gradually add complexity to your specifications
+4. **Cache results** when processing multiple files or specs
+5. **Handle errors gracefully** with proper try-catch blocks
+</Aside>
+
+<Aside type="note" title="Performance Notes">
+- Coral UI is optimized for build-time processing
+- Consider using workers for CPU-intensive transformations
+- Batch similar operations when possible
+- Use incremental processing for large component libraries
+</Aside>
+
+## Next Steps
+
+Explore more advanced topics:
+
+- [React Integration](/examples/react-integration/) - Working with React components
+- [HTML Generation](/examples/html-generation/) - Creating HTML from specs
+- [Style Conversion](/examples/style-conversion/) - Advanced CSS transformations
+- [Custom Transformations](/advanced/custom-transformations/) - Building your own transformers

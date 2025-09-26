@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { zCoralColorSchema } from './color'
 import { zCoralGradientTypeSchema } from './gradient'

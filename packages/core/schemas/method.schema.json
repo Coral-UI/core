@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "An object representing a method in a Coral Component",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "The name of the method",
+      "type": "string",
+      "pattern": "^[a-zA-Z_$][0-9a-zA-Z_$]*$"
+    },
+    "description": {
+      "description": "The description of the method",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "body": {
+      "description": "The body of the method",
+      "type": "string"
+    },
+    "parameters": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "description": "The name of the parameter argument",
+            "type": "string",
+            "pattern": "^[a-zA-Z_$][0-9a-zA-Z_$]*$"
+          },
+          {
+            "description": "An object representing a parameter argument of the method",
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "The name of the parameter",
+                "type": "string",
+                "pattern": "^[a-zA-Z_$][0-9a-zA-Z_$]*$"
+              },
+              "tsType": {
+                "description": "The default value of the parameter as a TypeScript type",
+                "anyOf": [
+                  {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "string"
+                              },
+                              {
+                                "type": "string",
+                                "const": "number"
+                              },
+                              {
+                                "type": "string",
+                                "const": "boolean"
+                              },
+                              {
+                                "type": "string",
+                                "const": "array"
+                              },
+                              {
+                                "type": "string",
+                                "const": "object"
+                              },
+                              {
+                                "type": "string",
+                                "const": "function"
+                              },
+                              {}
+                            ]
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "const": "string"
+                                },
+                                {
+                                  "type": "string",
+                                  "const": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "const": "boolean"
+                                },
+                                {
+                                  "type": "string",
+                                  "const": "array"
+                                },
+                                {
+                                  "type": "string",
+                                  "const": "object"
+                                },
+                                {
+                                  "type": "string",
+                                  "const": "function"
+                                },
+                                {}
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "defaultValue": {
+                "anyOf": [
+                  {},
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": ["name"],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "stateInteractions": {
+      "description": "The state interactions of the method. This is used to determine if the method interacts with the state directly and therefore should enforce the existence of component state in the Coral Config",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "reads": {
+              "description": "The state properties that the method reads",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "writes": {
+              "description": "The state properties that the method writes",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": ["reads", "writes"],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": ["name", "body", "parameters"],
+  "additionalProperties": false,
+  "$id": "https://schemas.coral.design/v0.0.0/schema.json",
+  "version": "0.0.0"
+}

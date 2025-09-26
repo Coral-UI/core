@@ -2,3 +2,12 @@ node_modules
 .DS_Store
 dist
 .turbo
+
+# Vite cache files
+vite.config.ts.timestamp-*
+*.timestamp-*
+.vite
+
+apps/docs/.astro
+
+*.tsbuildinfo

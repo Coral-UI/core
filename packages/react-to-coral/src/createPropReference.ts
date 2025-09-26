@@ -14,7 +14,10 @@ export const createPropReference = (
     return { type: 'method', value }
   } else if (result.stateHooks && result.stateHooks.some((s) => s.name === value)) {
     return { type: 'state', value }
-  } else if (result.componentProperties && Object.keys(result.componentProperties).some((p) => p === value)) {
+  } else if (
+    result.componentProperties &&
+    result.componentProperties.some((p) => Object.keys(p).some((key) => key === value))
+  ) {
     return { type: 'prop', value }
   }
   // If it's not found, we'll assume it's a prop

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "string"
+        },
+        {
+          "type": "string",
+          "const": "number"
+        },
+        {
+          "type": "string",
+          "const": "boolean"
+        },
+        {
+          "type": "string",
+          "const": "array"
+        },
+        {
+          "type": "string",
+          "const": "object"
+        },
+        {
+          "type": "string",
+          "const": "function"
+        },
+        {}
+      ]
+    },
+    {
+      "type": "null"
+    }
+  ],
+  "$id": "https://schemas.coral.design/v0.0.0/schema.json",
+  "version": "0.0.0"
+}

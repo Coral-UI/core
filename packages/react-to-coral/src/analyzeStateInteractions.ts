@@ -1,36 +1,31 @@
-import { isNode } from '@/isNode'
+import { NodePath } from '@babel/traverse'
 import * as t from '@babel/types'
 
 import type { CoralStateType } from '@reallygoodwork/coral-core'
 
-export const analyzeStateInteractions = (node: t.Node, stateHooks: Array<CoralStateType>) => {
+export const analyzeStateInteractions = (path: NodePath, stateHooks: Array<CoralStateType>) => {
   const interactions = {
     reads: new Set<string>(),
     writes: new Set<string>(),
   }
 
-  function visit(node: t.Node) {
-    if (t.isIdentifier(node)) {
-      const stateHook = stateHooks.find((hook) => hook.name === node.name || hook.setterName === node.name)
+  path.traverse({
+    Identifier(identifierPath: NodePath<t.Identifier>) {
+      const stateHook = stateHooks.find(
+        (hook) => hook.name === identifierPath.node.name || hook.setterName === identifierPath.node.name,
+      )
       if (stateHook) {
-        // @ts-expect-error TS2339: Property 'parent' does not exist on type 'Identifier'.
-        if (t.isMemberExpression(node.parent) || t.isVariableDeclarator(node.parent)) {
-          interactions.reads.add(stateHook.name)
-          // @ts-expect-error TS2339: Property 'parent' does not exist on type 'Identifier'.
-        } else if (t.isCallExpression(node.parent) && node.parent.callee === node) {
+        const isWrite =
+          identifierPath.parentPath?.isCallExpression() && identifierPath.parentPath.get('callee') === identifierPath
+
+        if (isWrite) {
           interactions.writes.add(stateHook.name)
+        } else {
+          interactions.reads.add(stateHook.name)
         }
       }
-    }
-    for (const key in node) {
-      const prop = node[key as keyof t.Node]
-      if (isNode(prop)) {
-        visit(prop)
-      }
-    }
-  }
-
-  visit(node)
+    },
+  })
 
   return {
     reads: Array.from(interactions.reads),

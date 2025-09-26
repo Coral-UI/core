@@ -1,0 +1,98 @@
+---
+title: Coral UI - Design to Code Toolkit
+description: A powerful toolkit for transforming UI components between different formats with declarative specifications
+template: splash
+editUrl: false
+hero:
+  tagline: Transform UI components between different formats with declarative specifications
+  actions:
+    - text: Get Started
+      link: /getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/Coral-UI/core
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components'
+import { ContainerSection } from 'starlight-theme-black/components'
+
+<ContainerSection>
+
+## What is Coral UI?
+
+Coral UI is a comprehensive toolkit for building and transforming UI components in a declarative way. It provides a unified specification format that allows you to convert between different UI representations - from React components to HTML, from design tokens to CSS, and more.
+
+<CardGrid stagger>
+  <Card title="🔄 Universal Transformations" icon="rocket">
+    Convert between React, HTML, and design specifications seamlessly with our transformation pipeline.
+  </Card>
+  <Card title="📋 JSON Schema Validation" icon="setting">
+    Robust validation and type safety with comprehensive JSON schemas for all component specifications.
+  </Card>
+  <Card title="🎨 Design System Integration" icon="puzzle">
+    Built-in support for design tokens, Tailwind CSS, and style transformations.
+  </Card>
+  <Card title="🔌 Figma Plugin Ready" icon="external">
+    Export designs directly from Figma into code with our integrated plugin ecosystem.
+  </Card>
+</CardGrid>
+
+## Core Packages
+
+<CardGrid>
+  <Card title="@reallygoodwork/coral-core" icon="star">
+    Core utilities, schemas, and transformation functions for the Coral UI ecosystem.
+
+    [Learn more →](/packages/core/)
+  </Card>
+  <Card title="@reallygoodwork/react-to-coral" icon="react">
+    Parse React components into standardized Coral specifications with full TypeScript support.
+
+    [Learn more →](/packages/react-to-coral/)
+  </Card>
+  <Card title="@reallygoodwork/coral-to-html" icon="document">
+    Generate clean, semantic HTML from Coral specifications with customizable templates.
+
+    [Learn more →](/packages/coral-to-html/)
+  </Card>
+  <Card title="@reallygoodwork/tw2css" icon="styles">
+    Convert Tailwind CSS classes to standard CSS properties and style objects.
+
+    [Learn more →](/packages/tw2css/)
+  </Card>
+</CardGrid>
+
+## Quick Example
+
+Here's a simple example of transforming a React component to HTML using Coral UI:
+
+```typescript
+import { transformReactComponentToSpec } from '@reallygoodwork/react-to-coral'
+import { transformSpecToHTML } from '@reallygoodwork/coral-to-html'
+
+// React component source
+const reactSource = `
+function Button({ children, variant = 'primary' }) {
+  return (
+    <button className={\`btn btn-\${variant}\`}>
+      {children}
+    </button>
+  )
+}
+`
+
+// Transform React to Coral spec
+const coralSpec = transformReactComponentToSpec(reactSource)
+
+// Transform Coral spec to HTML
+const html = transformSpecToHTML(coralSpec)
+```
+
+## Get Started
+
+Ready to start building with Coral UI? Check out our [Getting Started guide](/getting-started/) or explore the [API documentation](/api/core-functions/).
+
+</ContainerSection>

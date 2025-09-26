@@ -1,7 +1,7 @@
 {
   "name": "@reallygoodwork/coral-ui",
   "private": true,
-  "packageManager": "pnpm@9.1.0",
+  "packageManager": "pnpm@10.12.3",
   "engines": {
     "node": ">=20.12.0"
   },
@@ -13,8 +13,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "lint-staged": "^15.2.10",
-    "prettier": "^3.3.3",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.6.0",
     "turbo": "latest"
   },
   "scripts": {
@@ -28,6 +28,9 @@
     "lint:fix": "turbo lint --continue -- --fix --cache --cache-location node_modules/.cache/.eslintcache",
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:watch": "turbo test:watch",
+    "test:coverage": "turbo test:coverage"
   }
 }

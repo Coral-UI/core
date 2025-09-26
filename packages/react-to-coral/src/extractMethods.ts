@@ -1,10 +1,6 @@
 import { analyzeStateInteractions } from '@/analyzeStateInteractions'
 import { getParamName } from '@/getParamName'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import generate from '@babel/generator'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import { NodePath } from '@babel/traverse'
 import * as t from '@babel/types'
 
@@ -21,8 +17,10 @@ export const extractMethods = (
     if (t.isIdentifier(path.node.id)) {
       const methodName = path.node.id.name
       const parameters = path.node.init.params.map(getParamName)
-      const body = generate.default(path.node.init.body).code
-      const stateInteractions = analyzeStateInteractions(path.node.init.body, result.stateHooks || [])
+      const body = generate(path.node.init.body).code
+      const initPath = path.get('init') as NodePath
+      const initBodyPath = initPath.get('body') as NodePath
+      const stateInteractions = analyzeStateInteractions(initBodyPath, result.stateHooks || [])
 
       if (!result.methods?.some((m) => m.name === methodName)) {
         if (!result.methods) result.methods = []

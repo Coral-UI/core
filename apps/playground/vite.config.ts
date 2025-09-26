@@ -11,10 +11,14 @@ export default defineConfig({
   plugins: [
     nodePolyfills({
       globals: {
-        Buffer: true, // can also be 'build', 'dev', or false
+        Buffer: true,
         global: true,
         process: true,
       },
+      // Don't polyfill these modules
+      exclude: ['fs', 'path'],
+      // Specify which modules should be polyfilled
+      include: ['buffer', 'process', 'util'],
     }),
     react(),
     tailwindcss(),

@@ -21,7 +21,8 @@
       "@/*": ["./src/*"],
       "@structures/*": ["./src/structures/*"],
       "@utils/*": ["./src/utils/*"],
-      "@lib/*": ["./src/lib/*"]
+      "@lib/*": ["./src/lib/*"],
+      "@config/*": ["./src/config/*"]
     },
     "target": "ES2022",
     "incremental": false,

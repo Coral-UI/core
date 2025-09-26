@@ -1,7 +1,7 @@
 import * as parserHtml from 'prettier/parser-html'
 import * as prettier from 'prettier/standalone'
 
-import type { CoralNodeWithChildren, CoralRootNode } from '@reallygoodwork/coral-core'
+import type { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 // List of self-closing HTML elements
 const selfClosingTags = [
@@ -21,9 +21,25 @@ const selfClosingTags = [
   'wbr',
 ]
 
-const nodeToHTML = (node: CoralNodeWithChildren): string => {
-  const attributes = node.elementAttributes ? ` ${node.elementAttributes}` : ''
-  const children = node.children ? node.children.map(nodeToHTML).join('') : ''
+// Helper function to convert elementAttributes object to HTML attribute string
+const formatAttributes = (attributes: Record<string, string | number | boolean | string[]>): string => {
+  return Object.entries(attributes)
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return `${key}="${value.join(' ')}"`
+      }
+      if (typeof value === 'boolean') {
+        return value ? key : ''
+      }
+      return `${key}="${value}"`
+    })
+    .filter(Boolean)
+    .join(' ')
+}
+
+const nodeToHTML = (node: CoralNode): string => {
+  const attributes = node.elementAttributes ? ` ${formatAttributes(node.elementAttributes)}` : ''
+  const children = node.children ? (node.children as CoralNode[]).map(nodeToHTML).join('') : ''
 
   // Check if the element is self-closing
   if (selfClosingTags.includes(node.elementType)) {

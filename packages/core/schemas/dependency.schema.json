@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "An object representing a dependency of another Coral document in a Coral Component",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "The name of the dependency",
+      "type": "string"
+    },
+    "version": {
+      "description": "The version of the dependency",
+      "type": "string"
+    },
+    "path": {
+      "description": "The path to the dependency",
+      "type": "string"
+    }
+  },
+  "required": ["name", "version", "path"],
+  "additionalProperties": false,
+  "$id": "https://schemas.coral.design/v0.0.0/schema.json",
+  "version": "0.0.0"
+}

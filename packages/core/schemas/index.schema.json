@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "$id": "https://schemas.coral.design/v0.0.0/index.json",
+  "version": "0.0.0",
+  "title": "Coral Design System Schemas",
+  "description": "Collection of JSON schemas for the Coral design system",
+  "type": "object",
+  "properties": {
+    "schemas": {
+      "type": "object",
+      "properties": {
+        "coral-root": {
+          "$ref": "./coral-root.schema.json"
+        },
+        "coral": {
+          "$ref": "./coral.schema.json"
+        },
+        "component-property": {
+          "$ref": "./component-property.schema.json"
+        },
+        "dependency": {
+          "$ref": "./dependency.schema.json"
+        },
+        "design-token": {
+          "$ref": "./design-token.schema.json"
+        },
+        "import": {
+          "$ref": "./import.schema.json"
+        },
+        "method": {
+          "$ref": "./method.schema.json"
+        },
+        "state": {
+          "$ref": "./state.schema.json"
+        },
+        "styles": {
+          "$ref": "./styles.schema.json"
+        },
+        "ts-types": {
+          "$ref": "./ts-types.schema.json"
+        },
+        "variant": {
+          "$ref": "./variant.schema.json"
+        }
+      }
+    }
+  }
+}

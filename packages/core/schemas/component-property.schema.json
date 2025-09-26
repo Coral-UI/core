@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "The properties passed to the component",
+  "type": "object",
+  "propertyNames": {
+    "description": "The name of the component property",
+    "type": "string",
+    "pattern": "^[a-zA-Z_$][0-9a-zA-Z_$]*$"
+  },
+  "additionalProperties": {
+    "anyOf": [
+      {},
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "string"
+                      },
+                      {
+                        "type": "string",
+                        "const": "number"
+                      },
+                      {
+                        "type": "string",
+                        "const": "boolean"
+                      },
+                      {
+                        "type": "string",
+                        "const": "array"
+                      },
+                      {
+                        "type": "string",
+                        "const": "object"
+                      },
+                      {
+                        "type": "string",
+                        "const": "function"
+                      },
+                      {}
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              {
+                "description": "An array of types used as or",
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "string"
+                        },
+                        {
+                          "type": "string",
+                          "const": "number"
+                        },
+                        {
+                          "type": "string",
+                          "const": "boolean"
+                        },
+                        {
+                          "type": "string",
+                          "const": "array"
+                        },
+                        {
+                          "type": "string",
+                          "const": "object"
+                        },
+                        {
+                          "type": "string",
+                          "const": "function"
+                        },
+                        {}
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "options": {
+            "description": "The options of the variant",
+            "anyOf": [
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "defaultValue": {
+            "description": "The default value of the component property"
+          }
+        },
+        "required": ["type", "defaultValue"],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "string"
+                      },
+                      {
+                        "type": "string",
+                        "const": "number"
+                      },
+                      {
+                        "type": "string",
+                        "const": "boolean"
+                      },
+                      {
+                        "type": "string",
+                        "const": "array"
+                      },
+                      {
+                        "type": "string",
+                        "const": "object"
+                      },
+                      {
+                        "type": "string",
+                        "const": "function"
+                      },
+                      {}
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              {
+                "description": "An array of types used as or",
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "string"
+                        },
+                        {
+                          "type": "string",
+                          "const": "number"
+                        },
+                        {
+                          "type": "string",
+                          "const": "boolean"
+                        },
+                        {
+                          "type": "string",
+                          "const": "array"
+                        },
+                        {
+                          "type": "string",
+                          "const": "object"
+                        },
+                        {
+                          "type": "string",
+                          "const": "function"
+                        },
+                        {}
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "value": {
+            "description": "The value of the variant property"
+          }
+        },
+        "required": ["type", "value"],
+        "additionalProperties": false
+      }
+    ]
+  },
+  "$id": "https://schemas.coral.design/v0.0.0/schema.json",
+  "version": "0.0.0"
+}

@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "The name of the state property. Will be used to represent the state symbol in the component.",
+      "type": "string",
+      "pattern": "^[a-zA-Z_$][0-9a-zA-Z_$]*$"
+    },
+    "setterName": {
+      "description": "The name of the setter function for the state property. Will be used to set the state symbol in the component.",
+      "type": "string",
+      "pattern": "^[a-zA-Z_$][0-9a-zA-Z_$]*$"
+    },
+    "initialValue": {
+      "anyOf": [
+        {
+          "description": "The initial value of the state property."
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "tsType": {
+      "description": "The types of the state property. Can be a single type or an array of types",
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "string"
+                },
+                {
+                  "type": "string",
+                  "const": "number"
+                },
+                {
+                  "type": "string",
+                  "const": "boolean"
+                },
+                {
+                  "type": "string",
+                  "const": "array"
+                },
+                {
+                  "type": "string",
+                  "const": "object"
+                },
+                {
+                  "type": "string",
+                  "const": "function"
+                },
+                {}
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "const": "string"
+                  },
+                  {
+                    "type": "string",
+                    "const": "number"
+                  },
+                  {
+                    "type": "string",
+                    "const": "boolean"
+                  },
+                  {
+                    "type": "string",
+                    "const": "array"
+                  },
+                  {
+                    "type": "string",
+                    "const": "object"
+                  },
+                  {
+                    "type": "string",
+                    "const": "function"
+                  },
+                  {}
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "hookType": {
+      "description": "The type of React hook used",
+      "type": "string",
+      "enum": ["useState", "useEffect", "useReducer", "useContext", "useMemo", "useCallback"]
+    },
+    "dependencies": {
+      "description": "Dependencies array for hooks like useEffect, useMemo, useCallback",
+      "type": "string"
+    },
+    "reducer": {
+      "description": "Reducer function for useReducer hook",
+      "type": "string"
+    }
+  },
+  "required": ["name", "setterName", "tsType"],
+  "additionalProperties": false,
+  "$id": "https://schemas.coral.design/v0.0.0/schema.json",
+  "version": "0.0.0"
+}

@@ -1,0 +1,202 @@
+---
+title: Overview
+description: Learn how to get started with Coral UI and its ecosystem of packages
+---
+
+import { Card, CardGrid, Tabs, TabItem } from '@astrojs/starlight/components'
+
+Welcome to Coral UI! This guide will help you get up and running with our design-to-code toolkit.
+
+## What is Coral UI?
+
+Coral UI is a comprehensive toolkit that enables seamless transformation between different UI representations. Whether you're working with React components, HTML markup, design tokens, or CSS styles, Coral UI provides the tools to convert between these formats using a standardized specification.
+
+### Key Features
+
+<CardGrid>
+  <Card title="Universal Transformations" icon="rocket">
+    Convert between React, HTML, and design specifications
+  </Card>
+  <Card title="Type Safety" icon="approve-check">
+    Full TypeScript support with comprehensive type definitions
+  </Card>
+  <Card title="Schema Validation" icon="setting">
+    JSON Schema validation for all component specifications
+  </Card>
+  <Card title="Design Integration" icon="puzzle">
+    Built-in support for Figma, design tokens, and CSS frameworks
+  </Card>
+</CardGrid>
+
+## Installation
+
+Install the core package and any additional packages you need:
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    # Core package (required)
+    npm install @reallygoodwork/coral-core
+
+    # Additional packages (optional)
+    npm install @reallygoodwork/react-to-coral
+    npm install @reallygoodwork/coral-to-html
+    npm install @reallygoodwork/tw2css
+    npm install @reallygoodwork/style-to-tailwind
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```bash
+    # Core package (required)
+    yarn add @reallygoodwork/coral-core
+
+    # Additional packages (optional)
+    yarn add @reallygoodwork/react-to-coral
+    yarn add @reallygoodwork/coral-to-html
+    yarn add @reallygoodwork/tw2css
+    yarn add @reallygoodwork/style-to-tailwind
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```bash
+    # Core package (required)
+    pnpm add @reallygoodwork/coral-core
+
+    # Additional packages (optional)
+    pnpm add @reallygoodwork/react-to-coral
+    pnpm add @reallygoodwork/coral-to-html
+    pnpm add @reallygoodwork/tw2css
+    pnpm add @reallygoodwork/style-to-tailwind
+    ```
+  </TabItem>
+</Tabs>
+
+### Peer Dependencies
+
+Some packages require peer dependencies. Install them as needed:
+
+```bash
+npm install colord node-html-parser
+```
+
+## Your First Transformation
+
+Let's start with a simple example that demonstrates the core concept of Coral UI - transforming a UI specification.
+
+### 1. Create a Basic Coral Spec
+
+```typescript
+import { parseUISpec } from '@reallygoodwork/coral-core'
+
+const buttonSpec = {
+  elementType: 'button',
+  name: 'PrimaryButton',
+  children: ['Click me'],
+  styles: {
+    backgroundColor: '#3b82f6',
+    color: '#ffffff',
+    padding: '12px 24px',
+    borderRadius: '6px',
+    border: 'none',
+    cursor: 'pointer'
+  },
+  attributes: {
+    type: 'button'
+  }
+}
+
+// Validate and parse the specification
+const validatedSpec = parseUISpec(buttonSpec)
+console.log('Valid spec:', validatedSpec)
+```
+
+### 2. Transform HTML to Coral Spec
+
+```typescript
+import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
+
+const htmlString = `
+  <div class="card bg-white shadow-lg rounded-lg p-6">
+    <h2 class="text-xl font-bold mb-4">Card Title</h2>
+    <p class="text-gray-600">Card content goes here.</p>
+    <button class="btn btn-primary mt-4">Action</button>
+  </div>
+`
+
+const coralSpec = transformHTMLToSpec(htmlString)
+console.log('Coral spec from HTML:', coralSpec)
+```
+
+### 3. Convert Tailwind to CSS
+
+```typescript
+import { tailwindToCSS } from '@reallygoodwork/tw2css'
+
+const tailwindClasses = 'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600'
+const cssStyles = tailwindToCSS(tailwindClasses)
+
+console.log('CSS styles:', cssStyles)
+// Output: {
+//   backgroundColor: '#3b82f6',
+//   color: '#ffffff',
+//   paddingLeft: '16px',
+//   paddingRight: '16px',
+//   paddingTop: '8px',
+//   paddingBottom: '8px',
+//   borderRadius: '6px'
+// }
+```
+
+## Understanding the Coral Specification
+
+The Coral specification is a JSON-based format that describes UI components in a framework-agnostic way. Here's the basic structure:
+
+```typescript
+interface CoralNode {
+  elementType: string        // HTML element or component name
+  name?: string             // Component name
+  children?: (CoralNode | string)[]  // Child elements or text content
+  styles?: Record<string, any>       // CSS styles
+  attributes?: Record<string, any>   // HTML attributes
+  props?: Record<string, any>        // Component props
+  variants?: CoralVariantType[]      // Style variants
+  state?: CoralStateType[]           // State management
+  methods?: CoralMethodType[]        // Component methods
+  imports?: CoralImportType[]        // Import dependencies
+}
+```
+
+## Next Steps
+
+Now that you have Coral UI installed and understand the basics, explore these topics:
+
+<CardGrid>
+  <Card title="Core Concepts" icon="open-book">
+    Learn about the Coral specification, transformations, and schemas
+
+    [Explore concepts →](/concepts/overview/)
+  </Card>
+  <Card title="Package Guides" icon="puzzle">
+    Detailed documentation for each package in the ecosystem
+
+    [View packages →](/packages/core/)
+  </Card>
+  <Card title="API Reference" icon="list-format">
+    Complete API documentation with examples
+
+    [Browse API →](/api/core-functions/)
+  </Card>
+  <Card title="Examples" icon="laptop">
+    Practical examples and use cases
+
+    [See examples →](/examples/basic-usage/)
+  </Card>
+</CardGrid>
+
+## Community and Support
+
+- **GitHub**: [Coral-UI/core](https://github.com/Coral-UI/core)
+- **Issues**: Report bugs and request features
+- **Discussions**: Share ideas and get help from the community
+
+Ready to dive deeper? Check out the [Installation Guide](/installation/) for more detailed setup instructions, or jump into the [Quick Start](/quick-start/) for hands-on examples.

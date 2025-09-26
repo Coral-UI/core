@@ -1,7 +1,8 @@
-import { getTypeFromAnnotation } from '@/getTypeFromAnnotation'
 import * as t from '@babel/types'
 
 import type { CoralComponentPropertyType, CoralTSTypes } from '@reallygoodwork/coral-core'
+
+import { getTypeFromAnnotation } from './getTypeFromAnnotation'
 
 export const extractProps = (param: t.Node | null): CoralComponentPropertyType | undefined => {
   if (!param) return undefined

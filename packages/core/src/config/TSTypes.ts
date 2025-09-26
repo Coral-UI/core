@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 export const zTS_TYPES = z.union([
   z.literal('string'),
