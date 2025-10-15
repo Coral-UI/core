@@ -4,12 +4,23 @@ import type { CoralComponentPropertyType, CoralElementType, CoralRootNode } from
 import { tailwindToCSS } from '@reallygoodwork/coral-tw2css'
 
 export const transformUIElementToBaseNode = (element: UIElement): CoralRootNode => {
-  const { className, styles, ...otherProps } =
-    (element.componentProperties as {
-      className?: string
-      styles?: unknown
-      [key: string]: unknown
-    }) ?? {}
+  const extractValue = (prop: any): any => {
+    // Handle new format with type and value
+    if (prop && typeof prop === 'object' && 'value' in prop) {
+      return prop.value
+    }
+    // Handle legacy format (direct value)
+    return prop
+  }
+
+  const extractedProps: Record<string, any> = {}
+
+  // Extract values from the new component property format
+  Object.entries(element.componentProperties || {}).forEach(([key, prop]) => {
+    extractedProps[key] = extractValue(prop)
+  })
+
+  const { className, styles, ...otherProps } = extractedProps
 
   const elementAttributes: Record<string, string | number | boolean | string[]> = {}
 
@@ -24,9 +35,17 @@ export const transformUIElementToBaseNode = (element: UIElement): CoralRootNode 
     elementAttributes.class = className
   }
 
+  // Preserve the original component properties format (with types)
+  const preservedComponentProperties: CoralComponentPropertyType = {}
+  Object.entries(element.componentProperties || {}).forEach(([key, prop]) => {
+    if (key !== 'className' && key !== 'styles') {
+      preservedComponentProperties[key] = prop
+    }
+  })
+
   const node: CoralRootNode = {
     elementType: element.elementType as CoralElementType,
-    componentProperties: otherProps as CoralComponentPropertyType,
+    componentProperties: preservedComponentProperties,
     // isComponent: element.isComponent,
     name: element.elementType,
     methods: [],

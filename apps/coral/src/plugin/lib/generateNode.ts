@@ -18,10 +18,10 @@ export const generateNode = async (node: SceneNode): Promise<CoralRootNode | Cor
   }
 
   if (node.type === 'INSTANCE') {
-    const mainComponent = await node.getMainComponentAsync()
+    // const mainComponent = await node.getMainComponentAsync()
     nodeData.isComponentInstance = true
     nodeData.type = 'INSTANCE'
-    nodeData.componentParentFigmaNodeRef = mainComponent?.parent?.id ?? mainComponent?.id
+    // nodeData.componentParentFigmaNodeRef = mainComponent?.parent?.id ?? mainComponent?.id
     let variantProperties: Record<string, { type: string; value: string | boolean }> = {}
     variantProperties = Object.entries(node.componentProperties).reduce<
       Record<string, { type: string; value: string | boolean }>

@@ -25,13 +25,20 @@ const childRequiresAutoLayout = (node: CoralNode | CoralRootNode) => {
   return node.children?.some((child) => shouldApplyAutoLayout(child)) ?? false
 }
 
-const applyAutoLayout = (element: ElementWithOptionalText, shouldFill: boolean = false) => {
+const applyAutoLayout = (element: ElementWithOptionalText, shouldFill: boolean = false, node?: CoralNode | CoralRootNode) => {
   // Step 3: Enable autoLayout (must happen after children are added)
   element.layoutMode = 'VERTICAL'
 
   // Step 4 & 5: Set sizing (must happen after autoLayout)
   element.layoutSizingHorizontal = shouldFill ? 'FILL' : 'HUG'
-  element.layoutSizingVertical = 'HUG'
+
+  // Only set fixed height if explicitly specified, otherwise hug contents
+  if (node?.styles?.['height'] && typeof node.styles['height'] === 'number') {
+    element.layoutSizingVertical = 'FIXED'
+    element.resize(element.width, node.styles['height'] as number)
+  } else {
+    element.layoutSizingVertical = 'HUG'
+  }
 
   return element
 }
@@ -99,7 +106,7 @@ export const createFrameWithFillingText = async (node: CoralNode) => {
     ...node.styles,
   }
 
-  const textContent = node.children?.find((child) => 'textContent' in child)?.textContent
+  const textContent = node.children?.find((child) => 'textContent' in child)?.textContent ?? node.textContent
 
   // Step 1: Create the frame
   const frame = figma.createFrame()
@@ -111,25 +118,41 @@ export const createFrameWithFillingText = async (node: CoralNode) => {
   // Step 2: Create and immediately append the text node
   const textNode = figma.createText()
 
-  if (fontStyle !== 'Regular' || fontFamily !== 'Inter') {
+  // Try to load the font, with fallbacks
+  let loadedFontStyle = fontStyle
+  try {
     await figma.loadFontAsync({ family: fontFamily, style: fontStyle })
-  } else {
-    await figma.loadFontAsync({ family: 'Inter', style: 'Regular' })
+  } catch (error) {
+    // Try with space in style name (e.g., "Semi Bold" instead of "SemiBold")
+    const styleWithSpace = fontStyle.replace(/([A-Z])/g, ' $1').trim()
+    try {
+      await figma.loadFontAsync({ family: fontFamily, style: styleWithSpace })
+      loadedFontStyle = styleWithSpace
+    } catch {
+      // Fall back to Regular
+      await figma.loadFontAsync({ family: fontFamily, style: 'Regular' })
+      loadedFontStyle = 'Regular'
+    }
   }
 
-  textNode.fontName = { family: fontFamily, style: fontStyle }
+  textNode.fontName = { family: fontFamily, style: loadedFontStyle }
 
   textNode.characters = textContent ?? ''
 
   frame.appendChild(textNode)
 
-  // await wait(2000)
-  setTimeout(() => {
-    frame.layoutSizingHorizontal = 'FILL'
-    textNode.layoutSizingHorizontal = 'FILL'
-    textNode.textAlignHorizontal = 'CENTER'
-    frame.layoutSizingVertical = 'HUG'
-  }, 2000)
+  // Enable auto-layout first before setting sizing properties
+  frame.layoutMode = 'VERTICAL'
+
+  // Now that the frame has auto-layout, we can set sizing properties
+  frame.layoutSizingVertical = 'HUG'
+  frame.layoutSizingHorizontal = 'HUG'
+  textNode.layoutSizingHorizontal = 'FILL'
+
+  // Set text alignment based on styles
+  if (styles?.['textAlign']) {
+    textNode.textAlignHorizontal = (styles['textAlign'] as string).toUpperCase() as TextNode['textAlignHorizontal']
+  }
 
   applyMarginToFrame(frame, node)
   applyTypographyStyles(textNode, styles)
@@ -142,48 +165,60 @@ export const createFrameWithFillingText = async (node: CoralNode) => {
 export const applyStyles = async (element: Element, node: CoralNode | CoralRootNode, addTextAlign?: textAlign) => {
   // Special case for text nodes that should fill
   if (isTextNode(node) && node.styles?.['width'] === '100%') {
-    element.layoutSizingHorizontal = 'FILL'
-    return
-  }
-
-  // Step 1 & 2 happen before this function is called (frame creation and child appending)
-
-  if (!nodeHasTextChildren(node) && (childRequiresAutoLayout(node) || shouldApplyAutoLayout(node))) {
-    // Step 3, 4, 5: Apply autoLayout and sizing
-    const shouldFill = node.styles?.['width'] === '100%' || node.styles?.['width'] === 'fill'
-    applyAutoLayout(element as ElementWithOptionalText, shouldFill)
-
-    applyFlexDirection(element as ElementWithOptionalText, node)
-    applyPadding(element as ElementWithOptionalText, node)
-    applyMaxWidth(element as ElementWithOptionalText, node)
-  }
-
-  if (isTextNode(node)) {
-    // await applyTypographyStyles(element as TextNode, node, addTextAlign)
-    // styles = {}
-    // Apply layoutSizingHorizontal if shouldHugHorizontal is true
-  }
-
-  if (shouldApplyAutoLayout(node) && node.styles?.['textAlign']) {
-    if ('counterAxisAlignItems' in element) {
-      element.counterAxisAlignItems = 'CENTER'
+    // Only set layoutSizingHorizontal if the element is in an auto-layout frame
+    if ('layoutSizingHorizontal' in element && element.parent && 'layoutMode' in element.parent && element.parent.layoutMode !== 'NONE') {
+      element.layoutSizingHorizontal = 'FILL'
     }
+    // Don't return early for text nodes - they need other styles applied
+  }
+
+  // Auto-layout is now enabled by default in createFrame/createComponent
+  // Here we just need to apply specific style overrides
+
+  if (element.type !== 'TEXT' && 'layoutMode' in element) {
+    // Override sizing if width is specified
+    const shouldFill = node.styles?.['width'] === '100%' || node.styles?.['width'] === 'fill'
+    if (shouldFill) {
+      element.layoutSizingHorizontal = 'FILL'
+    }
+
+    // Override height if explicitly specified
+    if (node.styles?.['height'] && typeof node.styles['height'] === 'number') {
+      element.layoutSizingVertical = 'FIXED'
+      element.resize(element.width, node.styles['height'] as number)
+    }
+
+    // Apply flex direction
+    applyFlexDirection(element as ElementWithOptionalText, node)
+
+    // Apply padding if specified
+    applyPadding(element as ElementWithOptionalText, node)
+
+    // Apply max width if specified
+    applyMaxWidth(element as ElementWithOptionalText, node)
+
+    // IMPORTANT: textAlign should NOT affect frame sizing or layout
+    // It only applies to child text nodes, not the container frame itself
+  }
+
+  if (isTextNode(node) && element.type === 'TEXT') {
+    // Apply typography styles to actual text nodes
+    await applyTypographyStyles(element as TextNode, node.styles || {}, addTextAlign)
   } else if (addTextAlign && isTextNode(node) && node.styles?.['textAlign']) {
-    ;(element as TextNode).textAlignHorizontal = node.styles?.['textAlign'] as TextNode['textAlignHorizontal']
+    // Only apply text alignment to text nodes, not frames
+    ;(element as TextNode).textAlignHorizontal = (node.styles?.['textAlign'] as string).toUpperCase() as TextNode['textAlignHorizontal'] ?? 'LEFT'
   }
 
   if (node.styles) {
     Object.entries(node.styles).forEach(([key]) => {
       if (key === 'backgroundColor') {
-        if (!nodeHasTextChildren(node)) {
+        if (!nodeHasTextChildren(node) && element.type !== 'TEXT') {
           applyPaint(element, node)
         }
       }
 
-      if (key === 'color' && isTextNode(node)) {
-        applyPaint(element, node)
-        // console.log('color', value)
-      }
+      // Color should NEVER be applied to frames - it's only for text fills
+      // It's already handled by applyTypographyStyles for actual text nodes
     })
   }
 }

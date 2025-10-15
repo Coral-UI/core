@@ -1,4 +1,6 @@
+import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
@@ -7,6 +9,9 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 export default defineConfig({
   resolve: {
     extensions: ['.mjs', '.js', '.json', '.jsx', '.ts', '.tsx'],
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
   },
   plugins: [
     nodePolyfills({
@@ -19,6 +24,10 @@ export default defineConfig({
       exclude: ['fs', 'path'],
       // Specify which modules should be polyfilled
       include: ['buffer', 'process', 'util'],
+    }),
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true,
     }),
     react(),
     tailwindcss(),

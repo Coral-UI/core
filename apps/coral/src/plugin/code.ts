@@ -2,11 +2,12 @@ import { parseUISpec } from '@reallygoodwork/coral-core'
 
 import { EXPORT_SPEC, IMPORT_SPEC } from './lib/events'
 import { exportSpec } from './lib/exportSpec'
-import { createElements } from './lib/import/importSpec'
 
+import { createElements } from './lib/import/importSpec'
+//
 console.clear()
 
-figma.showUI(__html__, { width: 600, height: 900, themeColors: true })
+figma.showUI(__html__, { width: 740, height: 878, themeColors: true })
 
 figma.on('selectionchange', () => {
   const selection = figma.currentPage.selection

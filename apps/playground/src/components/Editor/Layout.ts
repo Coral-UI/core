@@ -1,0 +1,130 @@
+import { z } from 'zod'
+
+export const zLayoutSchema = z.object({
+  width: z.number().optional(),
+  widthUnit: z.enum(['px', 'em', 'rem', 'vw', 'vh']).optional(),
+  height: z.number().optional(),
+  heightUnit: z.enum(['px', 'em', 'rem', 'vw', 'vh']).optional(),
+  display: z.enum(['block', 'inline', 'inline-block', 'flex', 'grid', 'none']).optional(),
+  flexDirection: z.enum(['row', 'row-reverse', 'column', 'column-reverse']).optional(),
+  flexWrap: z.enum(['nowrap', 'wrap', 'wrap-reverse']).optional(),
+  flexJustify: z.enum(['flex-start', 'flex-end', 'center', 'space-between', 'space-around', 'space-evenly']).optional(),
+  flexAlign: z.enum(['flex-start', 'flex-end', 'center', 'stretch', 'baseline']).optional(),
+  flexGrow: z.number().optional(),
+  flexShrink: z.number().optional(),
+})
+
+export type LayoutSchema = z.infer<typeof zLayoutSchema>
+
+export const LayoutComponents = [
+  {
+    label: 'Width',
+    name: 'width',
+    type: 'inputWithOptions',
+    inputType: 'number',
+    placeholder: '100',
+    defaultValue: 100,
+    selectName: 'widthUnit',
+    options: [
+      { label: 'px', value: 'px' },
+      { label: 'em', value: 'em' },
+      { label: 'rem', value: 'rem' },
+      { label: 'vw', value: 'vw' },
+      { label: 'vh', value: 'vh' },
+    ],
+  },
+  {
+    label: 'Height',
+    name: 'height',
+    type: 'inputWithOptions',
+    inputType: 'number',
+    placeholder: '100',
+    defaultValue: 100,
+    selectName: 'heightUnit',
+    options: [
+      { label: 'px', value: 'px' },
+      { label: 'em', value: 'em' },
+      { label: 'rem', value: 'rem' },
+      { label: 'vw', value: 'vw' },
+      { label: 'vh', value: 'vh' },
+    ],
+  },
+  {
+    label: 'Display',
+    name: 'display',
+    type: 'select',
+    defaultValue: 'block',
+    options: [
+      { label: 'Block', value: 'block' },
+      { label: 'Inline', value: 'inline' },
+      { label: 'Inline Block', value: 'inline-block' },
+      { label: 'Flex', value: 'flex' },
+      { label: 'Grid', value: 'grid' },
+      { label: 'None', value: 'none' },
+    ],
+  },
+  {
+    label: 'Flex Direction',
+    name: 'flexDirection',
+    type: 'select',
+    defaultValue: 'row',
+    options: [
+      { label: 'Row', value: 'row' },
+      { label: 'Row Reverse', value: 'row-reverse' },
+      { label: 'Column', value: 'column' },
+      { label: 'Column Reverse', value: 'column-reverse' },
+    ],
+  },
+  {
+    label: 'Flex Wrap',
+    name: 'flexWrap',
+    type: 'select',
+    defaultValue: 'nowrap',
+    options: [
+      { label: 'Nowrap', value: 'nowrap' },
+      { label: 'Wrap', value: 'wrap' },
+      { label: 'Wrap Reverse', value: 'wrap-reverse' },
+    ],
+  },
+  {
+    label: 'Flex Justify',
+    name: 'flexJustify',
+    type: 'select',
+    defaultValue: 'flex-start',
+    options: [
+      { label: 'Flex Start', value: 'flex-start' },
+      { label: 'Flex End', value: 'flex-end' },
+      { label: 'Center', value: 'center' },
+      { label: 'Space Between', value: 'space-between' },
+      { label: 'Space Around', value: 'space-around' },
+      { label: 'Space Evenly', value: 'space-evenly' },
+    ],
+  },
+  {
+    label: 'Flex Align',
+    name: 'flexAlign',
+    type: 'select',
+    defaultValue: 'flex-start',
+    options: [
+      { label: 'Flex Start', value: 'flex-start' },
+      { label: 'Flex End', value: 'flex-end' },
+      { label: 'Center', value: 'center' },
+      { label: 'Stretch', value: 'stretch' },
+      { label: 'Baseline', value: 'baseline' },
+    ],
+  },
+  {
+    label: 'Flex Grow',
+    name: 'flexGrow',
+    type: 'number',
+    placeholder: '0',
+    defaultValue: 0,
+  },
+  {
+    label: 'Flex Shrink',
+    name: 'flexShrink',
+    type: 'number',
+    placeholder: '1',
+    defaultValue: 1,
+  },
+]

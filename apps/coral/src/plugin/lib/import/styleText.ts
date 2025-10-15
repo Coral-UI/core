@@ -14,7 +14,7 @@ export const transformFontWeightToFigmaFontStyle = (fontWeight: number) => {
     case 100:
       return 'Thin'
     case 200:
-      return 'Extra Light'
+      return 'ExtraLight'
     case 300:
       return 'Light'
     case 400:
@@ -22,11 +22,11 @@ export const transformFontWeightToFigmaFontStyle = (fontWeight: number) => {
     case 500:
       return 'Medium'
     case 600:
-      return 'Semi Bold'
+      return 'SemiBold'
     case 700:
       return 'Bold'
     case 800:
-      return 'Extra Bold'
+      return 'ExtraBold'
     case 900:
       return 'Black'
     default:
@@ -60,9 +60,9 @@ export const applyTypographyStyles = async (element: TextNode, styles: CoralStyl
   }
 
   if (styles['textAlign']) {
-    element.textAlignHorizontal = styles['textAlign'] as TextNode['textAlignHorizontal']
+    element.textAlignHorizontal = (styles['textAlign'] as string).toUpperCase() as TextNode['textAlignHorizontal'] ?? 'LEFT'
   } else if (textAlign) {
-    element.textAlignHorizontal = textAlign.toUpperCase() as TextNode['textAlignHorizontal']
+    element.textAlignHorizontal = (textAlign as string).toUpperCase() as TextNode['textAlignHorizontal'] ?? 'LEFT'
   } else {
     element.textAlignHorizontal = 'LEFT'
   }

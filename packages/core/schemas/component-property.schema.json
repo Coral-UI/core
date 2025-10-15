@@ -110,6 +110,58 @@
           },
           "defaultValue": {
             "description": "The default value of the component property"
+          },
+          "optional": {
+            "description": "Whether the property is optional",
+            "type": "boolean"
+          },
+          "description": {
+            "description": "Description of the property",
+            "type": "string"
+          },
+          "usage": {
+            "description": "Framework-agnostic usage metadata for transformation to other UI libraries",
+            "type": "object",
+            "properties": {
+              "contexts": {
+                "description": "Contexts where this property is used within the component",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "location": {
+                      "description": "Framework-agnostic location (e.g., \"template\", \"computed\", \"method\")",
+                      "type": "string"
+                    },
+                    "expression": {
+                      "description": "The expression or context where the prop is used",
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Type of usage",
+                      "type": "string",
+                      "enum": ["binding", "interpolation", "conditional", "iteration", "event", "reference"]
+                    }
+                  },
+                  "required": ["location", "expression", "type"],
+                  "additionalProperties": false
+                }
+              },
+              "isUsed": {
+                "description": "Whether this property is actually used in the component",
+                "default": false,
+                "type": "boolean"
+              },
+              "dependencies": {
+                "description": "Other properties or state this prop depends on",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["isUsed"],
+            "additionalProperties": false
           }
         },
         "required": ["type", "defaultValue"],
@@ -200,6 +252,58 @@
           },
           "value": {
             "description": "The value of the variant property"
+          },
+          "optional": {
+            "description": "Whether the property is optional",
+            "type": "boolean"
+          },
+          "description": {
+            "description": "Description of the property",
+            "type": "string"
+          },
+          "usage": {
+            "description": "Framework-agnostic usage metadata for transformation to other UI libraries",
+            "type": "object",
+            "properties": {
+              "contexts": {
+                "description": "Contexts where this property is used within the component",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "location": {
+                      "description": "Framework-agnostic location (e.g., \"template\", \"computed\", \"method\")",
+                      "type": "string"
+                    },
+                    "expression": {
+                      "description": "The expression or context where the prop is used",
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Type of usage",
+                      "type": "string",
+                      "enum": ["binding", "interpolation", "conditional", "iteration", "event", "reference"]
+                    }
+                  },
+                  "required": ["location", "expression", "type"],
+                  "additionalProperties": false
+                }
+              },
+              "isUsed": {
+                "description": "Whether this property is actually used in the component",
+                "default": false,
+                "type": "boolean"
+              },
+              "dependencies": {
+                "description": "Other properties or state this prop depends on",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["isUsed"],
+            "additionalProperties": false
           }
         },
         "required": ["type", "value"],

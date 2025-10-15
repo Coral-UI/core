@@ -7,11 +7,11 @@ export const flexDirection = {
     property: 'flexDirection',
     value: 'row-reverse',
   },
-  'flex-column': {
+  'flex-col': {
     property: 'flexDirection',
     value: 'column',
   },
-  'flex-column-reverse': {
+  'flex-col-reverse': {
     property: 'flexDirection',
     value: 'column-reverse',
   },

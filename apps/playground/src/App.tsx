@@ -1,50 +1,30 @@
-import { javascript } from '@codemirror/lang-javascript'
-import { json } from '@codemirror/lang-json'
-import { xcodeDark } from '@uiw/codemirror-themes-all'
-import CodeMirror from '@uiw/react-codemirror'
-import clsx from 'clsx'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import MonacoEditor from '@monaco-editor/react'
+import { CopyIcon } from 'lucide-react'
 import React from 'react'
+import { toast } from 'sonner'
 
 import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
 import { coralToHTML } from '@reallygoodwork/coral-to-html'
 import { transformReactComponentToSpec } from '@reallygoodwork/react-to-coral'
 
-import { Toasts, useToasts } from './components/Toasts'
-
 // import { TabButtons } from './components/TabButtons'
-
-const NavButton = ({
-  children,
-  onClick,
-  isActive,
-}: {
-  children: React.ReactNode
-  onClick: () => void
-  isActive: boolean
-}) => {
-  return (
-    <button
-      className={clsx(
-        'hover:text-foreground/80 font-medium tracking-tight text-sm uppercase py-1.5 px-4 hover:bg-primary/5 transition-colors font-mono border border-transparent rounded-full',
-        isActive
-          ? 'text-primary-light dark:text-primary-dark bg-primary-dark/20 hover:bg-primary-dark/20 hover:text-primary-light dark:hover:text-primary-dark border-border-dark/20 dark:border-border-light/20'
-          : 'text-muted-light dark:text-muted-dark border-border-light dark:border-border-dark hover:border-border-dark dark:hover:border-border-light',
-      )}
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  )
-}
 
 function App() {
   const [inputValue, setInputValue] = React.useState<string>('')
   const [specValue, setSpecValue] = React.useState<string>('')
   const [_outputValue, setOutputValue] = React.useState<string>('')
   const [selectedLanguage, setSelectedLanguage] = React.useState<string>('html')
-  const { addToast } = useToasts()
 
-  const handleInputChange = async (value: string) => {
+  const handleSpecChange = async (value: string | undefined) => {
+    if (!value) return
+    setSpecValue(value)
+  }
+
+  const handleInputChange = async (value: string | undefined) => {
+    if (!value) return
     try {
       setInputValue(value.length > 0 ? value : '')
       if (selectedLanguage === 'html' && value.length > 0) {
@@ -52,16 +32,18 @@ function App() {
         const html = await coralToHTML(spec)
         setOutputValue(html)
         setSpecValue(JSON.stringify(spec, null, 2))
+        toast.success('HTML converted to CoralUI spec')
       } else if (selectedLanguage === 'react' && value.length > 0) {
         const spec = transformReactComponentToSpec(value)
         setSpecValue(JSON.stringify(spec, null, 2))
         const html = await coralToHTML(spec)
         setOutputValue(html)
+        toast.success('React component converted to CoralUI spec')
       } else {
         setSpecValue('')
       }
     } catch (error: unknown) {
-      addToast((error as Error).toString(), 'error')
+      toast.error((error as Error).toString())
     }
   }
 
@@ -71,101 +53,116 @@ function App() {
     setSpecValue('')
   }
 
+  const onCopySpec = () => {
+    navigator.clipboard.writeText(specValue)
+    toast.success('Spec copied to clipboard')
+  }
+
   return (
-    <div className="flex flex-col h-screen bg-background-dark antialiased">
-      <div className="px-4">
-        <header className="flex items-center justify-between py-4 border-b border-border-dark h-20">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-medium text-primary-dark">🪸 CoralUI Playground</h1>
-            <p className="text-muted-dark text-sm font-mono uppercase bg-primary-dark/20 rounded-full px-2 py-1">
-              Beta
-            </p>
-          </div>
-
-          <div className="flex items-center text-sm gap-1">
-            <NavButton isActive={selectedLanguage === 'html'} onClick={() => handleLanguageChange('html')}>
-              HTML
-            </NavButton>
-            <NavButton isActive={selectedLanguage === 'react'} onClick={() => handleLanguageChange('react')}>
-              React
-            </NavButton>
-          </div>
-        </header>
-      </div>
-
-      <div className="px-4 py-3 max-w-3xl mt-4 bg-primary-dark/5 rounded-lg mx-4">
-        <p className="text-muted-dark">
-          This is a playground for CoralUI. It allows you to convert HTML and React to CoralUI spec and vice versa. To
-          learn more about CoralUI, visit the{' '}
-          <a href="https://coralui.com" className="underline">
-            CoralUI website
-          </a>
-          .
-        </p>
-      </div>
-
-      <div className="flex flex-col flex-1 max-h-[100dvh]">
-        <div className="grid grid-cols-1 md:grid-cols-2  h-full overflow-hidden ">
-          <div className="flex flex-col overflow-auto">
-            <header className="flex items-center justify-between mt-8 px-4">
-              <h2 className="text-xl font-medium tracking-tight text-primary-dark">
-                Input <span className="text-muted-dark uppercase text-sm font-mono">{selectedLanguage}</span>
-              </h2>
-            </header>
-            <div className="px-4 mt-2 mb-6 flex flex-col flex-1 max-h-[80dvh] ">
-              <div className="flex-1 flex flex-col shrink-0 overflow-hidden rounded-sm border border-border-dark">
-                <CodeMirror
-                  theme={xcodeDark}
-                  height="100%"
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  className="flex-1 max-h-[80dvh]"
-                  extensions={[javascript({ jsx: true })]}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col overflow-auto">
-            <header className="flex items-center justify-between mt-4 md:mt-8 px-4">
-              <h2 className="text-xl font-medium tracking-tight text-primary-dark">Converted Spec</h2>
-            </header>
-            <div className="px-4 mt-2 mb-6 flex flex-col flex-1 max-h-[80dvh] border-l border-border-dark">
-              <div className="flex-1 flex flex-col shrink-0 overflow-hidden rounded-sm border border-border-dark">
-                <CodeMirror
-                  theme={xcodeDark}
-                  height="100%"
-                  value={specValue}
-                  onChange={setSpecValue}
-                  className="flex-1 max-h-[80dvh]"
-                  extensions={[json()]}
-                />
-              </div>
-            </div>
-          </div>
-          {/* <div className="flex flex-col h-full overflow-auto">
-            <header className="flex items-center justify-between p-4 border-b border-white/5">
-              <h2 className="text-xl font-medium tracking-tight text-white">Output</h2>
-            </header>
-            <CodeMirror
-              theme={'dark'}
-              height="100%"
-              value={outputValue}
-              className="flex-1 border-l border-gray-600 pt-2 max-h-[80dvh]"
-              extensions={[javascript({ jsx: true })]}
-              readOnly
-            />
-          </div> */}
+    <div className="flex flex-col h-screen bg-background font-sans mt-12">
+      <div className="container mx-auto flex flex-col flex-1">
+        <div className="p-6 max-w-xl mt-6 bg-muted rounded-lg flex flex-col gap-2">
+          <p className="text-primary text-base font-semibold leading-tight text-balance">
+            This is a playground for CoralUI.{' '}
+          </p>
+          <p className="text-muted-foreground text-sm">
+            It allows you to convert HTML and React to CoralUI spec and vice versa. To learn more about CoralUI, visit
+            the{' '}
+            <a href="https://coralui.com" className="underline">
+              CoralUI website
+            </a>
+            .
+          </p>
         </div>
+
+        <div className="flex flex-col flex-1 max-h-[100dvh] mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2  h-full overflow-hidden ">
+            <div className="flex flex-col overflow-auto">
+              <header className="flex items-center justify-between px-4">
+                <h2 className="text-xl font-medium tracking-tight text-foreground">Input</h2>
+                <ToggleGroup
+                  type="single"
+                  value={selectedLanguage}
+                  onValueChange={handleLanguageChange}
+                  defaultValue="html"
+                  variant="outline"
+                >
+                  <ToggleGroupItem value="html">HTML</ToggleGroupItem>
+                  <ToggleGroupItem value="react">React</ToggleGroupItem>
+                </ToggleGroup>
+              </header>
+              <div className="mt-2 mb-6 flex flex-col flex-1 max-h-[80dvh] ">
+                <div className="flex-1 flex flex-col shrink-0 overflow-hidden rounded-l-lg border border-border">
+                  <MonacoEditor
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    language={selectedLanguage === 'html' ? 'html' : 'typescript'}
+                    theme={'vs-light'}
+                    options={{
+                      minimap: {
+                        enabled: false,
+                      },
+                      lineNumbers: 'on',
+                      fontSize: 11,
+                      wordWrap: 'on',
+                      useTabStops: false,
+                      tabSize: 2,
+                      contextmenu: false,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col overflow-auto">
+              <header className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-medium tracking-tight text-foreground">Converted Spec</h2>
+                  <Badge variant="outline">JSON</Badge>
+                </div>
+                <Button variant="secondary" size="icon" onClick={onCopySpec}>
+                  <CopyIcon />
+                </Button>
+              </header>
+              <div className="mt-2 mb-6 flex flex-col flex-1 max-h-[80dvh] ">
+                <div className="flex-1 flex flex-col shrink-0 overflow-hidden border border-border  border-l-0 rounded-r-lg bg-surface">
+                  <MonacoEditor
+                    value={specValue}
+                    onChange={handleSpecChange}
+                    language={'json'}
+                    // height={height}
+                    theme={'vs-light'}
+                    className={'bg-surface'}
+                    options={{
+                      minimap: {
+                        enabled: false,
+                      },
+                      padding: {
+                        top: 10,
+                        bottom: 10,
+                      },
+                      lineNumbers: 'on',
+                      fontSize: 11,
+                      wordWrap: 'on',
+                      useTabStops: false,
+                      tabSize: 2,
+                      contextmenu: false,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer className="px-4 py-3">
+          <p className="font-sans text-sm text-foreground">
+            Made with ❤️ by{' '}
+            <a href="https://reallygood.work" className="font-medium underline underline-offset-2">
+              Really Good Work Inc
+            </a>
+          </p>
+        </footer>
       </div>
-      <footer className="px-4 py-3">
-        <p className="font-mono text-sm text-muted-dark">
-          Made with ❤️ by{' '}
-          <a href="https://reallygood.work" className="font-medium underline underline-offset-2">
-            The Really Good Work Internet Company
-          </a>
-        </p>
-      </footer>
-      <Toasts />
     </div>
   )
 }

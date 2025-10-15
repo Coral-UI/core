@@ -1,4 +1,4 @@
-import { CaretUpDown, Check } from '@phosphor-icons/react'
+import { Check } from '@phosphor-icons/react'
 
 import { Select } from '../components/Select'
 

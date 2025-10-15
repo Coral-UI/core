@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import { z } from 'zod/v4'
+import * as z from 'zod'
 
 import { zCoralComponentPropertySchema } from '../structures/componentProperty'
 import { zCoralRootSchema, zCoralSchema } from '../structures/coral'

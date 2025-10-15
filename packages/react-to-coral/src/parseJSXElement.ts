@@ -4,7 +4,43 @@ import { Result, UIElement } from '@/transformReactComponentToSpec'
 import generate from '@babel/generator'
 import * as t from '@babel/types'
 
-import type { CoralComponentPropertyType, CoralMethodType, CoralStateType } from '@reallygoodwork/coral-core'
+import type {
+  CoralComponentPropertyType,
+  CoralMethodType,
+  CoralStateType,
+  CoralTSTypes,
+} from '@reallygoodwork/coral-core'
+
+/**
+ * Helper function to get the type and additional info of a prop from component properties
+ */
+const getPropInfo = (
+  propName: string,
+  result: Result,
+): { type: CoralTSTypes | string; optional?: boolean; defaultValue?: any; description?: string } => {
+  if (!result.componentProperties || result.componentProperties.length === 0) {
+    return { type: 'any' }
+  }
+
+  // Get the first component properties object (there should typically be only one)
+  const props = result.componentProperties[0]
+  if (!props || typeof props !== 'object') {
+    return { type: 'any' }
+  }
+
+  const propDef = props[propName]
+  if (!propDef || typeof propDef !== 'object') {
+    return { type: 'any' }
+  }
+
+  // Return the enhanced property information
+  return {
+    type: propDef.type || 'any',
+    optional: propDef.optional,
+    defaultValue: propDef.defaultValue,
+    description: propDef.description,
+  }
+}
 
 export const parseJSXElement = (node: t.JSXElement | t.JSXFragment, result: Result): UIElement => {
   // Handle JSX fragments
@@ -23,6 +59,7 @@ export const parseJSXElement = (node: t.JSXElement | t.JSXFragment, result: Resu
   // Parse props (including spread operators)
   node.openingElement.attributes.forEach((attr) => {
     if (t.isJSXAttribute(attr) && t.isJSXIdentifier(attr.name)) {
+      const propName = attr.name.name
       const value = parseJSXAttributeValue(
         attr.value,
         result as {
@@ -31,13 +68,38 @@ export const parseJSXElement = (node: t.JSXElement | t.JSXFragment, result: Resu
           componentProperties: Array<CoralComponentPropertyType>
         },
       )
+
       if (value !== null) {
-        componentProperties[attr.name.name] = value
+        // Get the enhanced type and property information
+        const propInfo = getPropInfo(propName, result)
+
+        // Store comprehensive property information in the Coral ComponentProperty format
+        const propertyData: any = {
+          type: propInfo.type,
+          value: value,
+        }
+
+        // Add optional property metadata
+        if (propInfo.optional !== undefined) {
+          propertyData.optional = propInfo.optional
+        }
+        if (propInfo.defaultValue !== undefined) {
+          propertyData.defaultValue = propInfo.defaultValue
+        }
+        if (propInfo.description) {
+          propertyData.description = propInfo.description
+        }
+
+        componentProperties[propName] = propertyData
       }
     } else if (t.isJSXSpreadAttribute(attr)) {
       // Handle spread attributes like {...props}
+      const spreadKey = `...${generate(attr.argument).code}`
       const spreadValue = `{...${generate(attr.argument).code}}`
-      componentProperties[`...${generate(attr.argument).code}`] = spreadValue
+      componentProperties[spreadKey] = {
+        type: 'object',
+        value: spreadValue,
+      }
     }
   })
 
@@ -59,7 +121,12 @@ export const parseJSXElement = (node: t.JSXElement | t.JSXFragment, result: Resu
         children.push({
           elementType: 'jsx-expression',
           isComponent: false,
-          componentProperties: { expression: expressionCode },
+          componentProperties: {
+            expression: {
+              type: 'any',
+              value: expressionCode,
+            },
+          },
           children: [],
           textContent: expressionCode,
         })
@@ -97,7 +164,12 @@ const parseJSXFragment = (node: t.JSXFragment, result: Result): UIElement => {
         children.push({
           elementType: 'jsx-expression',
           isComponent: false,
-          componentProperties: { expression: expressionCode },
+          componentProperties: {
+            expression: {
+              type: 'any',
+              value: expressionCode,
+            },
+          },
           children: [],
           textContent: expressionCode,
         })

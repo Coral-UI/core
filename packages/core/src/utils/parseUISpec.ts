@@ -12,6 +12,7 @@ export async function parseUISpec(html: Record<string, unknown>): Promise<CoralR
   const result = await zCoralRootSchema.safeParseAsync(html)
 
   if (!result.success) {
+    console.log(result.error)
     throw new Error(result.error.message)
   } else {
     return result.data

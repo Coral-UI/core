@@ -1,47 +1,25 @@
-import clsx from 'clsx'
+import { Button } from '@/ui/components/ui/button'
 
 import { useRoute } from '../state/route'
-
-const NavButton = ({
-  children,
-  onClick,
-  isActive,
-}: {
-  children: React.ReactNode
-  onClick: () => void
-  isActive: boolean
-}) => {
-  return (
-    <button
-      className={clsx(
-        'hover:text-foreground/80 font-semibold tracking-tight text-xs text-foreground/60 py-1.5 px-4 rounded-md hover:bg-primary/5 transition-colors',
-        isActive && 'text-primary bg-primary/20 hover:bg-primary/20 hover:text-primary',
-      )}
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  )
-}
 
 export const Header = () => {
   const { setRoute, route } = useRoute()
   return (
-    <header className="flex items-center justify-between p-4 border-b border-border h-14">
-      <h1 className="text-xl font-medium text-white">🪸 CoralUI</h1>
-      <div className="flex items-center text-sm gap-1">
-        <NavButton isActive={route === 'import'} onClick={() => setRoute('import')}>
+    <header className="flex items-center justify-between border-b border-border px-5 py-4">
+      <h1 className="text-sm font-medium text-foreground">🪸 CoralUI</h1>
+      <div className="flex items-center gap-1">
+        <Button variant={route === 'import' ? 'default' : 'secondary'} onClick={() => setRoute('import')} size="sm">
           Import Spec
-        </NavButton>
-        <NavButton isActive={route === 'export'} onClick={() => setRoute('export')}>
+        </Button>
+        <Button variant={route === 'export' ? 'default' : 'secondary'} size="sm" onClick={() => setRoute('export')}>
           Export Spec
-        </NavButton>
-        <NavButton isActive={route === 'preview'} onClick={() => setRoute('preview')}>
+        </Button>
+        <Button variant={route === 'preview' ? 'default' : 'secondary'} size="sm" onClick={() => setRoute('preview')}>
           Preview
-        </NavButton>
-        <NavButton isActive={route === 'settings'} onClick={() => setRoute('settings')}>
+        </Button>
+        <Button variant={route === 'settings' ? 'default' : 'secondary'} size="sm" onClick={() => setRoute('settings')}>
           Settings
-        </NavButton>
+        </Button>
       </div>
     </header>
   )

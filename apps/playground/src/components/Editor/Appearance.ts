@@ -1,0 +1,103 @@
+import { z } from 'zod'
+
+export const zAppearanceSchema = z.object({
+  color: z.string().optional(),
+  backgroundColor: z.string().optional(),
+  borderColor: z.string().optional(),
+  borderWidth: z.number().optional(),
+  borderStyle: z.enum(['solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset']).optional(),
+  borderTopLeftRadius: z.number().optional(),
+  borderTopRightRadius: z.number().optional(),
+  borderBottomLeftRadius: z.number().optional(),
+  borderBottomRightRadius: z.number().optional(),
+  borderTopLeftRadiusUnit: z.enum(['px', 'em', 'rem', 'vw', 'vh']).optional(),
+  borderTopRightRadiusUnit: z.enum(['px', 'em', 'rem', 'vw', 'vh']).optional(),
+  borderBottomLeftRadiusUnit: z.enum(['px', 'em', 'rem', 'vw', 'vh']).optional(),
+  borderBottomRightRadiusUnit: z.enum(['px', 'em', 'rem', 'vw', 'vh']).optional(),
+})
+
+export type AppearanceSchema = z.infer<typeof zAppearanceSchema>
+
+export const AppearanceComponents = [
+  {
+    label: 'Color',
+    name: 'color',
+    type: 'input',
+    inputType: 'color',
+    placeholder: '#000000',
+    defaultValue: '#000000',
+  },
+  {
+    label: 'Background Color',
+    name: 'backgroundColor',
+    type: 'input',
+    inputType: 'color',
+    placeholder: '#000000',
+    defaultValue: '#000000',
+  },
+  {
+    label: 'Border Color',
+    name: 'borderColor',
+    type: 'input',
+    inputType: 'color',
+    placeholder: '#000000',
+    defaultValue: '#000000',
+  },
+  {
+    label: 'Border Width',
+    name: 'borderWidth',
+    type: 'input',
+    inputType: 'number',
+    placeholder: '0',
+    defaultValue: 0,
+    min: 0,
+  },
+  {
+    label: 'Border Style',
+    name: 'borderStyle',
+    type: 'select',
+    defaultValue: 'solid',
+    options: [
+      { label: 'Solid', value: 'solid' },
+      { label: 'Dashed', value: 'dashed' },
+      { label: 'Dotted', value: 'dotted' },
+      { label: 'Double', value: 'double' },
+      { label: 'Groove', value: 'groove' },
+      { label: 'Ridge', value: 'ridge' },
+      { label: 'Inset', value: 'inset' },
+      { label: 'Outset', value: 'outset' },
+    ],
+  },
+  {
+    label: 'Border Top Left Radius',
+    name: 'borderTopLeftRadius',
+    type: 'input',
+    inputType: 'number',
+    placeholder: '0',
+    defaultValue: 0,
+  },
+  {
+    label: 'Border Top Right Radius',
+    name: 'borderTopRightRadius',
+    type: 'input',
+    inputType: 'number',
+    placeholder: '0',
+    defaultValue: 0,
+  },
+  {
+    label: 'Border Bottom Left Radius',
+    name: 'borderBottomLeftRadius',
+    type: 'input',
+    inputType: 'number',
+    placeholder: '0',
+    defaultValue: 0,
+  },
+  {
+    label: 'Border Bottom Right Radius',
+    name: 'borderBottomRightRadius',
+    type: 'input',
+    inputType: 'number',
+    placeholder: '0',
+    defaultValue: 0,
+  },
+]

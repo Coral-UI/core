@@ -1,7 +1,7 @@
-import { FileImage, Trash } from '@phosphor-icons/react'
+import { ExportIcon, TrashIcon } from '@phosphor-icons/react'
 
 import { EXPORT_SPEC } from '../../plugin/lib/events'
-import { Button } from '../components/Button'
+import { Button } from '../components/ui/button'
 import { Editor } from '../components/Editor'
 import { useSpecValue } from '../state/specValue'
 
@@ -16,14 +16,16 @@ export const Export = () => {
   }
 
   return (
-    <div className="flex flex-col px-4">
-      <div className="my-6">
-        <Editor language="json" className="flex-1" />
-        <div className="flex gap-2 py-4 mt-6 border-t border-border">
-          <Button icon={FileImage} iconPosition="left" onClick={handleClickExport}>
+    <div className="">
+      <div>
+        <Editor language="json" />
+        <div className="flex gap-2 mt-4 px-5 items-start justify-end bg-surface">
+          <Button onClick={handleClickExport}>
+            <ExportIcon />
             Export to Spec
           </Button>
-          <Button variant="destructive" icon={Trash} iconPosition="left" onClick={handleClickClear}>
+          <Button variant="ghost" onClick={handleClickClear}>
+            <TrashIcon />
             Clear
           </Button>
         </div>

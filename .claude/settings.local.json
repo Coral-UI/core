@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node esbuild.config.js)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
