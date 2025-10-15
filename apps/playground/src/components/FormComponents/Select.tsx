@@ -6,7 +6,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
+import { Label } from '@radix-ui/react-label'
 import { FieldValues, UseFormReturn } from 'react-hook-form'
+
+import { InputGroup, InputGroupAddon } from '../ui/input-group'
 
 type SelectProps<T extends FieldValues = FieldValues> = {
   name: string
@@ -17,6 +22,9 @@ type SelectProps<T extends FieldValues = FieldValues> = {
   options: { label: string; value: string }[]
   form: UseFormReturn<T>
   className?: string
+  icon?: React.ComponentType<{ className?: string }>
+  iconClassName?: string
+  hideLabel?: boolean
 }
 
 export const Select = <T extends FieldValues = FieldValues>({
@@ -28,16 +36,18 @@ export const Select = <T extends FieldValues = FieldValues>({
   options,
   form,
   className,
+  icon: Icon,
+  iconClassName,
+  hideLabel = false,
 }: SelectProps<T>) => {
   return (
-    <FormField
-      control={form.control}
-      name={name as any}
-      disabled={disabled || false}
-      render={({ field }) => (
-        <FormItem className={className}>
-          <FormLabel className="col-span-1 text-xs font-medium">{label}</FormLabel>
-          <div className="col-span-3 flex flex-col gap-2">
+    <InputGroup>
+      <FormField
+        control={form.control}
+        name={name as any}
+        disabled={disabled || false}
+        render={({ field }) => (
+          <FormItem className={cn(className, 'col-span-1 flex-1')}>
             <SelectPrimitive
               onValueChange={field.onChange}
               onOpenChange={(open) => {
@@ -61,11 +71,20 @@ export const Select = <T extends FieldValues = FieldValues>({
                 ))}
               </SelectContent>
             </SelectPrimitive>
-            {description && <FormDescription>{description}</FormDescription>}
-          </div>
-          <FormMessage />
-        </FormItem>
+          </FormItem>
+        )}
+      />
+            {Icon && (
+        <InputGroupAddon align="inline-start">
+          <Icon className={cn('size-4 text-muted-foreground shrink-0', iconClassName)} />
+        </InputGroupAddon>
       )}
-    />
+      <InputGroupAddon align="inline-start">
+        <Label className="text-xs font-medium whitespace-nowrap text-muted-foreground" htmlFor={name}>
+          {label}
+        </Label>
+      </InputGroupAddon>
+
+    </InputGroup>
   )
 }

@@ -5,7 +5,6 @@ import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { ElementTreeNode } from '@/hooks/useElementTree'
@@ -17,6 +16,8 @@ import { CoralElementType } from '@reallygoodwork/coral-core'
 
 import { EditorStyleFormComponents } from './Editor/EditorStyleFormComponents'
 import { StyleFormComponents, StyleFormDefaultValues, StyleFormSchema } from './Editor/EditorStyleFormStructure'
+
+import { Combobox } from './ui/combobox'
 
 const ELEMENT_TYPES: CoralElementType[] = [
   'div',
@@ -46,6 +47,44 @@ const ELEMENT_TYPES: CoralElementType[] = [
   'form',
   'textarea',
   'select',
+  'option',
+  'table',
+  'tr',
+  'td',
+  'th',
+  'thead',
+  'tbody',
+  'tfoot',
+  'caption',
+  'time',
+  'figure',
+  'figcaption',
+  'strong',
+  'em',
+  'code',
+  'pre',
+  'blockquote',
+  'hr',
+  'br',
+  'label',
+  'fieldset',
+  'legend',
+  'audio',
+  'video',
+  'source',
+  'canvas',
+  'svg',
+  'circle',
+  'rect',
+  'path',
+  'ellipse',
+  'polygon',
+  'line',
+  'polyline',
+  'g',
+  'dl',
+  'dt',
+  'dd',
 ]
 
 interface ElementPropertiesProps {
@@ -171,18 +210,14 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
             <Label htmlFor="element-type" className="text-xs">
               Element Type
             </Label>
-            <Select value={element.elementType} onValueChange={(value) => handleUpdateProperty('elementType', value)}>
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {ELEMENT_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Combobox
+              options={ELEMENT_TYPES.map((type) => ({ value: type, label: type }))}
+              value={element.elementType}
+              onChange={(value) => handleUpdateProperty('elementType', value)}
+              label="Element Type"
+              placeholder="Select element type"
+              noneFoundLabel="No element types found"
+            />
           </div>
 
           {element.elementType === 'text' ||

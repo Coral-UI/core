@@ -6,6 +6,7 @@ export interface ElementTreeNode extends CoralNode {
   parentId?: string | undefined
   isExpanded?: boolean | undefined
   isSelected?: boolean | undefined
+  orderIndex?: number | undefined
 }
 
 export const useElementTree = () => {
@@ -114,17 +115,80 @@ export const useElementTree = () => {
     })
   }, [])
 
-  const moveElement = useCallback((elementId: string, newParentId?: string, _index?: number) => {
+  const moveElement = useCallback((elementId: string, newParentId?: string, index?: number) => {
+    console.log('moveElement called:', { elementId, newParentId, index })
+
     setElements(prev => {
       const element = prev.find(el => el.id === elementId)
-      if (!element) return prev
-      
-      const updated = prev.map(el => 
-        el.id === elementId 
+      if (!element) {
+        console.log('Element not found!')
+        return prev
+      }
+
+      console.log('Element found:', element)
+      console.log('Current parentId:', element.parentId)
+
+      // Update the parent of the moved element
+      let updated = prev.map(el =>
+        el.id === elementId
           ? { ...el, parentId: newParentId }
           : el
       )
-      
+
+      // If an index is specified, we need to reorder siblings
+      if (index !== undefined) {
+        // Normalize parent ID
+        const normalizedParentId = !newParentId || newParentId === 'root' ? 'root' : newParentId
+        console.log('Normalized parent ID:', normalizedParentId)
+
+        // Get all siblings (by ID only)
+        const siblingIds = updated
+          .filter(el => {
+            const elParentId = !el.parentId || el.parentId === 'root' ? 'root' : el.parentId
+            return elParentId === normalizedParentId
+          })
+          .sort((a, b) => {
+            // Sort by existing orderIndex if available
+            if (a.orderIndex !== undefined && b.orderIndex !== undefined) {
+              return a.orderIndex - b.orderIndex
+            }
+            return 0
+          })
+          .map(el => el.id)
+
+        console.log('Sibling IDs before move:', siblingIds)
+
+        // Remove the element from its current position
+        const currentIndex = siblingIds.indexOf(elementId)
+        console.log('Current index:', currentIndex, 'Target index:', index)
+
+        if (currentIndex !== -1) {
+          siblingIds.splice(currentIndex, 1)
+        }
+
+        // Insert at the new index
+        siblingIds.splice(index, 0, elementId)
+        console.log('Sibling IDs after move:', siblingIds)
+
+        // Create a map of id -> orderIndex
+        const orderMap = new Map<string, number>()
+        siblingIds.forEach((id, idx) => {
+          orderMap.set(id, idx)
+        })
+
+        console.log('Order map:', Array.from(orderMap.entries()))
+
+        // Update ALL siblings with new orderIndex values
+        updated = updated.map(el => {
+          if (orderMap.has(el.id)) {
+            return { ...el, orderIndex: orderMap.get(el.id) }
+          }
+          return el
+        })
+
+        console.log('Updated elements:', updated.map(e => ({ id: e.id, name: e.name, orderIndex: e.orderIndex, parentId: e.parentId })))
+      }
+
       return updated
     })
   }, [])
@@ -143,13 +207,21 @@ export const useElementTree = () => {
 
   const getElementTree = useCallback(() => {
     const buildTree = (parentId?: string): ElementTreeNode[] => {
-      const filtered = elements.filter(el => el.parentId === parentId)
+      const filtered = elements
+        .filter(el => el.parentId === parentId)
+        .sort((a, b) => {
+          // Sort by orderIndex if available, otherwise maintain original order
+          if (a.orderIndex !== undefined && b.orderIndex !== undefined) {
+            return a.orderIndex - b.orderIndex
+          }
+          return 0
+        })
       return filtered.map(el => ({
         ...el,
         children: buildTree(el.id) as CoralNode[]
       }))
     }
-    
+
     return buildTree()
   }, [elements])
 

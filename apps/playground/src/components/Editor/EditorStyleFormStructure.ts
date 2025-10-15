@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import { AppearanceComponents, zAppearanceSchema } from './Appearance'
-import { LayoutComponents, zLayoutSchema } from './Layout'
+import { AppearanceComponents, AppearanceGroups, zAppearanceSchema } from './Appearance'
+import { LayoutComponents, LayoutGroups, zLayoutSchema } from './Layout'
 import { PositionComponents, zPositionSchema } from './Position'
-import { SpacingComponents, zSpacingSchema } from './Spacing'
+import { SpacingComponents, SpacingGroups, zSpacingSchema } from './Spacing'
 
 export const zStyleFormSchema = z.object({
   ...zLayoutSchema.shape,
@@ -30,6 +30,12 @@ type BaseComponent = {
   label: string
   name: string
   defaultValue: unknown
+  icon?: React.ComponentType<{ className?: string }>
+  iconClassName?: string
+  showWhen?: {
+    field: string
+    values: string[]
+  }
 }
 
 type InputComponent = BaseComponent & {
@@ -50,26 +56,33 @@ type InputWithOptionsComponent = BaseComponent & {
   inputType: 'text' | 'number' | 'email' | 'password' | 'url' | 'search'
   placeholder: string
   selectName: string
+  selectLabel?: string
   options: { label: string; value: string }[]
 }
 
 type FormComponent = InputComponent | SelectComponent | InputWithOptionsComponent
 
+type ComponentGroup = {
+  legend?: string
+  components: FormComponent[]
+}
+
 export const StyleFormComponents: {
   label: string
-  components: FormComponent[]
+  components?: FormComponent[]
+  groups?: ComponentGroup[]
 }[] = [
   {
     label: 'Layout',
-    components: LayoutComponents as FormComponent[],
+    groups: LayoutGroups as ComponentGroup[],
   },
   {
     label: 'Spacing',
-    components: SpacingComponents as FormComponent[],
+    groups: SpacingGroups as ComponentGroup[],
   },
   {
     label: 'Appearance',
-    components: AppearanceComponents as FormComponent[],
+    groups: AppearanceGroups as ComponentGroup[],
   },
   {
     label: 'Position',

@@ -1,8 +1,14 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import MonacoEditor from '@monaco-editor/react'
+import { EyeIcon, BracesIcon, CodeIcon, CopyIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { CoralRootNode } from '@reallygoodwork/coral-core'
+import { Button } from './ui/button'
+import { toast } from 'sonner'
+import { Badge } from './ui/badge'
+import { Pill } from './ui/pill'
+
 
 const ElementPreviewRenderer = ({ element }: { element: any }) => {
   if (!element) return null
@@ -12,7 +18,7 @@ const ElementPreviewRenderer = ({ element }: { element: any }) => {
     if (styles && Object.keys(styles).length > 0) {
       return 'border border-dashed border-gray-300 m-1 transition-all' // No padding, background, or other conflicting styles
     }
-    
+
     // Default generic styles when no custom styles are applied
     const baseStyles = 'border border-dashed border-gray-300 m-1 transition-all'
     switch (elementType) {
@@ -22,7 +28,7 @@ const ElementPreviewRenderer = ({ element }: { element: any }) => {
       case 'footer':
       case 'main':
       case 'nav':
-        return `${baseStyles} p-4 min-h-8 bg-gray-50`
+        return `${baseStyles} p-4 min-h-8 bg-gray-100`
       case 'h1':
         return `${baseStyles} p-2 text-2xl font-bold bg-gray-50`
       case 'h2':
@@ -45,15 +51,15 @@ const ElementPreviewRenderer = ({ element }: { element: any }) => {
       case 'li':
         return `${baseStyles} p-1 ml-4 bg-gray-50`
       default:
-        return `${baseStyles} p-2 bg-gray-50`
+        return `${baseStyles} p-1 bg-gray-300`
     }
   }
 
   const getInlineStyles = (styles?: any) => {
     if (!styles || Object.keys(styles).length === 0) return {}
-    
+
     const inlineStyles: React.CSSProperties = {}
-    
+
     // Map coral styles to CSS properties with !important-like priority through inline styles
     if (styles.backgroundColor) inlineStyles.backgroundColor = styles.backgroundColor
     if (styles.color) inlineStyles.color = styles.color
@@ -101,7 +107,7 @@ const ElementPreviewRenderer = ({ element }: { element: any }) => {
     if (styles.opacity) inlineStyles.opacity = styles.opacity
     if (styles.transform) inlineStyles.transform = styles.transform
     if (styles.boxShadow) inlineStyles.boxShadow = styles.boxShadow
-    
+
     return inlineStyles
   }
 
@@ -110,75 +116,40 @@ const ElementPreviewRenderer = ({ element }: { element: any }) => {
     const inlineStyles = getInlineStyles(elem.styles)
     const hasChildren = elem.children && elem.children.length > 0
     const hasText = elem.textContent && elem.textContent.trim() !== ''
-    
+
     // Combine preview positioning with user styles
     const combinedStyles = {
       marginLeft: `${depth * 8}px`,
-      ...inlineStyles
+      ...inlineStyles,
     }
-    
+
     return (
-      <div
-        key={elem.id || `${elem.name}-${depth}`}
-        className={className}
-        style={combinedStyles}
-      >
-        <div className="flex items-center justify-between mb-1">
+      <div key={elem.id || `${elem.name}-${depth}`} className={className} style={combinedStyles}>
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-gray-500">{elem.elementType}</span>
-            <span className="text-sm font-medium">{elem.name}</span>
-            {elem.styles ? (
-              <span className="text-xs bg-green-100 text-green-600 px-1 rounded">styled</span>
-            ) : (
-              <span className="text-xs bg-gray-100 text-gray-500 px-1 rounded">generic</span>
-            )}
+            <Badge variant="default" className="text-xs font-mono">{elem.elementType}</Badge>
           </div>
-          {elem.elementAttributes && Object.keys(elem.elementAttributes).length > 0 && (
-            <span className="text-xs text-gray-400">
-              {Object.keys(elem.elementAttributes).length} attrs
-            </span>
-          )}
+          {/* {elem.elementAttributes && Object.keys(elem.elementAttributes).length > 0 && (
+            <span className="text-xs text-gray-400">{Object.keys(elem.elementAttributes).length} attrs</span>
+          )} */}
         </div>
-        
+
         {hasText && (
-          <div 
+          <div
             className={`mb-2 ${
-              elem.elementType === 'text' 
-                ? 'text-base text-gray-900 font-normal' 
-                : 'text-sm text-gray-700 italic'
+              elem.elementType === 'text' ? 'text-base text-gray-900 font-normal' : 'text-sm text-gray-700 italic'
             }`}
           >
             {elem.elementType === 'text' ? elem.textContent : `"${elem.textContent}"`}
           </div>
         )}
-        
-        {elem.elementAttributes && Object.keys(elem.elementAttributes).length > 0 && (
-          <div className="text-xs text-gray-500 mb-2">
-            {Object.entries(elem.elementAttributes).map(([key, value]) => (
-              <div key={key}>
-                {key}="{String(value)}"
-              </div>
-            ))}
-          </div>
-        )}
-        
+
+
         {hasChildren && (
-          <div className="mt-2">
-            {elem.children.map((child: any) => 
-              renderElement(child, depth + 1)
-            )}
-          </div>
+          <div>{elem.children.map((child: any) => renderElement(child, depth + 1))}</div>
         )}
-        
-        {!hasChildren && !hasText && (
-          <div className={`text-xs italic ${
-            elem.elementType === 'text' 
-              ? 'text-orange-500 bg-orange-50 px-2 py-1 rounded border border-orange-200' 
-              : 'text-gray-400'
-          }`}>
-            {elem.elementType === 'text' ? 'Text element needs content' : 'Empty element'}
-          </div>
-        )}
+
+
       </div>
     )
   }
@@ -198,14 +169,26 @@ export const EditorPreviewPane = ({ spec }: { spec: CoralRootNode }) => {
     setSpecValue(value)
   }
 
+  const handleCopySpec = () => {
+    toast.success('Coral spec copied to clipboard')
+    navigator.clipboard.writeText(specValue)
+  }
+
   return (
     <Tabs defaultValue="preview" className="w-full h-full">
       <TabsList>
-        <TabsTrigger value="preview">Visual Preview</TabsTrigger>
-        <TabsTrigger value="spec">Coral Spec</TabsTrigger>
-        <TabsTrigger value="code">Generated Code</TabsTrigger>
+        <TabsTrigger value="preview">
+          {' '}
+          <EyeIcon className="size-3 text-muted-foreground" /> Visual Preview
+        </TabsTrigger>
+        <TabsTrigger value="spec">
+          <BracesIcon className="size-3 text-muted-foreground" /> Coral Spec
+        </TabsTrigger>
+        <TabsTrigger value="code">
+          <CodeIcon className="size-3 text-muted-foreground" /> Generated Code
+        </TabsTrigger>
       </TabsList>
-      
+
       <TabsContent value="preview" className="flex flex-col h-full w-full">
         <div className="h-full w-full overflow-auto p-4 bg-white">
           {spec && spec.name ? (
@@ -220,9 +203,9 @@ export const EditorPreviewPane = ({ spec }: { spec: CoralRootNode }) => {
           )}
         </div>
       </TabsContent>
-      
+
       <TabsContent value="spec" className="flex flex-col h-full w-full">
-        <div className="h-full w-full">
+        <div className="h-full w-full relative">
           <MonacoEditor
             value={specValue}
             onChange={handleSpecChange}
@@ -241,13 +224,14 @@ export const EditorPreviewPane = ({ spec }: { spec: CoralRootNode }) => {
               readOnly: true,
             }}
           />
+            <Button variant="default" size="icon-lg" onClick={handleCopySpec} className="absolute bottom-4 right-4">
+            <CopyIcon />
+          </Button>
         </div>
       </TabsContent>
-      
+
       <TabsContent value="code" className="flex flex-col h-full w-full">
-        <div className="p-4 text-center text-gray-500">
-          Generated code output will be available here
-        </div>
+        <div className="p-4 text-center text-gray-500">Generated code output will be available here</div>
       </TabsContent>
     </Tabs>
   )

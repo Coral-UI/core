@@ -1,3 +1,4 @@
+import { LayoutDashboardIcon, Maximize2Icon, MaximizeIcon, Minimize2Icon, MinimizeIcon, RulerDimensionLineIcon, SignpostIcon } from 'lucide-react'
 import { z } from 'zod'
 
 export const zLayoutSchema = z.object({
@@ -16,115 +17,171 @@ export const zLayoutSchema = z.object({
 
 export type LayoutSchema = z.infer<typeof zLayoutSchema>
 
-export const LayoutComponents = [
+export const LayoutGroups = [
   {
-    label: 'Width',
-    name: 'width',
-    type: 'inputWithOptions',
-    inputType: 'number',
-    placeholder: '100',
-    defaultValue: 100,
-    selectName: 'widthUnit',
-    options: [
-      { label: 'px', value: 'px' },
-      { label: 'em', value: 'em' },
-      { label: 'rem', value: 'rem' },
-      { label: 'vw', value: 'vw' },
-      { label: 'vh', value: 'vh' },
+    legend: 'Dimensions',
+    components: [
+      {
+        label: 'Width',
+        name: 'width',
+        type: 'inputWithOptions',
+        inputType: 'number',
+        placeholder: '100',
+        defaultValue: 100,
+        selectName: 'widthUnit',
+        selectLabel: 'Unit',
+        icon: RulerDimensionLineIcon,
+        options: [
+          { label: 'px', value: 'px' },
+          { label: 'em', value: 'em' },
+          { label: 'rem', value: 'rem' },
+          { label: 'vw', value: 'vw' },
+          { label: 'vh', value: 'vh' },
+        ],
+      },
+      {
+        label: 'Height',
+        name: 'height',
+        type: 'inputWithOptions',
+        inputType: 'number',
+        placeholder: '100',
+        defaultValue: 100,
+        selectName: 'heightUnit',
+        selectLabel: 'Unit',
+        icon: RulerDimensionLineIcon,
+        iconClassName: 'rotate-90',
+        options: [
+          { label: 'px', value: 'px' },
+          { label: 'em', value: 'em' },
+          { label: 'rem', value: 'rem' },
+          { label: 'vw', value: 'vw' },
+          { label: 'vh', value: 'vh' },
+        ],
+      },
     ],
   },
   {
-    label: 'Height',
-    name: 'height',
-    type: 'inputWithOptions',
-    inputType: 'number',
-    placeholder: '100',
-    defaultValue: 100,
-    selectName: 'heightUnit',
-    options: [
-      { label: 'px', value: 'px' },
-      { label: 'em', value: 'em' },
-      { label: 'rem', value: 'rem' },
-      { label: 'vw', value: 'vw' },
-      { label: 'vh', value: 'vh' },
+    legend: 'Display',
+    components: [
+      {
+        label: 'Display',
+        name: 'display',
+        type: 'select',
+        defaultValue: 'block',
+        icon: LayoutDashboardIcon,
+        options: [
+          { label: 'Block', value: 'block' },
+          { label: 'Inline', value: 'inline' },
+          { label: 'Inline Block', value: 'inline-block' },
+          { label: 'Flex', value: 'flex' },
+          { label: 'Inline Flex', value: 'inline-flex' },
+          { label: 'Grid', value: 'grid' },
+          { label: 'None', value: 'none' },
+        ],
+      },
     ],
   },
   {
-    label: 'Display',
-    name: 'display',
-    type: 'select',
-    defaultValue: 'block',
-    options: [
-      { label: 'Block', value: 'block' },
-      { label: 'Inline', value: 'inline' },
-      { label: 'Inline Block', value: 'inline-block' },
-      { label: 'Flex', value: 'flex' },
-      { label: 'Grid', value: 'grid' },
-      { label: 'None', value: 'none' },
+    legend: 'Flex Properties',
+    components: [
+      {
+        label: 'Direction',
+        name: 'flexDirection',
+        type: 'select',
+        defaultValue: 'row',
+        showWhen: {
+          field: 'display',
+          values: ['flex', 'inline-flex'],
+        },
+        icon: SignpostIcon,
+        options: [
+          { label: 'Row', value: 'row' },
+          { label: 'Row Reverse', value: 'row-reverse' },
+          { label: 'Column', value: 'column' },
+          { label: 'Column Reverse', value: 'column-reverse' },
+        ],
+      },
+      {
+        label: 'Wrap',
+        name: 'flexWrap',
+        type: 'select',
+        defaultValue: 'nowrap',
+        showWhen: {
+          field: 'display',
+          values: ['flex', 'inline-flex'],
+        },
+        options: [
+          { label: 'Nowrap', value: 'nowrap' },
+          { label: 'Wrap', value: 'wrap' },
+          { label: 'Wrap Reverse', value: 'wrap-reverse' },
+        ],
+      },
+      {
+        label: 'Justify Content',
+        name: 'flexJustify',
+        type: 'select',
+        defaultValue: 'flex-start',
+        showWhen: {
+          field: 'display',
+          values: ['flex', 'inline-flex'],
+        },
+        options: [
+          { label: 'Flex Start', value: 'flex-start' },
+          { label: 'Flex End', value: 'flex-end' },
+          { label: 'Center', value: 'center' },
+          { label: 'Space Between', value: 'space-between' },
+          { label: 'Space Around', value: 'space-around' },
+          { label: 'Space Evenly', value: 'space-evenly' },
+        ],
+      },
+      {
+        label: 'Align Items',
+        name: 'flexAlign',
+        type: 'select',
+        defaultValue: 'flex-start',
+        showWhen: {
+          field: 'display',
+          values: ['flex', 'inline-flex'],
+        },
+        options: [
+          { label: 'Flex Start', value: 'flex-start' },
+          { label: 'Flex End', value: 'flex-end' },
+          { label: 'Center', value: 'center' },
+          { label: 'Stretch', value: 'stretch' },
+          { label: 'Baseline', value: 'baseline' },
+        ],
+      },
+      {
+        label: 'Grow',
+        name: 'flexGrow',
+        type: 'input',
+        inputType: 'number',
+        placeholder: '0',
+        defaultValue: 0,
+        icon: Maximize2Icon,
+        iconClassName: 'rotate-45',
+        showWhen: {
+          field: 'display',
+          values: ['flex', 'inline-flex'],
+        },
+      },
+      {
+        label: 'Shrink',
+        name: 'flexShrink',
+        type: 'input',
+        inputType: 'number',
+        placeholder: '1',
+        defaultValue: 1,
+        icon: Minimize2Icon,
+        iconClassName: 'rotate-45',
+        showWhen: {
+          field: 'display',
+          values: ['flex', 'inline-flex'],
+        },
+      },
     ],
-  },
-  {
-    label: 'Flex Direction',
-    name: 'flexDirection',
-    type: 'select',
-    defaultValue: 'row',
-    options: [
-      { label: 'Row', value: 'row' },
-      { label: 'Row Reverse', value: 'row-reverse' },
-      { label: 'Column', value: 'column' },
-      { label: 'Column Reverse', value: 'column-reverse' },
-    ],
-  },
-  {
-    label: 'Flex Wrap',
-    name: 'flexWrap',
-    type: 'select',
-    defaultValue: 'nowrap',
-    options: [
-      { label: 'Nowrap', value: 'nowrap' },
-      { label: 'Wrap', value: 'wrap' },
-      { label: 'Wrap Reverse', value: 'wrap-reverse' },
-    ],
-  },
-  {
-    label: 'Flex Justify',
-    name: 'flexJustify',
-    type: 'select',
-    defaultValue: 'flex-start',
-    options: [
-      { label: 'Flex Start', value: 'flex-start' },
-      { label: 'Flex End', value: 'flex-end' },
-      { label: 'Center', value: 'center' },
-      { label: 'Space Between', value: 'space-between' },
-      { label: 'Space Around', value: 'space-around' },
-      { label: 'Space Evenly', value: 'space-evenly' },
-    ],
-  },
-  {
-    label: 'Flex Align',
-    name: 'flexAlign',
-    type: 'select',
-    defaultValue: 'flex-start',
-    options: [
-      { label: 'Flex Start', value: 'flex-start' },
-      { label: 'Flex End', value: 'flex-end' },
-      { label: 'Center', value: 'center' },
-      { label: 'Stretch', value: 'stretch' },
-      { label: 'Baseline', value: 'baseline' },
-    ],
-  },
-  {
-    label: 'Flex Grow',
-    name: 'flexGrow',
-    type: 'number',
-    placeholder: '0',
-    defaultValue: 0,
-  },
-  {
-    label: 'Flex Shrink',
-    name: 'flexShrink',
-    type: 'number',
-    placeholder: '1',
-    defaultValue: 1,
   },
 ]
+
+// For backwards compatibility, flatten groups into components
+export const LayoutComponents = LayoutGroups.flatMap((group) => group.components)

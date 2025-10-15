@@ -1,6 +1,17 @@
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input as InputPrimitive } from '@/components/ui/input'
-import { UseFormReturn, FieldValues } from 'react-hook-form'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupText,
+  InputGroupTextarea,
+} from '@/components/ui/input-group'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
+import { Label } from '@radix-ui/react-label'
+import { FieldValues, UseFormReturn } from 'react-hook-form'
 
 type InputProps<T extends FieldValues = FieldValues> = {
   name: string
@@ -11,6 +22,9 @@ type InputProps<T extends FieldValues = FieldValues> = {
   className?: string
   disabled?: boolean
   type?: 'text' | 'number' | 'email' | 'password' | 'url' | 'search' | 'color'
+  icon?: React.ComponentType<{ className?: string }>
+  iconClassName?: string
+  hideLabel?: boolean
 }
 
 export const Input = <T extends FieldValues = FieldValues>({
@@ -22,24 +36,33 @@ export const Input = <T extends FieldValues = FieldValues>({
   className,
   disabled,
   type = 'text',
+  icon: Icon,
+  iconClassName,
+  hideLabel = false,
 }: InputProps<T>) => {
   return (
-    <FormField
-      control={form.control}
-      name={name as any}
-      disabled={disabled || false}
-      render={({ field }) => (
-        <FormItem className={className}>
-          <FormLabel className="col-span-1 text-xs font-medium">{label}</FormLabel>
-          <FormControl>
-            <div className="col-span-3 flex flex-col gap-2">
-              <InputPrimitive disabled={disabled} placeholder={placeholder} type={type} {...field} />
-            </div>
-          </FormControl>
-          {description && <FormDescription>{description}</FormDescription>}
-          <FormMessage />
-        </FormItem>
+    <InputGroup>
+      <FormField
+        control={form.control}
+        name={name as any}
+        disabled={disabled || false}
+        render={({ field }) => (
+          <FormItem className={cn('col-span-1 flex-1')}>
+            <InputGroupInput disabled={disabled} placeholder={placeholder} type={type} {...field} className="min-w-6" />
+          </FormItem>
+        )}
+      />
+      {Icon && (
+        <InputGroupAddon align="inline-start">
+          <Icon className={cn('size-4 text-muted-foreground shrink-0', iconClassName)} />
+        </InputGroupAddon>
       )}
-    />
+      <InputGroupAddon align="inline-start">
+        <Label className="text-xs font-medium whitespace-nowrap text-muted-foreground" htmlFor={name}>
+          {label}
+        </Label>
+      </InputGroupAddon>
+
+    </InputGroup>
   )
 }
