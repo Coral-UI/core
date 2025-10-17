@@ -1,3 +1,4 @@
+import { useTheme } from '@/components/ThemeProvider'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
@@ -10,9 +11,8 @@ import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
 import { coralToHTML } from '@reallygoodwork/coral-to-html'
 import { transformReactComponentToSpec } from '@reallygoodwork/react-to-coral'
 
-// import { TabButtons } from './components/TabButtons'
-
-function App() {
+function Playground() {
+  const { theme } = useTheme()
   const [inputValue, setInputValue] = React.useState<string>('')
   const [specValue, setSpecValue] = React.useState<string>('')
   const [_outputValue, setOutputValue] = React.useState<string>('')
@@ -59,28 +59,15 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background font-sans mt-12">
-      <div className="container mx-auto flex flex-col flex-1">
-        <div className="p-6 max-w-xl mt-6 bg-muted rounded-lg flex flex-col gap-2">
-          <p className="text-primary text-base font-semibold leading-tight text-balance">
-            This is a playground for CoralUI.{' '}
-          </p>
-          <p className="text-muted-foreground text-sm">
-            It allows you to convert HTML and React to CoralUI spec and vice versa. To learn more about CoralUI, visit
-            the{' '}
-            <a href="https://coralui.com" className="underline">
-              CoralUI website
-            </a>
-            .
-          </p>
-        </div>
-
+    <div className="flex flex-col h-screen bg-background font-sans pt-12">
+      <div className="px-4 w-full mx-auto flex flex-col flex-1">
         <div className="flex flex-col flex-1 max-h-[100dvh] mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2  h-full overflow-hidden ">
             <div className="flex flex-col overflow-auto">
               <header className="flex items-center justify-between px-4">
                 <h2 className="text-xl font-medium tracking-tight text-foreground">Input</h2>
                 <ToggleGroup
+                  size="sm"
                   type="single"
                   value={selectedLanguage}
                   onValueChange={handleLanguageChange}
@@ -96,8 +83,8 @@ function App() {
                   <MonacoEditor
                     value={inputValue}
                     onChange={handleInputChange}
-                    language={selectedLanguage === 'html' ? 'html' : 'typescript'}
-                    theme={'vs-light'}
+                    language={selectedLanguage === 'html' ? 'html' : 'tsx'}
+                    theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
                     options={{
                       minimap: {
                         enabled: false,
@@ -131,8 +118,7 @@ function App() {
                     onChange={handleSpecChange}
                     language={'json'}
                     // height={height}
-                    theme={'vs-light'}
-                    className={'bg-surface'}
+                    theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
                     options={{
                       minimap: {
                         enabled: false,
@@ -154,17 +140,9 @@ function App() {
             </div>
           </div>
         </div>
-        <footer className="px-4 py-3">
-          <p className="font-sans text-sm text-foreground">
-            Made with ❤️ by{' '}
-            <a href="https://reallygood.work" className="font-medium underline underline-offset-2">
-              Really Good Work Inc
-            </a>
-          </p>
-        </footer>
       </div>
     </div>
   )
 }
 
-export default App
+export default Playground

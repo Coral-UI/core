@@ -35,7 +35,9 @@ export const applyPaint = (element: Element, node: CoralNode | CoralRootNode) =>
     element.fills = fills
   }
 
-  if (color) {
+  // Only apply color to TEXT nodes, not frames/containers
+  // For elements with textContent, color is applied to the child text node
+  if (color && element.type === 'TEXT') {
     fills[0] = figma.util.solidPaint(color.hex, fills[0])
     element.fills = fills
   }

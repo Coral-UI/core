@@ -1,40 +1,79 @@
-import { ChevronDown, ChevronRight, Plus, Trash2, Type, Square, Circle, GripVertical, ArrowUp, ArrowDown, Heading1Icon, Heading2Icon, Heading3Icon, Heading4Icon, Heading5Icon, TextCursorInputIcon, LinkIcon, ImageIcon, ListIcon, ListOrderedIcon, SquareMousePointerIcon, LayoutListIcon } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
-import { CoralElementType } from '@reallygoodwork/coral-core'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { ElementTreeNode } from '@/hooks/useElementTree'
-import { canContain, getValidChildTypes, getElementCategory } from '@/utils/elementHierarchy'
+import { canContain, getElementCategory, getValidChildTypes } from '@/utils/elementHierarchy'
 import {
   DndContext,
   DragEndEvent,
   DragOverEvent,
+  DragOverlay,
   DragStartEvent,
   KeyboardSensor,
+  MeasuringStrategy,
   PointerSensor,
+  pointerWithin,
+  UniqueIdentifier,
   useSensor,
   useSensors,
-  DragOverlay,
-  UniqueIdentifier,
-  MeasuringStrategy,
-  pointerWithin,
 } from '@dnd-kit/core'
 import {
   SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
   useSortable,
+  verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import {
+  IconClick,
+  IconH1,
+  IconH2,
+  IconH3,
+  IconH4,
+  IconH5,
+  IconH6,
+  IconListDetails,
+  IconPilcrow,
+  IconTrash,
+  IconTrashFilled,
+} from '@tabler/icons-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  ChevronRight,
+  Circle,
+  GripVertical,
+  Heading1Icon,
+  Heading2Icon,
+  Heading3Icon,
+  Heading4Icon,
+  Heading5Icon,
+  ImageIcon,
+  LayoutListIcon,
+  LinkIcon,
+  ListIcon,
+  ListOrderedIcon,
+  Plus,
+  Square,
+  SquareMousePointer,
+  SquareMousePointerIcon,
+  TextCursorInputIcon,
+  Trash2,
+  Type,
+} from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+
+import { CoralElementType } from '@reallygoodwork/coral-core'
 
 const ELEMENT_TYPES: { type: CoralElementType; label: string; icon: JSX.Element }[] = [
-  { type: 'div', label: 'Container', icon: <Square className="w-3 h-3" /> },
+  { type: 'div', label: 'Container', icon: <SquareMousePointerIcon className="w-3 h-3" /> },
   { type: 'section', label: 'Section', icon: <Square className="w-3 h-3" /> },
   { type: 'header', label: 'Header', icon: <Square className="w-3 h-3" /> },
   { type: 'footer', label: 'Footer', icon: <Square className="w-3 h-3" /> },
@@ -42,20 +81,20 @@ const ELEMENT_TYPES: { type: CoralElementType; label: string; icon: JSX.Element 
   { type: 'nav', label: 'Navigation', icon: <Square className="w-3 h-3" /> },
   { type: 'article', label: 'Article', icon: <Square className="w-3 h-3" /> },
   { type: 'aside', label: 'Aside', icon: <Square className="w-3 h-3" /> },
-  { type: 'h1', label: 'Heading 1', icon: <Heading1Icon className="w-3 h-3" /> },
-  { type: 'h2', label: 'Heading 2', icon: <Heading2Icon className="w-3 h-3" /> },
-  { type: 'h3', label: 'Heading 3', icon: <Heading3Icon className="w-3 h-3" /> },
-  { type: 'h4', label: 'Heading 4', icon: <Heading4Icon className="w-3 h-3" /> },
-  { type: 'h5', label: 'Heading 5', icon: <Heading5Icon className="w-3 h-3" /> },
-  { type: 'p', label: 'Paragraph', icon: <Type className="w-3 h-3" /> },
+  { type: 'h1', label: 'Heading 1', icon: <IconH1 className="w-3 h-3" /> },
+  { type: 'h2', label: 'Heading 2', icon: <IconH2 className="w-3 h-3" /> },
+  { type: 'h3', label: 'Heading 3', icon: <IconH3 className="w-3 h-3" /> },
+  { type: 'h4', label: 'Heading 4', icon: <IconH4 className="w-3 h-3" /> },
+  { type: 'h5', label: 'Heading 5', icon: <IconH5 className="w-3 h-3" /> },
+  { type: 'p', label: 'Paragraph', icon: <IconPilcrow className="w-3 h-3" /> },
   { type: 'span', label: 'Span', icon: <Type className="w-3 h-3" /> },
-  { type: 'button', label: 'Button', icon: <SquareMousePointerIcon className="w-3 h-3" /> },
+  { type: 'button', label: 'Button', icon: <IconClick className="w-3 h-3" /> },
   { type: 'input', label: 'Input', icon: <TextCursorInputIcon className="w-3 h-3" /> },
   { type: 'a', label: 'Link', icon: <LinkIcon className="w-3 h-3" /> },
   { type: 'img', label: 'Image', icon: <ImageIcon className="w-3 h-3" /> },
   { type: 'ul', label: 'Unordered List', icon: <ListIcon className="w-3 h-3" /> },
   { type: 'ol', label: 'Ordered List', icon: <ListOrderedIcon className="w-3 h-3" /> },
-  { type: 'li', label: 'List Item', icon: <LayoutListIcon className="w-3 h-3" /> },
+  { type: 'li', label: 'List Item', icon: <IconListDetails className="w-3 h-3" /> },
 ]
 
 interface SimpleElementTreeItemProps {
@@ -68,6 +107,7 @@ interface SimpleElementTreeItemProps {
   onUpdateElement: (elementId: string, updates: Partial<ElementTreeNode>) => void
   onMoveUp: (elementId: string) => void
   onMoveDown: (elementId: string) => void
+  selectedElementId: string | null
   isDragging?: boolean
 }
 
@@ -81,6 +121,7 @@ const SimpleElementTreeItem = ({
   onUpdateElement,
   onMoveUp,
   onMoveDown,
+  selectedElementId,
   isDragging = false,
   dragOverElement,
   dropPosition,
@@ -105,7 +146,7 @@ const SimpleElementTreeItem = ({
 
     const parentId = element.parentId || 'root'
     const siblings = allElements
-      .filter(el => {
+      .filter((el) => {
         const elParentId = el.parentId || 'root'
         return elParentId === parentId
       })
@@ -116,7 +157,7 @@ const SimpleElementTreeItem = ({
         return 0
       })
 
-    const currentIndex = siblings.findIndex(el => el.id === element.id)
+    const currentIndex = siblings.findIndex((el) => el.id === element.id)
     return {
       hasSiblings: siblings.length > 1,
       isFirst: currentIndex === 0,
@@ -145,7 +186,7 @@ const SimpleElementTreeItem = ({
   }
 
   const hasChildren = element.children && element.children.length > 0
-  const paddingLeft = depth * 16
+  const paddingLeft = depth * 20
   const draggingClass = isDragging || isSortableDragging ? 'opacity-50' : ''
 
   // Check if this element is being dragged over
@@ -153,18 +194,19 @@ const SimpleElementTreeItem = ({
 
   // Simple visual feedback
   const dropZoneClass = isDragOver
-    ? (isValidDrop
-        ? 'bg-green-100/80 border-2 border-green-500'
-        : 'bg-red-100/80 border-2 border-red-500')
+    ? isValidDrop
+      ? 'bg-green-100/80 border-2 border-green-500'
+      : 'bg-red-100/80 border-2 border-red-500'
     : ''
 
-  const categoryClass = getElementCategory(element.elementType) === 'structural-block'
-    ? 'border-l-4 border-blue-500'
-    : getElementCategory(element.elementType) === 'text-block'
-    ? 'border-l-2 border-orange-200'
-    : getElementCategory(element.elementType) === 'inline'
-    ? 'border-l-2 border-purple-200'
-    : ''
+  const categoryClass =
+    getElementCategory(element.elementType) === 'structural-block'
+      ? 'border-l-4 border-blue-500'
+      : getElementCategory(element.elementType) === 'text-block'
+        ? 'border-l-2 border-orange-200'
+        : getElementCategory(element.elementType) === 'inline'
+          ? 'border-l-2 border-purple-200'
+          : ''
 
   const handleNameSubmit = () => {
     onUpdateElement(element.id, { name: editName })
@@ -184,10 +226,10 @@ const SimpleElementTreeItem = ({
     <div ref={setNodeRef} style={style} className={`w-full ${draggingClass}`}>
       <div
         data-element-id={element.id}
-        className={`flex items-center gap-1 py-2 px-2 hover:bg-muted/50 cursor-pointer group transition-all duration-200 min-h-[40px] ${
-          element.isSelected ? 'bg-primary/10 border-l-2 border-accent-foreground' : ''
-        } ${dropZoneClass} ${categoryClass}`}
-        style={{ paddingLeft: `${paddingLeft + 8}px` }}
+        className={`flex items-center gap-1 py-2 px-2 hover:bg-blue-500/10 cursor-pointer group transition-all duration-200 min-h-[40px] border relative ${
+          selectedElementId === element.id ? ' border-blue-500' : 'border-transparent'
+        } ${dropZoneClass}`}
+        style={{ paddingLeft: `${paddingLeft + 24}px` }}
         onClick={() => onSelect(element.id)}
       >
         {/* Drag handle - only show for non-root elements */}
@@ -195,59 +237,37 @@ const SimpleElementTreeItem = ({
           <div
             {...attributes}
             {...listeners}
-            className="h-4 w-4 p-0 hover:bg-transparent cursor-grab active:cursor-grabbing flex items-center justify-center opacity-0 group-hover:opacity-100"
+            className="h-4 w-4 p-0 hover:bg-transparent cursor-grab active:cursor-grabbing flex items-center justify-center opacity-0 group-hover:opacity-100 absolute left-0"
             onClick={(e) => e.stopPropagation()}
           >
             <GripVertical className="h-3 w-3 text-muted-foreground" />
           </div>
         )}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-4 w-4 p-0 hover:bg-transparent"
-          onClick={(e) => {
-            e.stopPropagation()
-            onToggleExpanded(element.id)
-          }}
-        >
-          {hasChildren ? (
-            element.isExpanded ? (
-              <ChevronDown className="h-3 w-3" />
-            ) : (
-              <ChevronRight className="h-3 w-3" />
-            )
-          ) : (
-            <div className="h-3 w-3" />
-          )}
-        </Button>
+        {hasChildren && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="h-4 w-4 p-0 hover:bg-transparent"
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggleExpanded(element.id)
+            }}
+          >
+            {element.isExpanded ? <ChevronDown /> : <ChevronRight />}
+          </Button>
+        )}
 
         <div className="flex items-baseline gap-1 flex-1 min-w-0">
-          <span className="text-xs text-muted-foreground font-mono tabular-nums tracking-wide">
-            {element.elementType}
-          </span>
+          <span className="text-xs text-primary">{element.elementType}</span>
           {isDragOver && (
-            <span className={`text-xs px-1 py-0.5 rounded font-medium ${
-              isValidDrop ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'
-            }`}>
-              {isValidDrop ? 'Drop inside' : 'Cannot drop here'}
-            </span>
-          )}
-          {isEditing ? (
-            <input
-              type="text"
-              value={editName}
-              onChange={(e) => setEditName(e.target.value)}
-              onBlur={handleNameSubmit}
-              onKeyDown={handleKeyDown}
-              className="text-sm bg-transparent border-none outline-none flex-1 min-w-0"
-              autoFocus
-            />
-          ) : (
             <span
-              className="text-xs flex-1 min-w-0 truncate font-medium"
-              onDoubleClick={() => setIsEditing(true)}
+              className={`text-xs px-1 py-0.5 rounded font-medium ${
+                isValidDrop
+                  ? 'bg-green-100 text-green-700 border border-green-300'
+                  : 'bg-red-100 text-red-700 border border-red-300'
+              }`}
             >
-              {element.name}
+              {isValidDrop ? 'Drop inside' : 'Cannot drop here'}
             </span>
           )}
         </div>
@@ -257,9 +277,8 @@ const SimpleElementTreeItem = ({
             <>
               {!siblingInfo.isFirst && (
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0 hover:bg-muted"
+                  variant="secondary"
+                  size="icon-sm"
                   onClick={(e) => {
                     e.stopPropagation()
                     onMoveUp(element.id)
@@ -271,9 +290,8 @@ const SimpleElementTreeItem = ({
               )}
               {!siblingInfo.isLast && (
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0 hover:bg-muted"
+                  variant="secondary"
+                  size="icon-sm"
                   onClick={(e) => {
                     e.stopPropagation()
                     onMoveDown(element.id)
@@ -287,44 +305,50 @@ const SimpleElementTreeItem = ({
           )}
 
           <DropdownMenu>
-            <DropdownMenuTrigger className="h-6 w-6 p-0 rounded border-0 bg-transparent hover:bg-muted flex items-center justify-center">
-              <Plus className="h-3 w-3" />
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="secondary"
+                size="icon-sm"
+                title="Add Child Element"
+                onClick={(e) => {
+                  e.stopPropagation()
+                }}
+              >
+                <Plus />
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <div className="text-xs text-muted-foreground px-2 py-1">Add Child Element</div>
               <DropdownMenuSeparator />
-              {ELEMENT_TYPES
-                .filter(elementType => {
-                  const validChildTypes = getValidChildTypes(element.elementType)
-                  return validChildTypes.includes(elementType.type)
-                })
-                .map((elementType) => (
-                  <DropdownMenuItem
-                    key={elementType.type}
-                    onClick={() => onAddChild(element.id, elementType.type)}
-                    className="flex items-center gap-2"
-                  >
-                    {elementType.icon}
-                    <span className="text-xs">{elementType.label}</span>
-                    <span className="text-xs text-muted-foreground ml-auto font-mono tabular-nums tracking-wide">
-                      {elementType.type}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
+              {ELEMENT_TYPES.filter((elementType) => {
+                const validChildTypes = getValidChildTypes(element.elementType)
+                return validChildTypes.includes(elementType.type)
+              }).map((elementType) => (
+                <DropdownMenuItem
+                  key={elementType.type}
+                  onClick={() => onAddChild(element.id, elementType.type)}
+                  className="flex items-center gap-2"
+                >
+                  {elementType.icon}
+                  <span className="text-xs">{elementType.label}</span>
+                  <span className="text-xs text-muted-foreground ml-auto font-mono tabular-nums tracking-wide">
+                    {elementType.type}
+                  </span>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
           {element.id !== 'root' && (
             <Button
-              variant="outline"
-              size="sm"
-              className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+              variant="secondary"
+              size="icon-sm"
               onClick={(e) => {
                 e.stopPropagation()
                 onRemove(element.id)
               }}
             >
-              <Trash2 className="h-3 w-3" />
+              <IconTrash stroke={1.5} className="text-destructive" />
             </Button>
           )}
         </div>
@@ -353,13 +377,14 @@ const SimpleElementTreeItem = ({
                   onUpdateElement={onUpdateElement}
                   onMoveUp={onMoveUp}
                   onMoveDown={onMoveDown}
+                  selectedElementId={selectedElementId}
                   dragOverElement={dragOverElement ?? null}
                   dropPosition={dropPosition ?? null}
                   isValidDrop={isValidDrop ?? false}
                   activeElement={activeElement ?? null}
                   allElements={allElements}
                 />
-              ) : null
+              ) : null,
             )}
           </div>
         </SortableContext>
@@ -377,6 +402,7 @@ interface SimpleElementTreeProps {
   onUpdateElement: (elementId: string, updates: Partial<ElementTreeNode>) => void
   onMoveElement: (elementId: string, newParentId?: string, index?: number) => void
   allElements: ElementTreeNode[]
+  selectedElementId: string | null
 }
 
 export const SimpleElementTree = ({
@@ -387,7 +413,8 @@ export const SimpleElementTree = ({
   onSelect,
   onUpdateElement,
   onMoveElement,
-  allElements
+  allElements,
+  selectedElementId,
 }: SimpleElementTreeProps) => {
   const [activeElement, setActiveElement] = useState<ElementTreeNode | null>(null)
   const [dragOverElement, setDragOverElement] = useState<string | null>(null)
@@ -413,16 +440,18 @@ export const SimpleElementTree = ({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   )
 
   const findElementById = (id: UniqueIdentifier) => {
-    return allElements.find(el => el.id === id)
+    return allElements.find((el) => el.id === id)
   }
 
   const findParentElement = (elementId: string) => {
-    return allElements.find(el =>
-      el.children?.some(child => typeof child === 'object' && 'id' in child && (child as ElementTreeNode).id === elementId)
+    return allElements.find((el) =>
+      el.children?.some(
+        (child) => typeof child === 'object' && 'id' in child && (child as ElementTreeNode).id === elementId,
+      ),
     )
   }
 
@@ -439,7 +468,7 @@ export const SimpleElementTree = ({
 
     // Get siblings and sort by orderIndex
     const siblings = allElements
-      .filter(el => {
+      .filter((el) => {
         const elParentId = el.parentId || 'root'
         const targetParentId = parentId || 'root'
         return elParentId === targetParentId
@@ -451,9 +480,12 @@ export const SimpleElementTree = ({
         return 0
       })
 
-    console.log('[handleMoveUp] siblings:', siblings.map(s => ({ id: s.id, name: s.name, orderIndex: s.orderIndex })))
+    console.log(
+      '[handleMoveUp] siblings:',
+      siblings.map((s) => ({ id: s.id, name: s.name, orderIndex: s.orderIndex })),
+    )
 
-    const currentIndex = siblings.findIndex(el => el.id === elementId)
+    const currentIndex = siblings.findIndex((el) => el.id === elementId)
     console.log('[handleMoveUp] currentIndex:', currentIndex)
 
     if (currentIndex > 0) {
@@ -478,7 +510,7 @@ export const SimpleElementTree = ({
 
     // Get siblings and sort by orderIndex
     const siblings = allElements
-      .filter(el => {
+      .filter((el) => {
         const elParentId = el.parentId || 'root'
         const targetParentId = parentId || 'root'
         return elParentId === targetParentId
@@ -490,9 +522,12 @@ export const SimpleElementTree = ({
         return 0
       })
 
-    console.log('[handleMoveDown] siblings:', siblings.map(s => ({ id: s.id, name: s.name, orderIndex: s.orderIndex })))
+    console.log(
+      '[handleMoveDown] siblings:',
+      siblings.map((s) => ({ id: s.id, name: s.name, orderIndex: s.orderIndex })),
+    )
 
-    const currentIndex = siblings.findIndex(el => el.id === elementId)
+    const currentIndex = siblings.findIndex((el) => el.id === elementId)
     console.log('[handleMoveDown] currentIndex:', currentIndex, 'length:', siblings.length)
 
     if (currentIndex < siblings.length - 1 && currentIndex !== -1) {
@@ -551,8 +586,12 @@ export const SimpleElementTree = ({
   }
 
   // Helper function to check if activeId is a descendant of targetId (prevents dropping parent into child)
-  const isDescendant = (activeId: UniqueIdentifier, targetId: UniqueIdentifier, allElements: ElementTreeNode[]): boolean => {
-    const target = allElements.find(el => el.id === targetId)
+  const isDescendant = (
+    activeId: UniqueIdentifier,
+    targetId: UniqueIdentifier,
+    allElements: ElementTreeNode[],
+  ): boolean => {
+    const target = allElements.find((el) => el.id === targetId)
     if (!target || !target.children) return false
 
     for (const child of target.children) {
@@ -580,10 +619,7 @@ export const SimpleElementTree = ({
 
     if (activeElement && overElement) {
       // Don't allow dropping on descendants or dragging root
-      if (
-        isDescendant(activeElement.id, overElement.id, allElements) ||
-        activeElement.id === 'root'
-      ) {
+      if (isDescendant(activeElement.id, overElement.id, allElements) || activeElement.id === 'root') {
         setActiveElement(null)
         setDragOverElement(null)
         setDropPosition(null)
@@ -603,62 +639,60 @@ export const SimpleElementTree = ({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-2 border-b">
-        <h3 className="text-sm font-medium">Elements</h3>
+      <div className="flex items-center justify-between px-4 py-1.5 border-b border-border h-14">
+        <h3 className="font-medium text-sm text-foreground">Structure</h3>
         <div className="text-xs text-muted-foreground">Drag to nest & reorder</div>
       </div>
 
-
-
       <div className="flex-1 overflow-auto">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={pointerWithin}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDragEnd={handleDragEnd}
-          measuring={{
-            droppable: {
-              strategy: MeasuringStrategy.Always,
-            },
-          }}
-        >
-          <SortableContext
-            items={elements.map(el => el.id)}
-            strategy={verticalListSortingStrategy}
+        <ScrollArea>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={pointerWithin}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            measuring={{
+              droppable: {
+                strategy: MeasuringStrategy.Always,
+              },
+            }}
           >
-            {elements.map((element) => (
-              <SimpleElementTreeItem
-                key={element.id}
-                element={element}
-                depth={0}
-                onAddChild={onAddChild}
-                onRemove={onRemove}
-                onToggleExpanded={onToggleExpanded}
-                onSelect={onSelect}
-                onUpdateElement={onUpdateElement}
-                onMoveUp={handleMoveUp}
-                onMoveDown={handleMoveDown}
-                dragOverElement={dragOverElement ?? null}
-                dropPosition={dropPosition ?? null}
-                isValidDrop={isValidDrop ?? false}
-                activeElement={activeElement ?? null}
-                allElements={allElements}
-              />
-            ))}
-          </SortableContext>
+            <SortableContext items={elements.map((el) => el.id)} strategy={verticalListSortingStrategy}>
+              {elements.map((element) => (
+                <SimpleElementTreeItem
+                  key={element.id}
+                  element={element}
+                  depth={0}
+                  onAddChild={onAddChild}
+                  onRemove={onRemove}
+                  onToggleExpanded={onToggleExpanded}
+                  onSelect={onSelect}
+                  onUpdateElement={onUpdateElement}
+                  onMoveUp={handleMoveUp}
+                  onMoveDown={handleMoveDown}
+                  selectedElementId={selectedElementId}
+                  dragOverElement={dragOverElement ?? null}
+                  dropPosition={dropPosition ?? null}
+                  isValidDrop={isValidDrop ?? false}
+                  activeElement={activeElement ?? null}
+                  allElements={allElements}
+                />
+              ))}
+            </SortableContext>
 
-          <DragOverlay>
-            {activeElement ? (
-              <div className="bg-background border border-border rounded p-2 shadow-lg">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground font-mono">{activeElement.elementType}</span>
-                  <span className="text-sm">{activeElement.name}</span>
+            <DragOverlay>
+              {activeElement ? (
+                <div className="bg-background border border-border rounded p-2 shadow-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground font-mono">{activeElement.elementType}</span>
+                    <span className="text-sm">{activeElement.name}</span>
+                  </div>
                 </div>
-              </div>
-            ) : null}
-          </DragOverlay>
-        </DndContext>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        </ScrollArea>
       </div>
     </div>
   )

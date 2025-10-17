@@ -1,5 +1,13 @@
 import { useState, useCallback } from 'react'
-import { CoralNode, CoralElementType } from '@reallygoodwork/coral-core'
+import { CoralNode, CoralElementType, ResponsiveStyle as CoreResponsiveStyle } from '@reallygoodwork/coral-core'
+import { useHistoryState } from '@uidotdev/usehooks'
+
+export type BreakpointType = 'min-width' | 'max-width' | 'min-height' | 'max-height'
+
+// Extended ResponsiveStyle for UI purposes (includes id for UI tracking)
+export interface ResponsiveStyle extends CoreResponsiveStyle {
+  id: string
+}
 
 export interface ElementTreeNode extends CoralNode {
   id: string
@@ -7,22 +15,32 @@ export interface ElementTreeNode extends CoralNode {
   isExpanded?: boolean | undefined
   isSelected?: boolean | undefined
   orderIndex?: number | undefined
+  responsiveStyles?: ResponsiveStyle[]
 }
 
 export const useElementTree = () => {
-  const [elements, setElements] = useState<ElementTreeNode[]>(() => {
-    // Initialize with a root element
-    const rootElement: ElementTreeNode = {
+  // Initialize with a root element
+  const initialElements: ElementTreeNode[] = [
+    {
       id: 'root',
       name: 'Root',
       elementType: 'div',
       type: 'NODE',
       isExpanded: true,
-      isSelected: false,
       children: [],
     }
-    return [rootElement]
-  })
+  ]
+
+  const {
+    state: elements,
+    set: setElements,
+    undo,
+    redo,
+    clear: clearHistory,
+    canUndo,
+    canRedo
+  } = useHistoryState<ElementTreeNode[]>(initialElements)
+
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null)
 
   const createElement = useCallback((
@@ -39,7 +57,6 @@ export const useElementTree = () => {
       elementType,
       type: 'NODE',
       isExpanded: true,
-      isSelected: false,
       children: [],
     }
     
@@ -60,148 +77,140 @@ export const useElementTree = () => {
 
   const addElement = useCallback((elementType: CoralElementType, parentId?: string, name?: string) => {
     const newElement = createElement(elementType, parentId, name)
-    
-    setElements(prev => {
-      // Just add the new element to the flat list
-      // The tree structure will be built dynamically in getElementTree
-      const updated = [...prev, newElement]
-      return updated
-    })
-    
+
+    // Add the new element to the flat list
+    // The tree structure will be built dynamically in getElementTree
+    const updated = [...elements, newElement]
+    setElements(updated)
+
     return newElement.id
-  }, [createElement])
+  }, [createElement, elements, setElements])
 
   const removeElement = useCallback((elementId: string) => {
     // Don't allow removing the root element
     if (elementId === 'root') return
-    
-    setElements(prev => {
-      const toRemove = new Set<string>()
-      
-      const collectChildIds = (id: string) => {
-        toRemove.add(id)
-        prev.filter(el => el.parentId === id).forEach(child => {
-          collectChildIds(child.id)
-        })
-      }
-      
-      collectChildIds(elementId)
-      
-      return prev.filter(el => !toRemove.has(el.id)).map(el => ({
-        ...el,
-        children: el.children?.filter(child => 
-          typeof child === 'object' && 'id' in child 
-            ? !toRemove.has((child as ElementTreeNode).id) 
-            : true
-        ) || []
-      }))
-    })
-    
+
+    const toRemove = new Set<string>()
+
+    const collectChildIds = (id: string) => {
+      toRemove.add(id)
+      elements.filter(el => el.parentId === id).forEach(child => {
+        collectChildIds(child.id)
+      })
+    }
+
+    collectChildIds(elementId)
+
+    const updated = elements.filter(el => !toRemove.has(el.id)).map(el => ({
+      ...el,
+      children: el.children?.filter(child =>
+        typeof child === 'object' && 'id' in child
+          ? !toRemove.has((child as ElementTreeNode).id)
+          : true
+      ) || []
+    }))
+
+    setElements(updated)
+
     if (selectedElementId === elementId) {
       setSelectedElementId(null)
     }
-  }, [selectedElementId])
+  }, [elements, selectedElementId, setElements])
 
   const updateElement = useCallback((elementId: string, updates: Partial<ElementTreeNode>) => {
     console.log('updateElement called:', { elementId, updates })
-    setElements(prev => {
-      const updated = prev.map(el => 
-        el.id === elementId 
-          ? { ...el, ...updates }
-          : el
-      )
-      console.log('Elements after update:', updated)
-      return updated
-    })
-  }, [])
+    const updated = elements.map(el =>
+      el.id === elementId
+        ? { ...el, ...updates }
+        : el
+    )
+    console.log('Elements after update:', updated)
+    setElements(updated)
+  }, [elements, setElements])
 
   const moveElement = useCallback((elementId: string, newParentId?: string, index?: number) => {
     console.log('moveElement called:', { elementId, newParentId, index })
 
-    setElements(prev => {
-      const element = prev.find(el => el.id === elementId)
-      if (!element) {
-        console.log('Element not found!')
-        return prev
-      }
+    const element = elements.find(el => el.id === elementId)
+    if (!element) {
+      console.log('Element not found!')
+      return
+    }
 
-      console.log('Element found:', element)
-      console.log('Current parentId:', element.parentId)
+    console.log('Element found:', element)
+    console.log('Current parentId:', element.parentId)
 
-      // Update the parent of the moved element
-      let updated = prev.map(el =>
-        el.id === elementId
-          ? { ...el, parentId: newParentId }
-          : el
-      )
+    // Update the parent of the moved element
+    let updated = elements.map(el =>
+      el.id === elementId
+        ? { ...el, parentId: newParentId }
+        : el
+    )
 
-      // If an index is specified, we need to reorder siblings
-      if (index !== undefined) {
-        // Normalize parent ID
-        const normalizedParentId = !newParentId || newParentId === 'root' ? 'root' : newParentId
-        console.log('Normalized parent ID:', normalizedParentId)
+    // If an index is specified, we need to reorder siblings
+    if (index !== undefined) {
+      // Normalize parent ID
+      const normalizedParentId = !newParentId || newParentId === 'root' ? 'root' : newParentId
+      console.log('Normalized parent ID:', normalizedParentId)
 
-        // Get all siblings (by ID only)
-        const siblingIds = updated
-          .filter(el => {
-            const elParentId = !el.parentId || el.parentId === 'root' ? 'root' : el.parentId
-            return elParentId === normalizedParentId
-          })
-          .sort((a, b) => {
-            // Sort by existing orderIndex if available
-            if (a.orderIndex !== undefined && b.orderIndex !== undefined) {
-              return a.orderIndex - b.orderIndex
-            }
-            return 0
-          })
-          .map(el => el.id)
-
-        console.log('Sibling IDs before move:', siblingIds)
-
-        // Remove the element from its current position
-        const currentIndex = siblingIds.indexOf(elementId)
-        console.log('Current index:', currentIndex, 'Target index:', index)
-
-        if (currentIndex !== -1) {
-          siblingIds.splice(currentIndex, 1)
-        }
-
-        // Insert at the new index
-        siblingIds.splice(index, 0, elementId)
-        console.log('Sibling IDs after move:', siblingIds)
-
-        // Create a map of id -> orderIndex
-        const orderMap = new Map<string, number>()
-        siblingIds.forEach((id, idx) => {
-          orderMap.set(id, idx)
+      // Get all siblings (by ID only)
+      const siblingIds = updated
+        .filter(el => {
+          const elParentId = !el.parentId || el.parentId === 'root' ? 'root' : el.parentId
+          return elParentId === normalizedParentId
         })
-
-        console.log('Order map:', Array.from(orderMap.entries()))
-
-        // Update ALL siblings with new orderIndex values
-        updated = updated.map(el => {
-          if (orderMap.has(el.id)) {
-            return { ...el, orderIndex: orderMap.get(el.id) }
+        .sort((a, b) => {
+          // Sort by existing orderIndex if available
+          if (a.orderIndex !== undefined && b.orderIndex !== undefined) {
+            return a.orderIndex - b.orderIndex
           }
-          return el
+          return 0
         })
+        .map(el => el.id)
 
-        console.log('Updated elements:', updated.map(e => ({ id: e.id, name: e.name, orderIndex: e.orderIndex, parentId: e.parentId })))
+      console.log('Sibling IDs before move:', siblingIds)
+
+      // Remove the element from its current position
+      const currentIndex = siblingIds.indexOf(elementId)
+      console.log('Current index:', currentIndex, 'Target index:', index)
+
+      if (currentIndex !== -1) {
+        siblingIds.splice(currentIndex, 1)
       }
 
-      return updated
-    })
-  }, [])
+      // Insert at the new index
+      siblingIds.splice(index, 0, elementId)
+      console.log('Sibling IDs after move:', siblingIds)
+
+      // Create a map of id -> orderIndex
+      const orderMap = new Map<string, number>()
+      siblingIds.forEach((id, idx) => {
+        orderMap.set(id, idx)
+      })
+
+      console.log('Order map:', Array.from(orderMap.entries()))
+
+      // Update ALL siblings with new orderIndex values
+      updated = updated.map(el => {
+        if (orderMap.has(el.id)) {
+          return { ...el, orderIndex: orderMap.get(el.id) }
+        }
+        return el
+      })
+
+      console.log('Updated elements:', updated.map(e => ({ id: e.id, name: e.name, orderIndex: e.orderIndex, parentId: e.parentId })))
+    }
+
+    setElements(updated)
+  }, [elements, setElements])
 
   const toggleExpanded = useCallback((elementId: string) => {
     updateElement(elementId, { isExpanded: !elements.find(el => el.id === elementId)?.isExpanded })
   }, [elements, updateElement])
 
   const selectElement = useCallback((elementId: string | null) => {
-    setElements(prev => prev.map(el => ({
-      ...el,
-      isSelected: el.id === elementId
-    })))
+    // Just update the selectedElementId state, don't modify elements array
+    // This avoids creating history entries for UI-only selection changes
     setSelectedElementId(elementId)
   }, [])
 
@@ -240,5 +249,10 @@ export const useElementTree = () => {
     selectElement,
     getElementTree,
     getSelectedElement,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    clearHistory,
   }
 }

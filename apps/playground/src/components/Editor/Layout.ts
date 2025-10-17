@@ -1,4 +1,5 @@
-import { LayoutDashboardIcon, Maximize2Icon, MaximizeIcon, Minimize2Icon, MinimizeIcon, RulerDimensionLineIcon, SignpostIcon } from 'lucide-react'
+import { IconAlignBoxLeftTop, IconDirectionArrows, IconDirections, IconLayout, IconRulerMeasure, IconRulerMeasure2, IconSpacingHorizontal, IconTextWrap } from '@tabler/icons-react'
+import { LayoutDashboardIcon, Maximize2Icon, Minimize2Icon, RulerDimensionLineIcon, SignpostIcon } from 'lucide-react'
 import { z } from 'zod'
 
 export const zLayoutSchema = z.object({
@@ -26,11 +27,11 @@ export const LayoutGroups = [
         name: 'width',
         type: 'inputWithOptions',
         inputType: 'number',
-        placeholder: '100',
-        defaultValue: 100,
+        placeholder: 'auto',
+        defaultValue: '',
         selectName: 'widthUnit',
         selectLabel: 'Unit',
-        icon: RulerDimensionLineIcon,
+        icon: IconRulerMeasure,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -44,12 +45,11 @@ export const LayoutGroups = [
         name: 'height',
         type: 'inputWithOptions',
         inputType: 'number',
-        placeholder: '100',
-        defaultValue: 100,
+        placeholder: 'auto',
+        defaultValue: '',
         selectName: 'heightUnit',
         selectLabel: 'Unit',
-        icon: RulerDimensionLineIcon,
-        iconClassName: 'rotate-90',
+        icon: IconRulerMeasure2,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -68,7 +68,7 @@ export const LayoutGroups = [
         name: 'display',
         type: 'select',
         defaultValue: 'block',
-        icon: LayoutDashboardIcon,
+        icon: IconLayout,
         options: [
           { label: 'Block', value: 'block' },
           { label: 'Inline', value: 'inline' },
@@ -93,7 +93,7 @@ export const LayoutGroups = [
           field: 'display',
           values: ['flex', 'inline-flex'],
         },
-        icon: SignpostIcon,
+        icon: IconDirections,
         options: [
           { label: 'Row', value: 'row' },
           { label: 'Row Reverse', value: 'row-reverse' },
@@ -106,6 +106,7 @@ export const LayoutGroups = [
         name: 'flexWrap',
         type: 'select',
         defaultValue: 'nowrap',
+        icon: IconTextWrap,
         showWhen: {
           field: 'display',
           values: ['flex', 'inline-flex'],
@@ -121,6 +122,7 @@ export const LayoutGroups = [
         name: 'flexJustify',
         type: 'select',
         defaultValue: 'flex-start',
+        icon: IconSpacingHorizontal,
         showWhen: {
           field: 'display',
           values: ['flex', 'inline-flex'],
@@ -139,6 +141,7 @@ export const LayoutGroups = [
         name: 'flexAlign',
         type: 'select',
         defaultValue: 'flex-start',
+        icon: IconAlignBoxLeftTop,
         showWhen: {
           field: 'display',
           values: ['flex', 'inline-flex'],

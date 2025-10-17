@@ -1,26 +1,88 @@
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ResponsiveStyle } from '@/hooks/useElementTree'
 import MonacoEditor from '@monaco-editor/react'
-import { EyeIcon, BracesIcon, CodeIcon, CopyIcon } from 'lucide-react'
+import { BracesIcon, CodeIcon, CopyIcon, EyeIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { CoralRootNode } from '@reallygoodwork/coral-core'
-import { Button } from './ui/button'
-import { toast } from 'sonner'
-import { Badge } from './ui/badge'
-import { Pill } from './ui/pill'
+import { useTheme } from '@/components/ThemeProvider'
+import { IconBracketsAngle, IconEyeSearch, IconSchema } from '@tabler/icons-react'
 
+const generateResponsiveStyles = (elementId: string, responsiveStyles?: ResponsiveStyle[]): string => {
+  if (!responsiveStyles || responsiveStyles.length === 0) return ''
 
-const ElementPreviewRenderer = ({ element }: { element: any }) => {
+  let css = ''
+  responsiveStyles.forEach((rs) => {
+    const mediaQuery = `@media (${rs.type}: ${rs.value})`
+    const selector = `[data-element-id="${elementId}"]`
+
+    if (rs.styles && Object.keys(rs.styles).length > 0) {
+      const styleDeclarations = Object.entries(rs.styles)
+        .map(([key, value]) => {
+          // Convert camelCase to kebab-case
+          const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase()
+          return `  ${cssKey}: ${value};`
+        })
+        .join('\n')
+
+      css += `
+${mediaQuery} {
+  ${selector} {
+${styleDeclarations}
+  }
+}
+`
+    }
+  })
+
+  return css
+}
+
+const ElementPreviewRenderer = ({
+  element,
+  onElementClick,
+  selectedElementId,
+}: {
+  element: any
+  onElementClick?: (elementId: string) => void
+  selectedElementId?: string | null
+}) => {
   if (!element) return null
 
-  const getElementStyles = (elementType: string, styles?: any) => {
+  // Generate all responsive styles for all elements in the tree
+  const [responsiveCSS, setResponsiveCSS] = useState('')
+
+  useEffect(() => {
+    const collectResponsiveStyles = (elem: any): string => {
+      let css = generateResponsiveStyles(elem.id, elem.responsiveStyles)
+
+      if (elem.children && Array.isArray(elem.children)) {
+        elem.children.forEach((child: any) => {
+          css += collectResponsiveStyles(child)
+        })
+      }
+
+      return css
+    }
+
+    setResponsiveCSS(collectResponsiveStyles(element))
+  }, [element])
+
+  const getElementStyles = (elementType: string, styles?: any, isSelected?: boolean) => {
     // When element has custom styles, use absolutely minimal classes to avoid conflicts
     if (styles && Object.keys(styles).length > 0) {
-      return 'border border-dashed border-gray-300 m-1 transition-all' // No padding, background, or other conflicting styles
+      return `border border-dashed m-1 transition-all cursor-pointer hover:border-blue-400 ${
+        isSelected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-300'
+      }` // No padding, background, or other conflicting styles
     }
 
     // Default generic styles when no custom styles are applied
-    const baseStyles = 'border border-dashed border-gray-300 m-1 transition-all'
+    const baseStyles = `border border-dashed m-1 transition-all cursor-pointer hover:border-blue-400 ${
+      isSelected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-300'
+    }`
     switch (elementType) {
       case 'div':
       case 'section':
@@ -112,7 +174,8 @@ const ElementPreviewRenderer = ({ element }: { element: any }) => {
   }
 
   const renderElement = (elem: any, depth = 0): JSX.Element => {
-    const className = getElementStyles(elem.elementType, elem.styles)
+    const isSelected = elem.id === selectedElementId
+    const className = getElementStyles(elem.elementType, elem.styles, isSelected)
     const inlineStyles = getInlineStyles(elem.styles)
     const hasChildren = elem.children && elem.children.length > 0
     const hasText = elem.textContent && elem.textContent.trim() !== ''
@@ -123,11 +186,31 @@ const ElementPreviewRenderer = ({ element }: { element: any }) => {
       ...inlineStyles,
     }
 
+    const handleClick = (e: React.MouseEvent) => {
+      e.stopPropagation()
+      if (onElementClick) {
+        onElementClick(elem.id)
+      }
+    }
+
     return (
-      <div key={elem.id || `${elem.name}-${depth}`} className={className} style={combinedStyles}>
+      <div
+        key={elem.id || `${elem.name}-${depth}`}
+        className={className}
+        style={combinedStyles}
+        data-element-id={elem.id}
+        onClick={handleClick}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Badge variant="default" className="text-xs font-mono">{elem.elementType}</Badge>
+            <Badge variant="default" className="text-xs font-mono">
+              {elem.elementType}
+            </Badge>
+            {elem.responsiveStyles && elem.responsiveStyles.length > 0 && (
+              <Badge variant="outline" className="text-xs">
+                {elem.responsiveStyles.length} breakpoint{elem.responsiveStyles.length !== 1 ? 's' : ''}
+              </Badge>
+            )}
           </div>
           {/* {elem.elementAttributes && Object.keys(elem.elementAttributes).length > 0 && (
             <span className="text-xs text-gray-400">{Object.keys(elem.elementAttributes).length} attrs</span>
@@ -144,20 +227,29 @@ const ElementPreviewRenderer = ({ element }: { element: any }) => {
           </div>
         )}
 
-
-        {hasChildren && (
-          <div>{elem.children.map((child: any) => renderElement(child, depth + 1))}</div>
-        )}
-
-
+        {hasChildren && <div>{elem.children.map((child: any) => renderElement(child, depth + 1))}</div>}
       </div>
     )
   }
 
-  return renderElement(element)
+  return (
+    <>
+      {responsiveCSS && <style>{responsiveCSS}</style>}
+      {renderElement(element)}
+    </>
+  )
 }
 
-export const EditorPreviewPane = ({ spec }: { spec: CoralRootNode }) => {
+export const EditorPreviewPane = ({
+  spec,
+  onElementClick,
+  selectedElementId,
+}: {
+  spec: CoralRootNode
+  onElementClick?: (elementId: string) => void
+  selectedElementId?: string | null
+}) => {
+  const { theme } = useTheme()
   const [specValue, setSpecValue] = useState<string>('')
 
   useEffect(() => {
@@ -179,20 +271,24 @@ export const EditorPreviewPane = ({ spec }: { spec: CoralRootNode }) => {
       <TabsList>
         <TabsTrigger value="preview">
           {' '}
-          <EyeIcon className="size-3 text-muted-foreground" /> Visual Preview
+          <IconEyeSearch strokeWidth={1.5} className="size-4 text-muted-foreground" /> Visual Preview
         </TabsTrigger>
         <TabsTrigger value="spec">
-          <BracesIcon className="size-3 text-muted-foreground" /> Coral Spec
+          <IconSchema strokeWidth={1.5} className="size-4 text-muted-foreground" /> Coral Spec
         </TabsTrigger>
         <TabsTrigger value="code">
-          <CodeIcon className="size-3 text-muted-foreground" /> Generated Code
+          <IconBracketsAngle strokeWidth={1.5} className="size-4 text-muted-foreground" /> Generated Code
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="preview" className="flex flex-col h-full w-full">
-        <div className="h-full w-full overflow-auto p-4 bg-white">
+        <div className="h-full w-full overflow-auto p-4 bg-muted rounded-sm">
           {spec && spec.name ? (
-            <ElementPreviewRenderer element={spec} />
+            <ElementPreviewRenderer
+              element={spec}
+              onElementClick={onElementClick}
+              selectedElementId={selectedElementId}
+            />
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">
               <div className="text-center">
@@ -210,7 +306,7 @@ export const EditorPreviewPane = ({ spec }: { spec: CoralRootNode }) => {
             value={specValue}
             onChange={handleSpecChange}
             language={'json'}
-            theme={'vs-light'}
+            theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
             options={{
               minimap: {
                 enabled: false,
@@ -224,7 +320,7 @@ export const EditorPreviewPane = ({ spec }: { spec: CoralRootNode }) => {
               readOnly: true,
             }}
           />
-            <Button variant="default" size="icon-lg" onClick={handleCopySpec} className="absolute bottom-4 right-4">
+          <Button variant="default" size="icon-lg" onClick={handleCopySpec} className="absolute bottom-4 right-4">
             <CopyIcon />
           </Button>
         </div>

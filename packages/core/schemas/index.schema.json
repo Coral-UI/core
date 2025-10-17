@@ -30,6 +30,15 @@
         "method": {
           "$ref": "./method.schema.json"
         },
+        "responsive-styles": {
+          "$ref": "./responsive-styles.schema.json"
+        },
+        "responsive-style": {
+          "$ref": "./responsive-style.schema.json"
+        },
+        "breakpoint": {
+          "$ref": "./breakpoint.schema.json"
+        },
         "state": {
           "$ref": "./state.schema.json"
         },

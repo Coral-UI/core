@@ -9,6 +9,12 @@ export const isTextNode = (node: CoralNode | CoralRootNode): node is CoralNode |
   return node.textContent !== undefined
 }
 
+// Determine if an element should use horizontal layout (inline elements)
+export const isInlineElement = (node: CoralNode | CoralRootNode): boolean => {
+  const inlineElements = ['a', 'span', 'strong', 'em', 'b', 'i', 'u', 'code', 'abbr', 'cite', 'kbd', 'mark', 'small', 'sub', 'sup', 'time']
+  return inlineElements.includes(node.elementType)
+}
+
 export const nodeHasTextChildren = (node: CoralNode | CoralRootNode) => {
   return node.children?.some((child) => isTextNode(child)) ?? false
 }
@@ -49,10 +55,14 @@ async function createElement(
     return null
   }
 
+  // Inherit textAlign from parent, but override if this node has its own textAlign
+  const nodeTextAlign = node.styles?.['textAlign'] as textAlign | undefined
+  const effectiveTextAlign = nodeTextAlign || textAlign
+
   // Check if this node has textContent directly on it (not just in children)
   const hasDirectTextContent = 'textContent' in node && node.textContent !== undefined && node.textContent !== ''
 
-  // Check if node needs a wrapper frame (has padding, margin, or background)
+  // Check if node needs a wrapper frame (has padding, margin, background, or maxWidth)
   const needsWrapper = node.styles && (
     node.styles['paddingInlineStart'] ||
     node.styles['paddingInlineEnd'] ||
@@ -62,21 +72,26 @@ async function createElement(
     node.styles['marginInlineEnd'] ||
     node.styles['marginBlockStart'] ||
     node.styles['marginBlockEnd'] ||
-    node.styles['backgroundColor']
+    node.styles['backgroundColor'] ||
+    node.styles['maxWidth']
   )
 
   // If it has direct text content and no children
   if (hasDirectTextContent && (!node.children || node.children.length === 0)) {
     if (needsWrapper) {
       // Create a frame wrapper with text inside
-      const { frame } = await createTextandWrapper(node)
+      // The text node gets text-related styles (color, font, etc.)
+      // The frame gets box-related styles (backgroundColor, padding, etc.)
+      const { frame, textNode } = await createTextandWrapper(node, effectiveTextAlign)
       frame.name = node.name
-      await applyStyles(frame, node, textAlign)
+      // Apply box model styles to frame only
+      await applyStyles(frame, node, effectiveTextAlign)
+      // Text styles (including inherited textAlign) are already applied in createTextandWrapper
       return frame
     } else {
       // Just create a text node directly
       const textNode = await createTextNode(node)
-      await applyStyles(textNode, node, textAlign)
+      await applyStyles(textNode, node, effectiveTextAlign)
       return textNode
     }
   }
@@ -131,7 +146,7 @@ async function createElement(
     // Create SVG frame with vector children
     element = await createSVGFrame(currentNode, parentColor)
   } else if (hasInlineTextChildren) {
-    const { frame } = await createTextandWrapper(node)
+    const { frame } = await createTextandWrapper(node, effectiveTextAlign)
     element = frame
   } else if ('type' in node && currentNode.type === 'COMPONENT') {
     element = await createComponent(node)
@@ -148,15 +163,35 @@ async function createElement(
     element.counterAxisAlignItems = 'MIN'
   }
 
+  // If element has both children AND textContent, add the text as the FIRST child
+  // This matches typical HTML where parent text content comes before child elements
+  if (hasDirectTextContent && node.children && node.children.length > 0 && 'appendChild' in element) {
+    const textNode = await createTextNode(node)
+    await applyStyles(textNode, node, effectiveTextAlign)
+    element.appendChild(textNode)
+    // Set text node sizing: FILL for block elements (for proper text alignment),
+    // HUG for inline elements (for natural content flow)
+    textNode.layoutSizingHorizontal = isInlineElement(node) ? 'HUG' : 'FILL'
+  }
+
   // Process children (skip for SVG elements as they're handled by createSVGFrame)
   if (!isSVGElement(currentNode) && 'children' in node && currentNode.children) {
+    // Determine if current element is inline (affects child text node sizing)
+    const isParentInline = isInlineElement(node)
+
     // Process children in sequence to maintain order
     for (const child of currentNode.children) {
       try {
-        const childElement = await createElement(child, textAlign, combinedStyles)
+        // Pass down the effective textAlign so children inherit it
+        const childElement = await createElement(child, effectiveTextAlign, combinedStyles)
         if (childElement && 'appendChild' in element) {
           console.log(`Appending ${child.name} to ${currentNode.name}`)
           element.appendChild(childElement)
+          // Set text node sizing: FILL for block parents (for proper text alignment),
+          // HUG for inline parents (for natural content flow)
+          if (childElement.type === 'TEXT') {
+            childElement.layoutSizingHorizontal = isParentInline ? 'HUG' : 'FILL'
+          }
         } else if (!childElement) {
           console.warn(`Child element ${child.name} was null, skipping`)
         }
@@ -167,16 +202,9 @@ async function createElement(
     }
   }
 
-  // If element has both children AND textContent, add the text as a final child
-  if (hasDirectTextContent && node.children && node.children.length > 0 && 'appendChild' in element) {
-    const textNode = await createTextNode(node)
-    await applyStyles(textNode, node, textAlign)
-    element.appendChild(textNode)
-  }
-
   // Apply styles (skip for SVG elements as createSVGFrame already handles sizing)
   if (!isSVGElement(currentNode)) {
-    await applyStyles(element, node, textAlign)
+    await applyStyles(element, node, effectiveTextAlign)
   }
 
   return element
@@ -221,8 +249,8 @@ async function createTextNode(spec: CoralNode) {
   return textNode
 }
 
-async function createTextandWrapper(spec: CoralNode) {
-  const { frame, textNode } = await createFrameWithFillingText(spec)
+async function createTextandWrapper(spec: CoralNode, textAlign?: textAlign) {
+  const { frame, textNode } = await createFrameWithFillingText(spec, textAlign)
   return { frame, textNode }
 }
 
@@ -230,10 +258,17 @@ async function createFrame(spec: CoralNode) {
   const frame = figma.createFrame()
   frame.name = spec.name
 
-  // Enable auto-layout by default with HUG sizing (like HTML divs)
-  frame.layoutMode = 'VERTICAL'
+  // Enable auto-layout by default with HUG sizing
+  // Use horizontal layout for inline elements (a, span, etc.), vertical for block elements
+  const isInline = isInlineElement(spec)
+  frame.layoutMode = isInline ? 'HORIZONTAL' : 'VERTICAL'
   frame.layoutSizingHorizontal = 'HUG'
   frame.layoutSizingVertical = 'HUG'
+
+  // Center-align inline elements vertically
+  if (isInline) {
+    frame.counterAxisAlignItems = 'CENTER'
+  }
 
   await applyStyles(frame, spec)
   return frame

@@ -1,7 +1,7 @@
 import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 import { applyPaint } from './applyPaint'
-import { isTextNode, nodeHasTextChildren } from './importSpec'
+import { isInlineElement, isTextNode, nodeHasTextChildren } from './importSpec'
 import { applyTypographyStyles, textAlign, transformFontWeightToFigmaFontStyle } from './styleText'
 
 const shouldApplyAutoLayout = (node: CoralNode | CoralRootNode) => {
@@ -53,6 +53,53 @@ const applyFlexDirection = (element: ElementWithOptionalText, node: CoralNode | 
   }
 }
 
+const applyFlexAlignment = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
+  // alignItems controls cross-axis alignment
+  if (node.styles?.['alignItems']) {
+    const alignItems = node.styles['alignItems'] as string
+    const isHorizontal = element.layoutMode === 'HORIZONTAL'
+
+    if (alignItems === 'center') {
+      element.counterAxisAlignItems = 'CENTER'
+    } else if (alignItems === 'flex-start' || alignItems === 'start') {
+      element.counterAxisAlignItems = 'MIN'
+    } else if (alignItems === 'flex-end' || alignItems === 'end') {
+      element.counterAxisAlignItems = 'MAX'
+    }
+  }
+
+  // justifyContent controls main-axis alignment
+  if (node.styles?.['justifyContent']) {
+    const justifyContent = node.styles['justifyContent'] as string
+
+    if (justifyContent === 'center') {
+      element.primaryAxisAlignItems = 'CENTER'
+    } else if (justifyContent === 'flex-start' || justifyContent === 'start') {
+      element.primaryAxisAlignItems = 'MIN'
+    } else if (justifyContent === 'flex-end' || justifyContent === 'end') {
+      element.primaryAxisAlignItems = 'MAX'
+    } else if (justifyContent === 'space-between') {
+      element.primaryAxisAlignItems = 'SPACE_BETWEEN'
+    }
+  }
+}
+
+const applyGap = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
+  // columnGap for horizontal layouts, rowGap for vertical layouts
+  const isHorizontal = element.layoutMode === 'HORIZONTAL'
+
+  if (isHorizontal && node.styles?.['columnGap']) {
+    element.itemSpacing = node.styles['columnGap'] as number
+  } else if (!isHorizontal && node.styles?.['rowGap']) {
+    element.itemSpacing = node.styles['rowGap'] as number
+  }
+
+  // Generic 'gap' property applies to both
+  if (node.styles?.['gap']) {
+    element.itemSpacing = node.styles['gap'] as number
+  }
+}
+
 const applyPadding = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
   if (node.styles?.['paddingInlineStart']) {
     element.paddingLeft = node.styles?.['paddingInlineStart'] as number
@@ -71,23 +118,46 @@ const applyPadding = (element: ElementWithOptionalText, node: CoralNode | CoralR
   }
 }
 
-const applyMarginToFrame = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
-  if (node.styles?.['marginInlineStart']) {
-    element.paddingLeft = node.styles?.['marginInlineStart'] as number
+const applyMargin = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
+  // In Figma, we simulate margins by converting them to padding on the element
+  // This only works for frames with auto-layout enabled
+
+  // Only apply margins if the element has auto-layout (layoutMode is not NONE)
+  if ('layoutMode' in element && element.layoutMode === 'NONE') {
+    return
   }
 
-  if (node.styles?.['marginInlineEnd']) {
-    element.paddingRight = node.styles?.['marginInlineEnd'] as number
+  // Get margin values (only numeric ones, ignore 'auto')
+  const marginLeft = typeof node.styles?.['marginInlineStart'] === 'number' ? node.styles['marginInlineStart'] : 0
+  const marginRight = typeof node.styles?.['marginInlineEnd'] === 'number' ? node.styles['marginInlineEnd'] : 0
+  const marginTop = typeof node.styles?.['marginBlockStart'] === 'number' ? node.styles['marginBlockStart'] : 0
+  const marginBottom = typeof node.styles?.['marginBlockEnd'] === 'number' ? node.styles['marginBlockEnd'] : 0
+
+  // Get padding values
+  const paddingLeft = (node.styles?.['paddingInlineStart'] as number) || 0
+  const paddingRight = (node.styles?.['paddingInlineEnd'] as number) || 0
+  const paddingTop = (node.styles?.['paddingBlockStart'] as number) || 0
+  const paddingBottom = (node.styles?.['paddingBlockEnd'] as number) || 0
+
+  // Always set padding (even if margin is 0), to ensure padding is applied
+  if (paddingLeft > 0 || marginLeft > 0) {
+    element.paddingLeft = paddingLeft + marginLeft
   }
 
-  if (node.styles?.['marginBlockStart']) {
-    element.paddingTop = node.styles?.['marginBlockStart'] as number
+  if (paddingRight > 0 || marginRight > 0) {
+    element.paddingRight = paddingRight + marginRight
   }
 
-  if (node.styles?.['marginBlockEnd']) {
-    element.paddingBottom = node.styles?.['marginBlockEnd'] as number
+  if (paddingTop > 0 || marginTop > 0) {
+    element.paddingTop = paddingTop + marginTop
+  }
+
+  if (paddingBottom > 0 || marginBottom > 0) {
+    element.paddingBottom = paddingBottom + marginBottom
   }
 }
+
+const applyMarginToFrame = applyMargin // Keep old name for backwards compatibility
 
 export const applyMaxWidth = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
   if (node.styles?.['maxWidth']) {
@@ -101,10 +171,17 @@ export type Element = FrameNode | ComponentNode | InstanceNode | TextNode
 type ElementWithOptionalText = FrameNode | ComponentNode | InstanceNode
 
 // Add this new function
-export const createFrameWithFillingText = async (node: CoralNode) => {
+export const createFrameWithFillingText = async (node: CoralNode, inheritedTextAlign?: textAlign) => {
+  // Separate styles into text styles and box model styles
+  // Text styles (color, font, etc.) go on the text node
+  // Box model styles (backgroundColor, padding, etc.) stay on the frame
   const styles = {
     ...node.styles,
   }
+
+  // Determine effective textAlign: use node's own textAlign if present, otherwise inherit from parent
+  const nodeTextAlign = styles?.['textAlign'] as textAlign | undefined
+  const effectiveTextAlign = nodeTextAlign || inheritedTextAlign
 
   const textContent = node.children?.find((child) => 'textContent' in child)?.textContent ?? node.textContent
 
@@ -142,21 +219,34 @@ export const createFrameWithFillingText = async (node: CoralNode) => {
   frame.appendChild(textNode)
 
   // Enable auto-layout first before setting sizing properties
-  frame.layoutMode = 'VERTICAL'
+  // Use horizontal layout for inline elements (a, span, etc.), vertical for block elements
+  const isInline = isInlineElement(node)
+  frame.layoutMode = isInline ? 'HORIZONTAL' : 'VERTICAL'
 
   // Now that the frame has auto-layout, we can set sizing properties
   frame.layoutSizingVertical = 'HUG'
   frame.layoutSizingHorizontal = 'HUG'
-  textNode.layoutSizingHorizontal = 'FILL'
 
-  // Set text alignment based on styles
-  if (styles?.['textAlign']) {
-    textNode.textAlignHorizontal = (styles['textAlign'] as string).toUpperCase() as TextNode['textAlignHorizontal']
+  // Set text node sizing: FILL for block elements (for proper text alignment),
+  // HUG for inline elements (for natural content flow)
+  textNode.layoutSizingHorizontal = isInline ? 'HUG' : 'FILL'
+
+  // Center-align inline elements vertically
+  if (isInline) {
+    frame.counterAxisAlignItems = 'CENTER'
   }
 
   applyMarginToFrame(frame, node)
+  // Apply typography styles including color to the text node
+  // This ensures color from the parent node goes to text, not the frame
   applyTypographyStyles(textNode, styles)
-  textNode.textAlignHorizontal = 'LEFT'
+
+  // Apply text alignment (either from node's own styles or inherited from parent)
+  if (effectiveTextAlign) {
+    textNode.textAlignHorizontal = effectiveTextAlign.toUpperCase() as TextNode['textAlignHorizontal']
+  } else {
+    textNode.textAlignHorizontal = 'LEFT'
+  }
 
   return { frame, textNode }
 }
@@ -191,8 +281,34 @@ export const applyStyles = async (element: Element, node: CoralNode | CoralRootN
     // Apply flex direction
     applyFlexDirection(element as ElementWithOptionalText, node)
 
-    // Apply padding if specified
-    applyPadding(element as ElementWithOptionalText, node)
+    // Apply flex alignment (alignItems, justifyContent)
+    applyFlexAlignment(element as ElementWithOptionalText, node)
+
+    // Apply gap (columnGap, rowGap, gap)
+    applyGap(element as ElementWithOptionalText, node)
+
+    // Apply margin and padding together (margin is converted to padding in Figma)
+    // Check if element has any margin properties (even if they're 'auto')
+    const hasMarginProperty = node.styles && (
+      'marginInlineStart' in node.styles ||
+      'marginInlineEnd' in node.styles ||
+      'marginBlockStart' in node.styles ||
+      'marginBlockEnd' in node.styles
+    )
+
+    if (hasMarginProperty) {
+      // Has margin properties - applyMargin will combine padding + margin
+      // (it handles 'auto' margins by ignoring them and still applying padding)
+      applyMargin(element as ElementWithOptionalText, node)
+    } else {
+      // No margin properties at all - just apply padding normally
+      applyPadding(element as ElementWithOptionalText, node)
+    }
+
+    // Apply border radius if specified
+    if (node.styles?.['borderRadius'] && typeof node.styles['borderRadius'] === 'number') {
+      element.cornerRadius = node.styles['borderRadius'] as number
+    }
 
     // Apply max width if specified
     applyMaxWidth(element as ElementWithOptionalText, node)

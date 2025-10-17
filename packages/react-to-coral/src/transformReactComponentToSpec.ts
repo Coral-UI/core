@@ -19,6 +19,7 @@ import type {
   CoralStateType,
   CoralTSTypes,
 } from '@reallygoodwork/coral-core'
+import { extractResponsiveStylesFromObject } from '@reallygoodwork/coral-core'
 import { tailwindToCSS } from '@reallygoodwork/coral-tw2css'
 
 export interface UIElement {
@@ -297,6 +298,15 @@ export const transformReactComponentToSpec = (
     //   })
     // }
 
+    // Combine inline styles and Tailwind classes
+    const combinedStyles = {
+      ...(styles ? styles : {}),
+      ...tailwindToCSS(className || ''),
+    }
+
+    // Extract responsive styles from media queries
+    const { baseStyles, responsiveStyles } = extractResponsiveStylesFromObject(combinedStyles)
+
     const obj: CoralRootNode = {
       $schema: 'https://coral.design/schema.json',
       elementType: (result.rootElement?.elementType as CoralElementType) || 'div',
@@ -309,14 +319,16 @@ export const transformReactComponentToSpec = (
         parameters: method.parameters.map((param) => (typeof param === 'string' ? param : param.name)),
       })),
       componentName: result.componentName,
-      styles: {
-        ...(styles ? styles : {}),
-        ...tailwindToCSS(className || ''),
-      },
+      styles: baseStyles,
       children: result.rootElement?.children.map(transformUIElementToBaseNode) || [],
       // Include metadata from result
       type: result.type === 'ArrowFunction' ? 'COMPONENT' : 'INSTANCE',
       imports: result.imports,
+    }
+
+    // Add responsive styles if any were found
+    if (responsiveStyles.length > 0) {
+      obj.responsiveStyles = responsiveStyles
     }
 
     if (result.stateHooks && result.stateHooks.length > 0) {

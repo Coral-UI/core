@@ -1,4 +1,5 @@
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { FormControl, FormField, FormItem } from '@/components/ui/form'
+import { InputGroup, InputGroupAddon } from '@/components/ui/input-group'
 import {
   SelectContent,
   SelectItem,
@@ -6,12 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { Label } from '@radix-ui/react-label'
 import { FieldValues, UseFormReturn } from 'react-hook-form'
-
-import { InputGroup, InputGroupAddon } from '../ui/input-group'
 
 type SelectProps<T extends FieldValues = FieldValues> = {
   name: string
@@ -31,14 +29,12 @@ export const Select = <T extends FieldValues = FieldValues>({
   name,
   label,
   disabled,
-  description,
   placeholder,
   options,
   form,
   className,
   icon: Icon,
   iconClassName,
-  hideLabel = false,
 }: SelectProps<T>) => {
   return (
     <InputGroup>
@@ -74,7 +70,7 @@ export const Select = <T extends FieldValues = FieldValues>({
           </FormItem>
         )}
       />
-            {Icon && (
+      {Icon && (
         <InputGroupAddon align="inline-start">
           <Icon className={cn('size-4 text-muted-foreground shrink-0', iconClassName)} />
         </InputGroupAddon>
@@ -84,7 +80,6 @@ export const Select = <T extends FieldValues = FieldValues>({
           {label}
         </Label>
       </InputGroupAddon>
-
     </InputGroup>
   )
 }

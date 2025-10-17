@@ -43,6 +43,7 @@ import { objectFit } from '@/mappings/objectFit'
 import { objectPosition } from '@/mappings/objectPosition'
 import { opacity } from '@/mappings/opacity'
 import { order } from '@/mappings/order'
+import { outline } from '@/mappings/outline'
 import { overflow } from '@/mappings/overflow'
 import { padding } from '@/mappings/padding'
 import { placeContent } from '@/mappings/placeContent'
@@ -117,6 +118,7 @@ export const mappings: Mapping = {
   ...margin,
   ...objectFit,
   ...order,
+  ...outline,
   ...overflow,
   ...objectPosition,
   ...padding,

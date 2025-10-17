@@ -1,5 +1,11 @@
 export { parseUISpec } from '@utils/parseUISpec'
 export { transformHTMLToSpec } from '@lib/transformHTMLToSpec'
+export {
+  parseMediaQuery,
+  extractMediaQueriesFromCSS,
+  mediaQueriesToResponsiveStyles,
+  extractResponsiveStylesFromObject,
+} from '@utils/parseMediaQuery'
 
 export type { CoralNode, CoralRootNode } from '@structures/coral'
 export type { CoralColorType } from '@structures/color'
@@ -11,6 +17,14 @@ export type { CoralImportType } from '@structures/import'
 export type { CoralMethodType } from '@structures/method'
 export type { CoralStateType } from '@structures/state'
 export type { CoralStyleType } from '@structures/styles'
+export type {
+  BreakpointType,
+  SimpleBreakpoint,
+  RangeBreakpoint,
+  Breakpoint,
+  ResponsiveStyle,
+  CoralResponsiveStyles,
+} from '@structures/responsiveStyles'
 export type { CoralVariantType } from '@structures/variant'
 export type { CoralTSTypes } from '@structures/TStypes'
 export type { CoralElementType } from '@structures/utilities'

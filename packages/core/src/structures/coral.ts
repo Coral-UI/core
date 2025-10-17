@@ -5,6 +5,7 @@ import { zCoralDependencySchema } from './dependency'
 import { zCoralDesignTokenSchema } from './designToken'
 import { zCoralImportSchema } from './import'
 import { zCoralMethodSchema } from './method'
+import { zCoralResponsiveStylesSchema } from './responsiveStyles'
 import { zCoralStateSchema } from './state'
 import { zCoralStyleSchema } from './styles'
 import { zCoralTSTypesSchema } from './TStypes'
@@ -27,6 +28,7 @@ export const zCoralSchema: z.ZodType<CoralNode> = z.lazy(() =>
     name: zCoralNameSchema.describe('The name of the Coral Component'),
     options: z.record(z.string(), z.unknown()).nullish().describe('The options of the variant'),
     styles: zCoralStyleSchema.optional(),
+    responsiveStyles: zCoralResponsiveStylesSchema.describe('Responsive styles for different breakpoints'),
     textContent: z.string().optional().describe('The text content of the element'),
     tsType: z.string().optional().describe('The TypeScript type of the Coral Component'),
 
@@ -91,6 +93,7 @@ export type CoralNode = {
   name: string
   options?: Record<string, unknown> | null
   styles?: z.infer<typeof zCoralStyleSchema>
+  responsiveStyles?: z.infer<typeof zCoralResponsiveStylesSchema>
   textContent?: string
   tsType?: string
   type?: 'COMPONENT' | 'INSTANCE' | 'COMPONENT_SET' | 'NODE'

@@ -1,6 +1,7 @@
 import { UIElement } from '@/transformReactComponentToSpec'
 
 import type { CoralComponentPropertyType, CoralElementType, CoralRootNode } from '@reallygoodwork/coral-core'
+import { extractResponsiveStylesFromObject } from '@reallygoodwork/coral-core'
 import { tailwindToCSS } from '@reallygoodwork/coral-tw2css'
 
 export const transformUIElementToBaseNode = (element: UIElement): CoralRootNode => {
@@ -43,6 +44,15 @@ export const transformUIElementToBaseNode = (element: UIElement): CoralRootNode 
     }
   })
 
+  // Combine inline styles and Tailwind classes
+  const combinedStyles = {
+    ...(styles ? styles : {}),
+    ...tailwindToCSS(className || ''),
+  }
+
+  // Extract responsive styles from media queries
+  const { baseStyles, responsiveStyles } = extractResponsiveStylesFromObject(combinedStyles)
+
   const node: CoralRootNode = {
     elementType: element.elementType as CoralElementType,
     componentProperties: preservedComponentProperties,
@@ -51,12 +61,14 @@ export const transformUIElementToBaseNode = (element: UIElement): CoralRootNode 
     methods: [],
     stateHooks: [],
     componentName: element.elementType,
-    styles: {
-      ...(styles ? styles : {}),
-      ...tailwindToCSS(className || ''),
-    },
+    styles: baseStyles,
     children: element.children.map(transformUIElementToBaseNode),
     elementAttributes,
+  }
+
+  // Add responsive styles if any were found
+  if (responsiveStyles.length > 0) {
+    node.responsiveStyles = responsiveStyles
   }
 
   if (element.textContent) {

@@ -1,4 +1,4 @@
-import { SimpleElementTree } from '@/components/SimpleElementTree'
+import { SimpleElementTree } from '@/components/Editor/SimpleElementTree'
 import { useElementTree } from '@/hooks/useElementTree'
 
 import { CoralElementType } from '@reallygoodwork/coral-core'
@@ -9,7 +9,7 @@ interface EditorSidebarProps {
 }
 
 export const EditorSidebar = ({ onElementSelect, elementTreeHook }: EditorSidebarProps) => {
-  const { elements, addElement, removeElement, updateElement, toggleExpanded, getElementTree, moveElement } =
+  const { elements, addElement, removeElement, updateElement, toggleExpanded, getElementTree, moveElement, selectedElementId } =
     elementTreeHook
 
   const handleSelect = (elementId: string) => {
@@ -30,6 +30,7 @@ export const EditorSidebar = ({ onElementSelect, elementTreeHook }: EditorSideba
       onSelect={handleSelect}
       onUpdateElement={updateElement}
       onMoveElement={moveElement}
+      selectedElementId={selectedElementId}
     />
   )
 }

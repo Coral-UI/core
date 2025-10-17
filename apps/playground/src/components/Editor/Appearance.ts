@@ -1,4 +1,5 @@
-import { MinusIcon, PaintBucketIcon, PaletteIcon, SquareDashedIcon, SquareRoundCornerIcon } from 'lucide-react'
+import { IconBorderRadius, IconRadiusTopLeft, IconRadiusTopRight, IconRadiusBottomLeft, IconRadiusBottomRight, IconBorderStyle2, IconPaint } from '@tabler/icons-react'
+import { MinusIcon, PaintBucketIcon, PaletteIcon } from 'lucide-react'
 import { z } from 'zod'
 
 export const zAppearanceSchema = z.object({
@@ -51,7 +52,7 @@ export const AppearanceGroups = [
         name: 'borderColor',
         type: 'input',
         inputType: 'color',
-        icon: PaintBucketIcon,
+        icon: IconPaint,
         placeholder: '#000000',
         defaultValue: '#000000',
       },
@@ -70,7 +71,7 @@ export const AppearanceGroups = [
         name: 'borderStyle',
         type: 'select',
         defaultValue: 'solid',
-        icon: SquareDashedIcon,
+        icon: IconBorderStyle2,
         options: [
           { label: 'Solid', value: 'solid' },
           { label: 'Dashed', value: 'dashed' },
@@ -91,8 +92,7 @@ export const AppearanceGroups = [
         defaultValue: 0,
         selectName: 'borderTopLeftRadiusUnit',
         selectLabel: 'Unit',
-        icon: SquareRoundCornerIcon,
-        iconClassName: '-rotate-90',
+        icon: IconRadiusTopLeft,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -110,7 +110,7 @@ export const AppearanceGroups = [
         defaultValue: 0,
         selectName: 'borderTopRightRadiusUnit',
         selectLabel: 'Unit',
-        icon: SquareRoundCornerIcon,
+        icon: IconRadiusTopRight,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -128,8 +128,7 @@ export const AppearanceGroups = [
         defaultValue: 0,
         selectName: 'borderBottomLeftRadiusUnit',
         selectLabel: 'Unit',
-        icon: SquareRoundCornerIcon,
-        iconClassName: '-rotate-180',
+        icon: IconRadiusBottomLeft,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -147,8 +146,7 @@ export const AppearanceGroups = [
         defaultValue: 0,
         selectName: 'borderBottomRightRadiusUnit',
         selectLabel: 'Unit',
-        icon: SquareRoundCornerIcon,
-        iconClassName: 'rotate-90',
+        icon: IconRadiusBottomRight,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },

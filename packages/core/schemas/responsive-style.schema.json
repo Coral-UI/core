@@ -1,0 +1,484 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A set of styles to apply at a specific breakpoint",
+  "type": "object",
+  "properties": {
+    "breakpoint": {
+      "description": "The breakpoint at which these styles apply",
+      "anyOf": [
+        {
+          "description": "A simple breakpoint with a single condition",
+          "type": "object",
+          "properties": {
+            "type": {
+              "description": "The type of the breakpoint condition",
+              "type": "string",
+              "enum": ["min-width", "max-width", "min-height", "max-height"]
+            },
+            "value": {
+              "description": "The value of the breakpoint (e.g., \"768px\", \"50rem\")",
+              "type": "string"
+            }
+          },
+          "required": ["type", "value"],
+          "additionalProperties": false
+        },
+        {
+          "description": "A range breakpoint with min and/or max conditions",
+          "type": "object",
+          "properties": {
+            "min": {
+              "description": "The minimum condition for the range",
+              "type": "object",
+              "properties": {
+                "type": {
+                  "description": "The minimum condition type",
+                  "type": "string",
+                  "enum": ["min-width", "min-height"]
+                },
+                "value": {
+                  "description": "The minimum value (e.g., \"768px\")",
+                  "type": "string"
+                }
+              },
+              "required": ["type", "value"],
+              "additionalProperties": false
+            },
+            "max": {
+              "description": "The maximum condition for the range",
+              "type": "object",
+              "properties": {
+                "type": {
+                  "description": "The maximum condition type",
+                  "type": "string",
+                  "enum": ["max-width", "max-height"]
+                },
+                "value": {
+                  "description": "The maximum value (e.g., \"1024px\")",
+                  "type": "string"
+                }
+              },
+              "required": ["type", "value"],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "label": {
+      "description": "Optional label for this breakpoint (e.g., \"Mobile\", \"Tablet\")",
+      "type": "string"
+    },
+    "styles": {
+      "description": "The styles to apply at this breakpoint",
+      "$ref": "#/$defs/__schema0"
+    }
+  },
+  "required": ["breakpoint", "styles"],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "description": "The styles of the Coral Component",
+      "type": "object",
+      "propertyNames": {
+        "description": "The name of a style property",
+        "type": "string"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "description": "The value of a style property",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "hex": {
+                    "type": "string"
+                  },
+                  "rgb": {
+                    "type": "object",
+                    "properties": {
+                      "r": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 255
+                      },
+                      "g": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 255
+                      },
+                      "b": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 255
+                      },
+                      "a": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": ["r", "g", "b", "a"],
+                    "additionalProperties": false
+                  },
+                  "hsl": {
+                    "type": "object",
+                    "properties": {
+                      "h": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 360
+                      },
+                      "s": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      "l": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      "a": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": ["h", "s", "l", "a"],
+                    "additionalProperties": false
+                  }
+                },
+                "required": ["hex", "rgb", "hsl"],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "angle": {
+                    "description": "The angle of the gradient",
+                    "type": "number"
+                  },
+                  "type": {
+                    "description": "The type of the gradient",
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "linear"
+                      },
+                      {
+                        "type": "string",
+                        "const": "radial"
+                      },
+                      {
+                        "type": "string",
+                        "const": "LINEAR"
+                      },
+                      {
+                        "type": "string",
+                        "const": "RADIAL"
+                      }
+                    ]
+                  },
+                  "colors": {
+                    "description": "The color stops of the gradient",
+                    "type": "array",
+                    "items": {
+                      "description": "An object representing a single color stop in the gradient",
+                      "type": "object",
+                      "properties": {
+                        "color": {
+                          "type": "object",
+                          "properties": {
+                            "hex": {
+                              "type": "string"
+                            },
+                            "rgb": {
+                              "type": "object",
+                              "properties": {
+                                "r": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 255
+                                },
+                                "g": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 255
+                                },
+                                "b": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 255
+                                },
+                                "a": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1
+                                }
+                              },
+                              "required": ["r", "g", "b", "a"],
+                              "additionalProperties": false
+                            },
+                            "hsl": {
+                              "type": "object",
+                              "properties": {
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 360
+                                },
+                                "s": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 100
+                                },
+                                "l": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 100
+                                },
+                                "a": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1
+                                }
+                              },
+                              "required": ["h", "s", "l", "a"],
+                              "additionalProperties": false
+                            }
+                          },
+                          "required": ["hex", "rgb", "hsl"],
+                          "additionalProperties": false
+                        },
+                        "position": {
+                          "description": "The position of the color in the gradient",
+                          "type": "number"
+                        }
+                      },
+                      "required": ["color", "position"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": ["angle", "type", "colors"],
+                "additionalProperties": false
+              }
+            ]
+          },
+          {
+            "description": "A nested style property",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "description": "The value of a style property",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "hex": {
+                          "type": "string"
+                        },
+                        "rgb": {
+                          "type": "object",
+                          "properties": {
+                            "r": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 255
+                            },
+                            "g": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 255
+                            },
+                            "b": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 255
+                            },
+                            "a": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            }
+                          },
+                          "required": ["r", "g", "b", "a"],
+                          "additionalProperties": false
+                        },
+                        "hsl": {
+                          "type": "object",
+                          "properties": {
+                            "h": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 360
+                            },
+                            "s": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100
+                            },
+                            "l": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100
+                            },
+                            "a": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            }
+                          },
+                          "required": ["h", "s", "l", "a"],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": ["hex", "rgb", "hsl"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "angle": {
+                          "description": "The angle of the gradient",
+                          "type": "number"
+                        },
+                        "type": {
+                          "description": "The type of the gradient",
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "linear"
+                            },
+                            {
+                              "type": "string",
+                              "const": "radial"
+                            },
+                            {
+                              "type": "string",
+                              "const": "LINEAR"
+                            },
+                            {
+                              "type": "string",
+                              "const": "RADIAL"
+                            }
+                          ]
+                        },
+                        "colors": {
+                          "description": "The color stops of the gradient",
+                          "type": "array",
+                          "items": {
+                            "description": "An object representing a single color stop in the gradient",
+                            "type": "object",
+                            "properties": {
+                              "color": {
+                                "type": "object",
+                                "properties": {
+                                  "hex": {
+                                    "type": "string"
+                                  },
+                                  "rgb": {
+                                    "type": "object",
+                                    "properties": {
+                                      "r": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 255
+                                      },
+                                      "g": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 255
+                                      },
+                                      "b": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 255
+                                      },
+                                      "a": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 1
+                                      }
+                                    },
+                                    "required": ["r", "g", "b", "a"],
+                                    "additionalProperties": false
+                                  },
+                                  "hsl": {
+                                    "type": "object",
+                                    "properties": {
+                                      "h": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 360
+                                      },
+                                      "s": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 100
+                                      },
+                                      "l": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 100
+                                      },
+                                      "a": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 1
+                                      }
+                                    },
+                                    "required": ["h", "s", "l", "a"],
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "required": ["hex", "rgb", "hsl"],
+                                "additionalProperties": false
+                              },
+                              "position": {
+                                "description": "The position of the color in the gradient",
+                                "type": "number"
+                              }
+                            },
+                            "required": ["color", "position"],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": ["angle", "type", "colors"],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                {
+                  "$ref": "#/$defs/__schema0"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$id": "https://schemas.coral.design/v0.0.0/schema.json",
+  "version": "0.0.0"
+}

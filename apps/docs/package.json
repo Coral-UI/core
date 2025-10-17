@@ -10,10 +10,10 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.34.4",
+    "@astrojs/starlight": "^0.36.1",
     "@fontsource/geist-mono": "^5.2.6",
     "@fontsource/geist-sans": "^5.2.5",
-    "astro": "^5.10.1",
+    "astro": "^5.14.0",
     "starlight-theme-black": "^0.6.0"
   }
 }

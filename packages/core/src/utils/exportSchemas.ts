@@ -8,6 +8,7 @@ import { zCoralDependencySchema } from '../structures/dependency'
 import { zCoralDesignTokenSchema } from '../structures/designToken'
 import { zCoralImportSchema } from '../structures/import'
 import { zCoralMethodSchema } from '../structures/method'
+import { zBreakpointSchema, zCoralResponsiveStylesSchema, zResponsiveStyleSchema } from '../structures/responsiveStyles'
 import { zCoralStateSchema } from '../structures/state'
 import { zCoralStyleSchema } from '../structures/styles'
 import { zCoralTSTypesSchema } from '../structures/TStypes'
@@ -29,6 +30,9 @@ export const SCHEMA_EXPORTS = {
   'design-token': zCoralDesignTokenSchema,
   import: zCoralImportSchema,
   method: zCoralMethodSchema,
+  'responsive-styles': zCoralResponsiveStylesSchema,
+  'responsive-style': zResponsiveStyleSchema,
+  breakpoint: zBreakpointSchema,
   state: zCoralStateSchema,
   styles: zCoralStyleSchema,
   'ts-types': zCoralTSTypesSchema,

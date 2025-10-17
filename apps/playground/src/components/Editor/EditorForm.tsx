@@ -1,14 +1,13 @@
-import { Form } from '@/components/ui/form'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-
-import { EditorStyleFormComponents } from './EditorStyleFormComponents'
+import { EditorStyleFormComponents } from '@/components/Editor/EditorStyleFormComponents'
 import {
   StyleFormComponents,
   StyleFormDefaultValues,
   StyleFormSchema,
   zStyleFormSchema,
-} from './EditorStyleFormStructure'
+} from '@/components/Editor/EditorStyleFormStructure'
+import { Form } from '@/components/ui/form'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 export const EditorForm = () => {
   const form = useForm<StyleFormSchema>({

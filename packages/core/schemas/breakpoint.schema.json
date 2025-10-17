@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A breakpoint definition (simple or range)",
+  "anyOf": [
+    {
+      "description": "A simple breakpoint with a single condition",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of the breakpoint condition",
+          "type": "string",
+          "enum": ["min-width", "max-width", "min-height", "max-height"]
+        },
+        "value": {
+          "description": "The value of the breakpoint (e.g., \"768px\", \"50rem\")",
+          "type": "string"
+        }
+      },
+      "required": ["type", "value"],
+      "additionalProperties": false
+    },
+    {
+      "description": "A range breakpoint with min and/or max conditions",
+      "type": "object",
+      "properties": {
+        "min": {
+          "description": "The minimum condition for the range",
+          "type": "object",
+          "properties": {
+            "type": {
+              "description": "The minimum condition type",
+              "type": "string",
+              "enum": ["min-width", "min-height"]
+            },
+            "value": {
+              "description": "The minimum value (e.g., \"768px\")",
+              "type": "string"
+            }
+          },
+          "required": ["type", "value"],
+          "additionalProperties": false
+        },
+        "max": {
+          "description": "The maximum condition for the range",
+          "type": "object",
+          "properties": {
+            "type": {
+              "description": "The maximum condition type",
+              "type": "string",
+              "enum": ["max-width", "max-height"]
+            },
+            "value": {
+              "description": "The maximum value (e.g., \"1024px\")",
+              "type": "string"
+            }
+          },
+          "required": ["type", "value"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  ],
+  "$id": "https://schemas.coral.design/v0.0.0/schema.json",
+  "version": "0.0.0"
+}

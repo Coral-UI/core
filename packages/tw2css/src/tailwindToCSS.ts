@@ -111,6 +111,12 @@ const createStyleObject = (styles: StylesWithModifiers, className: string) => {
           ...styles,
           backgroundColor: convertTailwindScaletoPixels(`${subProperty}-${rest}`),
         }
+      } else if (property === 'outline' && subProperty && rest) {
+        // Handle outline-color-shade (e.g., outline-indigo-600)
+        return {
+          ...styles,
+          outlineColor: convertTailwindScaletoPixels(`${subProperty}-${rest}`),
+        }
       } else {
         const classes = {
           ...(mappings[mappingKey] as string[])?.reduce(
