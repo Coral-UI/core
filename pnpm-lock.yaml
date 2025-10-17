@@ -186,9 +186,15 @@ importers:
       '@fontsource/geist-sans':
         specifier: ^5.2.5
         version: 5.2.5
+      '@pelagornis/page':
+        specifier: ^1.0.7
+        version: 1.0.7(@astrojs/starlight@0.36.1(astro@5.14.5(@types/node@24.0.4)(jiti@2.6.0)(lightningcss@1.30.1)(rollup@4.52.3)(terser@5.44.0)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0)))
       astro:
-        specifier: ^5.14.0
+        specifier: ^5.14.5
         version: 5.14.5(@types/node@24.0.4)(jiti@2.6.0)(lightningcss@1.30.1)(rollup@4.52.3)(terser@5.44.0)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0)
+      starlight-links-validator:
+        specifier: ^0.18.1
+        version: 0.18.1(@astrojs/starlight@0.36.1(astro@5.14.5(@types/node@24.0.4)(jiti@2.6.0)(lightningcss@1.30.1)(rollup@4.52.3)(terser@5.44.0)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0)))
       starlight-theme-black:
         specifier: ^0.6.0
         version: 0.6.0(@astrojs/starlight@0.36.1(astro@5.14.5(@types/node@24.0.4)(jiti@2.6.0)(lightningcss@1.30.1)(rollup@4.52.3)(terser@5.44.0)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0)))
@@ -1893,6 +1899,12 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@pelagornis/page@1.0.7':
+    resolution: {integrity: sha512-Um76lyBzCgKVLeMU5DVIgtPbpCUtsIdMZee+q0x4peG7PkjHAmgkvgOVxWT407mRpMzC/DS3PsWAjwGrPXDy7w==}
+    engines: {node: ^18.17.1 || ^20.3.0 || >=21.0.0}
+    peerDependencies:
+      '@astrojs/starlight': '>=0.35.2'
+
   '@phosphor-icons/react@2.1.10':
     resolution: {integrity: sha512-vt8Tvq8GLjheAZZYa+YG/pW7HDbov8El/MANW8pOAz4eGxrwhnbfrQZq0Cp4q8zBEu8NIhHdnr+r8thnfRSNYA==}
     engines: {node: '>=10'}
@@ -2984,6 +2996,9 @@ packages:
 
   '@types/node@24.0.4':
     resolution: {integrity: sha512-ulyqAkrhnuNq9pB76DRBTkcS6YsmDALy6Ua63V8OhrOBgbcYt6IOdzpw5P1+dyRIyMerzLkeYWBeOXPpA9GMAA==}
+
+  '@types/picomatch@3.0.2':
+    resolution: {integrity: sha512-n0i8TD3UDB7paoMMxA3Y65vUncFJXjcUf7lQY7YyKGl6031FNjfsLs6pdLFCy2GNFxItPJG8GvvpbZc2skH7WA==}
 
   '@types/prop-types@15.7.15':
     resolution: {integrity: sha512-F6bEyamV9jKGAFBEmlQnesRPGOQqS2+Uwi0Em15xenOxHaf2hv6L8YCVn3rPdPJOiJfPiCnLIRyvwVaqMY3MIw==}
@@ -4682,6 +4697,10 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
+  has-flag@5.0.1:
+    resolution: {integrity: sha512-CsNUt5x9LUdx6hnk/E2SZLsDyvfqANZSUq4+D3D8RzDJ2M+HDTIkF60ibS1vHaK55vzgiZw1bEPFG9yH7l33wA==}
+    engines: {node: '>=12'}
+
   has-property-descriptors@1.0.2:
     resolution: {integrity: sha512-55JNKuIW+vq4Ke1BjOTjM2YctQIvCT7GFzHwmfZPGo5wnrgkid0YQtnAleFSqumZm4az3n2BS+erby5ipJdgrg==}
 
@@ -4850,6 +4869,10 @@ packages:
 
   iron-webcrypto@1.2.1:
     resolution: {integrity: sha512-feOM6FaSr6rEABp/eDfVseKyTMDt+KGpeB35SkVn9Tyn0CqvVsY3EwI0v5i8nMHyJnzCIQf7nsy3p41TPkJZhg==}
+
+  is-absolute-url@4.0.1:
+    resolution: {integrity: sha512-/51/TKE88Lmm7Gc4/8btclNXWS+g50wXhYJq8HWIBAGUBnoAdRu1aXeh364t/O7wXDAcTJDP8PNuNKWUDWie+A==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   is-alphabetical@2.0.1:
     resolution: {integrity: sha512-FWyyY60MeTNyeSRpkM2Iry0G9hpr7/9kD40mD/cGQEuilcZYS4okz8SN2Q6rLCJ8gbCt6fN+rC+6tMGS99LaxQ==}
@@ -6371,6 +6394,12 @@ packages:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
     engines: {node: '>=10'}
 
+  starlight-links-validator@0.18.1:
+    resolution: {integrity: sha512-64BlSEL6SYItOdEZadCicORYAbLyDtLSAH2Ry8FWh/cLAvOSPTCFZiOzmk0h4A0vPU7mZ2H/FZEcIGmyB7Hb9g==}
+    engines: {node: '>=18.17.1'}
+    peerDependencies:
+      '@astrojs/starlight': '>=0.32.0'
+
   starlight-theme-black@0.6.0:
     resolution: {integrity: sha512-SoYAlyFEyRizcxQXd1ibfAGytmI5gVbSBReK25YFeASI51YwdB9bQtmp14/d70KgfD6kD7SRidhOrPBMD4S3AA==}
     peerDependencies:
@@ -6464,6 +6493,10 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     hasBin: true
 
+  supports-color@10.2.2:
+    resolution: {integrity: sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g==}
+    engines: {node: '>=18'}
+
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
@@ -6471,6 +6504,10 @@ packages:
   supports-color@8.1.1:
     resolution: {integrity: sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q==}
     engines: {node: '>=10'}
+
+  supports-hyperlinks@4.3.0:
+    resolution: {integrity: sha512-i6sWEzuwadSlcr2mOnb0ktlIl+K5FVxsPXmoPfknDd2gyw4ZBIAZ5coc0NQzYqDdEYXMHy8NaY9rWwa1Q1myiQ==}
+    engines: {node: '>=20'}
 
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
@@ -6497,6 +6534,10 @@ packages:
   tar@7.5.1:
     resolution: {integrity: sha512-nlGpxf+hv0v7GkWBK2V9spgactGOp0qvfWRxUMjqHyzrt3SgwE48DIv/FhqPHJYLHpgW1opq3nERbz5Anq7n1g==}
     engines: {node: '>=18'}
+
+  terminal-link@5.0.0:
+    resolution: {integrity: sha512-qFAy10MTMwjzjU8U16YS4YoZD+NQLHzLssFMNqgravjbvIPNiqkGFR4yjhJfmY9R5OFU7+yHxc6y+uGHkKwLRA==}
+    engines: {node: '>=20'}
 
   terser@5.44.0:
     resolution: {integrity: sha512-nIVck8DK+GM/0Frwd+nIhZ84pR/BX7rmXMfYwyg+Sri5oGVE99/E3KvXqpC2xHFxyqXyGHTKBSioxxplrO4I4w==}
@@ -8572,6 +8613,10 @@ snapshots:
   '@pagefind/windows-x64@1.3.0':
     optional: true
 
+  '@pelagornis/page@1.0.7(@astrojs/starlight@0.36.1(astro@5.14.5(@types/node@24.0.4)(jiti@2.6.0)(lightningcss@1.30.1)(rollup@4.52.3)(terser@5.44.0)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0)))':
+    dependencies:
+      '@astrojs/starlight': 0.36.1(astro@5.14.5(@types/node@24.0.4)(jiti@2.6.0)(lightningcss@1.30.1)(rollup@4.52.3)(terser@5.44.0)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0))
+
   '@phosphor-icons/react@2.1.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       react: 18.3.1
@@ -9843,6 +9888,8 @@ snapshots:
     dependencies:
       undici-types: 7.8.0
     optional: true
+
+  '@types/picomatch@3.0.2': {}
 
   '@types/prop-types@15.7.15': {}
 
@@ -12024,6 +12071,10 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.2
 
+  fdir@6.4.6(picomatch@4.0.3):
+    optionalDependencies:
+      picomatch: 4.0.3
+
   fdir@6.5.0(picomatch@4.0.3):
     optionalDependencies:
       picomatch: 4.0.3
@@ -12200,6 +12251,8 @@ snapshots:
       uncrypto: 0.1.3
 
   has-flag@4.0.0: {}
+
+  has-flag@5.0.1: {}
 
   has-property-descriptors@1.0.2:
     dependencies:
@@ -12483,6 +12536,8 @@ snapshots:
   inline-style-parser@0.2.4: {}
 
   iron-webcrypto@1.2.1: {}
+
+  is-absolute-url@4.0.1: {}
 
   is-alphabetical@2.0.1: {}
 
@@ -14611,6 +14666,23 @@ snapshots:
     dependencies:
       escape-string-regexp: 2.0.0
 
+  starlight-links-validator@0.18.1(@astrojs/starlight@0.36.1(astro@5.14.5(@types/node@24.0.4)(jiti@2.6.0)(lightningcss@1.30.1)(rollup@4.52.3)(terser@5.44.0)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0))):
+    dependencies:
+      '@astrojs/starlight': 0.36.1(astro@5.14.5(@types/node@24.0.4)(jiti@2.6.0)(lightningcss@1.30.1)(rollup@4.52.3)(terser@5.44.0)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0))
+      '@types/picomatch': 3.0.2
+      github-slugger: 2.0.0
+      hast-util-from-html: 2.0.3
+      hast-util-has-property: 3.0.0
+      is-absolute-url: 4.0.1
+      kleur: 4.1.5
+      mdast-util-mdx-jsx: 3.2.0
+      mdast-util-to-string: 4.0.0
+      picomatch: 4.0.3
+      terminal-link: 5.0.0
+      unist-util-visit: 5.0.0
+    transitivePeerDependencies:
+      - supports-color
+
   starlight-theme-black@0.6.0(@astrojs/starlight@0.36.1(astro@5.14.5(@types/node@24.0.4)(jiti@2.6.0)(lightningcss@1.30.1)(rollup@4.52.3)(terser@5.44.0)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0))):
     dependencies:
       '@astrojs/starlight': 0.36.1(astro@5.14.5(@types/node@24.0.4)(jiti@2.6.0)(lightningcss@1.30.1)(rollup@4.52.3)(terser@5.44.0)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0))
@@ -14714,6 +14786,8 @@ snapshots:
       pirates: 4.0.7
       ts-interface-checker: 0.1.13
 
+  supports-color@10.2.2: {}
+
   supports-color@7.2.0:
     dependencies:
       has-flag: 4.0.0
@@ -14721,6 +14795,11 @@ snapshots:
   supports-color@8.1.1:
     dependencies:
       has-flag: 4.0.0
+
+  supports-hyperlinks@4.3.0:
+    dependencies:
+      has-flag: 5.0.1
+      supports-color: 10.2.2
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
@@ -14745,6 +14824,11 @@ snapshots:
       minipass: 7.1.2
       minizlib: 3.1.0
       yallist: 5.0.0
+
+  terminal-link@5.0.0:
+    dependencies:
+      ansi-escapes: 7.0.0
+      supports-hyperlinks: 4.3.0
 
   terser@5.44.0:
     dependencies:
@@ -14783,8 +14867,8 @@ snapshots:
 
   tinyglobby@0.2.14:
     dependencies:
-      fdir: 6.4.6(picomatch@4.0.2)
-      picomatch: 4.0.2
+      fdir: 6.4.6(picomatch@4.0.3)
+      picomatch: 4.0.3
 
   tinyglobby@0.2.15:
     dependencies:

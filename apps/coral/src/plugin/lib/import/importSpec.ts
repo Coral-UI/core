@@ -75,11 +75,16 @@ const precomputeMergedStylesForAllNodes = (
 ): Map<CoralNode | CoralRootNode, Map<string, CoralStyleType>> => {
   const styleMap = new Map<CoralNode | CoralRootNode, Map<string, CoralStyleType>>()
 
-  const processNode = (currentNode: CoralNode | CoralRootNode) => {
+  const processNode = (currentNode: CoralNode | CoralRootNode, parentColor?: any) => {
     const nodeBreakpointStyles = new Map<string, CoralStyleType>()
 
     // For each breakpoint, compute the fully cascaded styles for this node
     let accumulatedStyles: CoralStyleType = { ...currentNode.styles }
+
+    // Inherit color from parent if not explicitly set
+    if (!accumulatedStyles.color && parentColor) {
+      accumulatedStyles.color = parentColor
+    }
 
     for (const responsiveStyle of sortedResponsiveStyles) {
       const breakpointKey = JSON.stringify(responsiveStyle.breakpoint)
@@ -103,10 +108,13 @@ const precomputeMergedStylesForAllNodes = (
 
     styleMap.set(currentNode, nodeBreakpointStyles)
 
-    // Recursively process children
+    // Determine the color to pass to children (either this node's color or inherited color)
+    const colorToInherit = accumulatedStyles.color || parentColor
+
+    // Recursively process children with inherited color
     if (currentNode.children) {
       for (const child of currentNode.children) {
-        processNode(child)
+        processNode(child, colorToInherit)
       }
     }
   }
@@ -134,6 +142,37 @@ const applyPrecomputedStyles = (
   if (newNode.children) {
     newNode.children = newNode.children.map(child =>
       applyPrecomputedStyles(child, breakpoint, styleMap)
+    )
+  }
+
+  return newNode
+}
+
+// Apply color inheritance to base spec (without responsive styles)
+const applyColorInheritance = (
+  node: CoralNode | CoralRootNode,
+  parentColor?: any
+): CoralNode | CoralRootNode => {
+  const nodeStyles = { ...node.styles }
+
+  // Inherit color from parent if not explicitly set
+  if (!nodeStyles.color && parentColor) {
+    nodeStyles.color = parentColor
+  }
+
+  // Create new node with inherited color
+  const newNode: CoralNode | CoralRootNode = {
+    ...node,
+    styles: nodeStyles,
+  }
+
+  // Determine the color to pass to children
+  const colorToInherit = nodeStyles.color || parentColor
+
+  // Recursively apply to children
+  if (newNode.children) {
+    newNode.children = newNode.children.map(child =>
+      applyColorInheritance(child, colorToInherit)
     )
   }
 
@@ -231,8 +270,11 @@ async function createElementAsComponent(
   spec: CoralNode | CoralRootNode,
   textAlign?: textAlign
 ): Promise<ComponentNode> {
+  // Apply color inheritance before creating element
+  const specWithInheritedColor = applyColorInheritance(spec)
+
   // Create the element structure first
-  const element = await createElement(spec, textAlign)
+  const element = await createElement(specWithInheritedColor, textAlign)
 
   // Convert to component if it isn't already
   if (element && element.type === 'COMPONENT') {
@@ -464,6 +506,9 @@ async function createFrame(spec: CoralNode) {
   const frame = figma.createFrame()
   frame.name = spec.name
 
+  // Remove default white background - only apply fills if explicitly specified in styles
+  frame.fills = []
+
   // Enable auto-layout by default with HUG sizing
   // Use horizontal layout for inline elements (a, span, etc.), vertical for block elements
   const isInline = isInlineElement(spec)
@@ -483,6 +528,9 @@ async function createFrame(spec: CoralNode) {
 async function createComponent(spec: CoralNode) {
   const component = figma.createComponent()
   component.name = spec.name
+
+  // Remove default white background - only apply fills if explicitly specified in styles
+  component.fills = []
 
   // Enable auto-layout by default with HUG sizing
   component.layoutMode = 'VERTICAL'
@@ -514,8 +562,8 @@ async function createComponentWithVariants(
   // Pre-compute all merged styles for every node at every breakpoint
   const styleMap = precomputeMergedStylesForAllNodes(spec, sortedResponsiveStyles)
 
-  // Create base variant (without any responsive overrides)
-  const baseSpec = { ...spec }
+  // Create base variant (without any responsive overrides, but with color inheritance)
+  const baseSpec = applyColorInheritance(spec)
   const baseNode = await createElement(baseSpec, textAlign) as ComponentNode
 
   // Convert to component if it isn't already

@@ -11,23 +11,23 @@ export const useSpecValue = create<SpecValue>((set) => ({
   "elementType": "div",
   "styles": {
     "backgroundColor": {
-      "hex": "#ffffff",
+      "hex": "#4338ca",
       "rgb": {
-        "r": 255,
-        "g": 255,
-        "b": 255,
+        "r": 67,
+        "g": 56,
+        "b": 202,
         "a": 1
       },
       "hsl": {
-        "h": 0,
-        "s": 0,
-        "l": 100,
+        "h": 245,
+        "s": 58,
+        "l": 51,
         "a": 1
       }
     }
   },
   "elementAttributes": {
-    "class": "bg-white"
+    "class": "bg-indigo-700"
   },
   "children": [
     {
@@ -88,17 +88,17 @@ export const useSpecValue = create<SpecValue>((set) => ({
                 "fontWeight": 600,
                 "letterSpacing": -2.5,
                 "color": {
-                  "hex": "#18181b",
+                  "hex": "#ffffff",
                   "rgb": {
-                    "r": 24,
-                    "g": 24,
-                    "b": 27,
+                    "r": 255,
+                    "g": 255,
+                    "b": 255,
                     "a": 1
                   },
                   "hsl": {
-                    "h": 240,
-                    "s": 6,
-                    "l": 10,
+                    "h": 0,
+                    "s": 0,
+                    "l": 100,
                     "a": 1
                   }
                 }
@@ -116,7 +116,7 @@ export const useSpecValue = create<SpecValue>((set) => ({
                 }
               ],
               "elementAttributes": {
-                "class": "text-balance text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
+                "class": "text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl"
               },
               "children": [],
               "textContent": "Boost your productivity. Start using our app today."
@@ -133,23 +133,23 @@ export const useSpecValue = create<SpecValue>((set) => ({
                 "fontSize": 18,
                 "lineHeight": 32,
                 "color": {
-                  "hex": "#52525b",
+                  "hex": "#c7d2fe",
                   "rgb": {
-                    "r": 82,
-                    "g": 82,
-                    "b": 91,
+                    "r": 199,
+                    "g": 210,
+                    "b": 254,
                     "a": 1
                   },
                   "hsl": {
-                    "h": 240,
-                    "s": 5,
-                    "l": 34,
+                    "h": 228,
+                    "s": 96,
+                    "l": 89,
                     "a": 1
                   }
                 }
               },
               "elementAttributes": {
-                "class": "mx-auto mt-6 max-w-xl text-pretty text-lg/8 text-gray-600"
+                "class": "mx-auto mt-6 max-w-xl text-pretty text-lg/8 text-indigo-200"
               },
               "children": [],
               "textContent": "Incididunt sint fugiat pariatur cupidatat consectetur sit cillum anim id veniam aliqua proident excepteur commodo do ea."
@@ -174,6 +174,28 @@ export const useSpecValue = create<SpecValue>((set) => ({
                   "styles": {
                     "borderRadius": 6,
                     "backgroundColor": {
+                      "hex": "#ffffff",
+                      "rgb": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 1
+                      },
+                      "hsl": {
+                        "h": 0,
+                        "s": 0,
+                        "l": 100,
+                        "a": 1
+                      }
+                    },
+                    "paddingInlineStart": 14,
+                    "paddingInlineEnd": 14,
+                    "paddingBlockStart": 10,
+                    "paddingBlockEnd": 10,
+                    "fontSize": 14,
+                    "lineHeight": 20,
+                    "fontWeight": 600,
+                    "color": {
                       "hex": "#4f46e5",
                       "rgb": {
                         "r": 79,
@@ -188,12 +210,56 @@ export const useSpecValue = create<SpecValue>((set) => ({
                         "a": 1
                       }
                     },
-                    "paddingInlineStart": 14,
-                    "paddingInlineEnd": 14,
-                    "paddingBlockStart": 10,
-                    "paddingBlockEnd": 10,
+                    ":hover": {
+                      "backgroundColor": {
+                        "hex": "#eef2ff",
+                        "rgb": {
+                          "r": 238,
+                          "g": 242,
+                          "b": 255,
+                          "a": 1
+                        },
+                        "hsl": {
+                          "h": 226,
+                          "s": 100,
+                          "l": 97,
+                          "a": 1
+                        }
+                      }
+                    },
+                    ":focus-visible": {
+                      "outlineWidth": 2,
+                      "outlineOffset": 2,
+                      "outlineColor": {
+                        "hex": "#ffffff",
+                        "rgb": {
+                          "r": 255,
+                          "g": 255,
+                          "b": 255,
+                          "a": 1
+                        },
+                        "hsl": {
+                          "h": 0,
+                          "s": 0,
+                          "l": 100,
+                          "a": 1
+                        }
+                      }
+                    }
+                  },
+                  "elementAttributes": {
+                    "href": "#",
+                    "class": "rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  },
+                  "children": [],
+                  "textContent": "Get started"
+                },
+                {
+                  "name": "A",
+                  "elementType": "a",
+                  "styles": {
                     "fontSize": 14,
-                    "lineHeight": 20,
+                    "lineHeight": 24,
                     "fontWeight": 600,
                     "color": {
                       "hex": "#ffffff",
@@ -209,77 +275,11 @@ export const useSpecValue = create<SpecValue>((set) => ({
                         "l": 100,
                         "a": 1
                       }
-                    },
-                    ":hover": {
-                      "backgroundColor": {
-                        "hex": "#6366f1",
-                        "rgb": {
-                          "r": 99,
-                          "g": 102,
-                          "b": 241,
-                          "a": 1
-                        },
-                        "hsl": {
-                          "h": 239,
-                          "s": 84,
-                          "l": 67,
-                          "a": 1
-                        }
-                      }
-                    },
-                    ":focus-visible": {
-                      "outlineWidth": 2,
-                      "outlineOffset": 2,
-                      "outlineColor": {
-                        "hex": "#4f46e5",
-                        "rgb": {
-                          "r": 79,
-                          "g": 70,
-                          "b": 229,
-                          "a": 1
-                        },
-                        "hsl": {
-                          "h": 243,
-                          "s": 75,
-                          "l": 59,
-                          "a": 1
-                        }
-                      }
                     }
                   },
                   "elementAttributes": {
                     "href": "#",
-                    "class": "rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  },
-                  "children": [],
-                  "textContent": "Get started"
-                },
-                {
-                  "name": "A",
-                  "elementType": "a",
-                  "styles": {
-                    "fontSize": 14,
-                    "lineHeight": 24,
-                    "fontWeight": 600,
-                    "color": {
-                      "hex": "#18181b",
-                      "rgb": {
-                        "r": 24,
-                        "g": 24,
-                        "b": 27,
-                        "a": 1
-                      },
-                      "hsl": {
-                        "h": 240,
-                        "s": 6,
-                        "l": 10,
-                        "a": 1
-                      }
-                    }
-                  },
-                  "elementAttributes": {
-                    "href": "#",
-                    "class": "text-sm/6 font-semibold text-gray-900"
+                    "class": "text-sm/6 font-semibold text-white"
                   },
                   "children": [
                     {

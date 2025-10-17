@@ -82,6 +82,37 @@ const applyFlexAlignment = (element: ElementWithOptionalText, node: CoralNode | 
       element.primaryAxisAlignItems = 'SPACE_BETWEEN'
     }
   }
+
+  // Convert textAlign to alignment for container elements
+  // In CSS, text-align centers both inline content AND block children (like buttons)
+  // In Figma auto-layout with vertical layout (column), we need counterAxisAlignItems
+  // to center children horizontally
+  if (node.styles?.['textAlign']) {
+    const textAlign = node.styles['textAlign'] as string
+    const isVertical = element.layoutMode === 'VERTICAL'
+
+    if (textAlign === 'center') {
+      // For vertical layouts, counterAxis is horizontal (what we want for centering)
+      // For horizontal layouts, primaryAxis is horizontal
+      if (isVertical) {
+        element.counterAxisAlignItems = 'CENTER'
+      } else {
+        element.primaryAxisAlignItems = 'CENTER'
+      }
+    } else if (textAlign === 'left' || textAlign === 'start') {
+      if (isVertical) {
+        element.counterAxisAlignItems = 'MIN'
+      } else {
+        element.primaryAxisAlignItems = 'MIN'
+      }
+    } else if (textAlign === 'right' || textAlign === 'end') {
+      if (isVertical) {
+        element.counterAxisAlignItems = 'MAX'
+      } else {
+        element.primaryAxisAlignItems = 'MAX'
+      }
+    }
+  }
 }
 
 const applyGap = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
@@ -187,6 +218,9 @@ export const createFrameWithFillingText = async (node: CoralNode, inheritedTextA
 
   // Step 1: Create the frame
   const frame = figma.createFrame()
+
+  // Remove default white background - only apply fills if explicitly specified in styles
+  frame.fills = []
 
   const fontFamily = (styles?.['fontFamily'] as string) ?? 'Inter'
   const fontWeight = (styles?.['fontWeight'] as number) ?? 400

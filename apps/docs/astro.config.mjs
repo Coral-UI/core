@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightThemeBlack from 'starlight-theme-black'
+import starlightLinksValidator from 'starlight-links-validator'
 
 // https://astro.build/config
 export default defineConfig({
@@ -11,7 +12,9 @@ export default defineConfig({
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/Coral-UI/core' },
       ],
-      plugins: [starlightThemeBlack({
+      plugins: [
+        starlightLinksValidator(),
+        starlightThemeBlack({
         navLinks: [
           {
             label: 'Home',

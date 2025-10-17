@@ -194,40 +194,38 @@ const ElementPreviewRenderer = ({
     }
 
     return (
-      <div
-        key={elem.id || `${elem.name}-${depth}`}
-        className={className}
-        style={combinedStyles}
-        data-element-id={elem.id}
-        onClick={handleClick}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Badge variant="default" className="text-xs font-mono">
-              {elem.elementType}
+      <div className="relative" key={elem.id || `${elem.name}-${depth}`}>
+        {/* Informational badges - positioned absolutely so they don't affect layout */}
+        <div className="absolute -top-2 left-2 flex items-center gap-1 z-10 pointer-events-none">
+          <Badge variant="default" className="text-xs font-mono shadow-sm">
+            {elem.elementType}
+          </Badge>
+          {elem.responsiveStyles && elem.responsiveStyles.length > 0 && (
+            <Badge variant="outline" className="text-xs shadow-sm bg-background">
+              {elem.responsiveStyles.length} breakpoint{elem.responsiveStyles.length !== 1 ? 's' : ''}
             </Badge>
-            {elem.responsiveStyles && elem.responsiveStyles.length > 0 && (
-              <Badge variant="outline" className="text-xs">
-                {elem.responsiveStyles.length} breakpoint{elem.responsiveStyles.length !== 1 ? 's' : ''}
-              </Badge>
-            )}
-          </div>
-          {/* {elem.elementAttributes && Object.keys(elem.elementAttributes).length > 0 && (
-            <span className="text-xs text-gray-400">{Object.keys(elem.elementAttributes).length} attrs</span>
-          )} */}
+          )}
         </div>
 
-        {hasText && (
-          <div
-            className={`mb-2 ${
-              elem.elementType === 'text' ? 'text-base text-gray-900 font-normal' : 'text-sm text-gray-700 italic'
-            }`}
-          >
-            {elem.elementType === 'text' ? elem.textContent : `"${elem.textContent}"`}
-          </div>
-        )}
+        {/* Actual element preview */}
+        <div
+          className={className}
+          style={combinedStyles}
+          data-element-id={elem.id}
+          onClick={handleClick}
+        >
+          {hasText && (
+            <div
+              className={`mb-2 ${
+                elem.elementType === 'text' ? 'text-base text-gray-900 font-normal' : 'text-sm text-gray-700 italic'
+              }`}
+            >
+              {elem.elementType === 'text' ? elem.textContent : `"${elem.textContent}"`}
+            </div>
+          )}
 
-        {hasChildren && <div>{elem.children.map((child: any) => renderElement(child, depth + 1))}</div>}
+          {hasChildren && <div>{elem.children.map((child: any) => renderElement(child, depth + 1))}</div>}
+        </div>
       </div>
     )
   }
