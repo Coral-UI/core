@@ -1,4 +1,4 @@
-import { CoralNode, CoralRootNode, CoralStyleType } from '@reallygoodwork/coral-core'
+import { CoralNode, CoralRootNode, CoralStyleType, ResponsiveStyle } from '@reallygoodwork/coral-core'
 
 import { createSVGFrame, isSVGElement, isSVGShapeElement } from './createVector'
 import { applyStyles, createFrameWithFillingText } from './styles'
@@ -7,6 +7,182 @@ import { textAlign } from './styleText'
 export const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 export const isTextNode = (node: CoralNode | CoralRootNode): node is CoralNode | CoralRootNode => {
   return node.textContent !== undefined
+}
+
+// Recursively check if a node or any of its descendants has responsiveStyles
+export const hasResponsiveStyles = (node: CoralNode | CoralRootNode): boolean => {
+  if (node.responsiveStyles && node.responsiveStyles.length > 0) {
+    return true
+  }
+
+  if (node.children) {
+    return node.children.some(child => hasResponsiveStyles(child))
+  }
+
+  return false
+}
+
+// Collect all unique responsive styles from the entire spec tree
+export const collectResponsiveStyles = (node: CoralNode | CoralRootNode): ResponsiveStyle[] => {
+  const styles: ResponsiveStyle[] = []
+
+  // Collect from current node
+  if (node.responsiveStyles && node.responsiveStyles.length > 0) {
+    styles.push(...node.responsiveStyles)
+  }
+
+  // Recursively collect from children
+  if (node.children) {
+    for (const child of node.children) {
+      styles.push(...collectResponsiveStyles(child))
+    }
+  }
+
+  return styles
+}
+
+// Generate a variant name from a responsive style
+export const generateVariantName = (responsiveStyle: ResponsiveStyle): string => {
+  // Use label if provided
+  if (responsiveStyle.label) {
+    return responsiveStyle.label
+  }
+
+  // Otherwise generate from breakpoint
+  const bp = responsiveStyle.breakpoint
+
+  // Check if it's a range breakpoint
+  if ('min' in bp || 'max' in bp) {
+    const parts: string[] = []
+    if (bp.min) {
+      parts.push(`${bp.min.type}:${bp.min.value}`)
+    }
+    if (bp.max) {
+      parts.push(`${bp.max.type}:${bp.max.value}`)
+    }
+    return parts.join(' AND ')
+  }
+
+  // Simple breakpoint
+  return `${bp.type}:${bp.value}`
+}
+
+// Pre-compute all merged styles for each node at each breakpoint
+// This creates a lookup: node -> breakpoint -> fully merged styles
+const precomputeMergedStylesForAllNodes = (
+  node: CoralNode | CoralRootNode,
+  sortedResponsiveStyles: ResponsiveStyle[]
+): Map<CoralNode | CoralRootNode, Map<string, CoralStyleType>> => {
+  const styleMap = new Map<CoralNode | CoralRootNode, Map<string, CoralStyleType>>()
+
+  const processNode = (currentNode: CoralNode | CoralRootNode) => {
+    const nodeBreakpointStyles = new Map<string, CoralStyleType>()
+
+    // For each breakpoint, compute the fully cascaded styles for this node
+    let accumulatedStyles: CoralStyleType = { ...currentNode.styles }
+
+    for (const responsiveStyle of sortedResponsiveStyles) {
+      const breakpointKey = JSON.stringify(responsiveStyle.breakpoint)
+
+      // Check if this node has styles for this breakpoint
+      const nodeResponsiveStyle = currentNode.responsiveStyles?.find(rs =>
+        JSON.stringify(rs.breakpoint) === breakpointKey
+      )
+
+      // If node has styles for this breakpoint, apply them (cascading from previous breakpoints)
+      if (nodeResponsiveStyle) {
+        accumulatedStyles = {
+          ...accumulatedStyles,
+          ...nodeResponsiveStyle.styles,
+        }
+      }
+
+      // Store the accumulated styles for this breakpoint
+      nodeBreakpointStyles.set(breakpointKey, { ...accumulatedStyles })
+    }
+
+    styleMap.set(currentNode, nodeBreakpointStyles)
+
+    // Recursively process children
+    if (currentNode.children) {
+      for (const child of currentNode.children) {
+        processNode(child)
+      }
+    }
+  }
+
+  processNode(node)
+  return styleMap
+}
+
+// Apply precomputed styles to a node tree for a specific breakpoint
+const applyPrecomputedStyles = (
+  node: CoralNode | CoralRootNode,
+  breakpoint: ResponsiveStyle['breakpoint'],
+  styleMap: Map<CoralNode | CoralRootNode, Map<string, CoralStyleType>>
+): CoralNode | CoralRootNode => {
+  const breakpointKey = JSON.stringify(breakpoint)
+  const nodeStyles = styleMap.get(node)?.get(breakpointKey)
+
+  // Create new node with precomputed styles
+  const newNode: CoralNode | CoralRootNode = {
+    ...node,
+    styles: nodeStyles || node.styles,
+  }
+
+  // Recursively apply to children
+  if (newNode.children) {
+    newNode.children = newNode.children.map(child =>
+      applyPrecomputedStyles(child, breakpoint, styleMap)
+    )
+  }
+
+  return newNode
+}
+
+// Parse breakpoint value to number for sorting (convert px, rem, em to comparable values)
+const parseBreakpointValue = (value: string): number => {
+  const numValue = parseFloat(value)
+  if (value.endsWith('rem') || value.endsWith('em')) {
+    return numValue * 16 // Convert rem/em to px (assuming 16px base)
+  }
+  return numValue // Assume px
+}
+
+// Sort responsive styles by breakpoint order (mobile-first: smallest to largest)
+export const sortResponsiveStylesByBreakpoint = (styles: ResponsiveStyle[]): ResponsiveStyle[] => {
+  return [...styles].sort((a, b) => {
+    // Handle simple breakpoints
+    const aBreakpoint = a.breakpoint
+    const bBreakpoint = b.breakpoint
+
+    // Get the minimum value for each breakpoint
+    let aValue: number
+    let bValue: number
+
+    if ('min' in aBreakpoint && aBreakpoint.min) {
+      aValue = parseBreakpointValue(aBreakpoint.min.value)
+    } else if ('max' in aBreakpoint && aBreakpoint.max) {
+      aValue = parseBreakpointValue(aBreakpoint.max.value)
+    } else if ('type' in aBreakpoint) {
+      aValue = parseBreakpointValue(aBreakpoint.value)
+    } else {
+      aValue = 0
+    }
+
+    if ('min' in bBreakpoint && bBreakpoint.min) {
+      bValue = parseBreakpointValue(bBreakpoint.min.value)
+    } else if ('max' in bBreakpoint && bBreakpoint.max) {
+      bValue = parseBreakpointValue(bBreakpoint.max.value)
+    } else if ('type' in bBreakpoint) {
+      bValue = parseBreakpointValue(bBreakpoint.value)
+    } else {
+      bValue = 0
+    }
+
+    // Sort by value (smaller first for mobile-first approach)
+    return aValue - bValue
+  })
 }
 
 // Determine if an element should use horizontal layout (inline elements)
@@ -40,7 +216,37 @@ export const createElements = (spec: CoralRootNode | CoralNode, textAlign?: text
   const parentTextAlign = spec.styles?.['textAlign'] as textAlign | undefined
   const effectiveTextAlign = parentTextAlign || textAlign
 
-  return createElement(spec, effectiveTextAlign) as Promise<SceneNode>
+  // Check if this spec or any of its descendants has responsive styles
+  if (hasResponsiveStyles(spec)) {
+    // Create a component set with variants
+    return createComponentWithVariants(spec, effectiveTextAlign) as Promise<SceneNode>
+  }
+
+  // Otherwise, create a regular component (all imports become components by default)
+  return createElementAsComponent(spec, effectiveTextAlign) as Promise<SceneNode>
+}
+
+// Modified to always return components for top-level elements
+async function createElementAsComponent(
+  spec: CoralNode | CoralRootNode,
+  textAlign?: textAlign
+): Promise<ComponentNode> {
+  // Create the element structure first
+  const element = await createElement(spec, textAlign)
+
+  // Convert to component if it isn't already
+  if (element && element.type === 'COMPONENT') {
+    return element as ComponentNode
+  }
+
+  if (element) {
+    return figma.createComponentFromNode(element)
+  }
+
+  // Fallback: create an empty component
+  const component = figma.createComponent()
+  component.name = spec.name
+  return component
 }
 
 async function createElement(
@@ -285,4 +491,77 @@ async function createComponent(spec: CoralNode) {
 
   await applyStyles(component, spec)
   return component
+}
+
+// Create a component set with variants for responsive styles
+async function createComponentWithVariants(
+  spec: CoralNode | CoralRootNode,
+  textAlign?: textAlign
+): Promise<ComponentSetNode> {
+  // Collect all responsive styles from the spec tree
+  const allResponsiveStyles = collectResponsiveStyles(spec)
+
+  // Deduplicate by breakpoint (keep first occurrence of each unique breakpoint)
+  const uniqueResponsiveStyles = allResponsiveStyles.filter((style, index, self) =>
+    index === self.findIndex(s =>
+      JSON.stringify(s.breakpoint) === JSON.stringify(style.breakpoint)
+    )
+  )
+
+  // Sort responsive styles by breakpoint order (mobile-first: smallest to largest)
+  const sortedResponsiveStyles = sortResponsiveStylesByBreakpoint(uniqueResponsiveStyles)
+
+  // Pre-compute all merged styles for every node at every breakpoint
+  const styleMap = precomputeMergedStylesForAllNodes(spec, sortedResponsiveStyles)
+
+  // Create base variant (without any responsive overrides)
+  const baseSpec = { ...spec }
+  const baseNode = await createElement(baseSpec, textAlign) as ComponentNode
+
+  // Convert to component if it isn't already
+  const baseComponent = baseNode.type === 'COMPONENT'
+    ? baseNode
+    : figma.createComponentFromNode(baseNode)
+
+  baseComponent.name = `${spec.name}=Base`
+
+  // Position base component at origin
+  baseComponent.x = 0
+  baseComponent.y = 0
+
+  // Create variants for each responsive style with cascading inheritance
+  const variantComponents: ComponentNode[] = [baseComponent]
+  let currentX = baseComponent.width + 24 // Start 24px to the right of base component
+
+  for (const responsiveStyle of sortedResponsiveStyles) {
+    // Apply precomputed styles for this breakpoint
+    const mergedSpec = applyPrecomputedStyles(spec, responsiveStyle.breakpoint, styleMap)
+
+    // Create the variant node
+    const variantNode = await createElement(mergedSpec, textAlign) as ComponentNode
+
+    // Convert to component if it isn't already
+    const variantComponent = variantNode.type === 'COMPONENT'
+      ? variantNode
+      : figma.createComponentFromNode(variantNode)
+
+    // Name the variant
+    const variantName = generateVariantName(responsiveStyle)
+    variantComponent.name = `${spec.name}=${variantName}`
+
+    // Position variant horizontally with 24px spacing
+    variantComponent.x = currentX
+    variantComponent.y = 0
+
+    // Update position for next variant
+    currentX += variantComponent.width + 24
+
+    variantComponents.push(variantComponent)
+  }
+
+  // Create the component set from the variants
+  const componentSet = figma.combineAsVariants(variantComponents, figma.currentPage)
+  componentSet.name = spec.name
+
+  return componentSet
 }
