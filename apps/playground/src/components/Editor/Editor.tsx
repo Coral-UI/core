@@ -172,13 +172,13 @@ export const Editor = () => {
         </div>
       </div>
       <div className="flex flex-row flex-1 overflow-hidden">
-        <div className="w-64 border-r border-border bg-sidebar">
+        <div className="w-64 border-r border-border bg-sidebar shrink-0">
           <EditorSidebar onElementSelect={handleElementSelect} elementTreeHook={elementTreeHook} />
         </div>
-        <div className="flex-1 p-2 bg-background">
+        <div className="flex-1 bg-background max-w-[calc(100%-512px)]">
           <EditorPreviewPane spec={spec} onElementClick={handleElementSelect} selectedElementId={selectedElementId} />
         </div>
-        <div className="w-64 border-l border-border bg-sidebar">
+        <div className="w-64 border-l border-border bg-sidebar shrink-0">
           <ElementProperties element={selectedElement || null} onUpdateElement={updateElement} />
         </div>
       </div>

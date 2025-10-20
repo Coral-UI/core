@@ -4,7 +4,7 @@ import { handleFigmaStyles } from './handleFigmaStyles'
 import { transformComponentProperties } from './transformComponentProperties'
 
 export const generateComponentSet = async (node: ComponentSetNode): Promise<CoralRootNode> => {
-  const { styles, designTokens } = await handleFigmaStyles(node)
+  const { styles } = await handleFigmaStyles(node)
 
   return {
     name: node.name,
@@ -14,9 +14,8 @@ export const generateComponentSet = async (node: ComponentSetNode): Promise<Cora
     figmaNodeRef: node.id,
     componentProperties: transformComponentProperties(node.componentPropertyDefinitions),
     styles,
-    designTokens,
     variants: [],
-    dependencies: [],
+    children: [],
     figmaType: node.type,
     numberOfVariants: node.children.length,
     $schema: 'https://coral.design/schema.json',
