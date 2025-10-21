@@ -5,9 +5,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { IconDevices } from '@tabler/icons-react'
-import { ChevronRight, Plus, Trash2, Smartphone, Tablet, Monitor } from 'lucide-react'
+import { ChevronRight, Monitor, Plus, Smartphone, Tablet, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 export type BreakpointType = 'min-width' | 'max-width' | 'min-height' | 'max-height'
@@ -78,7 +79,7 @@ export const BreakpointManager = ({
   }
 
   return (
-    <div>
+    <div className="border-b border-border pb-6">
       <Collapsible defaultOpen>
         <CollapsibleTrigger className="group flex items-center gap-2 w-full">
           <p className="text-xs font-normal">Responsive Styles</p>
@@ -88,18 +89,16 @@ export const BreakpointManager = ({
         <CollapsibleContent className="mt-4 space-y-3">
           {/* Base styles indicator */}
           <div
-            className={`flex items-center justify-between p-2 rounded-md border cursor-pointer transition-colors ${
-              !activeBreakpointId ? 'bg-muted border-border' : 'bg-muted hover:bg-muted/80 border-border'
+            className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${
+              !activeBreakpointId ? 'bg-secondary border-border' : 'bg-muted hover:bg-muted/80 border-border'
             }`}
             onClick={() => onSelectBreakpoint(null)}
           >
             <div className="flex items-center gap-2">
               <IconDevices stroke={1.5} className="size-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Base Styles</span>
+              <span className="text-xs font-medium">Base Styles</span>
             </div>
-            <Badge variant={!activeBreakpointId ? 'default' : 'outline'} className="text-xs">
-              Default
-            </Badge>
+            <Badge variant={!activeBreakpointId ? 'default' : 'outline'}>Default</Badge>
           </div>
 
           {/* Breakpoint list */}
@@ -111,25 +110,25 @@ export const BreakpointManager = ({
               <div
                 key={breakpoint.id}
                 className={`flex items-center justify-between p-2 rounded-md border cursor-pointer transition-colors ${
-                  isActive ? 'bg-primary/10 border-primary' : 'bg-muted hover:bg-muted/80 border-border'
+                  isActive ? 'bg-accent border-primary' : 'bg-muted hover:bg-muted/80 border-border'
                 }`}
                 onClick={() => onSelectBreakpoint(breakpoint.id)}
               >
                 <div className="flex items-center gap-2">
                   <Icon className="size-4 text-muted-foreground" />
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium">{breakpoint.label || `${breakpoint.type}`}</span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs font-medium">{breakpoint.label || `${breakpoint.type}`}</span>
+                    <span className="text-tiny text-muted-foreground font-mono tabular-nums">
                       {breakpoint.type}: {breakpoint.value}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Badge variant={isActive ? 'default' : 'outline'} className="text-xs">
+                  <Badge variant={isActive ? 'default' : 'outline'}>
                     @media
                   </Badge>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     className="h-6 w-6 p-0 text-destructive hover:text-destructive"
                     onClick={(e) => {
@@ -168,14 +167,16 @@ export const BreakpointManager = ({
                         <Button
                           key={preset.label}
                           variant="outline"
-                          size="sm"
+                          // size="sm"
                           className="justify-start"
                           onClick={() => handleAddPreset(preset)}
                         >
                           <Icon className="h-3 w-3 mr-2" />
-                          <div className="flex flex-col items-start">
+                          <div>
                             <span className="text-xs font-medium">{preset.label}</span>
-                            <span className="text-xs text-muted-foreground">{preset.value}</span>
+                            <span className="text-xs text-muted-foreground font-mono ml-2 tabular-nums">
+                              {preset.value}
+                            </span>
                           </div>
                         </Button>
                       )
@@ -211,7 +212,10 @@ export const BreakpointManager = ({
                     <FieldLabel htmlFor="breakpoint-type" className="text-xs">
                       Type
                     </FieldLabel>
-                    <Select value={newBreakpointType} onValueChange={(value) => setNewBreakpointType(value as BreakpointType)}>
+                    <Select
+                      value={newBreakpointType}
+                      onValueChange={(value) => setNewBreakpointType(value as BreakpointType)}
+                    >
                       <SelectTrigger id="breakpoint-type" className="text-xs h-8">
                         <SelectValue />
                       </SelectTrigger>
@@ -238,7 +242,12 @@ export const BreakpointManager = ({
                   </Field>
                 </FieldGroup>
 
-                <Button onClick={handleAddBreakpoint} disabled={!newBreakpointValue.trim()} className="w-full" size="sm">
+                <Button
+                  onClick={handleAddBreakpoint}
+                  disabled={!newBreakpointValue.trim()}
+                  className="w-full"
+                  size="sm"
+                >
                   Add Custom Breakpoint
                 </Button>
               </div>

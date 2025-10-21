@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { FormComponent, GroupedComponent } from './types'
 
 export const zPositionSchema = z.object({
   position: z.enum(['static', 'relative', 'absolute', 'fixed', 'sticky']),
@@ -10,7 +11,7 @@ export const zPositionSchema = z.object({
 
 export type PositionSchema = z.infer<typeof zPositionSchema>
 
-export const PositionComponents = [
+export const PositionComponents: (FormComponent | GroupedComponent)[] = [
   {
     label: 'Position',
     name: 'position',
@@ -25,35 +26,41 @@ export const PositionComponents = [
     ],
   },
   {
-    label: 'Top',
-    name: 'top',
-    type: 'input',
-    inputType: 'number',
-    placeholder: '0',
-    defaultValue: 0,
-  },
-  {
-    label: 'Right',
-    name: 'right',
-    type: 'input',
-    inputType: 'number',
-    placeholder: '0',
-    defaultValue: 0,
-  },
-  {
-    label: 'Bottom',
-    name: 'bottom',
-    type: 'input',
-    inputType: 'number',
-    placeholder: '0',
-    defaultValue: 0,
-  },
-  {
-    label: 'Left',
-    name: 'left',
-    type: 'input',
-    inputType: 'number',
-    placeholder: '0',
-    defaultValue: 0,
+    label: '',
+    name: 'positionGroup',
+    groups: [
+      {
+        label: 'Top',
+        name: 'top',
+        type: 'input',
+        inputType: 'number',
+        placeholder: '0',
+        defaultValue: 0,
+      },
+      {
+        label: 'Right',
+        name: 'right',
+        type: 'input',
+        inputType: 'number',
+        placeholder: '0',
+        defaultValue: 0,
+      },
+      {
+        label: 'Bottom',
+        name: 'bottom',
+        type: 'input',
+        inputType: 'number',
+        placeholder: '0',
+        defaultValue: 0,
+      },
+      {
+        label: 'Left',
+        name: 'left',
+        type: 'input',
+        inputType: 'number',
+        placeholder: '0',
+        defaultValue: 0,
+      },
+    ],
   },
 ]

@@ -6,7 +6,7 @@ export type BreakpointType = 'min-width' | 'max-width' | 'min-height' | 'max-hei
 
 // Extended ResponsiveStyle for UI purposes (includes id for UI tracking)
 export interface ResponsiveStyle extends CoreResponsiveStyle {
-  id: string
+  // id: string
 }
 
 export interface ElementTreeNode extends CoralNode {
@@ -49,7 +49,7 @@ export const useElementTree = () => {
     name?: string
   ): ElementTreeNode => {
     const id = `element_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
-    
+
     const element: ElementTreeNode = {
       id,
       parentId: parentId || undefined,
@@ -59,7 +59,7 @@ export const useElementTree = () => {
       isExpanded: true,
       children: [],
     }
-    
+
     if (elementType === 'text') {
       element.textContent = 'Click to edit this text content'
     } else if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(elementType)) {
@@ -71,7 +71,7 @@ export const useElementTree = () => {
     } else if (['span'].includes(elementType)) {
       element.textContent = 'Span text'
     }
-    
+
     return element
   }, [])
 

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { MoveRight, MoveLeft, MoveUp, MoveDown, Space, ArrowLeftFromLineIcon, ArrowRightFromLineIcon, ArrowUpFromLineIcon, ArrowDownFromLineIcon, ArrowLeftToLineIcon, ArrowRightToLineIcon, ArrowUpToLineIcon, ArrowDownToLineIcon, UnfoldHorizontalIcon, UnfoldVerticalIcon } from 'lucide-react'
-
+import { FormComponent, GroupedComponent } from './types'
 export const zSpacingSchema = z.object({
   marginInlineStart: z.number().optional(),
   marginInlineEnd: z.number().optional(),
@@ -26,10 +26,11 @@ export const zSpacingSchema = z.object({
 
 export type SpacingSchema = z.infer<typeof zSpacingSchema>
 
-export const SpacingGroups = [
+export const SpacingGroups: (FormComponent | GroupedComponent)[] = [
   {
-    legend: 'Margin',
-    components: [
+    label: 'Margin',
+    name: 'marginGroup',
+    groups: [
       {
         label: 'Inline Start',
         name: 'marginInlineStart',
@@ -40,6 +41,7 @@ export const SpacingGroups = [
         selectName: 'marginInlineStartUnit',
         selectLabel: 'Unit',
         icon: ArrowLeftFromLineIcon,
+        hideLabel: true,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -58,6 +60,7 @@ export const SpacingGroups = [
         selectName: 'marginInlineEndUnit',
         selectLabel: 'Unit',
         icon: ArrowRightFromLineIcon,
+        hideLabel: true,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -76,6 +79,7 @@ export const SpacingGroups = [
         selectName: 'marginBlockStartUnit',
         selectLabel: 'Unit',
         icon: ArrowUpFromLineIcon,
+        hideLabel: true,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -93,6 +97,7 @@ export const SpacingGroups = [
         defaultValue: 0,
         selectName: 'marginBlockEndUnit',
         selectLabel: 'Unit',
+        hideLabel: true,
         icon: ArrowDownFromLineIcon,
         options: [
           { label: 'px', value: 'px' },
@@ -105,8 +110,9 @@ export const SpacingGroups = [
     ]
   },
   {
-    legend: 'Padding',
-    components: [
+    label: 'Padding',
+    name: 'paddingGroup',
+    groups: [
       {
         label: 'Padding Inline Start',
         name: 'paddingInlineStart',
@@ -116,6 +122,7 @@ export const SpacingGroups = [
         defaultValue: 0,
         selectName: 'paddingInlineStartUnit',
         selectLabel: 'Unit',
+        hideLabel: true,
         icon: ArrowLeftToLineIcon,
         options: [
           { label: 'px', value: 'px' },
@@ -134,6 +141,7 @@ export const SpacingGroups = [
         defaultValue: 0,
         selectName: 'paddingInlineEndUnit',
         selectLabel: 'Unit',
+        hideLabel: true,
         icon: ArrowRightToLineIcon,
         options: [
           { label: 'px', value: 'px' },
@@ -150,6 +158,7 @@ export const SpacingGroups = [
         inputType: 'number',
         placeholder: '0',
         defaultValue: 0,
+        hideLabel: true,
         selectName: 'paddingBlockStartUnit',
         selectLabel: 'Unit',
         icon: ArrowUpToLineIcon,
@@ -167,6 +176,7 @@ export const SpacingGroups = [
         type: 'inputWithOptions',
         inputType: 'number',
         placeholder: '0',
+        hideLabel: true,
         defaultValue: 0,
         selectName: 'paddingBlockEndUnit',
         selectLabel: 'Unit',
@@ -182,8 +192,9 @@ export const SpacingGroups = [
     ]
   },
   {
-    legend: 'Gap',
-    components: [
+    label: 'Gap',
+    name: 'gapGroup',
+    groups: [
       {
         label: 'Gap X',
         name: 'gapX',
@@ -194,6 +205,7 @@ export const SpacingGroups = [
         selectName: 'gapXUnit',
         selectLabel: 'Unit',
         icon: UnfoldHorizontalIcon,
+        hideLabel: true,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -212,6 +224,7 @@ export const SpacingGroups = [
         selectName: 'gapYUnit',
         selectLabel: 'Unit',
         icon: UnfoldVerticalIcon,
+        hideLabel: true,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -223,6 +236,3 @@ export const SpacingGroups = [
     ]
   },
 ]
-
-// For backwards compatibility, flatten groups into components
-export const SpacingComponents = SpacingGroups.flatMap((group) => group.components)

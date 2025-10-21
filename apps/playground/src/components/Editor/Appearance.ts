@@ -1,9 +1,9 @@
-import { IconBorderRadius, IconRadiusTopLeft, IconRadiusTopRight, IconRadiusBottomLeft, IconRadiusBottomRight, IconBorderStyle2, IconPaint } from '@tabler/icons-react'
+import { IconBorderRadius, IconRadiusTopLeft, IconRadiusTopRight, IconRadiusBottomLeft, IconRadiusBottomRight, IconBorderStyle2, IconPaint, IconPalette } from '@tabler/icons-react'
 import { MinusIcon, PaintBucketIcon, PaletteIcon } from 'lucide-react'
 import { z } from 'zod'
+import { FormComponent, GroupedComponent } from './types'
 
 export const zAppearanceSchema = z.object({
-  color: z.string().optional(),
   backgroundColor: z.string().optional(),
   borderColor: z.string().optional(),
   borderWidth: z.number().optional(),
@@ -20,37 +20,24 @@ export const zAppearanceSchema = z.object({
 
 export type AppearanceSchema = z.infer<typeof zAppearanceSchema>
 
-export const AppearanceGroups = [
+export const AppearanceGroups: (FormComponent | GroupedComponent)[] = [
   {
-    legend: 'Colors',
-    components: [
-      {
-        label: 'Color',
-        name: 'color',
-        type: 'input',
-        inputType: 'color',
-        icon: PaletteIcon,
-        placeholder: '#000000',
-        defaultValue: '#000000',
-      },
-      {
-        label: 'Background Color',
-        name: 'backgroundColor',
-        type: 'input',
-        inputType: 'color',
-        icon: PaintBucketIcon,
-        placeholder: '#000000',
-        defaultValue: '#000000',
-      },
-    ],
+    label: 'Background Color',
+    name: 'backgroundColor',
+    type: 'color',
+    inputType: 'color',
+    icon: PaintBucketIcon,
+    placeholder: '#000000',
+    defaultValue: '#000000',
   },
   {
-    legend: 'Border',
-    components: [
+    name: 'borderGroup',
+    label: 'Border',
+    groups: [
       {
         label: 'Border Color',
         name: 'borderColor',
-        type: 'input',
+        type: 'color',
         inputType: 'color',
         icon: IconPaint,
         placeholder: '#000000',
@@ -83,6 +70,14 @@ export const AppearanceGroups = [
           { label: 'Outset', value: 'outset' },
         ],
       },
+
+    ],
+
+  },
+  {
+    label: 'Border Radius',
+    name: 'borderRadiusGroup',
+    groups: [
       {
         label: 'Border Top Left Radius',
         name: 'borderTopLeftRadius',
@@ -155,9 +150,6 @@ export const AppearanceGroups = [
           { label: 'vh', value: 'vh' },
         ],
       },
-    ],
-  },
+    ]
+  }
 ]
-
-// For backwards compatibility, flatten groups into components
-export const AppearanceComponents = AppearanceGroups.flatMap((group) => group.components)

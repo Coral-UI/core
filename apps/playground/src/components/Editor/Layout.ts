@@ -1,6 +1,7 @@
 import { IconAlignBoxLeftTop, IconDirectionArrows, IconDirections, IconLayout, IconRulerMeasure, IconRulerMeasure2, IconSpacingHorizontal, IconTextWrap } from '@tabler/icons-react'
 import { LayoutDashboardIcon, Maximize2Icon, Minimize2Icon, RulerDimensionLineIcon, SignpostIcon } from 'lucide-react'
 import { z } from 'zod'
+import { FormComponent, GroupedComponent } from './types'
 
 export const zLayoutSchema = z.object({
   width: z.number().optional(),
@@ -18,10 +19,11 @@ export const zLayoutSchema = z.object({
 
 export type LayoutSchema = z.infer<typeof zLayoutSchema>
 
-export const LayoutGroups = [
+export const LayoutGroups: (FormComponent | GroupedComponent)[] = [
   {
-    legend: 'Dimensions',
-    components: [
+    label: 'Dimensions',
+    name: 'dimensionsGroup',
+    groups: [
       {
         label: 'Width',
         name: 'width',
@@ -61,8 +63,9 @@ export const LayoutGroups = [
     ],
   },
   {
-    legend: 'Display',
-    components: [
+    label: 'Display',
+    name: 'displayGroup',
+    groups: [
       {
         label: 'Display',
         name: 'display',
@@ -82,8 +85,9 @@ export const LayoutGroups = [
     ],
   },
   {
-    legend: 'Flex Properties',
-    components: [
+    label: 'Flex Properties',
+    name: 'flexPropertiesGroup',
+    groups: [
       {
         label: 'Direction',
         name: 'flexDirection',
@@ -185,6 +189,3 @@ export const LayoutGroups = [
     ],
   },
 ]
-
-// For backwards compatibility, flatten groups into components
-export const LayoutComponents = LayoutGroups.flatMap((group) => group.components)

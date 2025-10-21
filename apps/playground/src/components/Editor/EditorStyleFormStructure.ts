@@ -1,11 +1,15 @@
 import { z } from 'zod'
 
-import { AppearanceComponents, AppearanceGroups, zAppearanceSchema } from './Appearance'
-import { LayoutComponents, LayoutGroups, zLayoutSchema } from './Layout'
+import { AppearanceGroups, zAppearanceSchema } from './Appearance'
+import { LayoutGroups, zLayoutSchema } from './Layout'
 import { PositionComponents, zPositionSchema } from './Position'
-import { SpacingComponents, SpacingGroups, zSpacingSchema } from './Spacing'
+import { SpacingGroups, zSpacingSchema } from './Spacing'
+import { TypographyGroup, zTypographySchema } from './Typography'
+import type { StyleSection } from './types'
 
 export const zStyleFormSchema = z.object({
+  // Typography
+  ...zTypographySchema.shape,
   ...zLayoutSchema.shape,
   ...zSpacingSchema.shape,
   ...zAppearanceSchema.shape,
@@ -14,78 +18,57 @@ export const zStyleFormSchema = z.object({
 
 export type StyleFormSchema = z.infer<typeof zStyleFormSchema>
 
-export const StyleFormDefaultValues: StyleFormSchema = [
-  ...LayoutComponents,
-  ...SpacingComponents,
-  ...AppearanceComponents,
+// Flatten all components including nested groups
+const flattenComponents = (components: any[]): any[] => {
+  return components.flatMap((component) => {
+    if (component.groups) {
+      return component.groups.flatMap((group: any) => {
+        // For inputWithOptions, we need to extract both the input field and the select field
+        if (group.type === 'inputWithOptions') {
+          return [
+            { name: group.name, defaultValue: group.defaultValue },
+            { name: group.selectName, defaultValue: group.options?.[0]?.value }
+          ]
+        }
+        return group
+      })
+    }
+    return component
+  })
+}
+
+const allComponents = flattenComponents([
+  ...TypographyGroup,
+  ...LayoutGroups,
+  // ...SpacingComponents,
+  ...AppearanceGroups,
   ...PositionComponents,
-].reduce((acc, component) => {
-  // @ts-expect-error - Dynamic property assignment incompatible with exactOptionalPropertyTypes
+])
+
+export const StyleFormDefaultValues: StyleFormSchema = allComponents.reduce((acc, component) => {
   acc[component.name as keyof StyleFormSchema] = component.defaultValue
   return acc
 }, {} as StyleFormSchema)
 
-// Define component types
-type BaseComponent = {
-  label: string
-  name: string
-  defaultValue: unknown
-  icon?: React.ComponentType<{ className?: string }>
-  iconClassName?: string
-  showWhen?: {
-    field: string
-    values: string[]
-  }
-}
-
-type InputComponent = BaseComponent & {
-  type: 'input'
-  inputType: 'text' | 'number' | 'email' | 'password' | 'url' | 'search' | 'color'
-  placeholder: string
-  min?: number
-}
-
-type SelectComponent = BaseComponent & {
-  type: 'select'
-  options: { label: string; value: string }[]
-  placeholder?: string
-}
-
-type InputWithOptionsComponent = BaseComponent & {
-  type: 'inputWithOptions'
-  inputType: 'text' | 'number' | 'email' | 'password' | 'url' | 'search'
-  placeholder: string
-  selectName: string
-  selectLabel?: string
-  options: { label: string; value: string }[]
-}
-
-type FormComponent = InputComponent | SelectComponent | InputWithOptionsComponent
-
-type ComponentGroup = {
-  legend?: string
-  components: FormComponent[]
-}
-
-export const StyleFormComponents: {
-  label: string
-  components?: FormComponent[]
-  groups?: ComponentGroup[]
-}[] = [
+export const StyleFormComponents: StyleSection[] = [
+  {
+    label: 'Typography',
+    components: TypographyGroup,
+  },
   {
     label: 'Layout',
-    groups: LayoutGroups as ComponentGroup[],
+    components: LayoutGroups,
   },
   {
     label: 'Spacing',
-    groups: SpacingGroups as ComponentGroup[],
+    components: SpacingGroups,
   },
   {
     label: 'Appearance',
-    groups: AppearanceGroups as ComponentGroup[],
+    components: AppearanceGroups,
   },
   {
     label: 'Position',
-    components: PositionComponents as FormComponent[],
+    components: PositionComponents,
   },
 ]

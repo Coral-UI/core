@@ -1,7 +1,9 @@
 import { useTheme } from '@/components/ThemeProvider'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { ResponsiveStyle } from '@/hooks/useElementTree'
 import MonacoEditor from '@monaco-editor/react'
 import { IconBracketsAngle, IconEyeSearch, IconSchema } from '@tabler/icons-react'
@@ -105,32 +107,35 @@ const IsolatedPreviewFrame = ({
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: transparent;
+      background-color: ${theme === 'dark' ? '#0a0a0a' : '#ffffff'};
       color: ${theme === 'dark' ? '#fafafa' : '#09090b'};
-      padding: 0;
       margin: 0;
+      font-size: 16px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    #preview-root {
+      width: 100%;
+      max-width: ${viewportWidth + 32}px;
+      padding: 16px;
+      // background-color: rgba(255, 255, 255, 0.5);
     }
 
     /* Badge styles */
     .badge {
-      display: inline-flex;
-      align-items: center;
-      border-radius: 0.375rem;
-      padding: 0.125rem 0.625rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      transition: all 0.2s;
-      white-space: nowrap;
+      font-size: 10px;
+      text-transform: uppercase;
+      font-family: monospace;
     }
 
     .badge-default {
-      background: ${theme === 'dark' ? '#3b82f6' : '#2563eb'};
-      color: white;
+      color: #3b82f6;
     }
 
     .badge-outline {
-      border: 1px solid ${theme === 'dark' ? '#3f3f46' : '#e4e4e7'};
-      background: ${theme === 'dark' ? '#18181b' : '#ffffff'};
       color: ${theme === 'dark' ? '#fafafa' : '#09090b'};
     }
 
@@ -172,7 +177,7 @@ const IsolatedPreviewFrame = ({
         })
       })
     }
-  }, [element, selectedElementId, theme])
+  }, [element, selectedElementId, theme, viewportWidth])
 
   // Listen for messages from iframe
   useEffect(() => {
@@ -187,26 +192,20 @@ const IsolatedPreviewFrame = ({
   }, [onElementClick])
 
   return (
-    <div className="flex flex-col justify-start items-center w-full h-full overflow-auto p-4 bg-muted/50">
-      <div className="relative flex-shrink-0" style={{ width: `${viewportWidth}px` }}>
+    <ScrollArea className="flex flex-col justify-start w-full h-full overflow-auto">
+      <div className="relative shrink-0 flex-1 h-full w-full">
         <iframe
           ref={iframeRef}
           title="Preview"
-          className="border border-border rounded shadow-sm transition-all duration-300"
+          className="transition-all duration-300"
           style={{
-            width: `${viewportWidth}px`,
-            height: '600px',
+            width: '100%',
+            height: '100%',
             background: 'white',
           }}
         />
-        {/* Viewport width indicator */}
-        <div className="absolute -bottom-6 left-0 right-0 text-center pointer-events-none">
-          <span className="text-xs text-muted-foreground bg-background px-2 py-0.5 rounded border border-border inline-block">
-            {viewportWidth}px
-          </span>
-        </div>
       </div>
-    </div>
+    </ScrollArea>
   )
 }
 
@@ -231,9 +230,7 @@ const renderElementToHTML = (elem: any, depth: number, selectedElementId?: strin
   const elementStyles = getInlineStyles(elem.styles)
 
   // Add selection indicator (subtle outline that doesn't interfere with layout)
-  const selectionStyles = isSelected
-    ? 'outline: 2px solid #3b82f6; outline-offset: 2px; position: relative; z-index: 1;'
-    : ''
+  const selectionStyles = isSelected ? 'outline: 1px solid #3b82f6; position: relative; z-index: 1;' : ''
 
   // Only add minimal editor-specific styles if there are NO custom styles
   const editorHintStyles = !hasCustomStyles
@@ -244,11 +241,11 @@ const renderElementToHTML = (elem: any, depth: number, selectedElementId?: strin
 
   let html = `
     <div style="position: relative;">
-      <div style="position: absolute; top: -8px; left: 8px; display: flex; gap: 4px; z-index: 10; pointer-events: none;">
-        <span class="badge badge-default" style="font-family: monospace; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">${elem.elementType}</span>
+      <div style="position: absolute; top: -12px; left: 2px; display: flex; gap: 8px; z-index: 10; pointer-events: none;">
+        <span class="badge badge-default">${elem.elementType}</span>
         ${
           elem.responsiveStyles && elem.responsiveStyles.length > 0
-            ? `<span class="badge badge-outline" style="box-shadow: 0 1px 2px rgba(0,0,0,0.1);">${elem.responsiveStyles.length} breakpoint${elem.responsiveStyles.length !== 1 ? 's' : ''}</span>`
+            ? `<span class="badge badge-outline">${elem.responsiveStyles.length} breakpoint${elem.responsiveStyles.length !== 1 ? 's' : ''}</span>`
             : ''
         }
       </div>
@@ -421,12 +418,12 @@ const ElementPreviewRenderer = ({
     return (
       <div className="relative" key={elem.id || `${elem.name}-${depth}`}>
         {/* Informational badges - positioned absolutely so they don't affect layout */}
-        <div className="absolute -top-2 left-2 flex items-center gap-1 z-10 pointer-events-none">
-          <Badge variant="default" className="text-xs font-mono shadow-sm">
+        <div className="absolute -top-2 left-0 flex items-center gap-1 z-10 pointer-events-none">
+          <Badge variant="default" className="text-xs font-mono shadow-sm uppercase">
             {elem.elementType}
           </Badge>
           {elem.responsiveStyles && elem.responsiveStyles.length > 0 && (
-            <Badge variant="outline" className="text-xs shadow-sm bg-background">
+            <Badge variant="outline" className="text-xs shadow-sm bg-background uppercase">
               {elem.responsiveStyles.length} breakpoint{elem.responsiveStyles.length !== 1 ? 's' : ''}
             </Badge>
           )}
@@ -490,39 +487,37 @@ export const EditorPreviewPane = ({
       <div className="p-2 pb-0">
         <TabsList>
           <TabsTrigger value="preview">
-            {' '}
-            <IconEyeSearch strokeWidth={1.5} className="size-4 text-muted-foreground" /> Visual Preview
+            <IconEyeSearch strokeWidth={1.5} className="size-4" /> Visual Preview
           </TabsTrigger>
           <TabsTrigger value="spec">
-            <IconSchema strokeWidth={1.5} className="size-4 text-muted-foreground" /> Coral Spec
+            <IconSchema strokeWidth={1.5} className="size-4" /> Coral Spec
           </TabsTrigger>
           <TabsTrigger value="code">
-            <IconBracketsAngle strokeWidth={1.5} className="size-4 text-muted-foreground" /> Generated Code
+            <IconBracketsAngle strokeWidth={1.5} className="size-4" /> Generated Code
           </TabsTrigger>
         </TabsList>
       </div>
 
       <TabsContent value="preview" className="flex flex-col h-full w-full">
-        {/* Viewport controls */}
-        <div className="flex items-center p-2  border-t border-border bg-muted">
-          <ButtonGroup orientation="horizontal" aria-label="Viewport Presets">
-            <ButtonGroupText className="text-xs text-muted-foreground">Viewport:</ButtonGroupText>
+        <div className="p-2">
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            size="sm"
+            value={viewportWidth.toString()}
+            onValueChange={(value) => setViewportWidth(parseInt(value))}
+          >
             {VIEWPORT_PRESETS.map((preset) => (
-              <Button
+              <ToggleGroupItem
                 key={preset.name}
-                variant={viewportWidth === preset.width ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewportWidth(preset.width)}
-                className="h-7 gap-1.5"
+                value={preset.width.toString()}
+                aria-title={`${preset.name} (${preset.width}px)`}
               >
-                {preset.icon}
-                <span className="text-xs">{preset.name}</span>
-                <span className="text-xs text-muted-foreground">({preset.width}px)</span>
-              </Button>
+                {preset.icon} <span className="text-xs text-muted-foreground">({preset.width}px)</span>
+              </ToggleGroupItem>
             ))}
-          </ButtonGroup>
+          </ToggleGroup>
         </div>
-
         <div className="h-full w-full">
           {spec && spec.name ? (
             <IsolatedPreviewFrame
@@ -542,7 +537,7 @@ export const EditorPreviewPane = ({
         </div>
       </TabsContent>
 
-      <TabsContent value="spec" className="flex flex-col h-full w-full">
+      <TabsContent value="spec" className="flex flex-col h-full w-full flex-1 shrink-0">
         <div className="h-full w-full relative">
           <MonacoEditor
             value={specValue}

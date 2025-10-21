@@ -1,0 +1,26 @@
+@reference "../../index.css";
+
+.MuiFormControl-root.MuiTextField-root {
+  @apply min-w-6;
+}
+
+.MuiFormControl-root {
+
+
+  .MuiInputAdornment-root {
+    @apply mr-0 max-h-full;
+  }
+
+  .MuiInputBase-root {
+    @apply text-sm border-input text-foreground rounded-md px-0 h-9;
+  }
+
+  .MuiInputBase-input {
+    @apply px-3 py-1;
+  }
+
+  .MuiOutlinedInput-notchedOutline {
+    @apply border-input;
+
+  }
+}

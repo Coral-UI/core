@@ -1,15 +1,17 @@
+import { Badge } from '@/components/base/Badge'
+import { Button } from '@/components/base/Button'
 import { EditorPreviewPane } from '@/components/Editor/EditorPreviewPane'
 import { EditorSidebar } from '@/components/Editor/EditorSidebar'
 import { ElementProperties } from '@/components/Editor/ElementProperties'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { useElementTree } from '@/hooks/useElementTree'
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Undo, Redo, FileCode } from 'lucide-react'
+import { IconFileImport } from '@tabler/icons-react'
+import { Redo, Undo } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { CoralRootNode, transformHTMLToSpec } from '@reallygoodwork/coral-core'
-import { Badge } from '../ui/badge'
 
 export const Editor = () => {
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null)
@@ -134,54 +136,43 @@ export const Editor = () => {
   }, [undo, redo, canUndo, canRedo])
 
   return (
-    <div className="flex flex-col h-screen pt-12">
-      <div className="flex items-center justify-between gap-2 px-4 py-1 border-b border-border bg-sidebar">
-        <div className="flex items-center gap-2">
-          <p className="text-sm font-medium">
-            Component Name
-          </p>
-          <Badge variant="secondary">Unsaved</Badge>
-        </div>
-        <div className="flex items-center gap-2">
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => setImportDialogOpen(true)}
-          title="Import from Code"
-        >
-          <FileCode className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={undo}
-          disabled={!canUndo}
-          title="Undo (Ctrl+Z)"
-        >
-          <Undo className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={redo}
-          disabled={!canRedo}
-          title="Redo (Ctrl+Shift+Z)"
-        >
-          <Redo className="h-4 w-4" />
-        </Button>
-        </div>
-      </div>
-      <div className="flex flex-row flex-1 overflow-hidden">
-        <div className="w-64 border-r border-border bg-sidebar shrink-0">
+    <div className="flex flex-col h-screen pt-10">
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel maxSize={25} minSize={15} defaultSize={15} className="bg-sidebar shrink-0">
+          <div className="flex items-center justify-between gap-2 p-2 border-b border-border bg-background">
+            <div className="flex items-center gap-2">
+              <p className="text-xs font-medium">Name</p>
+              <Badge variant="secondary">Unsaved</Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="icon-sm"
+                onClick={() => setImportDialogOpen(true)}
+                title="Import from Code"
+                aria-label="Import from Code"
+              >
+                <IconFileImport className="size-3.5" />
+              </Button>
+              <Button variant="secondary" size="icon-sm" onClick={undo} disabled={!canUndo} title="Undo (Ctrl+Z)">
+                <Undo className="size-3.5" />
+              </Button>
+              <Button variant="ghost" size="icon-sm" onClick={redo} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)">
+                <Redo className="size-3.5" />
+              </Button>
+            </div>
+          </div>
           <EditorSidebar onElementSelect={handleElementSelect} elementTreeHook={elementTreeHook} />
-        </div>
-        <div className="flex-1 bg-background max-w-[calc(100%-512px)]">
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel maxSize={75} minSize={40} defaultSize={65} className="flex-1 bg-background h-full">
           <EditorPreviewPane spec={spec} onElementClick={handleElementSelect} selectedElementId={selectedElementId} />
-        </div>
-        <div className="w-64 border-l border-border bg-sidebar shrink-0">
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel maxSize={25} minSize={20} defaultSize={20} className="bg-sidebar shrink-0">
           <ElementProperties element={selectedElement || null} onUpdateElement={updateElement} />
-        </div>
-      </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
       <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} />
     </div>
   )

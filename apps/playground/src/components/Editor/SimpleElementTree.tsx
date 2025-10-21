@@ -639,8 +639,8 @@ export const SimpleElementTree = ({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-4 py-1.5 border-b border-border h-14">
-        <h3 className="font-medium text-sm text-foreground">Structure</h3>
+      <div className="flex items-center justify-between p-2 border-b border-border">
+        <h3 className="font-medium text-xs text-foreground">Structure</h3>
         <div className="text-xs text-muted-foreground">Drag to nest & reorder</div>
       </div>
 
