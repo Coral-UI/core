@@ -7,13 +7,11 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { ResponsiveStyle } from '@/hooks/useElementTree'
 import MonacoEditor from '@monaco-editor/react'
 import { IconBracketsAngle, IconEyeSearch, IconSchema } from '@tabler/icons-react'
-import { BracesIcon, CodeIcon, CopyIcon, EyeIcon, MonitorIcon, SmartphoneIcon, TabletIcon } from 'lucide-react'
+import { CopyIcon, MonitorIcon, SmartphoneIcon, TabletIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { CoralRootNode } from '@reallygoodwork/coral-core'
-
-import { ButtonGroup, ButtonGroupText } from '../ui/button-group'
 
 type ViewportPreset = {
   name: string
@@ -177,7 +175,7 @@ const IsolatedPreviewFrame = ({
         })
       })
     }
-  }, [element, selectedElementId, theme, viewportWidth])
+  }, [element, element?.elementType, element?.textContent, element?.styles, element?.responsiveStyles, selectedElementId, theme, viewportWidth])
 
   // Listen for messages from iframe
   useEffect(() => {
@@ -221,7 +219,22 @@ const renderElementToHTML = (elem: any, depth: number, selectedElementId?: strin
     let styleStr = ''
     Object.entries(styles).forEach(([key, value]) => {
       const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase()
-      styleStr += `${cssKey}: ${value}; `
+
+      // Handle dimension objects
+      if (typeof value === 'object' && value !== null && 'value' in value && 'unit' in value) {
+        styleStr += `${cssKey}: ${value.value}${value.unit}; `
+      }
+      // Handle color objects
+      else if (typeof value === 'object' && value !== null && 'type' in value && value.type === 'color') {
+        styleStr += `${cssKey}: ${value.hex || value.value}; `
+      }
+      // Handle plain values (numbers, strings)
+      else if (typeof value === 'number') {
+        // Plain numbers are interpreted as pixels
+        styleStr += `${cssKey}: ${value}px; `
+      } else if (typeof value === 'string') {
+        styleStr += `${cssKey}: ${value}; `
+      }
     })
     return styleStr
   }
@@ -239,7 +252,7 @@ const renderElementToHTML = (elem: any, depth: number, selectedElementId?: strin
 
   const combinedStyles = `${elementStyles} ${selectionStyles} ${editorHintStyles} cursor: pointer; transition: outline 0.2s;`
 
-  let html = `
+  const html = `
     <div style="position: relative;">
       <div style="position: absolute; top: -12px; left: 2px; display: flex; gap: 8px; z-index: 10; pointer-events: none;">
         <span class="badge badge-default">${elem.elementType}</span>
@@ -249,14 +262,10 @@ const renderElementToHTML = (elem: any, depth: number, selectedElementId?: strin
             : ''
         }
       </div>
-      <div style="${combinedStyles}" data-element-id="${elem.id}">
-        ${
-          hasText
-            ? `<div style="margin-bottom: 8px; ${elem.elementType === 'text' ? 'font-size: 1rem; color: inherit; font-weight: normal;' : 'font-size: 0.875rem; color: #6b7280; font-style: italic;'}">${elem.elementType === 'text' ? elem.textContent : `"${elem.textContent}"`}</div>`
-            : ''
-        }
-        ${hasChildren ? `<div>${elem.children.map((child: any) => renderElementToHTML(child, depth + 1, selectedElementId)).join('')}</div>` : ''}
-      </div>
+      <${elem.elementType} style="${combinedStyles}" data-element-id="${elem.id}">
+        ${hasText ? elem.textContent : ''}
+        ${hasChildren ? elem.children.map((child: any) => renderElementToHTML(child, depth + 1, selectedElementId)).join('') : ''}
+      </${elem.elementType}>
     </div>
   `
 

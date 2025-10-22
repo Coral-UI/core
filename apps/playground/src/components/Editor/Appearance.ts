@@ -88,6 +88,7 @@ export const AppearanceGroups: (FormComponent | GroupedComponent)[] = [
         selectName: 'borderTopLeftRadiusUnit',
         selectLabel: 'Unit',
         icon: IconRadiusTopLeft,
+        hideLabel: true,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -106,6 +107,7 @@ export const AppearanceGroups: (FormComponent | GroupedComponent)[] = [
         selectName: 'borderTopRightRadiusUnit',
         selectLabel: 'Unit',
         icon: IconRadiusTopRight,
+        hideLabel: true,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -124,6 +126,7 @@ export const AppearanceGroups: (FormComponent | GroupedComponent)[] = [
         selectName: 'borderBottomLeftRadiusUnit',
         selectLabel: 'Unit',
         icon: IconRadiusBottomLeft,
+        hideLabel: true,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
@@ -142,6 +145,7 @@ export const AppearanceGroups: (FormComponent | GroupedComponent)[] = [
         selectName: 'borderBottomRightRadiusUnit',
         selectLabel: 'Unit',
         icon: IconRadiusBottomRight,
+        hideLabel: true,
         options: [
           { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },

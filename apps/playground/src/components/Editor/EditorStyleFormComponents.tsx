@@ -8,8 +8,8 @@ import { FieldGroup, FieldLegend } from '@/components/ui/field'
 import { ChevronRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 
-import { StyleFormSchema } from './EditorStyleFormStructure'
 import type { FormComponent, GroupedComponent, StyleSection } from './types'
+import { StyleFormSchema } from './EditorStyleFormStructure'
 
 export const EditorStyleFormComponents = ({
   form,
@@ -53,7 +53,7 @@ export const EditorStyleFormComponents = ({
             selectName={formComponent.selectName}
             selectLabel={formComponent.selectLabel}
             selectPlaceholder={formComponent.options?.[0]?.value || ''}
-            options={formComponent.options.map(opt => ({ label: String(opt.label), value: opt.value }))}
+            options={formComponent.options.map((opt) => ({ label: String(opt.label), value: opt.value }))}
             form={form}
             inputType={formComponent.inputType}
             icon={formComponent.icon}
@@ -82,7 +82,7 @@ export const EditorStyleFormComponents = ({
             name={formComponent.name}
             label={formComponent.label}
             placeholder={formComponent.placeholder || ''}
-            options={formComponent.options.map(opt => ({ label: String(opt.label), value: opt.value }))}
+            options={formComponent.options.map((opt) => ({ label: String(opt.label), value: opt.value }))}
             form={form}
             icon={formComponent.icon}
             iconClassName={formComponent.iconClassName ?? undefined}
@@ -112,7 +112,7 @@ export const EditorStyleFormComponents = ({
       return (
         <FieldGroup key={groupedItem.name}>
           {groupedItem.label && <FieldLegend variant="label">{groupedItem.label}</FieldLegend>}
-          <div className="grid grid-cols-2 gap-x-2">
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
             {groupedItem.groups.map((group) => {
               return (
                 <div key={group.name} className="col-span-1">
@@ -137,9 +137,7 @@ export const EditorStyleFormComponents = ({
           <ChevronRight className="size-4 transition-transform group-data-[state=open]:rotate-90" />
         </CollapsibleTrigger>
         <CollapsibleContent className="pb-4">
-          <FieldGroup>
-            {component.components?.map((item) => renderComponentOrGroup(item))}
-          </FieldGroup>
+          <FieldGroup>{component.components?.map((item) => renderComponentOrGroup(item))}</FieldGroup>
         </CollapsibleContent>
       </Collapsible>
     )

@@ -1,5 +1,6 @@
 import { CoralStyleType } from '@reallygoodwork/coral-core'
 
+import { extractDimensionValue } from '../extractDimensionValue'
 import { applyColor } from './applyPaint'
 
 export const loadFont = (fontFamily: string, fontStyle: string) => {
@@ -37,25 +38,28 @@ export const transformFontWeightToFigmaFontStyle = (fontWeight: number) => {
 export type textAlign = 'left' | 'center' | 'right' | 'justify' | 'start' | 'end'
 
 export const applyTypographyStyles = async (element: TextNode, styles: CoralStyleType, textAlign?: textAlign) => {
-  if (styles['fontSize']) {
-    element.fontSize = styles['fontSize'] as number
+  const fontSize = extractDimensionValue(styles['fontSize'])
+  if (fontSize !== undefined) {
+    element.fontSize = fontSize
   }
 
   if (styles['color']) {
     applyColor(element, styles)
   }
 
-  if (styles['lineHeight']) {
+  const lineHeight = extractDimensionValue(styles['lineHeight'])
+  if (lineHeight !== undefined) {
     element.lineHeight = {
       unit: 'PIXELS',
-      value: styles['lineHeight'] as number,
+      value: lineHeight,
     }
   }
 
-  if (styles['letterSpacing']) {
+  const letterSpacing = extractDimensionValue(styles['letterSpacing'])
+  if (letterSpacing !== undefined) {
     element.letterSpacing = {
       unit: 'PERCENT',
-      value: styles['letterSpacing'] as number,
+      value: letterSpacing,
     }
   }
 

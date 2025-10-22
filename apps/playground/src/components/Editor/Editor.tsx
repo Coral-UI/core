@@ -20,9 +20,11 @@ export const Editor = () => {
   const { elements, updateElement, getElementTree, selectElement, undo, redo, canUndo, canRedo } = elementTreeHook
 
   const selectedElement = selectedElementId ? elements.find((el) => el.id === selectedElementId) : null
-  const elementTree = getElementTree()
 
   const convertToCoralSpec = (): CoralRootNode => {
+    // Get fresh element tree on each render
+    const elementTree = getElementTree()
+
     if (elementTree.length === 0) {
       return {
         name: 'root',
@@ -136,8 +138,8 @@ export const Editor = () => {
   }, [undo, redo, canUndo, canRedo])
 
   return (
-    <div className="flex flex-col h-screen pt-10">
-      <ResizablePanelGroup direction="horizontal">
+    <div className="flex flex-col h-dvh pt-10 overflow-hidden">
+      <ResizablePanelGroup direction="horizontal" className="h-screen overflow-hidden">
         <ResizablePanel maxSize={25} minSize={15} defaultSize={15} className="bg-sidebar shrink-0">
           <div className="flex items-center justify-between gap-2 p-2 border-b border-border bg-background">
             <div className="flex items-center gap-2">
@@ -169,7 +171,7 @@ export const Editor = () => {
           <EditorPreviewPane spec={spec} onElementClick={handleElementSelect} selectedElementId={selectedElementId} />
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel maxSize={25} minSize={20} defaultSize={20} className="bg-sidebar shrink-0">
+        <ResizablePanel maxSize={25} minSize={20} defaultSize={20} className="bg-sidebar shrink-0 h-dvh">
           <ElementProperties element={selectedElement || null} onUpdateElement={updateElement} />
         </ResizablePanel>
       </ResizablePanelGroup>

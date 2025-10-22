@@ -27,6 +27,8 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
         // Error state.
         "has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40",
 
+        'has-[[data-slot][aria-invalid=true]]',
+
         className
       )}
       {...props}
@@ -40,7 +42,7 @@ const inputGroupAddonVariants = cva(
     variants: {
       align: {
         "inline-start":
-          "order-first pl-3 has-[>button]:ml-[-0.45rem] has-[>kbd]:ml-[-0.35rem]",
+          "order-first pl-1.5 has-[>button]:ml-[-0.45rem] has-[>kbd]:ml-[-0.35rem]",
         "inline-end":
           "order-last pr-3 has-[>button]:mr-[-0.45rem] has-[>kbd]:mr-[-0.35rem]",
         "block-start":
@@ -135,7 +137,7 @@ const InputGroupInput = React.forwardRef<
       ref={ref}
       data-slot="input-group-control"
       className={cn(
-        "flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent",
+        "flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent shrink-0",
         className
       )}
       {...props}

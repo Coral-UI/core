@@ -59,7 +59,7 @@ export const Select = <T extends FieldValues = FieldValues>({
               disabled={disabled || false}
             >
               <FormControl>
-                <SelectTrigger id={field.name} aria-invalid={fieldState.invalid}>
+                <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="border-transparent w-full bg-transparent">
                   <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
               </FormControl>

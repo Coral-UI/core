@@ -1,5 +1,6 @@
 import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
+import { extractDimensionValue, isPercentageDimension } from '../extractDimensionValue'
 import { applyPaint } from './applyPaint'
 import { isInlineElement, isTextNode, nodeHasTextChildren } from './importSpec'
 import { applyTypographyStyles, textAlign, transformFontWeightToFigmaFontStyle } from './styleText'
@@ -33,9 +34,10 @@ const applyAutoLayout = (element: ElementWithOptionalText, shouldFill: boolean =
   element.layoutSizingHorizontal = shouldFill ? 'FILL' : 'HUG'
 
   // Only set fixed height if explicitly specified, otherwise hug contents
-  if (node?.styles?.['height'] && typeof node.styles['height'] === 'number') {
+  const heightValue = extractDimensionValue(node?.styles?.['height'])
+  if (heightValue !== undefined) {
     element.layoutSizingVertical = 'FIXED'
-    element.resize(element.width, node.styles['height'] as number)
+    element.resize(element.width, heightValue)
   } else {
     element.layoutSizingVertical = 'HUG'
   }
@@ -120,32 +122,39 @@ const applyGap = (element: ElementWithOptionalText, node: CoralNode | CoralRootN
   const isHorizontal = element.layoutMode === 'HORIZONTAL'
 
   if (isHorizontal && node.styles?.['columnGap']) {
-    element.itemSpacing = node.styles['columnGap'] as number
+    const gapValue = extractDimensionValue(node.styles['columnGap'])
+    if (gapValue !== undefined) element.itemSpacing = gapValue
   } else if (!isHorizontal && node.styles?.['rowGap']) {
-    element.itemSpacing = node.styles['rowGap'] as number
+    const gapValue = extractDimensionValue(node.styles['rowGap'])
+    if (gapValue !== undefined) element.itemSpacing = gapValue
   }
 
   // Generic 'gap' property applies to both
   if (node.styles?.['gap']) {
-    element.itemSpacing = node.styles['gap'] as number
+    const gapValue = extractDimensionValue(node.styles['gap'])
+    if (gapValue !== undefined) element.itemSpacing = gapValue
   }
 }
 
 const applyPadding = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
-  if (node.styles?.['paddingInlineStart']) {
-    element.paddingLeft = node.styles?.['paddingInlineStart'] as number
+  const paddingLeft = extractDimensionValue(node.styles?.['paddingInlineStart'])
+  if (paddingLeft !== undefined) {
+    element.paddingLeft = paddingLeft
   }
 
-  if (node.styles?.['paddingInlineEnd']) {
-    element.paddingRight = node.styles?.['paddingInlineEnd'] as number
+  const paddingRight = extractDimensionValue(node.styles?.['paddingInlineEnd'])
+  if (paddingRight !== undefined) {
+    element.paddingRight = paddingRight
   }
 
-  if (node.styles?.['paddingBlockStart']) {
-    element.paddingTop = node.styles?.['paddingBlockStart'] as number
+  const paddingTop = extractDimensionValue(node.styles?.['paddingBlockStart'])
+  if (paddingTop !== undefined) {
+    element.paddingTop = paddingTop
   }
 
-  if (node.styles?.['paddingBlockEnd']) {
-    element.paddingBottom = node.styles?.['paddingBlockEnd'] as number
+  const paddingBottom = extractDimensionValue(node.styles?.['paddingBlockEnd'])
+  if (paddingBottom !== undefined) {
+    element.paddingBottom = paddingBottom
   }
 }
 
@@ -159,16 +168,16 @@ const applyMargin = (element: ElementWithOptionalText, node: CoralNode | CoralRo
   }
 
   // Get margin values (only numeric ones, ignore 'auto')
-  const marginLeft = typeof node.styles?.['marginInlineStart'] === 'number' ? node.styles['marginInlineStart'] : 0
-  const marginRight = typeof node.styles?.['marginInlineEnd'] === 'number' ? node.styles['marginInlineEnd'] : 0
-  const marginTop = typeof node.styles?.['marginBlockStart'] === 'number' ? node.styles['marginBlockStart'] : 0
-  const marginBottom = typeof node.styles?.['marginBlockEnd'] === 'number' ? node.styles['marginBlockEnd'] : 0
+  const marginLeft = extractDimensionValue(node.styles?.['marginInlineStart']) || 0
+  const marginRight = extractDimensionValue(node.styles?.['marginInlineEnd']) || 0
+  const marginTop = extractDimensionValue(node.styles?.['marginBlockStart']) || 0
+  const marginBottom = extractDimensionValue(node.styles?.['marginBlockEnd']) || 0
 
   // Get padding values
-  const paddingLeft = (node.styles?.['paddingInlineStart'] as number) || 0
-  const paddingRight = (node.styles?.['paddingInlineEnd'] as number) || 0
-  const paddingTop = (node.styles?.['paddingBlockStart'] as number) || 0
-  const paddingBottom = (node.styles?.['paddingBlockEnd'] as number) || 0
+  const paddingLeft = extractDimensionValue(node.styles?.['paddingInlineStart']) || 0
+  const paddingRight = extractDimensionValue(node.styles?.['paddingInlineEnd']) || 0
+  const paddingTop = extractDimensionValue(node.styles?.['paddingBlockStart']) || 0
+  const paddingBottom = extractDimensionValue(node.styles?.['paddingBlockEnd']) || 0
 
   // Always set padding (even if margin is 0), to ensure padding is applied
   if (paddingLeft > 0 || marginLeft > 0) {
@@ -191,10 +200,11 @@ const applyMargin = (element: ElementWithOptionalText, node: CoralNode | CoralRo
 const applyMarginToFrame = applyMargin // Keep old name for backwards compatibility
 
 export const applyMaxWidth = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
-  if (node.styles?.['maxWidth']) {
+  const maxWidth = extractDimensionValue(node.styles?.['maxWidth'])
+  if (maxWidth !== undefined) {
     // element.layoutSizingHorizontal = 'HUG'
-    element.maxWidth = node.styles?.['maxWidth'] as number
-    element.resize(node.styles?.['maxWidth'] as number, element.height)
+    element.maxWidth = maxWidth
+    element.resize(maxWidth, element.height)
   }
 }
 
@@ -307,9 +317,10 @@ export const applyStyles = async (element: Element, node: CoralNode | CoralRootN
     }
 
     // Override height if explicitly specified
-    if (node.styles?.['height'] && typeof node.styles['height'] === 'number') {
+    const heightValue = extractDimensionValue(node.styles?.['height'])
+    if (heightValue !== undefined) {
       element.layoutSizingVertical = 'FIXED'
-      element.resize(element.width, node.styles['height'] as number)
+      element.resize(element.width, heightValue)
     }
 
     // Apply flex direction
@@ -340,8 +351,9 @@ export const applyStyles = async (element: Element, node: CoralNode | CoralRootN
     }
 
     // Apply border radius if specified
-    if (node.styles?.['borderRadius'] && typeof node.styles['borderRadius'] === 'number') {
-      element.cornerRadius = node.styles['borderRadius'] as number
+    const borderRadius = extractDimensionValue(node.styles?.['borderRadius'])
+    if (borderRadius !== undefined) {
+      element.cornerRadius = borderRadius
     }
 
     // Apply max width if specified

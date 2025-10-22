@@ -24,6 +24,10 @@ const DIMENSION_PROPERTIES: Record<string, string> = {
   right: 'rightUnit',
   bottom: 'bottomUnit',
   left: 'leftUnit',
+  borderTopLeftRadius: 'borderTopLeftRadiusUnit',
+  borderTopRightRadius: 'borderTopRightRadiusUnit',
+  borderBottomLeftRadius: 'borderBottomLeftRadiusUnit',
+  borderBottomRightRadius: 'borderBottomRightRadiusUnit',
 }
 
 /**
@@ -97,16 +101,9 @@ export function convertFormValuesToCoralStyles(
 
       // Only process if we have a valid numeric value
       if (numericValue !== undefined && !isNaN(numericValue)) {
-        // Check if it's different from the default (compare numerically)
-        const defaultNumeric = typeof defaultValue === 'number' ? defaultValue :
-                              (typeof defaultValue === 'string' && defaultValue !== '') ? parseFloat(defaultValue) : undefined
-        const isDefaultValue = numericValue === defaultNumeric
-
-        if (!isDefaultValue) {
-          const convertedValue = convertFormValueToCoralStyle(key, numericValue, formValues)
-          if (convertedValue !== undefined) {
-            coralStyles[key] = convertedValue
-          }
+        const convertedValue = convertFormValueToCoralStyle(key, numericValue, formValues)
+        if (convertedValue !== undefined) {
+          coralStyles[key] = convertedValue
         }
       }
     } else {

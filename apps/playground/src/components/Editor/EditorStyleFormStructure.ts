@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
+import type { StyleSection } from './types'
 import { AppearanceGroups, zAppearanceSchema } from './Appearance'
 import { LayoutGroups, zLayoutSchema } from './Layout'
 import { PositionComponents, zPositionSchema } from './Position'
 import { SpacingGroups, zSpacingSchema } from './Spacing'
 import { TypographyGroup, zTypographySchema } from './Typography'
-import type { StyleSection } from './types'
 
 export const zStyleFormSchema = z.object({
   // Typography
@@ -27,7 +27,7 @@ const flattenComponents = (components: any[]): any[] => {
         if (group.type === 'inputWithOptions') {
           return [
             { name: group.name, defaultValue: group.defaultValue },
-            { name: group.selectName, defaultValue: group.options?.[0]?.value || 'px' } // Default to 'px'
+            { name: group.selectName, defaultValue: group.options?.[0]?.value || 'px' }, // Default to 'px'
           ]
         }
         return group

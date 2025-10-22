@@ -103,6 +103,7 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
   const [newAttrKey, setNewAttrKey] = useState('')
   const [newAttrValue, setNewAttrValue] = useState('')
   const [activeBreakpointId, setActiveBreakpointId] = useState<string | null>(null)
+  const [isUpdatingFromForm, setIsUpdatingFromForm] = useState(false)
 
   const styleForm = useForm<StyleFormSchema>({
     defaultValues: StyleFormDefaultValues,
@@ -111,7 +112,7 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
   // Update form when element or active breakpoint changes
   // Derive state from the element (source of truth)
   useEffect(() => {
-    if (!element) return
+    if (!element || isUpdatingFromForm) return
 
     const formValues = { ...StyleFormDefaultValues }
 
@@ -139,12 +140,15 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
     }
 
     styleForm.reset(formValues)
-  }, [element, element?.styles, element?.responsiveStyles, activeBreakpointId])
+  }, [element, element?.styles, element?.responsiveStyles, activeBreakpointId, isUpdatingFromForm])
 
   // Auto-apply styles on form change
   useEffect(() => {
     const subscription = styleForm.watch((values) => {
       if (!element) return
+
+      // Set flag to prevent form reset while updating
+      setIsUpdatingFromForm(true)
 
       // Convert form values (with separate unit fields) to Coral styles (with dimension objects)
       const coralStyles = convertFormValuesToCoralStyles(values as Record<string, unknown>, StyleFormDefaultValues)
@@ -155,14 +159,17 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
         const breakpointIndex = parseInt(activeBreakpointId.replace('breakpoint_', ''))
         const updatedResponsiveStyles = (element.responsiveStyles || []).map((rs, index) =>
           index === breakpointIndex
-            ? { ...rs, styles: Object.keys(coralStyles).length > 0 ? coralStyles : undefined }
+            ? { ...rs, styles: Object.keys(coralStyles).length > 0 ? { ...rs.styles, ...coralStyles } : undefined }
             : rs,
         )
         handleUpdateProperty('responsiveStyles', updatedResponsiveStyles)
       } else {
-        // Update base styles
-        handleUpdateProperty('styles', Object.keys(coralStyles).length > 0 ? coralStyles : undefined)
+        // Update base styles - merge with existing styles
+        handleUpdateProperty('styles', Object.keys(coralStyles).length > 0 ? { ...element.styles, ...coralStyles } : undefined)
       }
+
+      // Clear flag after a short delay to allow updates to propagate
+      setTimeout(() => setIsUpdatingFromForm(false), 0)
     })
 
     return () => subscription.unsubscribe()
