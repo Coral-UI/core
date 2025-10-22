@@ -117,4 +117,65 @@ describe('coralToHTML', () => {
     expect(result).toMatch(/\n/)
     expect(result.trim()).toMatch(/<div>\s*<p>Test<\/p>\s*<\/div>/)
   })
+
+  it('should handle styles with dimension objects', async () => {
+    const coralSpec: CoralRootNode = {
+      name: 'div',
+      elementType: 'div',
+      styles: {
+        fontSize: { value: 1.5, unit: 'rem' },
+        padding: 16,
+        margin: { value: 2, unit: 'em' },
+        width: { value: 100, unit: '%' },
+      },
+      children: [],
+    }
+
+    const result = await coralToHTML(coralSpec)
+    expect(result).toContain('style=')
+    expect(result).toContain('font-size: 1.5rem')
+    expect(result).toContain('padding: 16px')
+    expect(result).toContain('margin: 2em')
+    expect(result).toContain('width: 100%')
+  })
+
+  it('should handle styles with plain numbers', async () => {
+    const coralSpec: CoralRootNode = {
+      name: 'div',
+      elementType: 'div',
+      styles: {
+        fontSize: 16,
+        padding: 20,
+      },
+      textContent: 'Styled text',
+    }
+
+    const result = await coralToHTML(coralSpec)
+    expect(result).toContain('style=')
+    expect(result).toContain('font-size: 16px')
+    expect(result).toContain('padding: 20px')
+  })
+
+  it('should handle mixed styles and attributes', async () => {
+    const coralSpec: CoralRootNode = {
+      name: 'div',
+      elementType: 'div',
+      elementAttributes: {
+        class: 'container',
+        id: 'main',
+      },
+      styles: {
+        fontSize: { value: 1.25, unit: 'rem' },
+        color: '#333',
+      },
+      textContent: 'Content',
+    }
+
+    const result = await coralToHTML(coralSpec)
+    expect(result).toContain('class="container"')
+    expect(result).toContain('id="main"')
+    expect(result).toContain('style=')
+    expect(result).toContain('font-size: 1.25rem')
+    expect(result).toContain('color: #333')
+  })
 })

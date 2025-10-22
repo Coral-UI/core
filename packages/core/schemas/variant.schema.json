@@ -240,6 +240,47 @@
                 },
                 "required": ["angle", "type", "colors"],
                 "additionalProperties": false
+              },
+              {
+                "anyOf": [
+                  {
+                    "description": "A dimension value in pixels",
+                    "type": "number"
+                  },
+                  {
+                    "description": "A dimension value with explicit unit",
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "description": "The numeric value of the dimension",
+                        "type": "number"
+                      },
+                      "unit": {
+                        "description": "The unit of measurement",
+                        "type": "string",
+                        "enum": [
+                          "px",
+                          "em",
+                          "rem",
+                          "vw",
+                          "vh",
+                          "vmin",
+                          "vmax",
+                          "%",
+                          "ch",
+                          "ex",
+                          "cm",
+                          "mm",
+                          "in",
+                          "pt",
+                          "pc"
+                        ]
+                      }
+                    },
+                    "required": ["value", "unit"],
+                    "additionalProperties": false
+                  }
+                ]
               }
             ]
           },
@@ -435,6 +476,47 @@
                       },
                       "required": ["angle", "type", "colors"],
                       "additionalProperties": false
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "description": "A dimension value in pixels",
+                          "type": "number"
+                        },
+                        {
+                          "description": "A dimension value with explicit unit",
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "description": "The numeric value of the dimension",
+                              "type": "number"
+                            },
+                            "unit": {
+                              "description": "The unit of measurement",
+                              "type": "string",
+                              "enum": [
+                                "px",
+                                "em",
+                                "rem",
+                                "vw",
+                                "vh",
+                                "vmin",
+                                "vmax",
+                                "%",
+                                "ch",
+                                "ex",
+                                "cm",
+                                "mm",
+                                "in",
+                                "pt",
+                                "pc"
+                              ]
+                            }
+                          },
+                          "required": ["value", "unit"],
+                          "additionalProperties": false
+                        }
+                      ]
                     }
                   ]
                 },

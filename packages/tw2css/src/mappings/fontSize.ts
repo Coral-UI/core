@@ -2,131 +2,131 @@ export const fontSize = {
   'text-xs': [
     {
       property: 'fontSize',
-      value: 12,
+      value: { value: 12, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 16,
+      value: { value: 16, unit: 'px' },
     },
   ],
   'text-sm': [
     {
       property: 'fontSize',
-      value: 14,
+      value: { value: 14, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 20,
+      value: { value: 20, unit: 'px' },
     },
   ],
   'text-base': [
     {
       property: 'fontSize',
-      value: 16,
+      value: { value: 16, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 24,
+      value: { value: 24, unit: 'px' },
     },
   ],
   'text-lg': [
     {
       property: 'fontSize',
-      value: 18,
+      value: { value: 18, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 28,
+      value: { value: 28, unit: 'px' },
     },
   ],
   'text-xl': [
     {
       property: 'fontSize',
-      value: 20,
+      value: { value: 20, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 28,
+      value: { value: 28, unit: 'px' },
     },
   ],
   'text-2xl': [
     {
       property: 'fontSize',
-      value: 24,
+      value: { value: 24, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 32,
+      value: { value: 32, unit: 'px' },
     },
   ],
   'text-3xl': [
     {
       property: 'fontSize',
-      value: 30,
+      value: { value: 30, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 36,
+      value: { value: 36, unit: 'px' },
     },
   ],
   'text-4xl': [
     {
       property: 'fontSize',
-      value: 36,
+      value: { value: 36, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 40,
+      value: { value: 40, unit: 'px' },
     },
   ],
   'text-5xl': [
     {
       property: 'fontSize',
-      value: 48,
+      value: { value: 48, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 48,
+      value: { value: 48, unit: 'px' },
     },
   ],
   'text-6xl': [
     {
       property: 'fontSize',
-      value: 60,
+      value: { value: 60, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 60,
+      value: { value: 60, unit: 'px' },
     },
   ],
   'text-7xl': [
     {
       property: 'fontSize',
-      value: 72,
+      value: { value: 72, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 72,
+      value: { value: 72, unit: 'px' },
     },
   ],
   'text-8xl': [
     {
       property: 'fontSize',
-      value: 96,
+      value: { value: 96, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 96,
+      value: { value: 96, unit: 'px' },
     },
   ],
   'text-9xl': [
     {
       property: 'fontSize',
-      value: 128,
+      value: { value: 128, unit: 'px' },
     },
     {
       property: 'lineHeight',
-      value: 128,
+      value: { value: 128, unit: 'px' },
     },
   ],
 }

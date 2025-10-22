@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node esbuild.config.js)"
+      "Bash(pnpm --filter \"*playground*\" build)"
     ],
     "deny": [],
     "ask": []

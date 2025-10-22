@@ -9,6 +9,10 @@ import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { ElementTreeNode, ResponsiveStyle } from '@/hooks/useElementTree'
+import {
+  convertCoralStylesToFormValues,
+  convertFormValuesToCoralStyles,
+} from '@/utils/convertFormToCoralStyles'
 import { Icon123 } from '@tabler/icons-react'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -105,63 +109,64 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
   })
 
   // Update form when element or active breakpoint changes
+  // Derive state from the element (source of truth)
   useEffect(() => {
+    if (!element) return
+
     const formValues = { ...StyleFormDefaultValues }
 
     // Load styles from the active breakpoint or base styles
-    const stylesToLoad = activeBreakpointId
-      ? element?.responsiveStyles?.find((rs) => rs.id === activeBreakpointId)?.styles
-      : element?.styles
+    let stylesToLoad: Record<string, unknown> | undefined
+
+    if (activeBreakpointId) {
+      // Find the responsive style by index-based ID
+      const breakpointIndex = parseInt(activeBreakpointId.replace('breakpoint_', ''))
+      const responsiveStyle = element.responsiveStyles?.[breakpointIndex]
+      stylesToLoad = responsiveStyle?.styles
+    } else {
+      // Load base styles
+      stylesToLoad = element.styles
+    }
 
     if (stylesToLoad) {
-      Object.keys(stylesToLoad).forEach((key) => {
+      // Convert Coral styles (with dimension objects) to form values (with separate unit fields)
+      const convertedFormValues = convertCoralStylesToFormValues(stylesToLoad)
+      Object.keys(convertedFormValues).forEach((key) => {
         if (key in formValues) {
-          ;(formValues as any)[key] = (stylesToLoad as any)[key]
+          ;(formValues as any)[key] = (convertedFormValues as any)[key]
         }
       })
     }
 
     styleForm.reset(formValues)
-  }, [element, activeBreakpointId, styleForm])
+  }, [element, element?.styles, element?.responsiveStyles, activeBreakpointId])
 
   // Auto-apply styles on form change
   useEffect(() => {
     const subscription = styleForm.watch((values) => {
       if (!element) return
 
-      // Only include values that differ from defaults
-      const coralStyles: Record<string, unknown> = {}
-
-      Object.entries(values).forEach(([key, value]) => {
-        const defaultValue = StyleFormDefaultValues[key as keyof StyleFormSchema]
-
-        // Only add to coral styles if the value differs from default
-        const isDefault =
-          value === defaultValue ||
-          (value === '' && (defaultValue === '' || defaultValue === null || defaultValue === undefined)) ||
-          (value === null && defaultValue === null) ||
-          (value === undefined && defaultValue === undefined)
-
-        if (!isDefault && value !== '' && value !== null && value !== undefined) {
-          coralStyles[key] = value
-        }
-      })
+      // Convert form values (with separate unit fields) to Coral styles (with dimension objects)
+      const coralStyles = convertFormValuesToCoralStyles(values as Record<string, unknown>, StyleFormDefaultValues)
 
       // Update either the breakpoint styles or base styles
       if (activeBreakpointId) {
-        const updatedResponsiveStyles = (element.responsiveStyles || []).map((rs) =>
-          rs.id === activeBreakpointId
+        // Update the specific breakpoint's styles by index
+        const breakpointIndex = parseInt(activeBreakpointId.replace('breakpoint_', ''))
+        const updatedResponsiveStyles = (element.responsiveStyles || []).map((rs, index) =>
+          index === breakpointIndex
             ? { ...rs, styles: Object.keys(coralStyles).length > 0 ? coralStyles : undefined }
             : rs,
         )
         handleUpdateProperty('responsiveStyles', updatedResponsiveStyles)
       } else {
+        // Update base styles
         handleUpdateProperty('styles', Object.keys(coralStyles).length > 0 ? coralStyles : undefined)
       }
     })
 
     return () => subscription.unsubscribe()
-  }, [element, activeBreakpointId, styleForm])
+  }, [element, activeBreakpointId])
 
   if (!element) {
     return <EmptyEditorForm />
@@ -220,9 +225,12 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
   }
 
   const handleAddBreakpoint = (breakpoint: Omit<Breakpoint, 'id'>) => {
+    // Create responsive style using core schema structure
     const newBreakpoint: ResponsiveStyle = {
-      type: breakpoint.type,
-      value: breakpoint.value,
+      breakpoint: {
+        type: breakpoint.type,
+        value: breakpoint.value,
+      },
       label: breakpoint.label,
       styles: {},
     }
@@ -230,12 +238,14 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
     const updatedResponsiveStyles = [...(element.responsiveStyles || []), newBreakpoint]
     handleUpdateProperty('responsiveStyles', updatedResponsiveStyles)
 
-    // Auto-select the newly created breakpoint
-    setActiveBreakpointId(newBreakpoint.id)
+    // Auto-select the newly created breakpoint using index-based ID
+    const newBreakpointId = `breakpoint_${updatedResponsiveStyles.length - 1}`
+    setActiveBreakpointId(newBreakpointId)
   }
 
   const handleRemoveBreakpoint = (breakpointId: string) => {
-    const updatedResponsiveStyles = (element.responsiveStyles || []).filter((rs) => rs.id !== breakpointId)
+    const breakpointIndex = parseInt(breakpointId.replace('breakpoint_', ''))
+    const updatedResponsiveStyles = (element.responsiveStyles || []).filter((_, index) => index !== breakpointIndex)
     handleUpdateProperty('responsiveStyles', updatedResponsiveStyles.length > 0 ? updatedResponsiveStyles : undefined)
 
     // Clear selection if the active breakpoint was removed
@@ -249,12 +259,20 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
   }
 
   // Convert ResponsiveStyle to Breakpoint format for the UI
-  const breakpoints: Breakpoint[] = (element.responsiveStyles || []).map((rs) => ({
-    id: rs.id,
-    type: rs.type,
-    value: rs.value,
-    label: rs.label ?? undefined,
-  }))
+  // Use index-based IDs since core schema doesn't have ID field
+  const breakpoints: Breakpoint[] = (element.responsiveStyles || []).map((rs, index) => {
+    // Handle both old flat structure and new nested breakpoint structure
+    const breakpointData = 'breakpoint' in rs ? rs.breakpoint : rs
+    const type = 'type' in breakpointData ? breakpointData.type : 'min-width'
+    const value = 'value' in breakpointData ? breakpointData.value : '768px'
+
+    return {
+      id: `breakpoint_${index}`,
+      type: type as BreakpointType,
+      value: value as string,
+      label: rs.label ?? undefined,
+    }
+  })
 
   return (
     <Tabs defaultValue="styles" className="flex flex-col h-full">

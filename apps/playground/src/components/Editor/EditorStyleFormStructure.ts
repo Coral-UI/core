@@ -27,7 +27,7 @@ const flattenComponents = (components: any[]): any[] => {
         if (group.type === 'inputWithOptions') {
           return [
             { name: group.name, defaultValue: group.defaultValue },
-            { name: group.selectName, defaultValue: group.options?.[0]?.value }
+            { name: group.selectName, defaultValue: group.options?.[0]?.value || 'px' } // Default to 'px'
           ]
         }
         return group
