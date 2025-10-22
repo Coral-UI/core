@@ -150,8 +150,23 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
       // Set flag to prevent form reset while updating
       setIsUpdatingFromForm(true)
 
+      // Get current styles based on active breakpoint
+      let currentStyles: Record<string, unknown> | undefined
+      if (activeBreakpointId) {
+        const breakpointIndex = parseInt(activeBreakpointId.replace('breakpoint_', ''))
+        const responsiveStyle = element.responsiveStyles?.[breakpointIndex]
+        currentStyles = responsiveStyle?.styles as Record<string, unknown> | undefined
+      } else {
+        currentStyles = element.styles as Record<string, unknown> | undefined
+      }
+
       // Convert form values (with separate unit fields) to Coral styles (with dimension objects)
-      const coralStyles = convertFormValuesToCoralStyles(values as Record<string, unknown>, StyleFormDefaultValues)
+      // Pass current styles to avoid adding default values unnecessarily
+      const coralStyles = convertFormValuesToCoralStyles(
+        values as Record<string, unknown>,
+        StyleFormDefaultValues,
+        currentStyles
+      )
 
       // Update either the breakpoint styles or base styles
       if (activeBreakpointId) {

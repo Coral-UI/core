@@ -68,10 +68,12 @@ export function convertFormValueToCoralStyle(
 /**
  * Convert form values object to Coral styles object
  * Handles dimension properties by combining values and units
+ * Only includes values that differ from the current element styles
  */
 export function convertFormValuesToCoralStyles(
   formValues: Record<string, unknown>,
   defaultValues: Record<string, unknown>,
+  currentStyles?: Record<string, unknown>,
 ): Record<string, unknown> {
   const coralStyles: Record<string, unknown> = {}
 
@@ -99,11 +101,32 @@ export function convertFormValuesToCoralStyles(
         }
       }
 
-      // Only process if we have a valid numeric value
+      // Check if this value exists in current styles
+      const currentValue = currentStyles?.[key]
+      const currentNumeric =
+        typeof currentValue === 'object' && currentValue !== null && 'value' in currentValue
+          ? (currentValue as any).value
+          : typeof currentValue === 'number'
+            ? currentValue
+            : undefined
+
+      // Only include if:
+      // 1. We have a valid numeric value AND
+      // 2. Either the current style doesn't exist OR the value is different
       if (numericValue !== undefined && !isNaN(numericValue)) {
-        const convertedValue = convertFormValueToCoralStyle(key, numericValue, formValues)
-        if (convertedValue !== undefined) {
-          coralStyles[key] = convertedValue
+        // Always include if element already has this style set
+        if (currentNumeric !== undefined) {
+          const convertedValue = convertFormValueToCoralStyle(key, numericValue, formValues)
+          if (convertedValue !== undefined) {
+            coralStyles[key] = convertedValue
+          }
+        }
+        // Only include if different from default
+        else if (numericValue !== defaultValue) {
+          const convertedValue = convertFormValueToCoralStyle(key, numericValue, formValues)
+          if (convertedValue !== undefined) {
+            coralStyles[key] = convertedValue
+          }
         }
       }
     } else {

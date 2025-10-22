@@ -1,7 +1,15 @@
-import { IconAlignCenter, IconAlignJustified, IconAlignLeft, IconAlignRight, IconTextSize, IconTypography, IconPalette } from "@tabler/icons-react";
-import { FormComponent, GroupedComponent } from './types'
+import {
+  IconAlignCenter,
+  IconAlignJustified,
+  IconAlignLeft,
+  IconAlignRight,
+  IconPalette,
+  IconTextSize,
+  IconTypography,
+} from '@tabler/icons-react'
 import { z } from 'zod'
 
+import { FormComponent, GroupedComponent } from './types'
 
 export const zTypographySchema = z.object({
   fontFamily: z.string(),
@@ -75,7 +83,7 @@ export const TypographyGroup: (FormComponent | GroupedComponent)[] = [
           { label: '900', value: 'black' },
         ],
       },
-    ]
+    ],
   },
 
   {
@@ -93,8 +101,8 @@ export const TypographyGroup: (FormComponent | GroupedComponent)[] = [
         selectLabel: 'Unit',
         icon: IconTypography,
         options: [
-          { label: 'px', value: 'px' },
           { label: 'em', value: 'em' },
+          { label: 'px', value: 'px' },
           { label: 'rem', value: 'rem' },
           { label: 'vw', value: 'vw' },
           { label: 'vh', value: 'vh' },
@@ -118,7 +126,7 @@ export const TypographyGroup: (FormComponent | GroupedComponent)[] = [
           { label: 'vh', value: 'vh' },
         ],
       },
-    ]
+    ],
   },
 
   {
