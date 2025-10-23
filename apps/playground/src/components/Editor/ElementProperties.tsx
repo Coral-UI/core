@@ -1,18 +1,12 @@
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { ElementTreeNode, ResponsiveStyle } from '@/hooks/useElementTree'
-import {
-  convertCoralStylesToFormValues,
-  convertFormValuesToCoralStyles,
-} from '@/utils/convertFormToCoralStyles'
+import { convertCoralStylesToFormValues, convertFormValuesToCoralStyles } from '@/utils/convertFormToCoralStyles'
 import { Icon123 } from '@tabler/icons-react'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -109,6 +103,116 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
     defaultValues: StyleFormDefaultValues,
   })
 
+  // Helper to get current styles based on active breakpoint
+  const getCurrentStyles = (): Record<string, unknown> | undefined => {
+    if (!element) return undefined
+    if (activeBreakpointId) {
+      const breakpointIndex = parseInt(activeBreakpointId.replace('breakpoint_', ''))
+      const responsiveStyle = element.responsiveStyles?.[breakpointIndex]
+      return responsiveStyle?.styles as Record<string, unknown> | undefined
+    }
+    return element.styles as Record<string, unknown> | undefined
+  }
+
+  // Helper to check if a field is explicitly set
+  const isFieldSet = (fieldName: string): boolean => {
+    const currentStyles = getCurrentStyles()
+    return currentStyles?.[fieldName] !== undefined
+  }
+
+  // Helper to get inherited value info
+  const getInheritedFrom = (fieldName: string): string | undefined => {
+    if (!activeBreakpointId || !element) return undefined
+
+    // Check if it exists in base styles
+    if (element.styles?.[fieldName] !== undefined) {
+      return 'base styles'
+    }
+
+    // Check previous breakpoints
+    const currentIndex = parseInt(activeBreakpointId.replace('breakpoint_', ''))
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      const rs = element.responsiveStyles?.[i]
+      if (rs?.styles?.[fieldName] !== undefined) {
+        return rs.label || `breakpoint ${i}`
+      }
+    }
+
+    return undefined
+  }
+
+  // Handler to clear a field
+  const handleClearField = (fieldName: string) => {
+    if (!element) return
+
+    const currentStyles = getCurrentStyles()
+    if (!currentStyles) return
+
+    // Remove the field from styles
+    const newStyles = { ...currentStyles }
+    delete newStyles[fieldName]
+
+    // Check if this is a dimension property and also clear the unit field
+    const DIMENSION_PROPERTIES: Record<string, string> = {
+      fontSize: 'fontSizeUnit',
+      lineHeight: 'lineHeightUnit',
+      letterSpacing: 'letterSpacingUnit',
+      width: 'widthUnit',
+      height: 'heightUnit',
+      marginInlineStart: 'marginInlineStartUnit',
+      marginInlineEnd: 'marginInlineEndUnit',
+      marginBlockStart: 'marginBlockStartUnit',
+      marginBlockEnd: 'marginBlockEndUnit',
+      paddingInlineStart: 'paddingInlineStartUnit',
+      paddingInlineEnd: 'paddingInlineEndUnit',
+      paddingBlockStart: 'paddingBlockStartUnit',
+      paddingBlockEnd: 'paddingBlockEndUnit',
+      gapX: 'gapXUnit',
+      gapY: 'gapYUnit',
+      top: 'topUnit',
+      right: 'rightUnit',
+      bottom: 'bottomUnit',
+      left: 'leftUnit',
+      borderTopLeftRadius: 'borderTopLeftRadiusUnit',
+      borderTopRightRadius: 'borderTopRightRadiusUnit',
+      borderBottomLeftRadius: 'borderBottomLeftRadiusUnit',
+      borderBottomRightRadius: 'borderBottomRightRadiusUnit',
+    }
+
+    const unitFieldName = DIMENSION_PROPERTIES[fieldName]
+
+    // Temporarily block form updates while clearing
+    setIsUpdatingFromForm(true)
+
+    // Update element
+    if (activeBreakpointId) {
+      const breakpointIndex = parseInt(activeBreakpointId.replace('breakpoint_', ''))
+      const updatedResponsiveStyles = (element.responsiveStyles || []).map((rs, index) =>
+        index === breakpointIndex ? { ...rs, styles: Object.keys(newStyles).length > 0 ? newStyles : undefined } : rs,
+      )
+      handleUpdateProperty('responsiveStyles', updatedResponsiveStyles)
+    } else {
+      handleUpdateProperty('styles', Object.keys(newStyles).length > 0 ? newStyles : undefined)
+    }
+
+    // Reset form fields after element update
+    setTimeout(() => {
+      styleForm.setValue(fieldName as any, StyleFormDefaultValues[fieldName as keyof StyleFormSchema], {
+        shouldValidate: false,
+      })
+
+      // Also reset unit field if it exists
+      if (unitFieldName) {
+        styleForm.setValue(unitFieldName as any, StyleFormDefaultValues[unitFieldName as keyof StyleFormSchema], {
+          shouldValidate: false,
+        })
+      }
+
+      // Re-enable form updates
+      setTimeout(() => setIsUpdatingFromForm(false), 0)
+    }, 0)
+  }
+
   // Update form when element or active breakpoint changes
   // Derive state from the element (source of truth)
   useEffect(() => {
@@ -165,7 +269,7 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
       const coralStyles = convertFormValuesToCoralStyles(
         values as Record<string, unknown>,
         StyleFormDefaultValues,
-        currentStyles
+        currentStyles,
       )
 
       // Update either the breakpoint styles or base styles
@@ -180,7 +284,10 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
         handleUpdateProperty('responsiveStyles', updatedResponsiveStyles)
       } else {
         // Update base styles - merge with existing styles
-        handleUpdateProperty('styles', Object.keys(coralStyles).length > 0 ? { ...element.styles, ...coralStyles } : undefined)
+        handleUpdateProperty(
+          'styles',
+          Object.keys(coralStyles).length > 0 ? { ...element.styles, ...coralStyles } : undefined,
+        )
       }
 
       // Clear flag after a short delay to allow updates to propagate
@@ -317,11 +424,14 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
             onSelectBreakpoint={handleSelectBreakpoint}
           />
 
-
-
-
           <Form {...styleForm}>
-            <EditorStyleFormComponents form={styleForm} components={StyleFormComponents} />
+            <EditorStyleFormComponents
+              form={styleForm}
+              components={StyleFormComponents}
+              isFieldSet={isFieldSet}
+              getInheritedFrom={getInheritedFrom}
+              onClearField={handleClearField}
+            />
           </Form>
         </div>
       </TabsContent>

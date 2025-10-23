@@ -14,9 +14,15 @@ import { StyleFormSchema } from './EditorStyleFormStructure'
 export const EditorStyleFormComponents = ({
   form,
   components,
+  isFieldSet,
+  getInheritedFrom,
+  onClearField,
 }: {
   form: UseFormReturn<StyleFormSchema>
   components: StyleSection[]
+  isFieldSet?: (fieldName: string) => boolean
+  getInheritedFrom?: (fieldName: string) => string | undefined
+  onClearField?: (fieldName: string) => void
 }) => {
   const shouldShowComponent = (formComponent: FormComponent) => {
     if (formComponent.showWhen) {
@@ -41,6 +47,9 @@ export const EditorStyleFormComponents = ({
             label={formComponent.label}
             placeholder={formComponent.placeholder || ''}
             hideLabel={formComponent.hideLabel ?? false}
+            isSet={isFieldSet?.(formComponent.name)}
+            inheritedFrom={getInheritedFrom?.(formComponent.name)}
+            onClear={onClearField ? () => onClearField(formComponent.name) : undefined}
           />
         )
       case 'inputWithOptions':
@@ -59,6 +68,9 @@ export const EditorStyleFormComponents = ({
             icon={formComponent.icon}
             iconClassName={formComponent.iconClassName ?? undefined}
             hideLabel={formComponent.hideLabel ?? false}
+            isSet={isFieldSet?.(formComponent.name)}
+            inheritedFrom={getInheritedFrom?.(formComponent.name)}
+            onClear={onClearField ? () => onClearField(formComponent.name) : undefined}
           />
         )
       case 'input':
@@ -73,6 +85,9 @@ export const EditorStyleFormComponents = ({
             icon={formComponent.icon}
             iconClassName={formComponent.iconClassName ?? undefined}
             hideLabel={formComponent.hideLabel ?? false}
+            isSet={isFieldSet?.(formComponent.name)}
+            inheritedFrom={getInheritedFrom?.(formComponent.name)}
+            onClear={onClearField ? () => onClearField(formComponent.name) : undefined}
           />
         )
       case 'select':
@@ -87,6 +102,9 @@ export const EditorStyleFormComponents = ({
             icon={formComponent.icon}
             iconClassName={formComponent.iconClassName ?? undefined}
             hideLabel={formComponent.hideLabel ?? false}
+            isSet={isFieldSet?.(formComponent.name)}
+            inheritedFrom={getInheritedFrom?.(formComponent.name)}
+            onClear={onClearField ? () => onClearField(formComponent.name) : undefined}
           />
         )
       case 'toggle':
