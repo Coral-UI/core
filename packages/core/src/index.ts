@@ -30,3 +30,5 @@ export type {
 export type { CoralVariantType } from '@structures/variant'
 export type { CoralTSTypes } from '@structures/TStypes'
 export type { CoralElementType } from '@structures/utilities'
+
+export { pascalCaseString } from '@utils/pascalCaseString'
