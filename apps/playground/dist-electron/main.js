@@ -1,7 +1,7 @@
-import { app, BrowserWindow, ipcMain, dialog } from "electron";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
 import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 process.env["APP_ROOT"] = path.join(__dirname, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
@@ -20,6 +20,7 @@ function createWindow() {
       nodeIntegration: false
     }
   });
+  win.maximize();
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
   });

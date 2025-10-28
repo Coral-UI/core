@@ -1,11 +1,15 @@
-import { Icon } from '@tabler/icons-react'
+import React from 'react'
+
+// Icon component type - flexible to accept various icon library types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type IconComponent = React.ComponentType<any>
 
 // Base component shared properties
 export type BaseComponent = {
   label: string
   name: string
-  defaultValue: unknown
-  icon?: typeof Icon
+  defaultValue: string | number | boolean
+  icon?: IconComponent
   iconClassName?: string
   showWhen?: {
     field: string
@@ -52,7 +56,7 @@ export type ColorComponent = BaseComponent & {
 // Toggle component type
 export type ToggleComponent = BaseComponent & {
   type: 'toggle'
-  options: { label: string; value: string; icon?: typeof Icon }[]
+  options: { label: string; value: string; icon?: IconComponent }[]
   hideLabel?: boolean
 }
 

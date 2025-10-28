@@ -1,10 +1,10 @@
 import { Field, FieldLabel } from '@/components/ui/field'
 import { FormControl, FormField, FormItem } from '@/components/ui/form'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { FieldValues, UseFormReturn } from 'react-hook-form'
+import { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form'
 
 type ToggleProps<T extends FieldValues = FieldValues> = {
-  name: string
+  name: FieldPath<T>
   label: string
   options: {
     label: string
@@ -25,7 +25,7 @@ export const Toggle = <T extends FieldValues = FieldValues>({
   return (
     <FormField
       control={form.control}
-      name={name as any}
+      name={name}
       render={({ field }) => (
         <Field>
           {!hideLabel ? (
@@ -37,12 +37,7 @@ export const Toggle = <T extends FieldValues = FieldValues>({
           )}
           <FormItem>
             <FormControl>
-              <ToggleGroup
-                type="single"
-                variant="outline"
-                value={field.value}
-                onValueChange={field.onChange}
-              >
+              <ToggleGroup type="single" variant="outline" value={field.value} onValueChange={field.onChange}>
                 {options.map((option) => (
                   <ToggleGroupItem key={option.value} value={option.value} aria-label={option.label}>
                     {option.icon && <option.icon className="size-4" />}

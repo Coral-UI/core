@@ -1,12 +1,12 @@
 import { Checkbox as CheckboxPrimitive } from '@/components/ui/checkbox'
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
-import { UseFormReturn } from 'react-hook-form'
+import { FieldValues, UseFormReturn } from 'react-hook-form'
 
 type CheckboxProps = {
   name: string
   label: string
   items: { label: string; id: string }[]
-  form: UseFormReturn<any>
+  form: UseFormReturn<FieldValues>
 }
 
 export const Checkbox = ({ name, label, form, items }: CheckboxProps) => {

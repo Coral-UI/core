@@ -5,32 +5,30 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
-import { FieldValues, UseFormReturn } from 'react-hook-form'
+import { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form'
 
 type InputProps<T extends FieldValues = FieldValues> = {
-  name: string
+  name: FieldPath<T>
   label: string
   placeholder: string
-  description?: string
+  description?: string | undefined
   form: UseFormReturn<T>
-  className?: string
-  disabled?: boolean
-  type?: 'text' | 'number' | 'email' | 'password' | 'url' | 'search' | 'color'
-  icon?: React.ComponentType<{ className?: string }>
+  className?: string | undefined
+  disabled?: boolean | undefined
+  type?: 'text' | 'number' | 'email' | 'password' | 'url' | 'search' | 'color' | undefined
+  icon?: React.ComponentType<{ className?: string }> | undefined
   iconClassName?: string | undefined
-  hideLabel?: boolean
-  isSet?: boolean
-  inheritedFrom?: string
-  onClear?: () => void
+  hideLabel?: boolean | undefined
+  isSet?: boolean | undefined
+  inheritedFrom?: string | undefined
+  onClear?: (() => void) | undefined
 }
 
 export const Input = <T extends FieldValues = FieldValues>({
   name,
   label,
   placeholder,
-  description,
   form,
-  className,
   disabled,
   type = 'text',
   icon: Icon,
@@ -43,7 +41,7 @@ export const Input = <T extends FieldValues = FieldValues>({
   return (
     <FormField
       control={form.control}
-      name={name as any}
+      name={name}
       disabled={disabled || false}
       render={({ field, fieldState }) => (
         <Field className="flex items-center" data-invalid={fieldState.invalid}>

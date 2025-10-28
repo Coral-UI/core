@@ -1,10 +1,10 @@
-import { Badge } from '@/components/base/Badge'
-import { Button } from '@/components/base/Button'
-import { EditorPreviewPane } from '@/components/Editor/EditorPreviewPane'
-import { EditorSidebar } from '@/components/Editor/EditorSidebar'
-import { ElementProperties } from '@/components/Editor/ElementProperties'
+import { ElementProperties } from '@/components/Editor/Configuration/ElementProperties'
+import { EditorSidebar } from '@/components/Editor/ElementTree/EditorSidebar'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
-import { useElementTree } from '@/hooks/useElementTree'
+import { EditorPreviewPane } from '@/components/Editor/Preview/EditorPreviewPane'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { ElementTreeNode, useElementTree } from '@/hooks/useElementTree'
 import { IconFileImport } from '@tabler/icons-react'
 import { Redo, Undo } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -33,7 +33,7 @@ export const Editor = () => {
       } as CoralRootNode
     }
 
-    const buildCoralNode = (element: any): any => {
+    const buildCoralNode = (element: ElementTreeNode): CoralRootNode => {
       const node = {
         id: element.id, // Preserve ID for click handlers
         name: element.name,
@@ -44,14 +44,19 @@ export const Editor = () => {
         elementAttributes: element.elementAttributes,
         styles: element.styles, // Include styles in the coral spec
         responsiveStyles: element.responsiveStyles, // Include responsive styles
-        children: element.children?.length > 0 ? element.children.map(buildCoralNode) : undefined,
+        children:
+          element.children && element.children.length > 0
+            ? element.children.map((child) => buildCoralNode(child as ElementTreeNode))
+            : undefined,
       }
 
-      return Object.fromEntries(Object.entries(node).filter(([_, value]) => value !== undefined))
+      return Object.fromEntries(
+        Object.entries(node).filter(([_, value]) => value !== undefined),
+      ) as unknown as CoralRootNode
     }
 
     if (elementTree.length === 1) {
-      return buildCoralNode(elementTree[0]) as CoralRootNode
+      return buildCoralNode(elementTree[0]!) as CoralRootNode
     }
 
     return {
@@ -137,8 +142,8 @@ export const Editor = () => {
   }, [undo, redo, canUndo, canRedo])
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-2.5rem)] max-h-[calc(100dvh-2.5rem)] overflow-hidden mt-10">
-      <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-background shrink-0">
+    <div className="flex flex-col w-full h-[calc(100dvh-2.5rem)] mt-10 bg-background">
+      <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-background shrink-0 h-10">
         <div className="flex items-center gap-2 place-self-center">
           <p className="text-xs font-medium">Name</p>
           <Badge variant="secondary">Unsaved</Badge>
@@ -161,20 +166,17 @@ export const Editor = () => {
           </Button>
         </div>
       </div>
-      <div className="flex flex-1">
+      <div className="flex flex-1 h-[calc(100dvh-2.5rem)] max-h-[calc(100dvh-2.5rem)] overflow-hidden">
         <aside className="w-64 bg-background flex flex-col h-full overflow-hidden border-r border-border">
-          <div className="flex-1 overflow-auto">
-            <EditorSidebar onElementSelect={handleElementSelect} elementTreeHook={elementTreeHook} />
-          </div>
+          <EditorSidebar onElementSelect={handleElementSelect} elementTreeHook={elementTreeHook} />
         </aside>
-        <div className="bg-background flex-1 overflow-hidden">
+        <main className="bg-background flex-1 overflow-hidden">
           <EditorPreviewPane spec={spec} onElementClick={handleElementSelect} selectedElementId={selectedElementId} />
-        </div>
-        <aside className="bg-background w-96 h-full overflow-hidden border-l border-border">
+        </main>
+        <aside className="w-96 bg-background h-full overflow-hidden border-l border-border">
           <ElementProperties element={selectedElement || null} onUpdateElement={updateElement} />
         </aside>
       </div>
-
       <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} />
     </div>
   )

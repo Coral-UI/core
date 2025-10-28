@@ -1,7 +1,7 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron'
-import { fileURLToPath } from 'node:url'
-import path from 'node:path'
 import fs from 'node:fs/promises'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { app, BrowserWindow, dialog, ipcMain } from 'electron'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -21,9 +21,7 @@ export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 export const MAIN_DIST = path.join(process.env['APP_ROOT']!, 'dist-electron')
 export const RENDERER_DIST = path.join(process.env['APP_ROOT']!, 'dist')
 
-process.env['VITE_PUBLIC'] = VITE_DEV_SERVER_URL
-  ? path.join(process.env['APP_ROOT']!, 'public')
-  : RENDERER_DIST
+process.env['VITE_PUBLIC'] = VITE_DEV_SERVER_URL ? path.join(process.env['APP_ROOT']!, 'public') : RENDERER_DIST
 
 let win: BrowserWindow | null
 
@@ -38,6 +36,8 @@ function createWindow() {
       nodeIntegration: false,
     },
   })
+
+  win.maximize()
 
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {

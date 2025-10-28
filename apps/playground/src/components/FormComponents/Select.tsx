@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
-import { FormControl, FormField, FormItem } from '@/components/ui/form'
+import { FormControl, FormField } from '@/components/ui/form'
 import { InputGroup, InputGroupAddon } from '@/components/ui/input-group'
 import {
   SelectContent,
@@ -12,23 +12,23 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
-import { FieldValues, UseFormReturn } from 'react-hook-form'
+import { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form'
 
 type SelectProps<T extends FieldValues = FieldValues> = {
-  name: string
+  name: FieldPath<T>
   label: string
-  disabled?: boolean
-  description?: React.ReactNode
-  placeholder?: string
+  disabled?: boolean | undefined
+  description?: React.ReactNode | undefined
+  placeholder?: string | undefined
   options: { label: string; value: string }[]
   form: UseFormReturn<T>
-  className?: string
-  icon?: React.ComponentType<{ className?: string }>
+  className?: string | undefined
+  icon?: React.ComponentType<{ className?: string }> | undefined
   iconClassName?: string | undefined
-  hideLabel?: boolean
-  isSet?: boolean
-  inheritedFrom?: string
-  onClear?: () => void
+  hideLabel?: boolean | undefined
+  isSet?: boolean | undefined
+  inheritedFrom?: string | undefined
+  onClear?: (() => void) | undefined
 }
 
 export const Select = <T extends FieldValues = FieldValues>({
@@ -39,7 +39,6 @@ export const Select = <T extends FieldValues = FieldValues>({
   options,
   form,
   hideLabel = false,
-  className,
   icon: Icon,
   iconClassName,
   isSet = false,
@@ -49,11 +48,17 @@ export const Select = <T extends FieldValues = FieldValues>({
   return (
     <FormField
       control={form.control}
-      name={name as any}
+      name={name}
       disabled={disabled || false}
       render={({ field, fieldState }) => (
         <Field className="flex items-center" data-invalid={fieldState.invalid}>
-          {!hideLabel ? <FieldLabel htmlFor={field.name}>{label}</FieldLabel> : <label htmlFor={field.name} className="sr-only">{label}</label>}
+          {!hideLabel ? (
+            <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+          ) : (
+            <label htmlFor={field.name} className="sr-only">
+              {label}
+            </label>
+          )}
           <div className="flex items-center gap-1 w-full">
             <InputGroup className={cn(isSet && 'ring-2 ring-destructive/50')}>
               <SelectPrimitive
@@ -69,7 +74,11 @@ export const Select = <T extends FieldValues = FieldValues>({
                 disabled={disabled || false}
               >
                 <FormControl>
-                  <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="border-transparent w-full bg-transparent">
+                  <SelectTrigger
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    className="border-transparent w-full bg-transparent"
+                  >
                     <SelectValue placeholder={placeholder} />
                   </SelectTrigger>
                 </FormControl>

@@ -5,13 +5,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
 import { matchIsValidColor, MuiColorInput } from 'mui-color-input'
-import { SketchPicker } from 'react-color'
-import { FieldValues, UseFormReturn } from 'react-hook-form'
+import { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form'
 
 import './ColorInput.css'
 
 type ColorInputProps<T extends FieldValues = FieldValues> = {
-  name: string
+  name: FieldPath<T>
   label: string
   placeholder: string
   description?: string
@@ -22,20 +21,15 @@ type ColorInputProps<T extends FieldValues = FieldValues> = {
   iconClassName?: string | undefined
   hideLabel?: boolean
   isSet?: boolean
-  inheritedFrom?: string
-  onClear?: () => void
+  inheritedFrom?: string | undefined
+  onClear?: (() => void) | undefined
 }
 
 export const Color = <T extends FieldValues = FieldValues>({
   name,
   label,
-  placeholder,
-  description,
   form,
-  className,
   disabled,
-  icon: Icon,
-  iconClassName,
   hideLabel = false,
   isSet = false,
   inheritedFrom,
@@ -45,7 +39,7 @@ export const Color = <T extends FieldValues = FieldValues>({
     <FormField
       rules={{ validate: matchIsValidColor }}
       control={form.control}
-      name={name as any}
+      name={name}
       disabled={disabled || false}
       render={({ field, fieldState }) => (
         <Field className="flex items-center" data-invalid={fieldState.invalid}>
@@ -93,25 +87,5 @@ export const Color = <T extends FieldValues = FieldValues>({
         </Field>
       )}
     />
-
-    // <InputGroup>
-    //   <FormField
-    //     control={form.control}
-    //     name={name as any}
-    //     disabled={disabled || false}
-    //     render={({ field }) => (
-    //       <FormItem className={cn('col-span-1 flex-1')}>
-    //         <InputGroupInput disabled={disabled} placeholder={placeholder} type={'color'} {...field} className="min-w-6" />
-    //       </FormItem>
-    //     )}
-    //   />
-
-    //   {Icon && (
-    //     <InputGroupAddon align="inline-start">
-    //       <Icon className={cn('size-4 text-muted-foreground shrink-0', iconClassName)} />
-    //     </InputGroupAddon>
-    //   )}
-
-    // </InputGroup>
   )
 }

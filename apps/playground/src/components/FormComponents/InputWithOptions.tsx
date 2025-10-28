@@ -7,27 +7,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
-import { FieldValues, UseFormReturn } from 'react-hook-form'
+import { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form'
 
 type InputWithOptionsProps<T extends FieldValues = FieldValues> = {
-  inputName: string
+  inputName: FieldPath<T>
   inputLabel: string
   inputType: 'text' | 'number' | 'email' | 'password' | 'url' | 'search'
   inputPlaceholder: string
-  inputClassName?: string
-  selectClassName?: string
-  disabled?: boolean
-  selectName: string
+  inputClassName?: string | undefined
+  selectClassName?: string | undefined
+  disabled?: boolean | undefined
+  selectName: FieldPath<T>
   selectLabel?: string | undefined
   selectPlaceholder: string
   options: { label: string; value: string }[]
   form: UseFormReturn<T>
-  icon?: React.ComponentType<{ className?: string }>
+  icon?: React.ComponentType<{ className?: string }> | undefined
   iconClassName?: string | undefined
-  hideLabel?: boolean
-  isSet?: boolean
-  inheritedFrom?: string
-  onClear?: () => void
+  hideLabel?: boolean | undefined
+  isSet?: boolean | undefined
+  inheritedFrom?: string | undefined
+  onClear?: (() => void) | undefined
 }
 
 export const InputWithOptions = <T extends FieldValues = FieldValues>({
@@ -64,7 +64,7 @@ export const InputWithOptions = <T extends FieldValues = FieldValues>({
           <InputGroup>
             <FormField
               control={form.control}
-              name={inputName as any}
+              name={inputName}
               render={({ field }) => (
                 <FormItem className={cn(inputClassName, 'col-span-1 flex-1')}>
                   <InputGroupInput {...field} disabled={disabled} placeholder={inputPlaceholder} type={inputType} />
@@ -80,7 +80,7 @@ export const InputWithOptions = <T extends FieldValues = FieldValues>({
 
           <FormField
             control={form.control}
-            name={selectName as any}
+            name={selectName}
             render={({ field }) => (
               <FormItem className={cn(selectClassName)}>
                 {selectLabel && (
