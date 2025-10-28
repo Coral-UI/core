@@ -11,6 +11,10 @@ import { routeTree } from './routeTree.gen'
 import './index.css'
 
 import { ThemeProvider } from './components/ThemeProvider'
+import { getPlatform } from './lib/adapters'
+
+// Log platform on startup
+console.log(`🚀 Coral Playground running on: ${getPlatform()}`)
 
 // Create a new router instance
 const router = createRouter({ routeTree })

@@ -1,4 +1,12 @@
 packages:
-  - "apps/*"
-  - "packages/*"
-  - "utilities/*"
+  - apps/*
+  - packages/*
+  - utilities/*
+
+ignoredBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - electron
+  - electron-winstaller
+  - esbuild
+  - sharp
+  - unrs-resolver

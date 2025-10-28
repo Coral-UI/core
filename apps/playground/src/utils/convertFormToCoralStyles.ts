@@ -105,7 +105,7 @@ export function convertFormValuesToCoralStyles(
       const currentValue = currentStyles?.[key]
       const currentNumeric =
         typeof currentValue === 'object' && currentValue !== null && 'value' in currentValue
-          ? (currentValue as any).value
+          ? (currentValue as Dimension & { value: number }).value
           : typeof currentValue === 'number'
             ? currentValue
             : undefined
@@ -166,8 +166,8 @@ export function convertCoralStylesToFormValues(coralStyles: Record<string, unkno
       value !== null &&
       'value' in value &&
       'unit' in value &&
-      typeof (value as any).value === 'number' &&
-      typeof (value as any).unit === 'string'
+      typeof (value as Dimension & { value: number }).value === 'number' &&
+      typeof (value as Dimension & { unit: string }).unit === 'string'
     ) {
       const dimension = value as Dimension & { value: number; unit: string }
       formValues[key] = dimension.value
