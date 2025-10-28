@@ -79,7 +79,7 @@ export const EditorPreviewPane = ({
                 size="lg"
                 key={preset.name}
                 value={preset.width.toString()}
-                aria-title={`${preset.name} (${preset.width}px)`}
+                aria-label={`${preset.name} (${preset.width}px)`}
               >
                 {preset.icon}
               </ToggleGroupItem>

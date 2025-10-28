@@ -66,7 +66,7 @@ export function AddElementCombobox({ validChildTypes, onSelect }: AddElementComb
                   >
                     {elementType.icon}
                     <span className="text-xs flex-1">{elementType.label}</span>
-                    <span className="text-xxs text-muted-foreground font-mono tabular-nums uppercase">
+                    <span className="text-xxs text-muted-foreground font-mono tabular-nums uppercase tracking-widest">
                       {elementType.type}
                     </span>
                   </CommandItem>

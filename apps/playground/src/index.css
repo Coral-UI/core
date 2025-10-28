@@ -71,13 +71,13 @@ html {
   --popover-foreground: oklch(0.5189 0.2431 264.6251);
   --primary: oklch(0.5399 0.1912 260.0103);
   --primary-foreground: oklch(0.9712 0.0136 258.3446);
-  --secondary: oklch(0.3446 0 0);
-  --secondary-foreground: oklch(1.0000 0 0);
+  --secondary: oklch(0.2955 0.0504 264.6371);
+  --secondary-foreground: oklch(0.9880 0.0041 91.4455);
   --muted: oklch(0.2720 0.0036 106.6382);
   --muted-foreground: oklch(0.8122 0.0107 81.7931);
   --accent: oklch(0.3236 0.0453 260.0775);
   --accent-foreground: oklch(1.0000 0 0);
-  --destructive: oklch(0.3290 0 0);
+  --destructive: oklch(0.5050 0.2130 27.5180);
   --destructive-foreground: oklch(0.9401 0 0);
   --border: oklch(0.2720 0.0036 106.6382);
   --input: oklch(0.3446 0 0);
@@ -153,7 +153,7 @@ html {
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
 
-  --text-xxs: 0.625rem;
+  --text-xxs: 0.6125rem;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -175,10 +175,6 @@ html {
   --tracking-wide: calc(var(--tracking-normal) + 0.025em);
   --tracking-wider: calc(var(--tracking-normal) + 0.05em);
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
-}
-
-body {
-  letter-spacing: var(--tracking-normal);
 }
 
 body {
