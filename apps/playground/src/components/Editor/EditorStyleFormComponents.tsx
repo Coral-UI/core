@@ -3,7 +3,6 @@ import { Input } from '@/components/FormComponents/Input'
 import { InputWithOptions } from '@/components/FormComponents/InputWithOptions'
 import { Select } from '@/components/FormComponents/Select'
 import { Toggle } from '@/components/FormComponents/Toggle'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { FieldGroup, FieldLegend } from '@/components/ui/field'
 import { ChevronRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
@@ -149,17 +148,17 @@ export const EditorStyleFormComponents = ({
 
   const formComponents = components.map((component) => {
     return (
-      <Collapsible key={component.label} className="w-full border-b border-border" defaultOpen>
-        <CollapsibleTrigger className="group flex w-full items-center gap-2 text-xs font-medium tracking-tight py-3  transition-colors justify-between">
+      <div key={component.label} className="w-full border-b border-border">
+        <div className="group flex w-full items-center gap-2 text-xs font-medium tracking-tight py-3  transition-colors justify-between">
           {component.label}
           <ChevronRight className="size-4 transition-transform group-data-[state=open]:rotate-90" />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pb-4">
+        </div>
+        <div className="pb-4">
           <FieldGroup>{component.components?.map((item) => renderComponentOrGroup(item))}</FieldGroup>
-        </CollapsibleContent>
-      </Collapsible>
+        </div>
+      </div>
     )
   })
 
-  return <div className="flex flex-col">{formComponents}</div>
+  return <div className="flex flex-col h-full overflow-hidden">{formComponents}</div>
 }

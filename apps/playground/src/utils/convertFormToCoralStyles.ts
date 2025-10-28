@@ -130,14 +130,20 @@ export function convertFormValuesToCoralStyles(
         }
       }
     } else {
-      // For non-dimension properties, use the original logic
+      // For non-dimension properties
       const isDefault =
         value === defaultValue ||
         (value === '' && (defaultValue === '' || defaultValue === null || defaultValue === undefined)) ||
         (value === null && defaultValue === null) ||
         (value === undefined && defaultValue === undefined)
 
-      if (!isDefault && hasValue) {
+      // Always include if element already has this style set (even if changing back to default)
+      // This allows users to explicitly change from a custom value back to the default
+      if (currentStyles?.[key] !== undefined && hasValue) {
+        coralStyles[key] = value
+      }
+      // Only include new values if different from default
+      else if (!isDefault && hasValue) {
         coralStyles[key] = value
       }
     }

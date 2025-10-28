@@ -7,86 +7,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { ElementTreeNode, ResponsiveStyle } from '@/hooks/useElementTree'
 import { convertCoralStylesToFormValues, convertFormValuesToCoralStyles } from '@/utils/convertFormToCoralStyles'
-import { Icon123 } from '@tabler/icons-react'
+import { IconIcons, IconSettings } from '@tabler/icons-react'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { CoralElementType } from '@reallygoodwork/coral-core'
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Breakpoint, BreakpointManager } from './BreakpointManager'
-import { EmptyEditorForm } from './EditorFormEmpty'
 import { EditorStyleFormComponents } from './EditorStyleFormComponents'
 import { StyleFormComponents, StyleFormDefaultValues, StyleFormSchema } from './EditorStyleFormStructure'
-
-const ELEMENT_TYPES: CoralElementType[] = [
-  'div',
-  'section',
-  'header',
-  'footer',
-  'main',
-  'nav',
-  'article',
-  'aside',
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'p',
-  'span',
-  'text',
-  'button',
-  'input',
-  'a',
-  'img',
-  'ul',
-  'ol',
-  'li',
-  'form',
-  'textarea',
-  'select',
-  'option',
-  'table',
-  'tr',
-  'td',
-  'th',
-  'thead',
-  'tbody',
-  'tfoot',
-  'caption',
-  'time',
-  'figure',
-  'figcaption',
-  'strong',
-  'em',
-  'code',
-  'pre',
-  'blockquote',
-  'hr',
-  'br',
-  'label',
-  'fieldset',
-  'legend',
-  'audio',
-  'video',
-  'source',
-  'canvas',
-  'svg',
-  'circle',
-  'rect',
-  'path',
-  'ellipse',
-  'polygon',
-  'line',
-  'polyline',
-  'g',
-  'dl',
-  'dt',
-  'dd',
-]
+import { ElementTypeCombobox } from './ElementTypeCombobox'
+import { EmptyEditorForm } from './EditorFormEmpty'
 
 interface ElementPropertiesProps {
   element: ElementTreeNode | null
@@ -397,7 +329,7 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
 
     return {
       id: `breakpoint_${index}`,
-      type: type as BreakpointType,
+      type: type as 'min-width' | 'max-width' | 'min-height' | 'max-height',
       value: value as string,
       label: rs.label ?? undefined,
     }
@@ -405,16 +337,18 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
 
   return (
     <Tabs defaultValue="styles" className="flex flex-col h-full">
-      <div className="w-full border-b border-border px-4 py-2 shrink-0">
-        <TabsList>
+      <div className="w-full border-b border-border shrink-0 p-2">
+        <TabsList className="w-full">
           <TabsTrigger value="styles">
-            <Icon123 /> Styles
+            <IconIcons /> Styles
           </TabsTrigger>
-          <TabsTrigger value="properties">Properties</TabsTrigger>
+          <TabsTrigger value="properties">
+            <IconSettings /> Properties
+          </TabsTrigger>
         </TabsList>
       </div>
 
-      <TabsContent value="styles" className="flex-1 m-0 overflow-y-auto">
+      <TabsContent value="styles" className="flex-1 m-0 overflow-auto">
         <div className="p-4 flex flex-col">
           <BreakpointManager
             breakpoints={breakpoints}
@@ -436,7 +370,7 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
         </div>
       </TabsContent>
 
-      <TabsContent value="properties" className="flex-1 m-0 overflow-y-auto">
+      <TabsContent value="properties" className="flex-1 m-0 overflow-auto">
         <div className="border-b border-border py-4">
           <FieldSet>
             <FieldLegend variant="label">Element Properties</FieldLegend>
@@ -455,18 +389,7 @@ export const ElementProperties = ({ element, onUpdateElement }: ElementPropertie
 
               <Field>
                 <FieldLabel htmlFor="element-type">Element Type</FieldLabel>
-                <Select value={element.elementType} onValueChange={handleElementTypeChange}>
-                  <SelectTrigger id="element-type">
-                    <SelectValue placeholder="Select element type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ELEMENT_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ElementTypeCombobox value={element.elementType} onChange={handleElementTypeChange} />
               </Field>
 
               {element.elementType === 'text' ||

@@ -1,11 +1,13 @@
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
-import { FormField, FormItem } from '@/components/ui/form'
+import { FormField } from '@/components/ui/form'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
 import { matchIsValidColor, MuiColorInput } from 'mui-color-input'
+import { SketchPicker } from 'react-color'
 import { FieldValues, UseFormReturn } from 'react-hook-form'
+
 import './ColorInput.css'
 
 type ColorInputProps<T extends FieldValues = FieldValues> = {
@@ -47,9 +49,15 @@ export const Color = <T extends FieldValues = FieldValues>({
       disabled={disabled || false}
       render={({ field, fieldState }) => (
         <Field className="flex items-center" data-invalid={fieldState.invalid}>
-          {!hideLabel ? <FieldLabel htmlFor={field.name}>{label}</FieldLabel> : <label htmlFor={field.name} className="sr-only">{label}</label>}
+          {!hideLabel ? (
+            <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+          ) : (
+            <label htmlFor={field.name} className="sr-only">
+              {label}
+            </label>
+          )}
           <div className="flex items-center gap-1 w-full">
-            <div className={cn(isSet && 'ring-2 ring-destructive/50 rounded-md')}>
+            <div className={cn(isSet && 'ring-2 ring-destructive/50 rounded-md', 'w-full')}>
               <MuiColorInput
                 {...field}
                 className="min-w-6"
@@ -57,6 +65,7 @@ export const Color = <T extends FieldValues = FieldValues>({
                 helperText={fieldState.invalid ? 'Invalid color' : ''}
                 error={fieldState.invalid}
               />
+              {/* <SketchPicker {...field} /> */}
             </div>
             {isSet && onClear && (
               <TooltipProvider>

@@ -9,8 +9,16 @@ interface EditorSidebarProps {
 }
 
 export const EditorSidebar = ({ onElementSelect, elementTreeHook }: EditorSidebarProps) => {
-  const { elements, addElement, removeElement, updateElement, toggleExpanded, getElementTree, moveElement, selectedElementId } =
-    elementTreeHook
+  const {
+    elements,
+    addElement,
+    removeElement,
+    updateElement,
+    toggleExpanded,
+    getElementTree,
+    moveElement,
+    selectedElementId,
+  } = elementTreeHook
 
   const handleSelect = (elementId: string) => {
     onElementSelect?.(elementId)

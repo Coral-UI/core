@@ -4,7 +4,6 @@ import { EditorPreviewPane } from '@/components/Editor/EditorPreviewPane'
 import { EditorSidebar } from '@/components/Editor/EditorSidebar'
 import { ElementProperties } from '@/components/Editor/ElementProperties'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { useElementTree } from '@/hooks/useElementTree'
 import { IconFileImport } from '@tabler/icons-react'
 import { Redo, Undo } from 'lucide-react'
@@ -138,39 +137,43 @@ export const Editor = () => {
   }, [undo, redo, canUndo, canRedo])
 
   return (
-    <div className="flex h-dvh pt-10">
-      <aside className="max-w-64 bg-sidebar">
-        <div className="flex items-center justify-between gap-2 p-2 border-b border-border bg-background">
-          <div className="flex items-center gap-2">
-            <p className="text-xs font-medium">Name</p>
-            <Badge variant="secondary">Unsaved</Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="icon-sm"
-              onClick={() => setImportDialogOpen(true)}
-              title="Import from Code"
-              aria-label="Import from Code"
-            >
-              <IconFileImport className="size-3.5" />
-            </Button>
-            <Button variant="secondary" size="icon-sm" onClick={undo} disabled={!canUndo} title="Undo (Ctrl+Z)">
-              <Undo className="size-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon-sm" onClick={redo} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)">
-              <Redo className="size-3.5" />
-            </Button>
-          </div>
+    <div className="flex flex-col h-[calc(100dvh-2.5rem)] max-h-[calc(100dvh-2.5rem)] overflow-hidden mt-10">
+      <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-background shrink-0">
+        <div className="flex items-center gap-2 place-self-center">
+          <p className="text-xs font-medium">Name</p>
+          <Badge variant="secondary">Unsaved</Badge>
         </div>
-        <EditorSidebar onElementSelect={handleElementSelect} elementTreeHook={elementTreeHook} />
-      </aside>
-      <div className="flex-1 bg-background h-full">
-        <EditorPreviewPane spec={spec} onElementClick={handleElementSelect} selectedElementId={selectedElementId} />
+        <div className="flex items-center gap-2 justify-self-end">
+          <Button
+            variant="secondary"
+            size="icon-sm"
+            onClick={() => setImportDialogOpen(true)}
+            title="Import from Code"
+            aria-label="Import from Code"
+          >
+            <IconFileImport className="size-3.5" />
+          </Button>
+          <Button variant="secondary" size="icon-sm" onClick={undo} disabled={!canUndo} title="Undo (Ctrl+Z)">
+            <Undo className="size-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon-sm" onClick={redo} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)">
+            <Redo className="size-3.5" />
+          </Button>
+        </div>
       </div>
-      <aside className="bg-sidebar max-w-96 w-full">
-        <ElementProperties element={selectedElement || null} onUpdateElement={updateElement} />
-      </aside>
+      <div className="flex flex-1">
+        <aside className="w-64 bg-background flex flex-col h-full overflow-hidden border-r border-border">
+          <div className="flex-1 overflow-auto">
+            <EditorSidebar onElementSelect={handleElementSelect} elementTreeHook={elementTreeHook} />
+          </div>
+        </aside>
+        <div className="bg-background flex-1 overflow-hidden">
+          <EditorPreviewPane spec={spec} onElementClick={handleElementSelect} selectedElementId={selectedElementId} />
+        </div>
+        <aside className="bg-background w-96 h-full overflow-hidden border-l border-border">
+          <ElementProperties element={selectedElement || null} onUpdateElement={updateElement} />
+        </aside>
+      </div>
 
       <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} />
     </div>
