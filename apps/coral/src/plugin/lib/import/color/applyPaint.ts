@@ -1,25 +1,37 @@
 import { CoralColorType, CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 import { Element } from '../../types'
+import { loadImage } from '../image/loadImage'
 import { cloneAPIObject } from '../../utils/cloneAPIObject'
 
-export const applyPaint = (element: Element, node: CoralNode | CoralRootNode) => {
-  const backgroundColor = node.styles?.['backgroundColor'] as CoralColorType
-  const color = node.styles?.['color'] as CoralColorType
+export const applyPaint = async (element: Element, node: CoralNode | CoralRootNode): Promise<void> => {
+  // Handle image fills for img elements or elements with background images
+  const isImgElement = 'elementType' in node && node.elementType === 'img'
+  const src = node.elementAttributes?.['src'] as string | undefined
 
-  const fills = cloneAPIObject(element.fills) as Paint[]
-
-  if (backgroundColor && fills.length > 0) {
-    const existingFill = fills[0]?.type === 'SOLID' ? (fills[0] as SolidPaint) : undefined
-    fills[0] = figma.util.solidPaint(backgroundColor.hex, existingFill)
-    element.fills = fills
+  if (isImgElement && src) {
+    try {
+      const image = await loadImage(src)
+      element.fills = [
+        {
+          type: 'IMAGE',
+          imageHash: image.hash,
+          scaleMode: 'FILL',
+        },
+      ]
+      return
+    } catch (error) {
+      console.error(`Failed to apply image fill from ${src}:`, error)
+      // Continue to apply backgroundColor if available as fallback
+    }
   }
 
-  // Only apply color to TEXT nodes, not frames/containers
-  // For elements with textContent, color is applied to the child text node
-  if (color && element.type === 'TEXT' && fills.length > 0) {
+  const backgroundColor = node.styles?.['backgroundColor'] as CoralColorType
+
+  if (backgroundColor) {
+    const fills = cloneAPIObject(element.fills) as Paint[]
     const existingFill = fills[0]?.type === 'SOLID' ? (fills[0] as SolidPaint) : undefined
-    fills[0] = figma.util.solidPaint(color.hex, existingFill)
+    fills[0] = figma.util.solidPaint(backgroundColor.hex, existingFill)
     element.fills = fills
   }
 }

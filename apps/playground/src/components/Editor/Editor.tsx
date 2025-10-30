@@ -146,7 +146,7 @@ export const Editor = () => {
       <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-background shrink-0 h-10">
         <div className="flex items-center gap-2 place-self-center">
           <p className="text-xs font-medium">Name</p>
-          <Badge variant="secondary">Unsaved</Badge>
+          <Badge variant="destructive">Unsaved</Badge>
         </div>
         <div className="flex items-center gap-2 justify-self-end">
           <Button

@@ -7,7 +7,7 @@ import { createElements } from './lib/import/create/createElements'
 //
 console.clear()
 
-figma.showUI(__html__, { width: 740, height: 878, themeColors: true })
+figma.showUI(__html__, { width: 600, height: 600, themeColors: true })
 
 figma.on('selectionchange', () => {
   const selection = figma.currentPage.selection

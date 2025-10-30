@@ -1,8 +1,12 @@
 import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
-import { ElementWithOptionalText } from '../../types'
+import { ElementWithOptionalText, textAlign } from '../../types'
 
-export const applyFlexAlignment = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
+export const applyFlexAlignment = (
+  element: ElementWithOptionalText,
+  node: CoralNode | CoralRootNode,
+  inheritedTextAlign?: textAlign,
+) => {
   // alignItems controls cross-axis alignment
   if (node.styles?.['alignItems']) {
     const alignItems = node.styles['alignItems'] as string
@@ -35,11 +39,13 @@ export const applyFlexAlignment = (element: ElementWithOptionalText, node: Coral
   // In CSS, text-align centers both inline content AND block children (like buttons)
   // In Figma auto-layout with vertical layout (column), we need counterAxisAlignItems
   // to center children horizontally
-  if (node.styles?.['textAlign']) {
-    const textAlign = node.styles['textAlign'] as string
+  // Use inherited textAlign if node doesn't have its own
+  const effectiveTextAlign = (node.styles?.['textAlign'] as string) || inheritedTextAlign
+
+  if (effectiveTextAlign) {
     const isVertical = element.layoutMode === 'VERTICAL'
 
-    if (textAlign === 'center') {
+    if (effectiveTextAlign === 'center') {
       // For vertical layouts, counterAxis is horizontal (what we want for centering)
       // For horizontal layouts, primaryAxis is horizontal
       if (isVertical) {
@@ -47,13 +53,13 @@ export const applyFlexAlignment = (element: ElementWithOptionalText, node: Coral
       } else {
         element.primaryAxisAlignItems = 'CENTER'
       }
-    } else if (textAlign === 'left' || textAlign === 'start') {
+    } else if (effectiveTextAlign === 'left' || effectiveTextAlign === 'start') {
       if (isVertical) {
         element.counterAxisAlignItems = 'MIN'
       } else {
         element.primaryAxisAlignItems = 'MIN'
       }
-    } else if (textAlign === 'right' || textAlign === 'end') {
+    } else if (effectiveTextAlign === 'right' || effectiveTextAlign === 'end') {
       if (isVertical) {
         element.counterAxisAlignItems = 'MAX'
       } else {

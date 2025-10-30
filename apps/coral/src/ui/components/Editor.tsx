@@ -2,7 +2,6 @@ import MonacoEditor, { useMonaco } from '@monaco-editor/react'
 import { useCallback } from 'react'
 
 import { useFigmaTheme } from '../hooks/useFigmaTheme'
-
 import { useSpecValue } from '../state/specValue'
 
 type EditorProps = {
@@ -11,7 +10,7 @@ type EditorProps = {
   height?: number
 }
 
-export const Editor = ({ language = 'javascript', height = 754, handleChange = () => {} }: EditorProps) => {
+export const Editor = ({ language = 'javascript', height = 476, handleChange = () => {} }: EditorProps) => {
   const { value, setValue } = useSpecValue()
   const { isDarkTheme } = useFigmaTheme()
 

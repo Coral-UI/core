@@ -10,34 +10,77 @@ export const useSpecValue = create<SpecValue>((set) => ({
   "name": "Div",
   "elementType": "div",
   "styles": {
+    "position": "relative",
+    "isolation": "isolate",
+    "overflow": "hidden",
     "backgroundColor": {
-      "hex": "#4338ca",
+      "hex": "#ffffff",
       "rgb": {
-        "r": 67,
-        "g": 56,
-        "b": 202,
+        "r": 255,
+        "g": 255,
+        "b": 255,
         "a": 1
       },
       "hsl": {
-        "h": 245,
-        "s": 58,
-        "l": 51,
+        "h": 0,
+        "s": 0,
+        "l": 100,
         "a": 1
       }
-    }
+    },
+    "paddingInlineStart": 24,
+    "paddingInlineEnd": 24,
+    "paddingBlockStart": 96,
+    "paddingBlockEnd": 96
   },
+  "responsiveStyles": [
+    {
+      "breakpoint": {
+        "type": "min-width",
+        "value": "640px"
+      },
+      "styles": {
+        "paddingBlockStart": 128,
+        "paddingBlockEnd": 128
+      }
+    },
+    {
+      "breakpoint": {
+        "type": "min-width",
+        "value": "1024px"
+      },
+      "styles": {
+        "paddingInlineStart": 32,
+        "paddingInlineEnd": 32
+      }
+    }
+  ],
   "elementAttributes": {
-    "class": "bg-indigo-700"
+    "class": "relative isolate overflow-hidden bg-white px-6 py-24 sm:py-32 lg:px-8"
   },
   "children": [
+    {
+      "name": "Img",
+      "elementType": "img",
+      "styles": {
+        "position": "absolute",
+        "inset": 0,
+        "width": "100%",
+        "height": "100%",
+        "objectFit": "cover",
+        "opacity": 0.1
+      },
+      "elementAttributes": {
+        "src": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&crop=focalpoint&fp-y=.8&w=2830&h=1500&q=80&blend=111827&sat=-100&exp=15&blend-mode=screen",
+        "alt": "",
+        "class": "absolute inset-0 -z-10 size-full object-cover opacity-10"
+      }
+    },
     {
       "name": "Div",
       "elementType": "div",
       "styles": {
-        "paddingInlineStart": 24,
-        "paddingInlineEnd": 24,
-        "paddingBlockStart": 96,
-        "paddingBlockEnd": 96
+        "display": "none"
       },
       "responsiveStyles": [
         {
@@ -46,258 +89,185 @@ export const useSpecValue = create<SpecValue>((set) => ({
             "value": "640px"
           },
           "styles": {
-            "paddingBlockStart": 128,
-            "paddingBlockEnd": 128
-          }
-        },
-        {
-          "breakpoint": {
-            "type": "min-width",
-            "value": "1024px"
-          },
-          "styles": {
-            "paddingInlineStart": 32,
-            "paddingInlineEnd": 32
+            "position": "absolute",
+            "marginInlineEnd": 40,
+            "display": "block"
           }
         }
       ],
       "elementAttributes": {
-        "class": "px-6 py-24 sm:py-32 lg:px-8"
+        "aria-hidden": "true",
+        "class": "hidden sm:absolute sm:-top-10 sm:right-1/2 sm:-z-10 sm:mr-10 sm:block sm:transform-gpu sm:blur-3xl"
       },
       "children": [
         {
           "name": "Div",
           "elementType": "div",
           "styles": {
-            "marginInlineStart": "auto",
-            "marginInlineEnd": "auto",
-            "maxWidth": 672,
-            "textAlign": "center"
+            "clip-path": "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+            "width": "68.5625rem",
+            "opacity": 0.15
           },
           "elementAttributes": {
-            "class": "mx-auto max-w-2xl text-center"
+            "class": "aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#ff4694] to-[#776fff] opacity-15"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Div",
+      "elementType": "div",
+      "styles": {
+        "position": "absolute"
+      },
+      "responsiveStyles": [
+        {
+          "breakpoint": {
+            "type": "min-width",
+            "value": "640px"
           },
-          "children": [
-            {
-              "name": "H2",
-              "elementType": "h2",
-              "styles": {
-                "textWrap": "balance",
-                "fontSize": 36,
-                "lineHeight": 40,
-                "fontWeight": 600,
-                "letterSpacing": -2.5,
-                "color": {
-                  "hex": "#ffffff",
-                  "rgb": {
-                    "r": 255,
-                    "g": 255,
-                    "b": 255,
-                    "a": 1
-                  },
-                  "hsl": {
-                    "h": 0,
-                    "s": 0,
-                    "l": 100,
-                    "a": 1
-                  }
-                }
-              },
-              "responsiveStyles": [
-                {
-                  "breakpoint": {
-                    "type": "min-width",
-                    "value": "640px"
-                  },
-                  "styles": {
-                    "fontSize": 48,
-                    "lineHeight": 48
-                  }
-                }
-              ],
-              "elementAttributes": {
-                "class": "text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl"
-              },
-              "children": [],
-              "textContent": "Boost your productivity. Start using our app today."
+          "styles": {
+            "marginInlineStart": 64
+          }
+        }
+      ],
+      "elementAttributes": {
+        "aria-hidden": "true",
+        "class": "absolute -top-52 left-1/2 -z-10 -translate-x-1/2 transform-gpu blur-3xl sm:top-[-28rem] sm:ml-16 sm:translate-x-0"
+      },
+      "children": [
+        {
+          "name": "Div",
+          "elementType": "div",
+          "styles": {
+            "clip-path": "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+            "width": "68.5625rem",
+            "opacity": 0.15
+          },
+          "elementAttributes": {
+            "class": "aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#ff4694] to-[#776fff] opacity-15"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Div",
+      "elementType": "div",
+      "styles": {
+        "marginInlineStart": "auto",
+        "marginInlineEnd": "auto",
+        "maxWidth": 672,
+        "textAlign": "center"
+      },
+      "elementAttributes": {
+        "class": "mx-auto max-w-2xl text-center"
+      },
+      "children": [
+        {
+          "name": "H2",
+          "elementType": "h2",
+          "styles": {
+            "fontSize": {
+              "value": 48,
+              "unit": "px"
             },
-            {
-              "name": "P",
-              "elementType": "p",
-              "styles": {
-                "marginInlineStart": "auto",
-                "marginInlineEnd": "auto",
-                "marginBlockStart": 24,
-                "maxWidth": 576,
-                "textWrap": "pretty",
-                "fontSize": 18,
-                "lineHeight": 32,
-                "color": {
-                  "hex": "#c7d2fe",
-                  "rgb": {
-                    "r": 199,
-                    "g": 210,
-                    "b": 254,
-                    "a": 1
-                  },
-                  "hsl": {
-                    "h": 228,
-                    "s": 96,
-                    "l": 89,
-                    "a": 1
-                  }
-                }
-              },
-              "elementAttributes": {
-                "class": "mx-auto mt-6 max-w-xl text-pretty text-lg/8 text-indigo-200"
-              },
-              "children": [],
-              "textContent": "Incididunt sint fugiat pariatur cupidatat consectetur sit cillum anim id veniam aliqua proident excepteur commodo do ea."
+            "lineHeight": {
+              "value": 48,
+              "unit": "px"
             },
-            {
-              "name": "Div",
-              "elementType": "div",
-              "styles": {
-                "marginBlockStart": 40,
-                "display": "flex",
-                "alignItems": "center",
-                "justifyContent": "center",
-                "columnGap": 24
+            "fontWeight": 600,
+            "letterSpacing": -2.5,
+            "color": {
+              "hex": "#18181b",
+              "rgb": {
+                "r": 24,
+                "g": 24,
+                "b": 27,
+                "a": 1
               },
-              "elementAttributes": {
-                "class": "mt-10 flex items-center justify-center gap-x-6"
-              },
-              "children": [
-                {
-                  "name": "A",
-                  "elementType": "a",
-                  "styles": {
-                    "borderRadius": 6,
-                    "backgroundColor": {
-                      "hex": "#ffffff",
-                      "rgb": {
-                        "r": 255,
-                        "g": 255,
-                        "b": 255,
-                        "a": 1
-                      },
-                      "hsl": {
-                        "h": 0,
-                        "s": 0,
-                        "l": 100,
-                        "a": 1
-                      }
-                    },
-                    "paddingInlineStart": 14,
-                    "paddingInlineEnd": 14,
-                    "paddingBlockStart": 10,
-                    "paddingBlockEnd": 10,
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                    "fontWeight": 600,
-                    "color": {
-                      "hex": "#4f46e5",
-                      "rgb": {
-                        "r": 79,
-                        "g": 70,
-                        "b": 229,
-                        "a": 1
-                      },
-                      "hsl": {
-                        "h": 243,
-                        "s": 75,
-                        "l": 59,
-                        "a": 1
-                      }
-                    },
-                    ":hover": {
-                      "backgroundColor": {
-                        "hex": "#eef2ff",
-                        "rgb": {
-                          "r": 238,
-                          "g": 242,
-                          "b": 255,
-                          "a": 1
-                        },
-                        "hsl": {
-                          "h": 226,
-                          "s": 100,
-                          "l": 97,
-                          "a": 1
-                        }
-                      }
-                    },
-                    ":focus-visible": {
-                      "outlineWidth": 2,
-                      "outlineOffset": 2,
-                      "outlineColor": {
-                        "hex": "#ffffff",
-                        "rgb": {
-                          "r": 255,
-                          "g": 255,
-                          "b": 255,
-                          "a": 1
-                        },
-                        "hsl": {
-                          "h": 0,
-                          "s": 0,
-                          "l": 100,
-                          "a": 1
-                        }
-                      }
-                    }
-                  },
-                  "elementAttributes": {
-                    "href": "#",
-                    "class": "rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                  },
-                  "children": [],
-                  "textContent": "Get started"
-                },
-                {
-                  "name": "A",
-                  "elementType": "a",
-                  "styles": {
-                    "fontSize": 14,
-                    "lineHeight": 24,
-                    "fontWeight": 600,
-                    "color": {
-                      "hex": "#ffffff",
-                      "rgb": {
-                        "r": 255,
-                        "g": 255,
-                        "b": 255,
-                        "a": 1
-                      },
-                      "hsl": {
-                        "h": 0,
-                        "s": 0,
-                        "l": 100,
-                        "a": 1
-                      }
-                    }
-                  },
-                  "elementAttributes": {
-                    "href": "#",
-                    "class": "text-sm/6 font-semibold text-white"
-                  },
-                  "children": [
-                    {
-                      "name": "Span",
-                      "elementType": "span",
-                      "styles": {},
-                      "elementAttributes": {
-                        "aria-hidden": "true"
-                      },
-                      "children": [],
-                      "textContent": "→"
-                    }
-                  ],
-                  "textContent": "Learn more"
-                }
-              ]
+              "hsl": {
+                "h": 240,
+                "s": 6,
+                "l": 10,
+                "a": 1
+              }
             }
-          ]
+          },
+          "responsiveStyles": [
+            {
+              "breakpoint": {
+                "type": "min-width",
+                "value": "640px"
+              },
+              "styles": {
+                "fontSize": {
+                  "value": 72,
+                  "unit": "px"
+                },
+                "lineHeight": {
+                  "value": 72,
+                  "unit": "px"
+                }
+              }
+            }
+          ],
+          "elementAttributes": {
+            "class": "text-5xl font-semibold tracking-tight text-gray-900 sm:text-7xl"
+          },
+          "children": [],
+          "textContent": "Support center"
+        },
+        {
+          "name": "P",
+          "elementType": "p",
+          "styles": {
+            "marginBlockStart": 32,
+            "textWrap": "pretty",
+            "fontSize": {
+              "value": 18,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 28,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "color": {
+              "hex": "#3f3f46",
+              "rgb": {
+                "r": 63,
+                "g": 63,
+                "b": 70,
+                "a": 1
+              },
+              "hsl": {
+                "h": 240,
+                "s": 5,
+                "l": 26,
+                "a": 1
+              }
+            }
+          },
+          "responsiveStyles": [
+            {
+              "breakpoint": {
+                "type": "min-width",
+                "value": "640px"
+              },
+              "styles": {
+                "fontSize": {
+                  "value": 20,
+                  "unit": "px"
+                },
+                "lineHeight": 32
+              }
+            }
+          ],
+          "elementAttributes": {
+            "class": "mt-8 text-pretty text-lg font-medium text-gray-700 sm:text-xl/8"
+          },
+          "children": [],
+          "textContent": "Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat."
         }
       ]
     }

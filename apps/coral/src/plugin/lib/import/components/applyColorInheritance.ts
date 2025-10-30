@@ -7,7 +7,8 @@ export const applyColorInheritance = (
   node: CoralNode | CoralRootNode,
   parentColor?: CoralColorType,
 ): CoralNode | CoralRootNode => {
-  const nodeStyles = { ...node.styles }
+  // Use Object.assign to avoid issues with frozen/sealed objects from state management
+  const nodeStyles = Object.assign({}, node.styles || {})
 
   // Inherit color from parent if not explicitly set
   if (!nodeStyles['color'] && parentColor) {
@@ -15,10 +16,9 @@ export const applyColorInheritance = (
   }
 
   // Create new node with inherited color
-  const newNode: CoralNode | CoralRootNode = {
-    ...node,
+  const newNode: CoralNode | CoralRootNode = Object.assign({}, node, {
     styles: nodeStyles,
-  }
+  })
 
   // Determine the color to pass to children
   const nodeColor = nodeStyles['color']

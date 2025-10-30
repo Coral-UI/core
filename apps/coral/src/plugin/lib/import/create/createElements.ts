@@ -3,18 +3,32 @@ import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 import { textAlign } from '../../types'
 import { hasResponsiveStyles } from '../assert/hasResponsiveStyles'
 import { createComponentWithVariants } from '../components/createComponentWithVariants'
+import { deferredActionsQueue } from '../utils/deferredActions'
 import { createElementAsComponent } from './createElementAsComponent'
 
-export const createElements = async (spec: CoralRootNode | CoralNode, textAlign?: textAlign) => {
+export const createElements = async (
+  spec: CoralRootNode | CoralNode,
+  textAlign?: textAlign,
+): Promise<ComponentNode | ComponentSetNode> => {
   const parentTextAlign = spec.styles?.['textAlign'] as textAlign | undefined
   const effectiveTextAlign = parentTextAlign || textAlign
+
+  // Clear any existing deferred actions from previous runs
+  deferredActionsQueue.clear()
+
+  let result: ComponentNode | ComponentSetNode
 
   // Check if this spec or any of its descendants has responsive styles
   if (hasResponsiveStyles(spec)) {
     // Create a component set with variants
-    return createComponentWithVariants(spec, effectiveTextAlign) as Promise<SceneNode>
+    result = await createComponentWithVariants(spec, effectiveTextAlign)
+  } else {
+    // Otherwise, create a regular component (all imports become components by default)
+    result = await createElementAsComponent(spec, effectiveTextAlign)
   }
 
-  // Otherwise, create a regular component (all imports become components by default)
-  return createElementAsComponent(spec, effectiveTextAlign) as Promise<SceneNode>
+  // Execute all deferred actions after the tree is fully built
+  deferredActionsQueue.executeAll()
+
+  return result
 }

@@ -12,7 +12,8 @@ export const precomputeMergedStylesForAllNodes = (
     const nodeBreakpointStyles = new Map<string, CoralStyleType>()
 
     // For each breakpoint, compute the fully cascaded styles for this node
-    let accumulatedStyles: CoralStyleType = { ...currentNode.styles }
+    // Use Object.assign to avoid issues with frozen/sealed objects from state management
+    let accumulatedStyles: CoralStyleType = Object.assign({}, currentNode.styles || {})
 
     // Inherit color from parent if not explicitly set
     if (!accumulatedStyles['color'] && parentColor) {
@@ -29,14 +30,11 @@ export const precomputeMergedStylesForAllNodes = (
 
       // If node has styles for this breakpoint, apply them (cascading from previous breakpoints)
       if (nodeResponsiveStyle) {
-        accumulatedStyles = {
-          ...accumulatedStyles,
-          ...nodeResponsiveStyle.styles,
-        }
+        accumulatedStyles = Object.assign({}, accumulatedStyles, nodeResponsiveStyle.styles || {})
       }
 
       // Store the accumulated styles for this breakpoint
-      nodeBreakpointStyles.set(breakpointKey, { ...accumulatedStyles })
+      nodeBreakpointStyles.set(breakpointKey, Object.assign({}, accumulatedStyles))
     }
 
     styleMap.set(currentNode, nodeBreakpointStyles)

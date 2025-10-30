@@ -106,25 +106,31 @@ export const EditorPreviewPane = ({
       </TabsContent>
 
       <TabsContent value="spec" className="flex flex-col h-full w-full flex-1 shrink-0">
-        <div className="h-full w-full relative">
-          <Editor
-            value={specValue}
-            onChange={handleSpecChange}
-            language="json"
-            theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
-            options={{
-              minimap: {
-                enabled: false,
-              },
-              lineNumbers: 'on',
-              fontSize: 11,
-              wordWrap: 'on',
-              useTabStops: false,
-              tabSize: 2,
-              contextmenu: false,
-              readOnly: true,
-            }}
-          />
+        <div className="h-full w-full relative p-2 flex flex-col">
+          <div className="border border-input rounded-xl flex-1 overflow-hidden">
+            <Editor
+              value={specValue}
+              onChange={handleSpecChange}
+              language="json"
+              theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
+              options={{
+                minimap: {
+                  enabled: false,
+                },
+                padding: {
+                  top: 10,
+                  bottom: 10,
+                },
+                lineNumbers: 'on',
+                fontSize: 11,
+                wordWrap: 'on',
+                useTabStops: false,
+                tabSize: 2,
+                contextmenu: false,
+                readOnly: true,
+              }}
+            />
+          </div>
           <Button variant="default" size="icon-lg" onClick={handleCopySpec} className="absolute bottom-4 right-4">
             <CopyIcon />
           </Button>

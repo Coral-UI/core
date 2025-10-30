@@ -1,4 +1,4 @@
-import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
+import { CoralNode, CoralRootNode, CoralStyleType } from '@reallygoodwork/coral-core'
 
 import { extractDimensionValue } from '../../export/utils/extractDimensionValue'
 import { Element, ElementWithOptionalText, textAlign } from '../../types'
@@ -13,43 +13,87 @@ import { applyMargin } from './applyMargin'
 import { applyMaxWidth } from './applyMaxWidth'
 import { applyPadding } from './applyPadding'
 
-export const applyStyles = async (element: Element, node: CoralNode | CoralRootNode, addTextAlign?: textAlign) => {
-  // Special case for text nodes that should fill
-  if (isTextNode(node) && node.styles?.['width'] === '100%') {
-    // Only set layoutSizingHorizontal if the element is in an auto-layout frame
-    if (
-      'layoutSizingHorizontal' in element &&
-      element.parent &&
-      'layoutMode' in element.parent &&
-      element.parent.layoutMode !== 'NONE'
-    ) {
-      element.layoutSizingHorizontal = 'FILL'
-    }
-    // Don't return early for text nodes - they need other styles applied
-  }
+export const applyStyles = async (
+  element: Element,
+  node: CoralNode | CoralRootNode,
+  addTextAlign?: textAlign,
+  inheritedStyles?: CoralStyleType,
+  skipGridConversion = false,
+) => {
+  // Merge inherited styles with node styles (node styles override)
+  // Use Object.assign to avoid issues with frozen/sealed objects from state management
+  try {
+    const combinedStyles = Object.assign({}, inheritedStyles || {}, node.styles || {})
 
-  // Auto-layout is now enabled by default in createFrame/createComponent
-  // Here we just need to apply specific style overrides
-
-  if (element.type !== 'TEXT' && 'layoutMode' in element) {
-    // Override sizing if width is specified
-    const shouldFill = node.styles?.['width'] === '100%' || node.styles?.['width'] === 'fill'
-    if (shouldFill) {
-      element.layoutSizingHorizontal = 'FILL'
-    }
-
-    // Override height if explicitly specified
-    const heightValue = extractDimensionValue(node.styles?.['height'])
-    if (heightValue !== undefined) {
-      element.layoutSizingVertical = 'FIXED'
-      element.resize(element.width, heightValue)
+    // Special case for text nodes that should fill
+    if (isTextNode(node) && node.styles?.['width'] === '100%') {
+      // Only set layoutSizingHorizontal if the element is in an auto-layout frame
+      if (
+        'layoutSizingHorizontal' in element &&
+        element.parent &&
+        'layoutMode' in element.parent &&
+        element.parent.layoutMode !== 'NONE'
+      ) {
+        element.layoutSizingHorizontal = 'FILL'
+      }
+      // Don't return early for text nodes - they need other styles applied
     }
 
-    // Apply flex direction
-    applyFlexDirection(element as ElementWithOptionalText, node)
+    // Auto-layout is now enabled by default in createFrame/createComponent
+    // Here we just need to apply specific style overrides
 
-    // Apply flex alignment (alignItems, justifyContent)
-    applyFlexAlignment(element as ElementWithOptionalText, node)
+    if (element.type !== 'TEXT' && 'layoutMode' in element) {
+    // Check if parent has auto-layout enabled
+    // Safely check parent without accessing properties on potentially frozen objects
+    let parentHasAutoLayout = false
+    try {
+      parentHasAutoLayout = !!(element.parent && 'layoutMode' in element.parent && element.parent.layoutMode !== 'NONE')
+    } catch (error) {
+      parentHasAutoLayout = false
+    }
+
+    // Skip FILL sizing for img elements and absolutely positioned elements
+    // They will be handled after being appended to parent
+    const isImgElement = 'elementType' in node && node.elementType === 'img'
+    const isAbsolute = node.styles?.['position'] === 'absolute'
+
+    if (!isImgElement && !isAbsolute) {
+      // Override sizing if width is specified
+      const shouldFillWidth = node.styles?.['width'] === '100%' || node.styles?.['width'] === 'fill'
+      const hasMaxWidth = node.styles?.['maxWidth'] !== undefined
+
+      // Elements with explicit fill width or maxWidth should use FILL sizing
+      // (only if parent has auto-layout - can't set FILL without a parent)
+      if ((shouldFillWidth || hasMaxWidth) && parentHasAutoLayout) {
+        element.layoutSizingHorizontal = 'FILL'
+      }
+
+      // Override height if explicitly specified
+      const heightStyle = node.styles?.['height']
+      const shouldFillHeight = heightStyle === '100%' || heightStyle === 'fill'
+
+      if (shouldFillHeight && parentHasAutoLayout) {
+        element.layoutSizingVertical = 'FILL'
+      } else {
+        const heightValue = extractDimensionValue(heightStyle)
+        // Only set FIXED sizing if there's an explicit pixel value
+        // Otherwise, keep HUG sizing (default) to prevent collapsing
+        if (heightValue !== undefined && heightValue > 0) {
+          element.layoutSizingVertical = 'FIXED'
+          element.resize(element.width, heightValue)
+        } else if (heightStyle === undefined && element.layoutMode !== 'GRID') {
+          // No height specified - explicitly set to HUG to ensure proper sizing
+          // BUT: Skip this for GRID layouts - they need FIXED sizing
+          element.layoutSizingVertical = 'HUG'
+        }
+      }
+    }
+
+    // Apply flex direction (skip grid conversion if requested - will be done after children added)
+    applyFlexDirection(element as ElementWithOptionalText, node, skipGridConversion)
+
+    // Apply flex alignment (alignItems, justifyContent, and inherited textAlign)
+    applyFlexAlignment(element as ElementWithOptionalText, node, addTextAlign)
 
     // Apply gap (columnGap, rowGap, gap)
     applyGap(element as ElementWithOptionalText, node)
@@ -78,6 +122,12 @@ export const applyStyles = async (element: Element, node: CoralNode | CoralRootN
       element.cornerRadius = borderRadius
     }
 
+    // Apply opacity if specified
+    const opacity = node.styles?.['opacity']
+    if (typeof opacity === 'number') {
+      element.opacity = opacity
+    }
+
     // Apply max width if specified
     applyMaxWidth(element as ElementWithOptionalText, node)
 
@@ -85,25 +135,36 @@ export const applyStyles = async (element: Element, node: CoralNode | CoralRootN
     // It only applies to child text nodes, not the container frame itself
   }
 
-  if (isTextNode(node) && element.type === 'TEXT') {
-    // Apply typography styles to actual text nodes
-    await applyTypographyStyles(element as TextNode, node.styles || {}, addTextAlign)
-  } else if (addTextAlign && isTextNode(node) && node.styles?.['textAlign']) {
-    // Only apply text alignment to text nodes, not frames
-    ;(element as TextNode).textAlignHorizontal =
-      ((node.styles?.['textAlign'] as string).toUpperCase() as TextNode['textAlignHorizontal']) ?? 'LEFT'
+  const isText = isTextNode(node)
+
+  if (isText && element.type === 'TEXT') {
+    // Apply typography styles to actual text nodes with inherited styles
+    await applyTypographyStyles(element as TextNode, combinedStyles, addTextAlign)
+  } else if (addTextAlign && isText && element.type === 'TEXT') {
+    const textAlign = combinedStyles?.['textAlign']
+    if (textAlign) {
+      // Only apply text alignment to text nodes, not frames
+      ;(element as TextNode).textAlignHorizontal =
+        ((textAlign as string).toUpperCase() as TextNode['textAlignHorizontal']) ?? 'LEFT'
+    }
   }
 
   if (node.styles) {
-    Object.entries(node.styles).forEach(([key]) => {
-      if (key === 'backgroundColor') {
-        if (!nodeHasTextChildren(node) && element.type !== 'TEXT') {
-          applyPaint(element, node)
-        }
+    // Use combinedStyles (which is already a plain object) instead of node.styles
+    // to avoid issues with frozen/sealed objects from state management
+    if (combinedStyles['backgroundColor']) {
+      if (!nodeHasTextChildren(node) && element.type !== 'TEXT') {
+        await applyPaint(element, node)
       }
+    }
+  }
 
-      // Color should NEVER be applied to frames - it's only for text fills
-      // It's already handled by applyTypographyStyles for actual text nodes
-    })
+  // Apply image fills for img elements (even if no backgroundColor)
+  if ('elementType' in node && node.elementType === 'img') {
+    await applyPaint(element, node)
+  }
+  } catch (error) {
+    console.error(`[applyStyles] ERROR for ${node.name}:`, error)
+    throw error
   }
 }

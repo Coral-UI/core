@@ -8,7 +8,9 @@
   "enableProposedApi": false,
   "documentAccess": "dynamic-page",
   "editorType": ["figma"],
+
   "networkAccess": {
-    "allowedDomains": ["https://api.fontshare.com", "https://cdn.fontshare.com", "https://cdn.jsdelivr.net", "https://coral.design"]
+    "reasoning": "This plugin needs to access the internet to load fonts and images.",
+    "allowedDomains": ["https://api.fontshare.com", "https://cdn.fontshare.com", "https://cdn.jsdelivr.net", "https://coral.design", "*"]
   }
 }

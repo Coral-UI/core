@@ -1,10 +1,14 @@
-import { CoralNode } from '@reallygoodwork/coral-core'
+import { CoralNode, CoralStyleType } from '@reallygoodwork/coral-core'
 
-export const createTextNode = async (spec: CoralNode) => {
+export const createTextNode = async (spec: CoralNode, inheritedStyles?: CoralStyleType) => {
   const textNode = figma.createText()
 
-  const fontFamily = (spec.styles?.['fontFamily'] as string) ?? 'Inter'
-  const fontWeight = (spec.styles?.['fontWeight'] as number) ?? 400
+  // Merge inherited styles with node styles (node styles override)
+  // Use Object.assign to avoid issues with frozen/sealed objects from state management
+  const combinedStyles = Object.assign({}, inheritedStyles || {}, spec.styles || {})
+
+  const fontFamily = (combinedStyles?.['fontFamily'] as string) ?? 'Inter'
+  const fontWeight = (combinedStyles?.['fontWeight'] as number) ?? 400
 
   // Import font style transformation
   const transformFontWeightToFigmaFontStyle = (weight: number): string => {

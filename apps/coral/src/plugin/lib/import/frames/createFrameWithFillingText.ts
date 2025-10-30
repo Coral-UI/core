@@ -10,9 +10,8 @@ export const createFrameWithFillingText = async (node: CoralNode, inheritedTextA
   // Separate styles into text styles and box model styles
   // Text styles (color, font, etc.) go on the text node
   // Box model styles (backgroundColor, padding, etc.) stay on the frame
-  const styles = {
-    ...node.styles,
-  }
+  // Use Object.assign to avoid issues with frozen/sealed objects from state management
+  const styles = Object.assign({}, node.styles || {})
 
   // Determine effective textAlign: use node's own textAlign if present, otherwise inherit from parent
   const nodeTextAlign = styles?.['textAlign'] as textAlign | undefined
@@ -77,14 +76,8 @@ export const createFrameWithFillingText = async (node: CoralNode, inheritedTextA
   applyMargin(frame, node)
   // Apply typography styles including color to the text node
   // This ensures color from the parent node goes to text, not the frame
-  applyTypographyStyles(textNode, styles)
-
-  // Apply text alignment (either from node's own styles or inherited from parent)
-  if (effectiveTextAlign) {
-    textNode.textAlignHorizontal = effectiveTextAlign.toUpperCase() as TextNode['textAlignHorizontal']
-  } else {
-    textNode.textAlignHorizontal = 'LEFT'
-  }
+  // Pass effectiveTextAlign so it can be applied if not in styles
+  await applyTypographyStyles(textNode, styles, effectiveTextAlign)
 
   return { frame, textNode }
 }
