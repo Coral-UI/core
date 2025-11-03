@@ -3,6 +3,7 @@ import { CoralNode } from '@reallygoodwork/coral-core'
 import { createCircleNode } from './createCircleNode'
 import { createEllipseNode } from './createEllipseNode'
 import { createLineNode } from './createLineNode'
+import { createPathNode } from './createPathNode'
 import { createRectNode } from './createRectNode'
 
 /**
@@ -20,6 +21,7 @@ export const createShapeFromSVG = (node: CoralNode, parentColor?: RGB): SceneNod
       case 'line':
         return createLineNode(node, parentColor)
       case 'path':
+        return createPathNode(node, parentColor)
       case 'polygon':
       case 'polyline':
         // These require vector path conversion - skip for now
