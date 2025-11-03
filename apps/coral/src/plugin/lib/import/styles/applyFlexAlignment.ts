@@ -1,6 +1,6 @@
-import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
+import { ElementWithOptionalText, textAlign } from '@/plugin/lib/types'
 
-import { ElementWithOptionalText, textAlign } from '../../types'
+import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 export const applyFlexAlignment = (
   element: ElementWithOptionalText,

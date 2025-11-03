@@ -1,14 +1,14 @@
-import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
+import { applyColorInheritance } from '@/plugin/lib/import/components/applyColorInheritance'
+import { applyPrecomputedStyles } from '@/plugin/lib/import/components/applyPrecomputedStyles'
+import { precomputeMergedStylesForAllNodes } from '@/plugin/lib/import/components/precomputeMergedStylesForAllNodes'
+import { createElement } from '@/plugin/lib/import/create/createElement'
+import { collectResponsiveStyles } from '@/plugin/lib/import/utils/collectResponsiveStyles'
+import { generateVariantName } from '@/plugin/lib/import/utils/generateVariantName'
+import { parseBreakpointValue } from '@/plugin/lib/import/utils/parseBreakpointValue'
+import { sortResponsiveStylesByBreakpoint } from '@/plugin/lib/import/utils/sortResponsiveStylesByBreakpoint'
+import { textAlign } from '@/plugin/lib/types'
 
-import { textAlign } from '../../types'
-import { createElement } from '../create/createElement'
-import { collectResponsiveStyles } from '../utils/collectResponsiveStyles'
-import { generateVariantName } from '../utils/generateVariantName'
-import { parseBreakpointValue } from '../utils/parseBreakpointValue'
-import { sortResponsiveStylesByBreakpoint } from '../utils/sortResponsiveStylesByBreakpoint'
-import { applyColorInheritance } from './applyColorInheritance'
-import { applyPrecomputedStyles } from './applyPrecomputedStyles'
-import { precomputeMergedStylesForAllNodes } from './precomputeMergedStylesForAllNodes'
+import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 // Create a component set with variants for responsive styles
 export const createComponentWithVariants = async (
@@ -37,7 +37,7 @@ export const createComponentWithVariants = async (
   // Convert to component if it isn't already
   const baseComponent = baseNode.type === 'COMPONENT' ? baseNode : figma.createComponentFromNode(baseNode)
 
-  baseComponent.name = `${spec.name}=Base`
+  baseComponent.name = `${spec.name}=base`
 
   // Position base component at origin
   baseComponent.x = 0
@@ -73,7 +73,7 @@ export const createComponentWithVariants = async (
 
     // Set minimum width based on breakpoint
     // For min-width breakpoints, set minWidth to the breakpoint value
-    if (responsiveStyle.breakpoint.type === 'min-width') {
+    if ('type' in responsiveStyle.breakpoint && responsiveStyle.breakpoint.type === 'min-width') {
       const minWidth = parseBreakpointValue(responsiveStyle.breakpoint.value)
       if (minWidth && 'minWidth' in variantComponent) {
         variantComponent.minWidth = minWidth
@@ -84,7 +84,7 @@ export const createComponentWithVariants = async (
       }
     }
     // For max-width breakpoints, set maxWidth to the breakpoint value
-    else if (responsiveStyle.breakpoint.type === 'max-width') {
+    else if ('type' in responsiveStyle.breakpoint && responsiveStyle.breakpoint.type === 'max-width') {
       const maxWidth = parseBreakpointValue(responsiveStyle.breakpoint.value)
       if (maxWidth && 'maxWidth' in variantComponent) {
         variantComponent.maxWidth = maxWidth

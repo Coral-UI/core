@@ -1,8 +1,9 @@
+import { isCoralColor } from '@/plugin/lib/types'
+
 import { CoralColorType, CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
-import { isCoralColor } from '../../types'
-
 // Apply color inheritance to base spec (without responsive styles)
+// This allows us to create color inheritance similar to CSS inheritance.
 export const applyColorInheritance = (
   node: CoralNode | CoralRootNode,
   parentColor?: CoralColorType,

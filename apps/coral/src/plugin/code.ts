@@ -1,8 +1,8 @@
-import { parseUISpec } from '@reallygoodwork/coral-core'
+import { EXPORT_SPEC, IMPORT_SPEC } from '@/plugin/lib/events'
+import { exportSpec } from '@/plugin/lib/export/exportSpec'
+import { createElements } from '@/plugin/lib/import/create/createElements'
 
-import { EXPORT_SPEC, IMPORT_SPEC } from './lib/events'
-import { exportSpec } from './lib/export/exportSpec'
-import { createElements } from './lib/import/create/createElements'
+import { parseUISpec } from '@reallygoodwork/coral-core'
 
 //
 console.clear()

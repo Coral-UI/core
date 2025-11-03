@@ -5,6 +5,7 @@ import { isInlineElement } from '../assert/isInlineElement'
 import { applyMargin } from '../styles/applyMargin'
 import { applyTypographyStyles } from '../typography/applyTypographyStyles'
 import { transformFontWeightToFigmaFontStyle } from '../typography/transformFontWeightToFigmaFontStyle'
+import { convertNameToElementType } from '../utils/convertNameToElementType'
 
 export const createFrameWithFillingText = async (node: CoralNode, inheritedTextAlign?: textAlign) => {
   // Separate styles into text styles and box model styles
@@ -31,6 +32,7 @@ export const createFrameWithFillingText = async (node: CoralNode, inheritedTextA
 
   // Step 2: Create and immediately append the text node
   const textNode = figma.createText()
+  textNode.name = convertNameToElementType(node.elementType)
 
   // Try to load the font, with fallbacks
   let loadedFontStyle = fontStyle

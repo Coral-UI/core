@@ -1,10 +1,10 @@
-import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
+import { hasResponsiveStyles } from '@/plugin/lib/import/assert/hasResponsiveStyles'
+import { createComponentWithVariants } from '@/plugin/lib/import/components/createComponentWithVariants'
+import { createElementAsComponent } from '@/plugin/lib/import/create/createElementAsComponent'
+import { deferredActionsQueue } from '@/plugin/lib/import/utils/deferredActions'
+import { textAlign } from '@/plugin/lib/types'
 
-import { textAlign } from '../../types'
-import { hasResponsiveStyles } from '../assert/hasResponsiveStyles'
-import { createComponentWithVariants } from '../components/createComponentWithVariants'
-import { deferredActionsQueue } from '../utils/deferredActions'
-import { createElementAsComponent } from './createElementAsComponent'
+import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 export const createElements = async (
   spec: CoralRootNode | CoralNode,

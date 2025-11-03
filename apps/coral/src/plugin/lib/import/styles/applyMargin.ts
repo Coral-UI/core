@@ -1,7 +1,7 @@
-import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
+import { extractDimensionValue } from '@/plugin/lib/export/utils/extractDimensionValue'
+import { ElementWithOptionalText } from '@/plugin/lib/types'
 
-import { extractDimensionValue } from '../../export/utils/extractDimensionValue'
-import { ElementWithOptionalText } from '../../types'
+import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 export const applyMargin = (element: ElementWithOptionalText, node: CoralNode | CoralRootNode) => {
   // In Figma, we simulate margins by converting them to padding on the element

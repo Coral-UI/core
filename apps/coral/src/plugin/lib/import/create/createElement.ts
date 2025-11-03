@@ -5,6 +5,7 @@ import { isCoralColor, textAlign } from '../../types'
 import { isInlineElement } from '../assert/isInlineElement'
 import { createComponent } from '../components/createComponent'
 import { applyStyles } from '../styles/applyStyles'
+import { convertNameToElementType } from '../utils/convertNameToElementType'
 import { deferredActionsQueue } from '../utils/deferredActions'
 import { createSVGFrame } from '../vector/createSVGFrame'
 import { isSVGElement } from '../vector/isSVGElement'
@@ -53,7 +54,7 @@ export const createElement = async (
       // The text node gets text-related styles (color, font, etc.)
       // The frame gets box-related styles (backgroundColor, padding, etc.)
       const { frame } = await createTextandWrapper(node, effectiveTextAlign)
-      frame.name = node.name
+      frame.name = convertNameToElementType(node.elementType, 'wrapper')
       // Apply box model styles to frame only
       await applyStyles(frame, node, effectiveTextAlign, parentStyles)
       // Text styles (including inherited textAlign) are already applied in createTextandWrapper
@@ -62,6 +63,7 @@ export const createElement = async (
       // Just create a text node directly - pass parent styles for inheritance
       const textNode = await createTextNode(node, parentStyles)
       await applyStyles(textNode, node, effectiveTextAlign, parentStyles)
+      textNode.name = convertNameToElementType(node.elementType)
       return textNode
     }
   }
@@ -158,7 +160,7 @@ export const createElement = async (
     const isParentInline = isInlineElement(node)
 
     // Check if this element will become a grid
-    const isGridLayout = node.styles?.['display'] === 'grid'
+    // const isGridLayout = node.styles?.['display'] === 'grid'
 
     // For grid layouts, we'll use appendChildAt to position children correctly
     // For non-grid layouts, process children normally
@@ -167,6 +169,9 @@ export const createElement = async (
     // Process children in sequence to maintain order
     for (let childIndex = 0; childIndex < childrenToProcess.length; childIndex++) {
       const child = childrenToProcess[childIndex]
+      if (!child) {
+        return null
+      }
       try {
         // Pass down the effective textAlign so children inherit it
         const childElement = await createElement(child, effectiveTextAlign, combinedStyles)
@@ -354,7 +359,9 @@ export const createElement = async (
       const gridElement = element
 
       deferredActionsQueue.add(() => {
-        console.log(`\n=== Positioning grid children for ${gridElement.name} with ${gridElement.children.length} children, ${columnCount} columns ===`)
+        console.log(
+          `\n=== Positioning grid children for ${gridElement.name} with ${gridElement.children.length} children, ${columnCount} columns ===`,
+        )
 
         // Figma grid appendChildAt signature: appendChildAt(node: SceneNode, rowIndex: number, columnIndex: number)
         // Note: Children are already appended, appendChildAt will reposition them

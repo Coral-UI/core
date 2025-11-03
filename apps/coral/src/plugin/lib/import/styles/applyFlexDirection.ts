@@ -1,6 +1,6 @@
-import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
+import { ElementWithOptionalText } from '@/plugin/lib/types'
 
-import { ElementWithOptionalText } from '../../types'
+import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 /**
  * Parse gridTemplateColumns to extract the number of columns

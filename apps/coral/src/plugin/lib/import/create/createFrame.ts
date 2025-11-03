@@ -2,10 +2,11 @@ import { CoralNode } from '@reallygoodwork/coral-core'
 
 import { isInlineElement } from '../assert/isInlineElement'
 import { applyStyles } from '../styles/applyStyles'
+import { convertNameToElementType } from '../utils/convertNameToElementType'
 
 export const createFrame = async (spec: CoralNode) => {
   const frame = figma.createFrame()
-  frame.name = spec.name
+  frame.name = convertNameToElementType(spec.elementType)
 
   // Remove default white background - only apply fills if explicitly specified in styles
   frame.fills = []
