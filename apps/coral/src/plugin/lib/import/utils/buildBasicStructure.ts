@@ -123,7 +123,7 @@ async function createBasicComponent(
   minWidth?: number,
 ): Promise<ComponentNode> {
   // Build the node tree
-  const rootNode = await buildNode(spec, analysis.autoLayoutNodes)
+  const rootNode = await buildNode(spec, analysis.autoLayoutNodes, undefined, {}, [])
 
   // Set minimum width if provided
   if (minWidth && 'resize' in rootNode) {
@@ -473,6 +473,7 @@ async function buildNode(
   autoLayoutNodes: AutoLayoutRequirement[],
   inheritedTextAlign?: string,
   inheritedStyles: Record<string, any> = {},
+  currentPath: string[] = [],
 ): Promise<SceneNode> {
   // const nodePath = [node.name || node.elementType || node.type]
   // const isContainer = node.elementType === 'div' || node.elementType === 'section' || node.elementType === 'article'
@@ -578,12 +579,23 @@ async function buildNode(
   // For elements with explicit dimensions, use FIXED sizing mode
   const width = node.styles?.['width']
   const height = node.styles?.['height']
-  const hasExplicitWidth = width !== undefined && width !== '100%' && width !== 'auto'
-  const hasExplicitHeight = height !== undefined && height !== '100%' && height !== 'auto'
+  const maxWidth = node.styles?.['maxWidth']
+  const maxHeight = node.styles?.['maxHeight']
+
+  // Use maxWidth/maxHeight if explicit width/height not set
+  const effectiveWidth = width !== undefined && width !== '100%' && width !== 'auto'
+    ? width
+    : maxWidth
+  const effectiveHeight = height !== undefined && height !== '100%' && height !== 'auto'
+    ? height
+    : maxHeight
+
+  const hasExplicitWidth = effectiveWidth !== undefined
+  const hasExplicitHeight = effectiveHeight !== undefined
 
   if (hasExplicitWidth || hasExplicitHeight) {
-    const widthValue = extractNumberValue(width)
-    const heightValue = extractNumberValue(height)
+    const widthValue = extractNumberValue(effectiveWidth)
+    const heightValue = extractNumberValue(effectiveHeight)
 
     // Get current dimensions as fallback
     const currentWidth = widthValue !== undefined && widthValue > 0 ? widthValue : frame.width
@@ -605,17 +617,41 @@ async function buildNode(
   }
 
   // Find auto layout configuration for this node
+  // Match by nodePath to handle multiple nodes with the same name
   const nodeName = node.name || node.elementType || node.type
-  // Use case-insensitive matching since names might differ in capitalization
-  const autoLayoutConfig = autoLayoutNodes.find((al) =>
-    al.nodeName?.toLowerCase() === nodeName?.toLowerCase()
-  )
+  const nodePath = [...currentPath, nodeName]
 
-  // Debug: log when looking for grid nodes
+  // Check if this node is a grid to prioritize grid layout config
+  const isGridNode = node.styles?.['display'] === 'grid'
+
+  const autoLayoutConfig = autoLayoutNodes.find((al) => {
+    // First try exact path match
+    if (al.nodePath && al.nodePath.length === nodePath.length) {
+      const pathMatches = al.nodePath.every((pathPart, index) =>
+        pathPart.toLowerCase() === nodePath[index].toLowerCase()
+      )
+      if (pathMatches) {
+        // If this is a grid node, only match grid-layout configs
+        if (isGridNode) {
+          return al.reason === 'grid-layout'
+        }
+        return true
+      }
+    }
+    // Fallback to name-only match for backwards compatibility
+    return al.nodeName?.toLowerCase() === nodeName?.toLowerCase()
+  })
+
+  // Debug: log grid node matching
   const hasGridInList = autoLayoutNodes.some(al => al.reason === 'grid-layout')
   if (hasGridInList) {
-    console.log('🟦 Looking for node:', nodeName, 'in autoLayoutNodes. Grid nodes available:',
-      autoLayoutNodes.filter(al => al.reason === 'grid-layout').map(al => al.nodeName))
+    console.log('🟦 Looking for node:', nodeName, 'path:', nodePath.join(' > '))
+    console.log('🟦 autoLayoutConfig found:', !!autoLayoutConfig, 'reason:', autoLayoutConfig?.reason)
+    console.log('🟦 ALL nodes named "Div" in autoLayoutNodes:', autoLayoutNodes.filter(al => al.nodeName === 'Div').map(al => ({
+      name: al.nodeName,
+      reason: al.reason,
+      path: al.nodePath?.join(' > ')
+    })))
   }
 
   // Apply auto layout if needed
@@ -737,7 +773,7 @@ async function buildNode(
   // Process children
   if (hasChildren && node.children) {
     for (const child of node.children) {
-      const childNode = await buildNode(child, autoLayoutNodes, currentTextAlign, mergedStyles)
+      const childNode = await buildNode(child, autoLayoutNodes, currentTextAlign, mergedStyles, nodePath)
       frame.appendChild(childNode)
 
       // Handle absolute positioning AFTER appending
@@ -836,8 +872,10 @@ async function buildNode(
     }
   }
 
-  // Store whether this frame has pending grid layout
+  // Store whether this frame has pending grid layout (BEFORE we clear plugin data)
   const isPendingGrid = frame.getPluginData('pendingGridLayout') === 'true'
+
+  console.log('🟦 Checking grid conversion for frame:', frame.name, 'isPendingGrid:', isPendingGrid)
 
   // Convert to GRID layout if deferred (MUST happen before margin wrapper)
   if (isPendingGrid) {
@@ -877,14 +915,89 @@ async function buildNode(
       frame.gridRowGap = autoLayoutConfig.rowGap
     }
 
-    // Grid children must use FIXED sizing
+    // Position children in grid and set explicit sizing
     if ('children' in frame) {
+      // Calculate available width per column
+      const paddingH = (frame.paddingLeft || 0) + (frame.paddingRight || 0)
+      const totalGapWidth = (columnCount - 1) * (autoLayoutConfig?.columnGap || 0)
+      const availableWidth = (frame.width || 0) - paddingH - totalGapWidth
+      const columnWidth = Math.floor(availableWidth / columnCount)
+
+      console.log('🟦 Grid sizing:', {
+        frameWidth: frame.width,
+        paddingH,
+        totalGapWidth,
+        availableWidth,
+        columnWidth,
+        columnCount
+      })
+
+      // Track row heights to calculate total grid height
+      const rowHeights: number[] = []
+
       for (let i = 0; i < frame.children.length; i++) {
         const child = frame.children[i]
+        const childSpec = node.children?.[i]
+
+        // Calculate grid position (row, column) based on index
+        const row = Math.floor(i / columnCount)
+        const col = i % columnCount
+
+        // Set grid position
+        child.setGridChildPosition(row, col)
+
+        // Set FIXED sizing for grid children
         if ('layoutSizingHorizontal' in child) {
           child.layoutSizingHorizontal = 'FIXED'
           child.layoutSizingVertical = 'FIXED'
         }
+
+        // For auto-layout children (frames), set counterAxisSizingMode to FIXED
+        if ('counterAxisSizingMode' in child && 'layoutMode' in child && child.layoutMode !== 'NONE') {
+          child.counterAxisSizingMode = 'FIXED'
+
+          // Check if child has explicit height in spec
+          const childHeight = childSpec?.styles?.['height']
+          const hasExplicitHeight = childHeight !== undefined && childHeight !== 'auto' && childHeight !== '100%'
+
+          if (!hasExplicitHeight) {
+            // No explicit height - set to HUG (AUTO) for primary axis
+            child.primaryAxisSizingMode = 'AUTO'
+          }
+        }
+
+        // Resize to column width, keeping current height
+        if ('resize' in child) {
+          const currentHeight = child.height || 100
+          child.resizeWithoutConstraints(columnWidth, currentHeight)
+        }
+
+        // Track the maximum height for this row
+        if (!rowHeights[row]) {
+          rowHeights[row] = 0
+        }
+        rowHeights[row] = Math.max(rowHeights[row], child.height || 0)
+
+        console.log('🟦 Positioned grid child', i, 'at row:', row, 'col:', col, 'width:', columnWidth, 'height:', child.height)
+      }
+
+      // Calculate total grid height: padding + row heights + gaps between rows
+      const paddingV = (frame.paddingTop || 0) + (frame.paddingBottom || 0)
+      const totalRowGaps = (rowCount - 1) * (autoLayoutConfig?.rowGap || 0)
+      const totalRowHeight = rowHeights.reduce((sum, height) => sum + height, 0)
+      const totalGridHeight = paddingV + totalRowHeight + totalRowGaps
+
+      console.log('🟦 Grid height calculation:', {
+        rowHeights,
+        paddingV,
+        totalRowGaps,
+        totalRowHeight,
+        totalGridHeight
+      })
+
+      // Resize grid to calculated height
+      if (frame.width && totalGridHeight > 0) {
+        frame.resizeWithoutConstraints(frame.width, totalGridHeight)
       }
     }
 
@@ -899,39 +1012,14 @@ async function buildNode(
       frame.paddingRight = (frame.paddingRight || 0) + spacing.marginRight
     }
 
-    // Clear plugin data
+    // Clear plugin data (do this AFTER using isPendingGrid below)
     frame.setPluginData('pendingGridLayout', '')
     frame.setPluginData('gridTemplateColumns', '')
   }
 
-  // If this container frame has margin, wrap it to convert margin to padding
-  // BUT: Don't wrap grid layouts - grid margins should be handled differently
-  if (hasMargin(node) && !isPendingGrid) {
-    const wrapper = figma.createFrame()
-    wrapper.name = `${convertNameToElementType(frame.elementType || frame.type)}-margin-wrapper`
-    wrapper.layoutMode = 'VERTICAL'
-    wrapper.layoutSizingHorizontal = 'HUG'
-    wrapper.layoutSizingVertical = 'HUG'
-    wrapper.fills = [] // No background on margin wrapper
-
-    // Convert margin to padding on wrapper
-    const spacing = extractSpacingValues(node)
-    wrapper.paddingTop = spacing.marginTop
-    wrapper.paddingBottom = spacing.marginBottom
-    wrapper.paddingLeft = spacing.marginLeft
-    wrapper.paddingRight = spacing.marginRight
-
-    // Append the frame to the wrapper
-    wrapper.appendChild(frame)
-
-    // Transfer any shouldFill plugin data to the wrapper
-    if (frame.getPluginData('shouldFillHorizontal') === 'true') {
-      wrapper.setPluginData('shouldFillHorizontal', 'true')
-      frame.setPluginData('shouldFillHorizontal', '')
-    }
-
-    return wrapper
-  }
+  // TODO: Handle container margin properly
+  // For now, we're not wrapping containers with margin
+  // Container margins should be handled by converting to padding directly
 
   return frame
 }

@@ -186,13 +186,6 @@ export function collectFontsAndStyles(spec: CoralRootNode): PrepareStructureResu
     } else if (isGrid && hasChildren) {
       // Add grid layout requirement
       const gridTemplateColumns = node.styles?.['gridTemplateColumns'] as string | undefined
-      console.log('🟦 Grid detected in prepareStructure:', {
-        nodeName: node.name || node.elementType || node.type,
-        gridTemplateColumns,
-        columnGap,
-        rowGap,
-        childCount: node.children?.length,
-      })
       autoLayoutNodes.push({
         nodeName: node.name || node.elementType || node.type,
         nodeType: node.elementType || node.type,
@@ -267,8 +260,6 @@ export function collectFontsAndStyles(spec: CoralRootNode): PrepareStructureResu
   }
 
   collectFonts(spec)
-
-  console.log('🟦 autoLayoutNodes collected:', autoLayoutNodes.filter(n => n.reason === 'grid-layout'))
 
   return {
     fontsToLoad: Array.from(fontsToLoad),

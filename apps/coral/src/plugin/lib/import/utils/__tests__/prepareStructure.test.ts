@@ -1298,6 +1298,296 @@ describe('prepareStructure', () => {
       })
     })
 
+    describe('grid layout detection', () => {
+      it('should detect grid containers and capture grid template columns', () => {
+        const spec: CoralRootNode = {
+          name: 'GridContainer',
+          elementType: 'div',
+          elementAttributes: {},
+          styles: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          },
+          children: [
+            {
+              name: 'GridItem1',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+            {
+              name: 'GridItem2',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+          ],
+        }
+
+        const result = collectFontsAndStyles(spec)
+
+        const gridNode = result.autoLayoutNodes.find((al) => al.nodeName === 'GridContainer')
+        expect(gridNode).toBeDefined()
+        expect(gridNode?.reason).toBe('grid-layout')
+        expect(gridNode?.layoutMode).toBe('GRID')
+        expect(gridNode?.gridTemplateColumns).toBe('repeat(2, minmax(0, 1fr))')
+      })
+
+      it('should detect single column grid', () => {
+        const spec: CoralRootNode = {
+          name: 'SingleColumnGrid',
+          elementType: 'div',
+          elementAttributes: {},
+          styles: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+          },
+          children: [
+            {
+              name: 'Item',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+          ],
+        }
+
+        const result = collectFontsAndStyles(spec)
+
+        const gridNode = result.autoLayoutNodes.find((al) => al.nodeName === 'SingleColumnGrid')
+        expect(gridNode?.gridTemplateColumns).toBe('repeat(1, minmax(0, 1fr))')
+        expect(gridNode?.layoutMode).toBe('GRID')
+      })
+
+      it('should capture grid gap properties', () => {
+        const spec: CoralRootNode = {
+          name: 'GridWithGaps',
+          elementType: 'div',
+          elementAttributes: {},
+          styles: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            columnGap: 16,
+            rowGap: 24,
+          },
+          children: [
+            {
+              name: 'Item1',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+            {
+              name: 'Item2',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+          ],
+        }
+
+        const result = collectFontsAndStyles(spec)
+
+        const gridNode = result.autoLayoutNodes.find((al) => al.nodeName === 'GridWithGaps')
+        expect(gridNode?.columnGap).toBe(16)
+        expect(gridNode?.rowGap).toBe(24)
+      })
+
+      it('should handle grid with responsive breakpoints (mobile-first)', () => {
+        const spec: CoralRootNode = {
+          name: 'ResponsiveGrid',
+          elementType: 'div',
+          elementAttributes: {},
+          styles: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+            rowGap: 24,
+          },
+          responsiveStyles: [
+            {
+              breakpoint: {
+                type: 'min-width',
+                value: '640px',
+              },
+              styles: {
+                rowGap: 0,
+              },
+            },
+            {
+              breakpoint: {
+                type: 'min-width',
+                value: '1024px',
+              },
+              styles: {
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+              },
+            },
+          ],
+          children: [
+            {
+              name: 'Item1',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+            {
+              name: 'Item2',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+          ],
+        }
+
+        const result = collectFontsAndStyles(spec)
+
+        const gridNode = result.autoLayoutNodes.find((al) => al.nodeName === 'ResponsiveGrid')
+        expect(gridNode?.gridTemplateColumns).toBe('repeat(1, minmax(0, 1fr))')
+        expect(gridNode?.rowGap).toBe(24)
+
+        // Verify responsive variants collected
+        expect(result.responsiveVariants).toHaveLength(2)
+      })
+
+      it('should not detect grid for non-grid containers', () => {
+        const spec: CoralRootNode = {
+          name: 'RegularDiv',
+          elementType: 'div',
+          elementAttributes: {},
+          styles: {},
+          children: [
+            {
+              name: 'Child',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+          ],
+        }
+
+        const result = collectFontsAndStyles(spec)
+
+        const gridNode = result.autoLayoutNodes.find((al) => al.nodeName === 'RegularDiv' && al.reason === 'grid-layout')
+        expect(gridNode).toBeUndefined()
+      })
+
+      it('should handle grid with margin that should be applied as padding', () => {
+        const spec: CoralRootNode = {
+          name: 'GridWithMargin',
+          elementType: 'div',
+          elementAttributes: {},
+          styles: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            marginBlockStart: 64,
+            marginInlineStart: 'auto',
+            marginInlineEnd: 'auto',
+          },
+          children: [
+            {
+              name: 'Item',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+          ],
+        }
+
+        const result = collectFontsAndStyles(spec)
+
+        const gridNode = result.autoLayoutNodes.find((al) => al.nodeName === 'GridWithMargin')
+        expect(gridNode?.layoutMode).toBe('GRID')
+        expect(gridNode?.reason).toBe('grid-layout')
+      })
+
+      it('should require children for grid layout detection', () => {
+        const spec: CoralRootNode = {
+          name: 'EmptyGrid',
+          elementType: 'div',
+          elementAttributes: {},
+          styles: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+          },
+          children: [],
+        }
+
+        const result = collectFontsAndStyles(spec)
+
+        const gridNode = result.autoLayoutNodes.find((al) => al.nodeName === 'EmptyGrid' && al.reason === 'grid-layout')
+        expect(gridNode).toBeUndefined()
+      })
+
+      it('should handle real-world card grid layout', () => {
+        const spec: CoralRootNode = {
+          name: 'CardGrid',
+          elementType: 'div',
+          elementAttributes: {},
+          styles: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+            rowGap: 32,
+          },
+          responsiveStyles: [
+            {
+              breakpoint: {
+                type: 'min-width',
+                value: '768px',
+              },
+              label: 'Tablet',
+              styles: {
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                columnGap: 24,
+              },
+            },
+            {
+              breakpoint: {
+                type: 'min-width',
+                value: '1024px',
+              },
+              label: 'Desktop',
+              styles: {
+                gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+              },
+            },
+          ],
+          children: [
+            {
+              name: 'Card1',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+            {
+              name: 'Card2',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+            {
+              name: 'Card3',
+              elementType: 'div',
+              styles: {},
+              children: [],
+            },
+          ],
+        }
+
+        const result = collectFontsAndStyles(spec)
+
+        const gridNode = result.autoLayoutNodes.find((al) => al.nodeName === 'CardGrid')
+        expect(gridNode?.layoutMode).toBe('GRID')
+        expect(gridNode?.gridTemplateColumns).toBe('repeat(1, minmax(0, 1fr))')
+        expect(gridNode?.rowGap).toBe(32)
+        expect(gridNode?.hasChildren).toBe(true)
+
+        // Verify responsive variants
+        expect(result.responsiveVariants).toHaveLength(2)
+        expect(result.responsiveVariants[0].label).toBe('Tablet')
+        expect(result.responsiveVariants[1].label).toBe('Desktop')
+      })
+    })
+
     describe('flex layout detection', () => {
       it('should detect flex containers and determine layout mode', () => {
         const spec: CoralRootNode = {
