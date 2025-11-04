@@ -1,6 +1,6 @@
-import { CoralRootNode, ResponsiveStyle } from '@reallygoodwork/coral-core'
+import { CoralRootNode } from '@reallygoodwork/coral-core'
 
-import { collectFontsAndStyles, TEXT_STYLE_PROPERTIES } from '../prepareStructure'
+import { collectFontsAndStyles } from '../prepareStructure'
 
 describe('prepareStructure', () => {
   describe('collectFontsAndStyles', () => {
@@ -1095,9 +1095,9 @@ describe('prepareStructure', () => {
         const result = collectFontsAndStyles(spec)
 
         expect(result.wrapperNodes).toContain('Text')
-        expect(result.autoLayoutNodes.some((al) => al.nodeName === 'Text-wrapper' && al.reason === 'text-spacing')).toBe(
-          true,
-        )
+        expect(
+          result.autoLayoutNodes.some((al) => al.nodeName === 'Text-wrapper' && al.reason === 'text-spacing'),
+        ).toBe(true)
       })
 
       it('should detect text nodes that need wrapper frames for padding', () => {
@@ -1467,7 +1467,9 @@ describe('prepareStructure', () => {
 
         const result = collectFontsAndStyles(spec)
 
-        const gridNode = result.autoLayoutNodes.find((al) => al.nodeName === 'RegularDiv' && al.reason === 'grid-layout')
+        const gridNode = result.autoLayoutNodes.find(
+          (al) => al.nodeName === 'RegularDiv' && al.reason === 'grid-layout',
+        )
         expect(gridNode).toBeUndefined()
       })
 

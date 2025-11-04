@@ -1,9 +1,16 @@
-import { CoralColorType, CoralNode, CoralRootNode, CoralStyleType, ResponsiveStyle } from '@reallygoodwork/coral-core'
+import { CoralColorType, CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 import { isCoralColor } from '../../types'
+import { convertCoralColorToRGB, getColorOpacity } from '../color/convertCoralColorToRGB'
+import { applyBorderFromNode } from '../styles/applyBorder'
 import { createSVGFrame } from '../vector/createSVGFrame'
 import { applyResponsiveStyles } from './applyResponsiveStyles'
 import { convertNameToElementType } from './convertNameToElementType'
+import { hasMargin, needsWrapperFrame } from './detectLayoutRequirements'
+import { extractDimensionValues } from './extractDimensionValues'
+import { extractSpacingValues } from './extractSpacingValues'
+import { extractStyleValue } from './extractStyleValue'
+import { getBreakpointWidth } from './getBreakpointWidth'
 import { AutoLayoutRequirement, collectFontsAndStyles } from './prepareStructure'
 
 /**
@@ -53,25 +60,6 @@ async function loadRequiredFonts(fontsToLoad: string[]): Promise<void> {
       }
     }),
   )
-}
-
-/**
- * Extract minimum width from breakpoint (mobile-first approach)
- */
-function getBreakpointWidth(breakpoint: ResponsiveStyle['breakpoint']): number {
-  // For simple breakpoints like { type: 'min-width', value: '768px' }
-  if ('type' in breakpoint && breakpoint.type === 'min-width' && breakpoint.value) {
-    const value = breakpoint.value.toString().replace('px', '')
-    return parseInt(value, 10)
-  }
-
-  // For range breakpoints, use the min value
-  if ('min' in breakpoint && breakpoint.min) {
-    const value = breakpoint.min.value.toString().replace('px', '')
-    return parseInt(value, 10)
-  }
-
-  return 480 // Default mobile width
 }
 
 /**
@@ -153,134 +141,23 @@ async function createBasicComponent(
 
   return component
 }
-
-/**
- * Check if a node has margin (needs wrapper to handle margin spacing)
- */
-function hasMargin(node: CoralNode | CoralRootNode): boolean {
-  if (!node.styles) return false
-
-  const marginProps = ['marginBlockStart', 'marginBlockEnd', 'marginInlineStart', 'marginInlineEnd']
-
-  return marginProps.some((prop) => {
-    const value = node.styles![prop]
-    // Ignore "auto" margins (used for centering) and undefined
-    return value !== undefined && value !== 'auto'
-  })
-}
-
-/**
- * Check if a node needs a wrapper frame (has margin or padding)
- */
-function needsWrapperFrame(node: CoralNode | CoralRootNode): boolean {
-  if (!node.styles) return false
-
-  const spacingProps = [
-    'marginBlockStart',
-    'marginBlockEnd',
-    'marginInlineStart',
-    'marginInlineEnd',
-    'paddingBlockStart',
-    'paddingBlockEnd',
-    'paddingInlineStart',
-    'paddingInlineEnd',
-  ]
-
-  return spacingProps.some((prop) => {
-    const value = node.styles![prop]
-    // Ignore "auto" margins (used for centering)
-    return value !== undefined && value !== 'auto'
-  })
-}
-
-/**
- * Convert Coral color to Figma RGB
- */
-function convertColor(color: CoralColorType): RGB {
-  if (!color) return { r: 0, g: 0, b: 0 }
-
-  // Color can be { hex, rgb, hsl }
-  if (color.rgb) {
-    return {
-      r: color.rgb.r / 255,
-      g: color.rgb.g / 255,
-      b: color.rgb.b / 255,
-    }
-  }
-
-  // Fallback: parse hex
-  if (color.hex) {
-    const hex = color.hex.replace('#', '')
-    return {
-      r: parseInt(hex.substring(0, 2), 16) / 255,
-      g: parseInt(hex.substring(2, 4), 16) / 255,
-      b: parseInt(hex.substring(4, 6), 16) / 255,
-    }
-  }
-
-  return { r: 0, g: 0, b: 0 }
-}
-
-/**
- * Get opacity from color object
- */
-function getOpacity(color: CoralColorType): number {
-  if (!color) return 1
-  if (color.rgb?.a !== undefined) return color.rgb.a
-  if (color.hsl?.a !== undefined) return color.hsl.a
-  return 1
-}
-
-/**
- * Extract numeric value from a style property (handles numbers and strings like "10px")
- */
-function extractNumberValue(value: CoralStyleType[keyof CoralStyleType] | undefined): number | undefined {
-  if (value === undefined) return undefined
-  if (typeof value === 'number') return value
-  if (typeof value === 'string') {
-    const parsed = parseFloat(value.replace('px', ''))
-    return isNaN(parsed) ? undefined : parsed
-  }
-  if (typeof value === 'object' && 'value' in value) {
-    return extractNumberValue(value.value)
-  }
-  return undefined
-}
-
-/**
- * Extract spacing values from styles
- */
-function extractSpacingValues(node: CoralNode | CoralRootNode) {
-  const styles = node.styles || {}
-  return {
-    marginTop: extractNumberValue(styles['marginBlockStart']) || 0,
-    marginBottom: extractNumberValue(styles['marginBlockEnd']) || 0,
-    marginLeft: extractNumberValue(styles['marginInlineStart']) || 0,
-    marginRight: extractNumberValue(styles['marginInlineEnd']) || 0,
-    paddingTop: extractNumberValue(styles['paddingBlockStart']) || 0,
-    paddingBottom: extractNumberValue(styles['paddingBlockEnd']) || 0,
-    paddingLeft: extractNumberValue(styles['paddingInlineStart']) || 0,
-    paddingRight: extractNumberValue(styles['paddingInlineEnd']) || 0,
-  }
-}
-
 /**
  * Create a text node wrapped in a frame with margin/padding
  */
 async function createTextNodeWithWrapper(
   node: CoralNode | CoralRootNode,
   textAlign?: string,
-  mergedStyles?: Record<string, any>,
+  mergedStyles?: Record<string, unknown>,
 ): Promise<FrameNode> {
   const spacing = extractSpacingValues(node)
-  const hasMargin =
+  const hasMarginValue =
     spacing.marginTop > 0 || spacing.marginBottom > 0 || spacing.marginLeft > 0 || spacing.marginRight > 0
   const hasPadding =
     spacing.paddingTop > 0 || spacing.paddingBottom > 0 || spacing.paddingLeft > 0 || spacing.paddingRight > 0
 
   // If both margin and padding exist, create nested structure:
   // Outer wrapper (margin) -> Inner wrapper (padding + background + border) -> Text
-  if (hasMargin && hasPadding) {
+  if (hasMarginValue && hasPadding) {
     // Create outer margin wrapper (no background)
     const marginWrapper = figma.createFrame()
     marginWrapper.name = `${convertNameToElementType(node.elementType || node.type)}-margin-wrapper`
@@ -310,8 +187,8 @@ async function createTextNodeWithWrapper(
       paddingWrapper.fills = [
         {
           type: 'SOLID',
-          color: convertColor(backgroundColor),
-          opacity: getOpacity(backgroundColor),
+          color: convertCoralColorToRGB(backgroundColor),
+          opacity: getColorOpacity(backgroundColor),
         },
       ]
     } else {
@@ -321,34 +198,14 @@ async function createTextNodeWithWrapper(
     // Apply border radius to padding wrapper
     const borderRadius = node.styles?.['borderRadius']
     if (borderRadius !== undefined) {
-      const radiusValue = extractNumberValue(borderRadius)
+      const radiusValue = extractStyleValue(borderRadius)
       if (radiusValue !== undefined) {
         paddingWrapper.cornerRadius = radiusValue
       }
     }
 
     // Apply border (stroke) to padding wrapper
-    const borderWidth = node.styles?.['borderWidth']
-    const borderColor = node.styles?.['borderColor']
-    const borderStyle = node.styles?.['borderStyle']
-    if (borderWidth && borderColor && isCoralColor(borderColor)) {
-      const strokeWeight = extractNumberValue(borderWidth)
-      if (strokeWeight !== undefined && strokeWeight > 0) {
-        paddingWrapper.strokeWeight = strokeWeight
-        paddingWrapper.strokes = [
-          {
-            type: 'SOLID',
-            color: convertColor(borderColor),
-            opacity: getOpacity(borderColor),
-          },
-        ]
-        if (borderStyle === 'dashed') {
-          paddingWrapper.dashPattern = [strokeWeight * 3, strokeWeight * 2]
-        } else if (borderStyle === 'dotted') {
-          paddingWrapper.dashPattern = [strokeWeight, strokeWeight]
-        }
-      }
-    }
+    applyBorderFromNode(paddingWrapper, node)
 
     // Apply padding to padding wrapper
     paddingWrapper.paddingTop = spacing.paddingTop
@@ -369,15 +226,10 @@ async function createTextNodeWithWrapper(
     }
 
     // Extract dimension constraints first to determine sizing strategy
-    const maxWidth = node.styles?.['maxWidth']
-    const minWidth = node.styles?.['minWidth']
-    const maxHeight = node.styles?.['maxHeight']
-    const minHeight = node.styles?.['minHeight']
-
-    const maxWidthValue = extractNumberValue(maxWidth)
-    const minWidthValue = extractNumberValue(minWidth)
+    const dimensions = extractDimensionValues(node)
     const hasWidthConstraints =
-      (maxWidthValue !== undefined && maxWidthValue > 0) || (minWidthValue !== undefined && minWidthValue > 0)
+      (dimensions.maxWidth !== undefined && dimensions.maxWidth > 0) ||
+      (dimensions.minWidth !== undefined && dimensions.minWidth > 0)
 
     // Create text node
     const textNode = await createSimpleTextNode(node, textAlign, mergedStyles)
@@ -389,11 +241,11 @@ async function createTextNodeWithWrapper(
       // Use HUG sizing so text node respects its own width constraints
       textNode.layoutSizingHorizontal = 'HUG'
 
-      if (maxWidthValue !== undefined && maxWidthValue > 0) {
-        textNode.maxWidth = maxWidthValue
+      if (dimensions.maxWidth !== undefined && dimensions.maxWidth > 0) {
+        textNode.maxWidth = dimensions.maxWidth
       }
-      if (minWidthValue !== undefined && minWidthValue > 0) {
-        textNode.minWidth = minWidthValue
+      if (dimensions.minWidth !== undefined && dimensions.minWidth > 0) {
+        textNode.minWidth = dimensions.minWidth
       }
     } else {
       // No width constraints - use FILL sizing (default behavior)
@@ -401,14 +253,12 @@ async function createTextNodeWithWrapper(
     }
 
     // Height constraints go on the wrapper to include padding/background
-    const maxHeightValue = extractNumberValue(maxHeight)
-    if (maxHeightValue !== undefined && maxHeightValue > 0) {
-      paddingWrapper.maxHeight = maxHeightValue
+    if (dimensions.maxHeight !== undefined && dimensions.maxHeight > 0) {
+      paddingWrapper.maxHeight = dimensions.maxHeight
     }
 
-    const minHeightValue = extractNumberValue(minHeight)
-    if (minHeightValue !== undefined && minHeightValue > 0) {
-      paddingWrapper.minHeight = minHeightValue
+    if (dimensions.minHeight !== undefined && dimensions.minHeight > 0) {
+      paddingWrapper.minHeight = dimensions.minHeight
     }
 
     // Assemble: marginWrapper contains paddingWrapper
@@ -431,8 +281,8 @@ async function createTextNodeWithWrapper(
   // Apply non-text styles to wrapper (backgroundColor, borderRadius, etc.)
   const backgroundColor = node.styles?.['backgroundColor']
   if (backgroundColor && isCoralColor(backgroundColor)) {
-    const rgb = convertColor(backgroundColor)
-    const opacity = getOpacity(backgroundColor)
+    const rgb = convertCoralColorToRGB(backgroundColor)
+    const opacity = getColorOpacity(backgroundColor)
     wrapper.fills = [
       {
         type: 'SOLID',
@@ -447,38 +297,14 @@ async function createTextNodeWithWrapper(
   // Apply border radius if present
   const borderRadius = node.styles?.['borderRadius']
   if (borderRadius !== undefined) {
-    const radiusValue = extractNumberValue(borderRadius)
+    const radiusValue = extractStyleValue(borderRadius)
     if (radiusValue !== undefined) {
       wrapper.cornerRadius = radiusValue
     }
   }
 
   // Apply border (stroke) if present
-  const borderWidth = node.styles?.['borderWidth']
-  const borderColor = node.styles?.['borderColor']
-  const borderStyle = node.styles?.['borderStyle']
-
-  if (borderWidth && borderColor && isCoralColor(borderColor)) {
-    const strokeWeight = extractNumberValue(borderWidth)
-    if (strokeWeight !== undefined && strokeWeight > 0) {
-      wrapper.strokeWeight = strokeWeight
-      wrapper.strokes = [
-        {
-          type: 'SOLID',
-          color: convertColor(borderColor),
-          opacity: getOpacity(borderColor),
-        },
-      ]
-
-      // Handle border style (solid, dashed, dotted)
-      if (borderStyle === 'dashed') {
-        wrapper.dashPattern = [strokeWeight * 3, strokeWeight * 2]
-      } else if (borderStyle === 'dotted') {
-        wrapper.dashPattern = [strokeWeight, strokeWeight]
-      }
-      // Default is solid (no dashPattern needed)
-    }
-  }
+  applyBorderFromNode(wrapper, node)
 
   // Apply spacing - combine margin + padding when both exist
   wrapper.paddingTop = spacing.paddingTop + spacing.marginTop
@@ -499,15 +325,10 @@ async function createTextNodeWithWrapper(
   }
 
   // Extract dimension constraints first to determine sizing strategy
-  const maxWidth = node.styles?.['maxWidth']
-  const minWidth = node.styles?.['minWidth']
-  const maxHeight = node.styles?.['maxHeight']
-  const minHeight = node.styles?.['minHeight']
-
-  const maxWidthValue = extractNumberValue(maxWidth)
-  const minWidthValue = extractNumberValue(minWidth)
+  const dimensions = extractDimensionValues(node)
   const hasWidthConstraints =
-    (maxWidthValue !== undefined && maxWidthValue > 0) || (minWidthValue !== undefined && minWidthValue > 0)
+    (dimensions.maxWidth !== undefined && dimensions.maxWidth > 0) ||
+    (dimensions.minWidth !== undefined && dimensions.minWidth > 0)
 
   // Create text node inside with merged styles for inheritance
   const textNode = await createSimpleTextNode(node, textAlign, mergedStyles)
@@ -519,11 +340,11 @@ async function createTextNodeWithWrapper(
     // Use HUG sizing so text node respects its own width constraints
     textNode.layoutSizingHorizontal = 'HUG'
 
-    if (maxWidthValue !== undefined && maxWidthValue > 0) {
-      textNode.maxWidth = maxWidthValue
+    if (dimensions.maxWidth !== undefined && dimensions.maxWidth > 0) {
+      textNode.maxWidth = dimensions.maxWidth
     }
-    if (minWidthValue !== undefined && minWidthValue > 0) {
-      textNode.minWidth = minWidthValue
+    if (dimensions.minWidth !== undefined && dimensions.minWidth > 0) {
+      textNode.minWidth = dimensions.minWidth
     }
   } else {
     // No width constraints - use FILL sizing (default behavior)
@@ -531,14 +352,12 @@ async function createTextNodeWithWrapper(
   }
 
   // Height constraints go on the wrapper to include padding/background
-  const maxHeightValue = extractNumberValue(maxHeight)
-  if (maxHeightValue !== undefined && maxHeightValue > 0) {
-    wrapper.maxHeight = maxHeightValue
+  if (dimensions.maxHeight !== undefined && dimensions.maxHeight > 0) {
+    wrapper.maxHeight = dimensions.maxHeight
   }
 
-  const minHeightValue = extractNumberValue(minHeight)
-  if (minHeightValue !== undefined && minHeightValue > 0) {
-    wrapper.minHeight = minHeightValue
+  if (dimensions.minHeight !== undefined && dimensions.minHeight > 0) {
+    wrapper.minHeight = dimensions.minHeight
   }
 
   return wrapper
@@ -551,7 +370,7 @@ async function buildNode(
   node: CoralNode | CoralRootNode,
   autoLayoutNodes: AutoLayoutRequirement[],
   inheritedTextAlign?: string,
-  inheritedStyles: Record<string, any> = {},
+  inheritedStyles: Record<string, unknown> = {},
   currentPath: string[] = [],
 ): Promise<SceneNode> {
   // const nodePath = [node.name || node.elementType || node.type]
@@ -605,8 +424,8 @@ async function buildNode(
   // Apply background color if present
   const backgroundColor = node.styles?.['backgroundColor']
   if (backgroundColor && isCoralColor(backgroundColor)) {
-    const rgb = convertColor(backgroundColor)
-    const opacity = getOpacity(backgroundColor)
+    const rgb = convertCoralColorToRGB(backgroundColor)
+    const opacity = getColorOpacity(backgroundColor)
     frame.fills = [
       {
         type: 'SOLID',
@@ -621,58 +440,31 @@ async function buildNode(
   // Apply border radius if present
   const borderRadius = node.styles?.['borderRadius']
   if (borderRadius !== undefined) {
-    const radiusValue = extractNumberValue(borderRadius)
+    const radiusValue = extractStyleValue(borderRadius)
     if (radiusValue !== undefined) {
       frame.cornerRadius = radiusValue
     }
   }
 
   // Apply border (stroke) if present
-  const borderWidth = node.styles?.['borderWidth']
-  const borderColor = node.styles?.['borderColor']
-  const borderStyle = node.styles?.['borderStyle']
-
-  if (borderWidth && borderColor && isCoralColor(borderColor)) {
-    const strokeWeight = extractNumberValue(borderWidth)
-    if (strokeWeight !== undefined && strokeWeight > 0) {
-      frame.strokeWeight = strokeWeight
-      frame.strokes = [
-        {
-          type: 'SOLID',
-          color: convertColor(borderColor),
-          opacity: getOpacity(borderColor),
-        },
-      ]
-
-      // Handle border style (solid, dashed, dotted)
-      if (borderStyle === 'dashed') {
-        frame.dashPattern = [strokeWeight * 3, strokeWeight * 2]
-      } else if (borderStyle === 'dotted') {
-        frame.dashPattern = [strokeWeight, strokeWeight]
-      }
-      // Default is solid (no dashPattern needed)
-    }
-  }
+  applyBorderFromNode(frame, node)
 
   // Apply explicit width and height if present
   // For elements with explicit dimensions, use FIXED sizing mode
+  const dimensions = extractDimensionValues(node)
   const width = node.styles?.['width']
   const height = node.styles?.['height']
-  const maxWidth = node.styles?.['maxWidth']
-  const maxHeight = node.styles?.['maxHeight']
-  const minWidth = node.styles?.['minWidth']
-  const minHeight = node.styles?.['minHeight']
 
   // Use maxWidth/maxHeight if explicit width/height not set
-  const effectiveWidth = width !== undefined && width !== '100%' && width !== 'auto' ? width : maxWidth
-  const effectiveHeight = height !== undefined && height !== '100%' && height !== 'auto' ? height : maxHeight
+  const effectiveWidth = width !== undefined && width !== '100%' && width !== 'auto' ? width : dimensions.maxWidth
+  const effectiveHeight = height !== undefined && height !== '100%' && height !== 'auto' ? height : dimensions.maxHeight
 
   const hasExplicitWidth = effectiveWidth !== undefined
   const hasExplicitHeight = effectiveHeight !== undefined
 
   if (hasExplicitWidth || hasExplicitHeight) {
-    const widthValue = extractNumberValue(effectiveWidth)
-    const heightValue = extractNumberValue(effectiveHeight)
+    const widthValue = extractStyleValue(effectiveWidth)
+    const heightValue = extractStyleValue(effectiveHeight)
 
     // Get current dimensions as fallback
     const currentWidth = widthValue !== undefined && widthValue > 0 ? widthValue : frame.width
@@ -695,7 +487,7 @@ async function buildNode(
 
   // Find auto layout configuration for this node
   // Match by nodePath to handle multiple nodes with the same name
-  const nodeName = node.name || node.elementType || node.type
+  const nodeName = node.name || node.elementType || node.type || 'unknown'
   const nodePath = [...currentPath, nodeName]
 
   // Check if this node is a grid or flex container
@@ -809,7 +601,8 @@ async function buildNode(
       frame.itemSpacing = finalAutoLayoutConfig.gap
     } else if (finalAutoLayoutConfig?.columnGap || finalAutoLayoutConfig?.rowGap) {
       // Use columnGap for horizontal, rowGap for vertical
-      const spacing = frame.layoutMode === 'HORIZONTAL' ? finalAutoLayoutConfig.columnGap || 0 : finalAutoLayoutConfig.rowGap || 0
+      const spacing =
+        frame.layoutMode === 'HORIZONTAL' ? finalAutoLayoutConfig.columnGap || 0 : finalAutoLayoutConfig.rowGap || 0
       frame.itemSpacing = spacing
     } else {
       frame.itemSpacing = 8 // Default spacing
@@ -881,24 +674,20 @@ async function buildNode(
 
     // Apply min/max dimension constraints AFTER setting layoutMode
     // These constraints only work on auto-layout frames and their direct children
-    const maxWidthValue = extractNumberValue(maxWidth)
-    if (maxWidthValue !== undefined && maxWidthValue > 0) {
-      frame.maxWidth = maxWidthValue
+    if (dimensions.maxWidth !== undefined && dimensions.maxWidth > 0) {
+      frame.maxWidth = dimensions.maxWidth
     }
 
-    const minWidthValue = extractNumberValue(minWidth)
-    if (minWidthValue !== undefined && minWidthValue > 0) {
-      frame.minWidth = minWidthValue
+    if (dimensions.minWidth !== undefined && dimensions.minWidth > 0) {
+      frame.minWidth = dimensions.minWidth
     }
 
-    const maxHeightValue = extractNumberValue(maxHeight)
-    if (maxHeightValue !== undefined && maxHeightValue > 0) {
-      frame.maxHeight = maxHeightValue
+    if (dimensions.maxHeight !== undefined && dimensions.maxHeight > 0) {
+      frame.maxHeight = dimensions.maxHeight
     }
 
-    const minHeightValue = extractNumberValue(minHeight)
-    if (minHeightValue !== undefined && minHeightValue > 0) {
-      frame.minHeight = minHeightValue
+    if (dimensions.minHeight !== undefined && dimensions.minHeight > 0) {
+      frame.minHeight = dimensions.minHeight
     }
   }
 
@@ -942,12 +731,12 @@ async function buildNode(
 
           // Calculate x position (left or right)
           if (left !== undefined) {
-            const leftValue = typeof left === 'number' ? left : extractNumberValue(left)
+            const leftValue = typeof left === 'number' ? left : extractStyleValue(left)
             if (leftValue !== undefined) {
               childNode.x = leftValue
             }
           } else if (right !== undefined) {
-            const rightValue = typeof right === 'number' ? right : extractNumberValue(right)
+            const rightValue = typeof right === 'number' ? right : extractStyleValue(right)
             if (rightValue !== undefined) {
               childNode.x = frame.width - childNode.width - rightValue
             }
@@ -957,12 +746,12 @@ async function buildNode(
 
           // Calculate y position (top or bottom)
           if (top !== undefined) {
-            const topValue = typeof top === 'number' ? top : extractNumberValue(top)
+            const topValue = typeof top === 'number' ? top : extractStyleValue(top)
             if (topValue !== undefined) {
               childNode.y = topValue
             }
           } else if (bottom !== undefined) {
-            const bottomValue = typeof bottom === 'number' ? bottom : extractNumberValue(bottom)
+            const bottomValue = typeof bottom === 'number' ? bottom : extractStyleValue(bottom)
             if (bottomValue !== undefined) {
               childNode.y = frame.height - childNode.height - bottomValue
             }
@@ -1025,7 +814,7 @@ async function buildNode(
     if (gridTemplateColumns) {
       // Handle "repeat(N, ...)" pattern
       const repeatMatch = gridTemplateColumns.match(/repeat\((\d+),/)
-      if (repeatMatch) {
+      if (repeatMatch && repeatMatch[1]) {
         columnCount = parseInt(repeatMatch[1], 10)
       } else {
         // Count columns by spaces/fr units
@@ -1077,12 +866,19 @@ async function buildNode(
         const child = frame.children[i]
         const childSpec = node.children?.[i]
 
+        // Skip if child is undefined
+        if (!child) {
+          continue
+        }
+
         // Calculate grid position (row, column) based on index
         const row = Math.floor(i / columnCount)
         const col = i % columnCount
 
         // Set grid position
-        child.setGridChildPosition(row, col)
+        if ('setGridChildPosition' in child && typeof child.setGridChildPosition === 'function') {
+          child.setGridChildPosition(row, col)
+        }
 
         // Set FIXED sizing for grid children
         if ('layoutSizingHorizontal' in child) {
@@ -1105,7 +901,7 @@ async function buildNode(
         }
 
         // Resize to column width, keeping current height
-        if ('resize' in child) {
+        if ('resizeWithoutConstraints' in child && typeof child.resizeWithoutConstraints === 'function') {
           const currentHeight = child.height || 100
           child.resizeWithoutConstraints(columnWidth, currentHeight)
         }
@@ -1179,7 +975,7 @@ async function buildNode(
 async function createSimpleTextNode(
   node: CoralNode | CoralRootNode,
   textAlign?: string,
-  mergedStyles?: Record<string, any>,
+  mergedStyles?: Record<string, unknown>,
 ): Promise<TextNode> {
   const textNode = figma.createText()
 
@@ -1244,8 +1040,8 @@ async function createSimpleTextNode(
   // Apply text color - check node styles first, then fall back to inherited styles
   const color = node.styles?.['color'] || mergedStyles?.['color']
   if (color && isCoralColor(color)) {
-    const rgb = convertColor(color)
-    const opacity = getOpacity(color)
+    const rgb = convertCoralColorToRGB(color)
+    const opacity = getColorOpacity(color)
     textNode.fills = [
       {
         type: 'SOLID',

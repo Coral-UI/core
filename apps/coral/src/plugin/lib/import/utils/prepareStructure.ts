@@ -2,6 +2,8 @@ import { CoralNode, CoralRootNode, ResponsiveStyle } from '@reallygoodwork/coral
 
 import { loadFont } from '../typography/loadFont'
 import { transformFontWeightToFigmaFontStyle } from '../typography/transformFontWeightToFigmaFontStyle'
+import { needsParentCentering, needsWrapperFrame } from './detectLayoutRequirements'
+import { generateVariantName } from './generateVariantName'
 
 export const TEXT_STYLE_PROPERTIES = [
   'fontFamily',
@@ -57,91 +59,6 @@ export interface PrepareStructureResult {
   responsiveVariants: ResponsiveVariant[]
   autoLayoutNodes: AutoLayoutRequirement[]
   wrapperNodes: string[]
-}
-
-function generateVariantName(responsiveStyle: ResponsiveStyle): string {
-  // Use label if provided
-  if (responsiveStyle.label) {
-    return responsiveStyle.label
-  }
-
-  // Otherwise generate from breakpoint
-  const bp = responsiveStyle.breakpoint
-
-  // Check if it's a range breakpoint
-  if ('min' in bp || 'max' in bp) {
-    const parts: string[] = []
-    if (bp.min) {
-      parts.push(`${bp.min.type}:${bp.min.value}`)
-    }
-    if (bp.max) {
-      parts.push(`${bp.max.type}:${bp.max.value}`)
-    }
-    return parts.join(' AND ')
-  }
-
-  // Simple breakpoint
-  return 'type' in bp ? `${bp.type}:${bp.value}` : 'range'
-}
-
-function needsWrapperFrame(node: CoralNode): boolean {
-  if (!node.styles) return false
-
-  const spacingProps = [
-    'marginBlockStart',
-    'marginBlockEnd',
-    'marginInlineStart',
-    'marginInlineEnd',
-    'paddingBlockStart',
-    'paddingBlockEnd',
-    'paddingInlineStart',
-    'paddingInlineEnd',
-  ]
-
-  return spacingProps.some((prop) => node.styles![prop] !== undefined)
-}
-
-/**
- * Check if a node has centering margin (margin: auto or mx-auto pattern)
- */
-function hasCenteringMargin(node: CoralNode): boolean {
-  if (!node.styles) return false
-
-  const marginInlineStart = node.styles['marginInlineStart']
-  const marginInlineEnd = node.styles['marginInlineEnd']
-  const marginLeft = node.styles['marginLeft']
-  const marginRight = node.styles['marginRight']
-
-  // Check for auto margins (horizontal centering)
-  return (
-    marginInlineStart === 'auto' ||
-    marginInlineEnd === 'auto' ||
-    marginLeft === 'auto' ||
-    marginRight === 'auto'
-  )
-}
-
-/**
- * Check if a node has width or maxWidth constraints
- */
-function hasWidthConstraints(node: CoralNode): boolean {
-  if (!node.styles) return false
-
-  const width = node.styles['width']
-  const maxWidth = node.styles['maxWidth']
-
-  // Check for explicit width or maxWidth (not 100% or auto)
-  const hasExplicitWidth = width !== undefined && width !== '100%' && width !== 'auto'
-  const hasMaxWidth = maxWidth !== undefined
-
-  return hasExplicitWidth || hasMaxWidth
-}
-
-/**
- * Check if a node needs to be centered by its parent
- */
-function needsParentCentering(node: CoralNode): boolean {
-  return hasCenteringMargin(node) && hasWidthConstraints(node)
 }
 
 export function collectFontsAndStyles(spec: CoralRootNode): PrepareStructureResult {
