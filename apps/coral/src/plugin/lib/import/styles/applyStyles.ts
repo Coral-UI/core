@@ -11,7 +11,7 @@ import { applyFlexDirection } from './applyFlexDirection'
 import { applyGap } from './applyGap'
 import { applyHidden } from './applyHidden'
 import { applyMargin } from './applyMargin'
-import { applyMaxWidth } from './applyMaxWidth'
+import { applyDimensionConstraints } from './applyDimensionConstraints'
 import { applyPadding } from './applyPadding'
 
 export const applyStyles = async (
@@ -135,8 +135,8 @@ export const applyStyles = async (
         element.opacity = opacity
       }
 
-      // Apply max width if specified
-      applyMaxWidth(element as ElementWithOptionalText, node)
+      // Apply dimension constraints (min/max width and height) if specified
+      applyDimensionConstraints(element as ElementWithOptionalText, node)
 
       // IMPORTANT: textAlign should NOT affect frame sizing or layout
       // It only applies to child text nodes, not the container frame itself

@@ -18,9 +18,9 @@ export const TEXT_STYLE_PROPERTIES = [
 
 export interface NodeStyleInfo {
   nodeType: string
-  inherited: Record<string, any>
-  current: Record<string, any>
-  merged: Record<string, any>
+  inherited: Record<string, unknown>
+  current: Record<string, unknown>
+  merged: Record<string, unknown>
 }
 
 export interface ResponsiveVariant {
@@ -36,18 +36,19 @@ export interface AutoLayoutRequirement {
   nodeType: string
   depth: number
   nodePath: string[]
-  reason: 'text-align' | 'flex-layout' | 'text-spacing'
+  reason: 'text-align' | 'flex-layout' | 'text-spacing' | 'grid-layout' | 'child-centering'
   textAlign?: 'left' | 'center' | 'right' | 'justify'
   hasChildren: boolean
   needsWrapper?: boolean
   // Flex properties
-  layoutMode?: 'HORIZONTAL' | 'VERTICAL'
+  layoutMode?: 'HORIZONTAL' | 'VERTICAL' | 'GRID'
   justifyContent?: string
   alignItems?: string
   flexDirection?: string
   gap?: number
   columnGap?: number
   rowGap?: number
+  gridTemplateColumns?: string
 }
 
 export interface PrepareStructureResult {
@@ -100,6 +101,49 @@ function needsWrapperFrame(node: CoralNode): boolean {
   return spacingProps.some((prop) => node.styles![prop] !== undefined)
 }
 
+/**
+ * Check if a node has centering margin (margin: auto or mx-auto pattern)
+ */
+function hasCenteringMargin(node: CoralNode): boolean {
+  if (!node.styles) return false
+
+  const marginInlineStart = node.styles['marginInlineStart']
+  const marginInlineEnd = node.styles['marginInlineEnd']
+  const marginLeft = node.styles['marginLeft']
+  const marginRight = node.styles['marginRight']
+
+  // Check for auto margins (horizontal centering)
+  return (
+    marginInlineStart === 'auto' ||
+    marginInlineEnd === 'auto' ||
+    marginLeft === 'auto' ||
+    marginRight === 'auto'
+  )
+}
+
+/**
+ * Check if a node has width or maxWidth constraints
+ */
+function hasWidthConstraints(node: CoralNode): boolean {
+  if (!node.styles) return false
+
+  const width = node.styles['width']
+  const maxWidth = node.styles['maxWidth']
+
+  // Check for explicit width or maxWidth (not 100% or auto)
+  const hasExplicitWidth = width !== undefined && width !== '100%' && width !== 'auto'
+  const hasMaxWidth = maxWidth !== undefined
+
+  return hasExplicitWidth || hasMaxWidth
+}
+
+/**
+ * Check if a node needs to be centered by its parent
+ */
+function needsParentCentering(node: CoralNode): boolean {
+  return hasCenteringMargin(node) && hasWidthConstraints(node)
+}
+
 export function collectFontsAndStyles(spec: CoralRootNode): PrepareStructureResult {
   const fontsToLoad = new Set<string>()
   const nodeStyles: NodeStyleInfo[] = []
@@ -108,12 +152,17 @@ export function collectFontsAndStyles(spec: CoralRootNode): PrepareStructureResu
   const wrapperNodes: string[] = []
   const seenBreakpoints = new Map<string, ResponsiveVariant>()
 
-  function collectFonts(node: CoralNode, inheritedStyles: Record<string, any> = {}, depth = 0, path: string[] = []) {
-    const currentPath = [...path, node.name || node.elementType || node.type]
+  function collectFonts(
+    node: CoralNode,
+    inheritedStyles: Record<string, unknown> = {},
+    depth = 0,
+    path: string[] = [],
+  ) {
+    const currentPath: string[] = [...path, node.name || node.elementType || node.type || 'unknown']
     const hasChildren = Boolean(node.children && node.children.length > 0)
 
     // Extract text styles from current node
-    const currentTextStyles: Record<string, any> = {}
+    const currentTextStyles: Record<string, unknown> = {}
     if (node.styles) {
       for (const prop of TEXT_STYLE_PROPERTIES) {
         if (node.styles[prop] !== undefined) {
@@ -169,40 +218,40 @@ export function collectFontsAndStyles(spec: CoralRootNode): PrepareStructureResu
     // Add auto layout requirement for flex containers
     if (isFlex && hasChildren) {
       autoLayoutNodes.push({
-        nodeName: node.name || node.elementType || node.type,
-        nodeType: node.elementType || node.type,
+        nodeName: node.name || node.elementType || node.type || 'unknown',
+        nodeType: node.elementType || node.type || 'unknown',
         depth,
         nodePath: currentPath,
         reason: 'flex-layout',
         hasChildren,
-        layoutMode,
-        flexDirection,
-        justifyContent,
-        alignItems,
-        gap,
-        columnGap,
-        rowGap,
+        ...(layoutMode !== undefined && { layoutMode }),
+        ...(flexDirection !== undefined && { flexDirection }),
+        ...(justifyContent !== undefined && { justifyContent }),
+        ...(alignItems !== undefined && { alignItems }),
+        ...(gap !== undefined && { gap }),
+        ...(columnGap !== undefined && { columnGap }),
+        ...(rowGap !== undefined && { rowGap }),
       })
     } else if (isGrid && hasChildren) {
       // Add grid layout requirement
       const gridTemplateColumns = node.styles?.['gridTemplateColumns'] as string | undefined
       autoLayoutNodes.push({
-        nodeName: node.name || node.elementType || node.type,
-        nodeType: node.elementType || node.type,
+        nodeName: node.name || node.elementType || node.type || 'unknown',
+        nodeType: node.elementType || node.type || 'unknown',
         depth,
         nodePath: currentPath,
         reason: 'grid-layout',
         hasChildren,
-        layoutMode: 'GRID' as any,
-        gridTemplateColumns,
-        columnGap,
-        rowGap,
+        layoutMode: 'GRID',
+        ...(gridTemplateColumns !== undefined && { gridTemplateColumns }),
+        ...(columnGap !== undefined && { columnGap }),
+        ...(rowGap !== undefined && { rowGap }),
       })
     } else if (isContainer && hasTextAlign && hasChildren) {
       // Container with textAlign needs auto layout for text alignment
       autoLayoutNodes.push({
-        nodeName: node.name || node.elementType || node.type,
-        nodeType: node.elementType || node.type,
+        nodeName: node.name || node.elementType || node.type || 'unknown',
+        nodeType: node.elementType || node.type || 'unknown',
         depth,
         nodePath: currentPath,
         reason: 'text-align',
@@ -213,7 +262,7 @@ export function collectFontsAndStyles(spec: CoralRootNode): PrepareStructureResu
 
     // Check if text node needs wrapper for margin/padding
     if (isTextElement && hasTextContent && !hasChildren && needsWrapperFrame(node)) {
-      const nodeName = node.name || node.elementType || node.type
+      const nodeName = node.name || node.elementType || node.type || 'unknown'
       wrapperNodes.push(nodeName)
 
       // Use merged styles for textAlign (could be inherited)
@@ -221,14 +270,39 @@ export function collectFontsAndStyles(spec: CoralRootNode): PrepareStructureResu
 
       autoLayoutNodes.push({
         nodeName: `${nodeName}-wrapper`,
-        nodeType: node.elementType || node.type,
+        nodeType: node.elementType || node.type || 'unknown',
         depth,
         nodePath: currentPath,
         reason: 'text-spacing',
-        textAlign: effectiveTextAlign,
+        ...(effectiveTextAlign !== undefined && { textAlign: effectiveTextAlign }),
         hasChildren: false,
         needsWrapper: true,
       })
+    }
+
+    // Check if this node's children need centering (for parent auto-layout)
+    // This must be done BEFORE recursing into children
+    if (hasChildren && node.children) {
+      const hasChildrenNeedingCentering = node.children.some((child) => needsParentCentering(child))
+
+      if (hasChildrenNeedingCentering) {
+        // Mark this parent node to have auto-layout for centering children
+        // Only add if not already marked for auto-layout with flex/grid
+        const alreadyHasAutoLayout = isFlex || isGrid
+
+        if (!alreadyHasAutoLayout) {
+          autoLayoutNodes.push({
+            nodeName: node.name || node.elementType || node.type || 'unknown',
+            nodeType: node.elementType || node.type || 'unknown',
+            depth,
+            nodePath: currentPath,
+            reason: 'child-centering',
+            layoutMode: 'VERTICAL', // Default to vertical for block-level centering
+            hasChildren,
+            alignItems: 'center', // Center children horizontally
+          })
+        }
+      }
     }
 
     // Collect responsive variants from this node
@@ -241,7 +315,7 @@ export function collectFontsAndStyles(spec: CoralRootNode): PrepareStructureResu
           const variant: ResponsiveVariant = {
             name: generateVariantName(responsiveStyle),
             breakpoint: responsiveStyle.breakpoint,
-            label: responsiveStyle.label,
+            ...(responsiveStyle.label !== undefined && { label: responsiveStyle.label }),
             depth,
             nodePath: currentPath,
           }

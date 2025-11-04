@@ -98,7 +98,12 @@ async function createComponentSetWithVariants(
     const specWithResponsiveStyles = applyResponsiveStyles(spec, variant.breakpoint)
     // Re-analyze the spec with responsive styles applied
     const variantAnalysis = collectFontsAndStyles(specWithResponsiveStyles)
-    const variantComponent = await createBasicComponent(specWithResponsiveStyles, variantAnalysis, variant.name, minWidth)
+    const variantComponent = await createBasicComponent(
+      specWithResponsiveStyles,
+      variantAnalysis,
+      variant.name,
+      minWidth,
+    )
     variantComponent.name = `${spec.name}=${variant.name}`
     variantComponent.x = currentX
     variantComponent.y = 0
@@ -363,10 +368,48 @@ async function createTextNodeWithWrapper(
       paddingWrapper.primaryAxisAlignItems = 'MIN'
     }
 
+    // Extract dimension constraints first to determine sizing strategy
+    const maxWidth = node.styles?.['maxWidth']
+    const minWidth = node.styles?.['minWidth']
+    const maxHeight = node.styles?.['maxHeight']
+    const minHeight = node.styles?.['minHeight']
+
+    const maxWidthValue = extractNumberValue(maxWidth)
+    const minWidthValue = extractNumberValue(minWidth)
+    const hasWidthConstraints =
+      (maxWidthValue !== undefined && maxWidthValue > 0) || (minWidthValue !== undefined && minWidthValue > 0)
+
     // Create text node
     const textNode = await createSimpleTextNode(node, textAlign, mergedStyles)
     paddingWrapper.appendChild(textNode)
-    textNode.layoutSizingHorizontal = 'FILL'
+
+    // If width constraints exist, apply them to TEXT NODE and use HUG sizing
+    // This allows the wrapper to center properly when parent doesn't have auto-layout
+    if (hasWidthConstraints) {
+      // Use HUG sizing so text node respects its own width constraints
+      textNode.layoutSizingHorizontal = 'HUG'
+
+      if (maxWidthValue !== undefined && maxWidthValue > 0) {
+        textNode.maxWidth = maxWidthValue
+      }
+      if (minWidthValue !== undefined && minWidthValue > 0) {
+        textNode.minWidth = minWidthValue
+      }
+    } else {
+      // No width constraints - use FILL sizing (default behavior)
+      textNode.layoutSizingHorizontal = 'FILL'
+    }
+
+    // Height constraints go on the wrapper to include padding/background
+    const maxHeightValue = extractNumberValue(maxHeight)
+    if (maxHeightValue !== undefined && maxHeightValue > 0) {
+      paddingWrapper.maxHeight = maxHeightValue
+    }
+
+    const minHeightValue = extractNumberValue(minHeight)
+    if (minHeightValue !== undefined && minHeightValue > 0) {
+      paddingWrapper.minHeight = minHeightValue
+    }
 
     // Assemble: marginWrapper contains paddingWrapper
     marginWrapper.appendChild(paddingWrapper)
@@ -455,12 +498,48 @@ async function createTextNodeWithWrapper(
     wrapper.primaryAxisAlignItems = 'MIN'
   }
 
+  // Extract dimension constraints first to determine sizing strategy
+  const maxWidth = node.styles?.['maxWidth']
+  const minWidth = node.styles?.['minWidth']
+  const maxHeight = node.styles?.['maxHeight']
+  const minHeight = node.styles?.['minHeight']
+
+  const maxWidthValue = extractNumberValue(maxWidth)
+  const minWidthValue = extractNumberValue(minWidth)
+  const hasWidthConstraints =
+    (maxWidthValue !== undefined && maxWidthValue > 0) || (minWidthValue !== undefined && minWidthValue > 0)
+
   // Create text node inside with merged styles for inheritance
   const textNode = await createSimpleTextNode(node, textAlign, mergedStyles)
   wrapper.appendChild(textNode)
 
-  // Text node should fill horizontally within wrapper (it's inside auto layout now, so this is safe)
-  textNode.layoutSizingHorizontal = 'FILL'
+  // If width constraints exist, apply them to TEXT NODE and use HUG sizing
+  // This allows the wrapper to center properly when parent doesn't have auto-layout
+  if (hasWidthConstraints) {
+    // Use HUG sizing so text node respects its own width constraints
+    textNode.layoutSizingHorizontal = 'HUG'
+
+    if (maxWidthValue !== undefined && maxWidthValue > 0) {
+      textNode.maxWidth = maxWidthValue
+    }
+    if (minWidthValue !== undefined && minWidthValue > 0) {
+      textNode.minWidth = minWidthValue
+    }
+  } else {
+    // No width constraints - use FILL sizing (default behavior)
+    textNode.layoutSizingHorizontal = 'FILL'
+  }
+
+  // Height constraints go on the wrapper to include padding/background
+  const maxHeightValue = extractNumberValue(maxHeight)
+  if (maxHeightValue !== undefined && maxHeightValue > 0) {
+    wrapper.maxHeight = maxHeightValue
+  }
+
+  const minHeightValue = extractNumberValue(minHeight)
+  if (minHeightValue !== undefined && minHeightValue > 0) {
+    wrapper.minHeight = minHeightValue
+  }
 
   return wrapper
 }
@@ -581,14 +660,12 @@ async function buildNode(
   const height = node.styles?.['height']
   const maxWidth = node.styles?.['maxWidth']
   const maxHeight = node.styles?.['maxHeight']
+  const minWidth = node.styles?.['minWidth']
+  const minHeight = node.styles?.['minHeight']
 
   // Use maxWidth/maxHeight if explicit width/height not set
-  const effectiveWidth = width !== undefined && width !== '100%' && width !== 'auto'
-    ? width
-    : maxWidth
-  const effectiveHeight = height !== undefined && height !== '100%' && height !== 'auto'
-    ? height
-    : maxHeight
+  const effectiveWidth = width !== undefined && width !== '100%' && width !== 'auto' ? width : maxWidth
+  const effectiveHeight = height !== undefined && height !== '100%' && height !== 'auto' ? height : maxHeight
 
   const hasExplicitWidth = effectiveWidth !== undefined
   const hasExplicitHeight = effectiveHeight !== undefined
@@ -621,14 +698,16 @@ async function buildNode(
   const nodeName = node.name || node.elementType || node.type
   const nodePath = [...currentPath, nodeName]
 
-  // Check if this node is a grid to prioritize grid layout config
-  const isGridNode = node.styles?.['display'] === 'grid'
+  // Check if this node is a grid or flex container
+  const display = node.styles?.['display']
+  const isGridNode = display === 'grid'
+  const isFlexNode = display === 'flex' || display === 'inline-flex'
 
   const autoLayoutConfig = autoLayoutNodes.find((al) => {
     // First try exact path match
     if (al.nodePath && al.nodePath.length === nodePath.length) {
-      const pathMatches = al.nodePath.every((pathPart, index) =>
-        pathPart.toLowerCase() === nodePath[index].toLowerCase()
+      const pathMatches = al.nodePath.every(
+        (pathPart, index) => pathPart.toLowerCase() === nodePath[index]?.toLowerCase(),
       )
       if (pathMatches) {
         // If this is a grid node, only match grid-layout configs
@@ -638,37 +717,69 @@ async function buildNode(
         return true
       }
     }
-    // Fallback to name-only match for backwards compatibility
-    return al.nodeName?.toLowerCase() === nodeName?.toLowerCase()
+    return false // Don't use name-only fallback in find()
   })
 
+  // If no path match found, try name-only fallback with priority for flex/grid
+  // IMPORTANT: Only match grid-layout if this node actually has display: grid
+  // IMPORTANT: Only match flex-layout if this node actually has display: flex
+  // This prevents children from incorrectly getting parent layout types
+  const autoLayoutConfigFallback =
+    autoLayoutConfig ||
+    autoLayoutNodes.find((al) => {
+      if (al.nodeName?.toLowerCase() !== nodeName?.toLowerCase()) return false
+      // Only match grid-layout if this node is actually a grid
+      if (al.reason === 'grid-layout') {
+        return isGridNode
+      }
+      // Only match flex-layout if this node is actually a flex container
+      if (al.reason === 'flex-layout') {
+        return isFlexNode
+      }
+      // For other reasons, match without additional checks
+      return true
+    }) ||
+    autoLayoutNodes.find((al) => al.nodeName?.toLowerCase() === nodeName?.toLowerCase())
+
+  const finalAutoLayoutConfig = autoLayoutConfigFallback
+
   // Debug: log grid node matching
-  const hasGridInList = autoLayoutNodes.some(al => al.reason === 'grid-layout')
+  const hasGridInList = autoLayoutNodes.some((al) => al.reason === 'grid-layout')
   if (hasGridInList) {
     console.log('🟦 Looking for node:', nodeName, 'path:', nodePath.join(' > '))
-    console.log('🟦 autoLayoutConfig found:', !!autoLayoutConfig, 'reason:', autoLayoutConfig?.reason)
-    console.log('🟦 ALL nodes named "Div" in autoLayoutNodes:', autoLayoutNodes.filter(al => al.nodeName === 'Div').map(al => ({
-      name: al.nodeName,
-      reason: al.reason,
-      path: al.nodePath?.join(' > ')
-    })))
+    console.log('🟦 finalAutoLayoutConfig found:', !!finalAutoLayoutConfig, 'reason:', finalAutoLayoutConfig?.reason)
+    console.log(
+      '🟦 ALL nodes named "Div" in autoLayoutNodes:',
+      autoLayoutNodes
+        .filter((al) => al.nodeName === 'Div')
+        .map((al) => ({
+          name: al.nodeName,
+          reason: al.reason,
+          path: al.nodePath?.join(' > '),
+        })),
+    )
   }
 
   // Apply auto layout if needed
-  if (needsAutoLayout || hasChildren || autoLayoutConfig) {
-    const isGridLayout = autoLayoutConfig?.reason === 'grid-layout'
+  if (needsAutoLayout || hasChildren || finalAutoLayoutConfig) {
+    const isGridLayout = finalAutoLayoutConfig?.reason === 'grid-layout'
 
     // For grid layouts, defer setup until after children are appended
     if (isGridLayout) {
-      console.log('🟦 Detected GRID layout for:', node.name || node.elementType, 'columns:', autoLayoutConfig.gridTemplateColumns)
+      console.log(
+        '🟦 Detected GRID layout for:',
+        node.name || node.elementType,
+        'columns:',
+        finalAutoLayoutConfig.gridTemplateColumns,
+      )
       // Set to VERTICAL temporarily - will convert to GRID after children
       frame.layoutMode = 'VERTICAL'
       frame.setPluginData('pendingGridLayout', 'true')
-      frame.setPluginData('gridTemplateColumns', autoLayoutConfig.gridTemplateColumns || '')
+      frame.setPluginData('gridTemplateColumns', finalAutoLayoutConfig.gridTemplateColumns || '')
     } else {
       // Set layout mode based on flex direction or default to vertical
-      if (autoLayoutConfig?.layoutMode) {
-        frame.layoutMode = autoLayoutConfig.layoutMode as 'HORIZONTAL' | 'VERTICAL'
+      if (finalAutoLayoutConfig?.layoutMode) {
+        frame.layoutMode = finalAutoLayoutConfig.layoutMode as 'HORIZONTAL' | 'VERTICAL'
       } else {
         frame.layoutMode = 'VERTICAL'
       }
@@ -694,20 +805,20 @@ async function buildNode(
     if (spacing.paddingRight > 0) frame.paddingRight = spacing.paddingRight
 
     // Apply gap/spacing
-    if (autoLayoutConfig?.gap) {
-      frame.itemSpacing = autoLayoutConfig.gap
-    } else if (autoLayoutConfig?.columnGap || autoLayoutConfig?.rowGap) {
+    if (finalAutoLayoutConfig?.gap) {
+      frame.itemSpacing = finalAutoLayoutConfig.gap
+    } else if (finalAutoLayoutConfig?.columnGap || finalAutoLayoutConfig?.rowGap) {
       // Use columnGap for horizontal, rowGap for vertical
-      const spacing = frame.layoutMode === 'HORIZONTAL' ? autoLayoutConfig.columnGap || 0 : autoLayoutConfig.rowGap || 0
+      const spacing = frame.layoutMode === 'HORIZONTAL' ? finalAutoLayoutConfig.columnGap || 0 : finalAutoLayoutConfig.rowGap || 0
       frame.itemSpacing = spacing
     } else {
       frame.itemSpacing = 8 // Default spacing
     }
 
     // Apply alignment based on flex properties or text alignment
-    if (autoLayoutConfig?.reason === 'flex-layout') {
+    if (finalAutoLayoutConfig?.reason === 'flex-layout') {
       // Map CSS justify-content to Figma primaryAxisAlignItems
-      switch (autoLayoutConfig.justifyContent) {
+      switch (finalAutoLayoutConfig.justifyContent) {
         case 'center':
           frame.primaryAxisAlignItems = 'CENTER'
           break
@@ -727,7 +838,7 @@ async function buildNode(
       }
 
       // Map CSS align-items to Figma counterAxisAlignItems
-      switch (autoLayoutConfig.alignItems) {
+      switch (finalAutoLayoutConfig.alignItems) {
         case 'center':
           frame.counterAxisAlignItems = 'CENTER'
           break
@@ -745,6 +856,11 @@ async function buildNode(
         default:
           frame.counterAxisAlignItems = 'MIN'
       }
+    } else if (finalAutoLayoutConfig?.reason === 'child-centering') {
+      // Center children horizontally (for elements with width constraints and margin: auto)
+      // In VERTICAL layout mode, counterAxis is horizontal, so CENTER aligns children horizontally
+      frame.counterAxisAlignItems = 'CENTER'
+      frame.primaryAxisAlignItems = 'MIN' // Start alignment vertically
     } else if (currentTextAlign) {
       // Apply text alignment to auto layout
       if (currentTextAlign === 'center') {
@@ -761,6 +877,28 @@ async function buildNode(
       // Default alignment
       frame.counterAxisAlignItems = 'MIN'
       frame.primaryAxisAlignItems = 'MIN'
+    }
+
+    // Apply min/max dimension constraints AFTER setting layoutMode
+    // These constraints only work on auto-layout frames and their direct children
+    const maxWidthValue = extractNumberValue(maxWidth)
+    if (maxWidthValue !== undefined && maxWidthValue > 0) {
+      frame.maxWidth = maxWidthValue
+    }
+
+    const minWidthValue = extractNumberValue(minWidth)
+    if (minWidthValue !== undefined && minWidthValue > 0) {
+      frame.minWidth = minWidthValue
+    }
+
+    const maxHeightValue = extractNumberValue(maxHeight)
+    if (maxHeightValue !== undefined && maxHeightValue > 0) {
+      frame.maxHeight = maxHeightValue
+    }
+
+    const minHeightValue = extractNumberValue(minHeight)
+    if (minHeightValue !== undefined && minHeightValue > 0) {
+      frame.minHeight = minHeightValue
     }
   }
 
@@ -891,7 +1029,7 @@ async function buildNode(
         columnCount = parseInt(repeatMatch[1], 10)
       } else {
         // Count columns by spaces/fr units
-        const columns = gridTemplateColumns.split(/\s+/).filter(c => c && c !== '')
+        const columns = gridTemplateColumns.split(/\s+/).filter((c) => c && c !== '')
         columnCount = columns.length
       }
     }
@@ -908,18 +1046,18 @@ async function buildNode(
     frame.gridRowCount = rowCount
 
     // Apply gap
-    if (autoLayoutConfig?.columnGap) {
-      frame.gridColumnGap = autoLayoutConfig.columnGap
+    if (finalAutoLayoutConfig?.columnGap) {
+      frame.gridColumnGap = finalAutoLayoutConfig.columnGap
     }
-    if (autoLayoutConfig?.rowGap) {
-      frame.gridRowGap = autoLayoutConfig.rowGap
+    if (finalAutoLayoutConfig?.rowGap) {
+      frame.gridRowGap = finalAutoLayoutConfig.rowGap
     }
 
     // Position children in grid and set explicit sizing
     if ('children' in frame) {
       // Calculate available width per column
       const paddingH = (frame.paddingLeft || 0) + (frame.paddingRight || 0)
-      const totalGapWidth = (columnCount - 1) * (autoLayoutConfig?.columnGap || 0)
+      const totalGapWidth = (columnCount - 1) * (finalAutoLayoutConfig?.columnGap || 0)
       const availableWidth = (frame.width || 0) - paddingH - totalGapWidth
       const columnWidth = Math.floor(availableWidth / columnCount)
 
@@ -929,7 +1067,7 @@ async function buildNode(
         totalGapWidth,
         availableWidth,
         columnWidth,
-        columnCount
+        columnCount,
       })
 
       // Track row heights to calculate total grid height
@@ -978,12 +1116,23 @@ async function buildNode(
         }
         rowHeights[row] = Math.max(rowHeights[row], child.height || 0)
 
-        console.log('🟦 Positioned grid child', i, 'at row:', row, 'col:', col, 'width:', columnWidth, 'height:', child.height)
+        console.log(
+          '🟦 Positioned grid child',
+          i,
+          'at row:',
+          row,
+          'col:',
+          col,
+          'width:',
+          columnWidth,
+          'height:',
+          child.height,
+        )
       }
 
       // Calculate total grid height: padding + row heights + gaps between rows
       const paddingV = (frame.paddingTop || 0) + (frame.paddingBottom || 0)
-      const totalRowGaps = (rowCount - 1) * (autoLayoutConfig?.rowGap || 0)
+      const totalRowGaps = (rowCount - 1) * (finalAutoLayoutConfig?.rowGap || 0)
       const totalRowHeight = rowHeights.reduce((sum, height) => sum + height, 0)
       const totalGridHeight = paddingV + totalRowHeight + totalRowGaps
 
@@ -992,7 +1141,7 @@ async function buildNode(
         paddingV,
         totalRowGaps,
         totalRowHeight,
-        totalGridHeight
+        totalGridHeight,
       })
 
       // Resize grid to calculated height
@@ -1105,6 +1254,11 @@ async function createSimpleTextNode(
       },
     ]
   }
+
+  // Note: min/max dimension constraints for text nodes are NOT applied here
+  // They can only be set on text nodes that are children of auto-layout frames
+  // Since text nodes created by this function are standalone and will be appended later,
+  // constraints are applied by the parent wrapper frames instead
 
   return textNode
 }
