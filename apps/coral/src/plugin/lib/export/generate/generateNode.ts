@@ -2,14 +2,19 @@ import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 import { VariantProperties, VariantPropertyValue } from '../../types'
 import { handleFigmaStyles } from '../handleFigmaStyles'
+import { extractElementType } from '../utils/extractElementType'
 import { normalizeName } from '../utils/normalizeName'
 
 export const generateNode = async (node: SceneNode): Promise<CoralRootNode | CoralNode> => {
   const { styles } = await handleFigmaStyles(node)
 
+  // Extract element type from angle brackets in name (e.g., "Title <h2>" -> "h2")
+  const extractedElementType = extractElementType(node.name)
+  const defaultElementType = node.type === 'TEXT' ? 'p' : 'div'
+
   const nodeData: CoralNode = {
     name: node.name,
-    elementType: 'div',
+    elementType: (extractedElementType || defaultElementType) as CoralNode['elementType'],
     figmaNodeRef: node.id,
     styles,
     children: [],
@@ -53,7 +58,10 @@ export const generateNode = async (node: SceneNode): Promise<CoralRootNode | Cor
   }
 
   if (node.type === 'TEXT') {
-    nodeData.elementType = 'p'
+    // Element type may have been set from angle brackets, otherwise use 'p'
+    if (!extractedElementType) {
+      nodeData.elementType = 'p'
+    }
     nodeData.textContent = (node as TextNode).characters
   }
 

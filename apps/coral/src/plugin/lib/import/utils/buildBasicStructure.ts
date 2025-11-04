@@ -99,9 +99,23 @@ async function createComponentSetWithVariants(
     variants.push(variantComponent)
   }
 
-  // Combine into component set
-  const componentSet = figma.combineAsVariants(variants, figma.currentPage)
+  // Combine into component set using a temporary frame (build in memory)
+  // Note: combineAsVariants requires a parent, but we don't want it on the page yet
+  // We'll create a temp frame that's NOT on the page, combine variants into it,
+  // then move the component set to the page in code.ts (which will automatically
+  // remove it from tempFrame). Then we can clean up tempFrame.
+  const tempFrame = figma.createFrame()
+  tempFrame.name = 'temp-variant-container'
+  // Don't append tempFrame to page - it exists only in memory
+
+  const componentSet = figma.combineAsVariants(variants, tempFrame)
   componentSet.name = spec.name
+
+  // Component set is now a child of tempFrame, which is NOT on the page
+  // When we append componentSet to figma.currentPage in code.ts, it will
+  // automatically be removed from tempFrame. After that, we can clean up tempFrame.
+  // Store reference to tempFrame on componentSet so we can clean it up later
+  componentSet.setPluginData('tempFrameId', tempFrame.id)
 
   return componentSet
 }
@@ -128,8 +142,14 @@ async function createBasicComponent(
   }
 
   // Convert to component
+  // rootNode should have no parent since it's built in memory
+  // createComponentFromNode will create the component with the same parent relationship
+  // If rootNode has no parent, component will also have no parent (which is what we want)
   const component = figma.createComponentFromNode(rootNode)
   component.name = variantName ? `${spec.name}=${variantName}` : spec.name
+
+  // Verify component is not on the page (it shouldn't be if rootNode wasn't on the page)
+  // If for some reason it is, we'll handle it in code.ts by checking before appending
 
   // Apply minimum width to component as well
   if (minWidth) {
@@ -535,35 +555,12 @@ async function buildNode(
 
   const finalAutoLayoutConfig = autoLayoutConfigFallback
 
-  // Debug: log grid node matching
-  const hasGridInList = autoLayoutNodes.some((al) => al.reason === 'grid-layout')
-  if (hasGridInList) {
-    console.log('🟦 Looking for node:', nodeName, 'path:', nodePath.join(' > '))
-    console.log('🟦 finalAutoLayoutConfig found:', !!finalAutoLayoutConfig, 'reason:', finalAutoLayoutConfig?.reason)
-    console.log(
-      '🟦 ALL nodes named "Div" in autoLayoutNodes:',
-      autoLayoutNodes
-        .filter((al) => al.nodeName === 'Div')
-        .map((al) => ({
-          name: al.nodeName,
-          reason: al.reason,
-          path: al.nodePath?.join(' > '),
-        })),
-    )
-  }
-
   // Apply auto layout if needed
   if (needsAutoLayout || hasChildren || finalAutoLayoutConfig) {
     const isGridLayout = finalAutoLayoutConfig?.reason === 'grid-layout'
 
     // For grid layouts, defer setup until after children are appended
     if (isGridLayout) {
-      console.log(
-        '🟦 Detected GRID layout for:',
-        node.name || node.elementType,
-        'columns:',
-        finalAutoLayoutConfig.gridTemplateColumns,
-      )
       // Set to VERTICAL temporarily - will convert to GRID after children
       frame.layoutMode = 'VERTICAL'
       frame.setPluginData('pendingGridLayout', 'true')
@@ -802,12 +799,9 @@ async function buildNode(
   // Store whether this frame has pending grid layout (BEFORE we clear plugin data)
   const isPendingGrid = frame.getPluginData('pendingGridLayout') === 'true'
 
-  console.log('🟦 Checking grid conversion for frame:', frame.name, 'isPendingGrid:', isPendingGrid)
-
   // Convert to GRID layout if deferred (MUST happen before margin wrapper)
   if (isPendingGrid) {
     const gridTemplateColumns = frame.getPluginData('gridTemplateColumns')
-    console.log('🟦 Converting to GRID layout:', frame.name, 'columns:', gridTemplateColumns)
 
     // Parse grid-template-columns to determine column count
     let columnCount = 1
@@ -826,8 +820,6 @@ async function buildNode(
     // Calculate row count based on children
     const childCount = hasChildren && node.children ? node.children.length : 0
     const rowCount = Math.ceil(childCount / columnCount)
-
-    console.log('🟦 Grid config:', { columnCount, rowCount, childCount })
 
     // Convert to GRID layout
     frame.layoutMode = 'GRID'
@@ -849,15 +841,6 @@ async function buildNode(
       const totalGapWidth = (columnCount - 1) * (finalAutoLayoutConfig?.columnGap || 0)
       const availableWidth = (frame.width || 0) - paddingH - totalGapWidth
       const columnWidth = Math.floor(availableWidth / columnCount)
-
-      console.log('🟦 Grid sizing:', {
-        frameWidth: frame.width,
-        paddingH,
-        totalGapWidth,
-        availableWidth,
-        columnWidth,
-        columnCount,
-      })
 
       // Track row heights to calculate total grid height
       const rowHeights: number[] = []
@@ -911,19 +894,6 @@ async function buildNode(
           rowHeights[row] = 0
         }
         rowHeights[row] = Math.max(rowHeights[row], child.height || 0)
-
-        console.log(
-          '🟦 Positioned grid child',
-          i,
-          'at row:',
-          row,
-          'col:',
-          col,
-          'width:',
-          columnWidth,
-          'height:',
-          child.height,
-        )
       }
 
       // Calculate total grid height: padding + row heights + gaps between rows
@@ -932,21 +902,11 @@ async function buildNode(
       const totalRowHeight = rowHeights.reduce((sum, height) => sum + height, 0)
       const totalGridHeight = paddingV + totalRowHeight + totalRowGaps
 
-      console.log('🟦 Grid height calculation:', {
-        rowHeights,
-        paddingV,
-        totalRowGaps,
-        totalRowHeight,
-        totalGridHeight,
-      })
-
       // Resize grid to calculated height
       if (frame.width && totalGridHeight > 0) {
         frame.resizeWithoutConstraints(frame.width, totalGridHeight)
       }
     }
-
-    console.log('🟦 Grid layout applied successfully')
 
     // Apply margin as padding on the grid frame itself (can't wrap grids)
     if (hasMargin(node)) {
