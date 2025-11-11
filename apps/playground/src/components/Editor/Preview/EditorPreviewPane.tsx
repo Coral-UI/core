@@ -1,7 +1,7 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/base/Tabs'
 import { HTMLRenderer } from '@/components/Editor/Preview/HTMLRenderer'
 import { useTheme } from '@/components/ThemeProvider'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Editor } from '@monaco-editor/react'
 import { IconBracketsAngle, IconEyeSearch, IconSchema } from '@tabler/icons-react'
@@ -131,7 +131,7 @@ export const EditorPreviewPane = ({
               }}
             />
           </div>
-          <Button variant="default" size="icon-lg" onClick={handleCopySpec} className="absolute bottom-4 right-4">
+          <Button variant="secondary" size="icon-lg" onClick={handleCopySpec} className="absolute bottom-4 right-4">
             <CopyIcon />
           </Button>
         </div>

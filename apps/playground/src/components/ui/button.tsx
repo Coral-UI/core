@@ -1,30 +1,31 @@
 import type { VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import { Slot } from '@radix-ui/react-slot'
 import { cva } from 'class-variance-authority'
-import * as React from 'react'
+import React from 'react'
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center whitespace-nowrap font-normal rounded-button border border-transparent transition-all disabled:pointer-events-none disabled:opacity-50 shrink-0 outline-none  [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 gap-2 text-sm text-text-primary",
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive:
-          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+        default: 'bg-interactive-bg-primary hover:bg-interactive-bg-primary/60 interactive-focus',
         outline:
-          'border border-border bg-background shadow-xs hover:bg-popover hover:text-accent-foreground hover:border-popover-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
-        link: 'text-primary underline-offset-4 hover:underline',
-        input: 'bg-transparent border-none hover:bg-transparent hover:text-accent-foreground',
+          'bg-transparent border-interactive-border hover:bg-interactive-bg-primary/60 shadow-xs interactive-focus',
+        ghost: 'bg-transparent border-transparent hover:bg-interactive-bg-primary/60 shadow-xs interactive-focus',
+        secondary:
+          'bg-interactive-bg-secondary hover:bg-interactive-bg-primary/60 border-interactive-border interactive-focus',
+        link: 'text-text-primary underline-offset-4 hover:underline interactive-focus',
+        destructive:
+          'bg-destructive-bg text-destructive-fg hover:bg-destructive-fg/20 focus-visible:ring-destructive-fg focus-visible:border-destructive-fg focus-visible:ring-1 border-destructive-fg/30',
+        colorPicker:
+          'bg-transparent border-transparent hover:bg-interactive-bg-primary/60 shadow-xs interactive-focus justify-start !pl-0 !h-7 text-xs tracking-wider',
       },
       size: {
-        default: 'h-9 px-4 py-2 has-[>svg]:px-3',
-        sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
-        lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
+        default: 'h-9  px-4 py-2 has-[>svg]:px-3',
+        sm: 'h-8 has-[>svg]:px-2.5 gap-1.5',
+        lg: 'h-12 px-6 has-[>svg]:px-4',
         icon: 'size-9',
-        'icon-sm': 'size-6',
+        'icon-sm': "size-7 [&_svg:not([class*='size-'])]:size-3.5",
         'icon-lg': 'size-10',
       },
     },
@@ -36,16 +37,28 @@ const buttonVariants = cva(
 )
 
 const Button = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentProps<'button'> &
-    VariantProps<typeof buttonVariants> & {
-      asChild?: boolean
-    }
->(({ className, variant, size, asChild = false, ...props }, ref) => {
-  const Comp = asChild ? Slot : 'button'
-
-  return <Comp data-slot="button" className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
+  HTMLButtonElement | HTMLAnchorElement,
+  (React.ComponentProps<'button'> | React.ComponentProps<'a'>) & VariantProps<typeof buttonVariants> & { href?: string }
+>(({ variant, size, href, className, ...props }, ref) => {
+  if (href) {
+    return (
+      <a
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        href={href}
+        {...(props as React.ComponentProps<'a'>)}
+        className={cn(className, buttonVariants({ variant, size }))}
+      />
+    )
+  }
+  return (
+    <button
+      ref={ref as React.Ref<HTMLButtonElement>}
+      {...(props as React.ComponentProps<'button'>)}
+      className={cn(className, buttonVariants({ variant, size }))}
+    />
+  )
 })
+
 Button.displayName = 'Button'
 
-export { Button, buttonVariants }
+export { Button }

@@ -1,44 +1,173 @@
-import { SimpleElementTree } from '@/components/Editor/ElementTree/SimpleElementTree'
-import { useElementTree } from '@/hooks/useElementTree'
-
-import { CoralElementType } from '@reallygoodwork/coral-core'
+import { Button } from '@/components/ui/button'
+import { TreeDataItem, TreeView } from '@/components/ui/tree-view'
+import { ElementTreeNode } from '@/hooks/useElementTree'
+import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
+import { canContain } from '@/utils/elementHierarchy'
+import { Minus, Plus } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
 
 interface EditorSidebarProps {
   onElementSelect?: (elementId: string | null) => void
-  elementTreeHook: ReturnType<typeof useElementTree>
+  selectedElementId?: string | null
 }
 
-export const EditorSidebar = ({ onElementSelect, elementTreeHook }: EditorSidebarProps) => {
-  const {
-    elements,
-    addElement,
-    removeElement,
-    updateElement,
-    toggleExpanded,
-    getElementTree,
-    moveElement,
-    selectedElementId,
-  } = elementTreeHook
+// Convert ElementTreeNode to TreeDataItem
+const convertToTreeDataItem = (
+  element: ElementTreeNode,
+  selectedElementId: string | null,
+  onSelect: (id: string) => void,
+  onAddChild: (parentId: string) => void,
+  onDelete: (id: string) => void,
+): TreeDataItem => {
+  const hasChildren = element.children && element.children.length > 0
+  const isSelected = selectedElementId === element.id
+  const canDelete = element.id !== 'root' // Don't allow deleting root
 
-  const handleSelect = (elementId: string) => {
-    onElementSelect?.(elementId)
+  const treeItem: TreeDataItem = {
+    id: element.id,
+    name: element.name || element.elementType,
+    draggable: element.id !== 'root',
+    droppable: true,
+    onClick: () => onSelect(element.id),
   }
 
-  const handleAddChild = (parentId: string, elementType: CoralElementType) => {
-    addElement(elementType, parentId)
+  if (hasChildren) {
+    treeItem.children = (element.children as ElementTreeNode[]).map((child) =>
+      convertToTreeDataItem(child, selectedElementId, onSelect, onAddChild, onDelete),
+    )
   }
+
+  if (isSelected) {
+    treeItem.actions = (
+      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-6 w-6"
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation()
+            onAddChild(element.id)
+          }}
+          title="Add child element"
+        >
+          <Plus className="h-3 w-3" />
+        </button>
+        {canDelete && (
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-6 w-6"
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation()
+              onDelete(element.id)
+            }}
+            title="Delete element"
+          >
+            <Minus className="h-3 w-3" />
+          </button>
+        )}
+      </div>
+    )
+  }
+
+  return treeItem
+}
+
+export const EditorSidebar = ({ onElementSelect, selectedElementId }: EditorSidebarProps) => {
+  const elementTreeHook = useElementTreeQuery()
+  const { getElementTree, addElement, moveElement, removeElement } = elementTreeHook
+  const [expandedItems, setExpandedItems] = useState<string[]>(['root'])
+
+  const elementTree = getElementTree()
+
+  // Handle delete element
+  const handleDelete = useCallback(
+    (elementId: string) => {
+      removeElement(elementId)
+      // Clear selection if the deleted element was selected
+      if (selectedElementId === elementId) {
+        onElementSelect?.(null)
+      }
+    },
+    [removeElement, selectedElementId, onElementSelect],
+  )
+
+  // Convert element tree to TreeDataItem format
+  const treeData = useMemo(() => {
+    return elementTree.map((element) =>
+      convertToTreeDataItem(
+        element,
+        selectedElementId || null,
+        (id) => onElementSelect?.(id),
+        (parentId) => {
+          // Default to adding a div element
+          addElement('div', parentId)
+          // Expand the parent when adding a child
+          if (!expandedItems.includes(parentId)) {
+            setExpandedItems([...expandedItems, parentId])
+          }
+        },
+        handleDelete,
+      ),
+    )
+  }, [elementTree, selectedElementId, addElement, expandedItems, handleDelete])
+
+  const handleSelectChange = useCallback(
+    (item: TreeDataItem | undefined) => {
+      if (item) {
+        onElementSelect?.(item.id)
+      }
+    },
+    [onElementSelect],
+  )
+
+  const handleDragDrop = useCallback(
+    (sourceItem: TreeDataItem, targetItem: TreeDataItem) => {
+      // Don't allow dropping on self
+      if (sourceItem.id === targetItem.id) return
+
+      // Don't allow dropping root
+      if (sourceItem.id === 'root') return
+
+      // Get the source element to check if it can be nested in target
+      const sourceElement = elementTreeHook.elements.find((el) => el.id === sourceItem.id)
+      const targetElement = elementTreeHook.elements.find((el) => el.id === targetItem.id)
+
+      if (!sourceElement || !targetElement) return
+
+      // Check if target can contain source element type
+      if (canContain(targetElement.elementType, sourceElement.elementType)) {
+        // Move element to be a child of target
+        moveElement(sourceItem.id, targetItem.id)
+      }
+    },
+    [elementTreeHook, moveElement],
+  )
 
   return (
-    <SimpleElementTree
-      elements={getElementTree()}
-      allElements={elements}
-      onAddChild={handleAddChild}
-      onRemove={removeElement}
-      onToggleExpanded={toggleExpanded}
-      onSelect={handleSelect}
-      onUpdateElement={updateElement}
-      onMoveElement={moveElement}
-      selectedElementId={selectedElementId}
-    />
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between px-4 py-4 border-b border-border">
+        <h3 className="text-xs font-semibold text-foreground tracking-tight">Structure</h3>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className="h-6 w-6"
+          onClick={() => {
+            // Add element to root
+            addElement('div', 'root')
+          }}
+          title="Add element"
+        >
+          <Plus className="h-3 w-3" />
+        </Button>
+      </div>
+      <div className="flex-1 overflow-auto">
+        <TreeView
+          data={treeData}
+          {...(selectedElementId && { initialSelectedItemId: selectedElementId })}
+          onSelectChange={handleSelectChange}
+          onDocumentDrag={handleDragDrop}
+          expandAll={false}
+        />
+      </div>
+    </div>
   )
 }

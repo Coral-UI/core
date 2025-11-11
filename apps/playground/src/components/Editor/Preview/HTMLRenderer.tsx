@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 
-import type { CoralNode, CoralRootNode, CoralStyleType, Dimension } from '@reallygoodwork/coral-core'
+import type { CoralNode, CoralRootNode, CoralStyleType, Dimension, CoralColorType } from '@reallygoodwork/coral-core'
 
 interface HTMLRendererProps {
   spec: CoralRootNode
@@ -45,16 +45,37 @@ type ColorValue = {
   value: string
 }
 
-// Helper to check if value is a color object
-const isColorValue = (value: unknown): value is ColorValue => {
+// Helper to check if value is a Coral color object
+const isCoralColor = (value: unknown): value is CoralColorType => {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'hex' in value &&
+    'rgb' in value &&
+    'hsl' in value &&
+    typeof (value as CoralColorType).hex === 'string'
+  )
+}
+
+// Helper to check if value is a color object (legacy format or Coral format)
+const isColorValue = (value: unknown): value is ColorValue | CoralColorType => {
+  if (isCoralColor(value)) {
+    return true
+  }
   return typeof value === 'object' && value !== null && 'type' in value && (value as ColorValue).type === 'color'
 }
 
 // Helper to convert color object to CSS string
 const colorToCSS = (color: unknown): string => {
-  if (isColorValue(color) && color.value) {
+  // Handle Coral color format
+  if (isCoralColor(color)) {
+    return color.hex
+  }
+  // Handle legacy color format
+  if (isColorValue(color) && 'value' in color && typeof color.value === 'string') {
     return color.value
   }
+  // Handle string colors
   if (typeof color === 'string') {
     return color
   }
