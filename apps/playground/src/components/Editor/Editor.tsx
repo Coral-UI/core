@@ -17,49 +17,6 @@ import type { StyleFormValues } from '../style-manager/formSchema'
 import { ScrollArea } from '../base/ScrollArea'
 import { StyleForm } from '../style-manager/styleForm'
 
-// Default values from StyleForm to use in conversion
-// These are used to determine which form values should be included in the Coral styles
-const styleFormDefaultValues = {
-  backgroundColor: '#000000',
-  backgroundColorFormat: 'hex',
-  color: '#ffffff',
-  colorFormat: 'hex',
-  paddingInlineStart: 0,
-  paddingInlineEndUnit: 'px',
-  paddingInlineEnd: 0,
-  paddingBlockStartUnit: 'px',
-  paddingBlockStart: 0,
-  paddingBlockEndUnit: 'px',
-  paddingBlockEnd: 0,
-  paddingInlineStartUnit: 'px',
-  marginInlineStart: 0,
-  marginInlineStartUnit: 'px',
-  marginInlineEnd: 0,
-  marginInlineEndUnit: 'px',
-  marginBlockStart: 0,
-  marginBlockStartUnit: 'px',
-  marginBlockEnd: 0,
-  marginBlockEndUnit: 'px',
-  borderEnabled: false,
-  display: 'block',
-  flexDirection: 'row',
-  flexWrap: 'nowrap',
-  flexGrow: 0,
-  flexShrink: 0,
-  flexBasis: 0,
-  flexBasisUnit: 'px',
-  alignItems: 'flex-start',
-  justifyContent: 'flex-start',
-  gap: 0,
-  gapUnit: 'px',
-  overflowEnabled: false,
-  width: 0,
-  widthUnit: 'px',
-  height: 0,
-  heightUnit: 'px',
-  typographyEnabled: false,
-} as Record<string, unknown>
-
 export const Editor = () => {
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null)
   const [importDialogOpen, setImportDialogOpen] = useState(false)
@@ -114,8 +71,8 @@ export const Editor = () => {
       // Convert only the changed fields to Coral styles
       const coralStyles = convertFormValuesToCoralStyles(
         fieldsToConvert as Record<string, unknown>,
-        styleFormDefaultValues,
-        selectedElement.styles as Record<string, unknown> | undefined,
+        // styleFormDefaultValues,
+        // selectedElement.styles as Record<string, unknown> | undefined,
       )
 
       // Only merge the styles that were actually changed

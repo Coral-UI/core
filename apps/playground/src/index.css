@@ -37,6 +37,8 @@
   --color-accent-orange-fg: var(--accent-orange-foreground);
 
   --color-focus-outline: var(--color-blue-800);
+  --color-highlight: var(--color-blue-800);
+  --color-highlight-bg: --alpha(var(--color-blue-800) / 0.3);
 
   /* Text Sizes */
   --text-xs: var(--text-size-xs);

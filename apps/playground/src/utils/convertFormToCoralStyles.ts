@@ -132,8 +132,8 @@ export function convertFormValueToCoralStyle(
  */
 export function convertFormValuesToCoralStyles(
   formValues: Record<string, unknown>,
-  defaultValues: Record<string, unknown>,
-  currentStyles?: Record<string, unknown>,
+  // defaultValues: Record<string, unknown>,
+  // currentStyles?: Record<string, unknown>,
 ): Record<string, unknown> {
   const coralStyles: Record<string, unknown> = {}
 

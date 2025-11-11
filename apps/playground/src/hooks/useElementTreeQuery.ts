@@ -81,20 +81,65 @@ export const useElementTreeQuery = () => {
       // Don't allow removing the root element
       if (elementId === 'root') return currentElements
 
+      // Verify the element exists
+      const elementToDelete = currentElements.find((el) => el.id === elementId)
+      if (!elementToDelete) return currentElements
+
+      console.log('Deleting element:', elementId)
+      console.log('Element to delete:', elementToDelete)
+      console.log('All elements before deletion:', currentElements.map(el => ({ id: el.id, parentId: el.parentId })))
+
       const toRemove = new Set<string>()
 
+      // Recursively collect all child IDs to remove
       const collectChildIds = (id: string) => {
+        // Only add to remove set if it's not already there (prevent infinite loops)
+        if (toRemove.has(id)) {
+          console.log('Skipping already processed:', id)
+          return
+        }
+
+        console.log('Collecting children for:', id)
         toRemove.add(id)
-        currentElements
-          .filter((el) => el.parentId === id)
-          .forEach((child) => {
-            collectChildIds(child.id)
-          })
+
+        // Find all direct children of this element
+        const children = currentElements.filter((el) => {
+          // Skip the element itself
+          if (el.id === id) {
+            console.log('Skipping self:', el.id)
+            return false
+          }
+
+          // For root, treat both undefined and 'root' as root
+          if (id === 'root') {
+            const isChild = !el.parentId || el.parentId === 'root'
+            if (isChild) console.log('Found root child:', el.id, 'parentId:', el.parentId)
+            return isChild
+          }
+
+          // For non-root elements, do exact match
+          const isChild = el.parentId === id
+          if (isChild) console.log('Found child:', el.id, 'parentId:', el.parentId, 'matches:', id)
+          return isChild
+        })
+
+        console.log('Children found for', id, ':', children.map(c => c.id))
+
+        // Recursively collect children's IDs
+        children.forEach((child) => {
+          collectChildIds(child.id)
+        })
       }
 
+      // Start collecting from the element to delete
       collectChildIds(elementId)
 
-      return currentElements.filter((el) => !toRemove.has(el.id))
+      console.log('Elements to remove:', Array.from(toRemove))
+      const result = currentElements.filter((el) => !toRemove.has(el.id))
+      console.log('Elements after deletion:', result.map(el => ({ id: el.id, parentId: el.parentId })))
+
+      // Filter out all elements that should be removed
+      return result
     },
     onSuccess: (newElements) => {
       queryClient.setQueryData(ELEMENT_TREE_QUERY_KEY, newElements)

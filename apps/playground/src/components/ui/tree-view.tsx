@@ -5,16 +5,17 @@ import { cn, omitUndefined } from '@/lib/utils'
 import { Accordion as BaseAccordion } from '@base-ui-components/react/accordion'
 import { IconChevronRight } from '@tabler/icons-react'
 import { cva } from 'class-variance-authority'
-import { ChevronRight } from 'lucide-react'
 import React from 'react'
 
 const treeVariants = cva(
-  'group hover:before:opacity-100 before:absolute before:rounded-lg before:left-0 px-2 before:w-full before:opacity-0 before:bg-accent/70 before:h-[2rem] before:-z-10',
+  'group hover:before:opacity-100 before:absolute before:rounded-sm before:left-0 px-2 before:w-full before:opacity-0 before:h-[2rem] relative h-10',
 )
 
-const selectedTreeVariants = cva('before:opacity-100 before:bg-accent/70 text-accent-foreground')
+const selectedTreeVariants = cva(
+  'before:opacity-100 before:bg-highlight-bg text-text-primary before:border-highlight before:border ',
+)
 
-const dragOverVariants = cva('before:opacity-100 before:bg-primary/20 text-primary-foreground')
+const dragOverVariants = cva('before:opacity-100 before:bg-accent-blue-bg text-accent-blue-fg')
 
 interface TreeDataItem {
   id: string
@@ -264,32 +265,45 @@ const TreeNode = ({
   return (
     <BaseAccordion.Root multiple={true} value={value} onValueChange={(s) => setValue(s)}>
       <BaseAccordion.Item value={item.id}>
-        <AccordionTrigger
-          className={cn(
-            treeVariants(),
-            selectedItemId === item.id && selectedTreeVariants(),
-            isDragOver && dragOverVariants(),
-          )}
-          onClick={() => {
-            handleSelectChange(item)
-            item.onClick?.()
-          }}
-          draggable={!!item.draggable}
-          onDragStart={onDragStart}
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDrop={onDrop}
-        >
-          <TreeIcon
-            item={item}
-            isSelected={selectedItemId === item.id}
-            isOpen={value.includes(item.id)}
-            {...(defaultNodeIcon !== undefined && { default: defaultNodeIcon })}
-          />
-          <span className="text-sm truncate">{item.name}</span>
+        <div className="relative group">
+          <AccordionTrigger
+            className={cn(
+              treeVariants(),
+              selectedItemId === item.id && selectedTreeVariants(),
+              isDragOver && dragOverVariants(),
+            )}
+            onClick={() => {
+              handleSelectChange(item)
+              item.onClick?.()
+            }}
+            draggable={!!item.draggable}
+            onDragStart={onDragStart}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
+          >
+            <div className="relative group">
+              <TreeIcon
+                item={item}
+                isSelected={selectedItemId === item.id}
+                isOpen={value.includes(item.id)}
+                {...(defaultNodeIcon !== undefined && { default: defaultNodeIcon })}
+              />
+              <span
+                className={cn(
+                  'text-sm truncate',
+                  selectedItemId === item.id
+                    ? 'text-text-primary'
+                    : 'text-text-secondary group-hover:text-text-primary',
+                )}
+              >
+                {item.name}
+              </span>
+            </div>
+          </AccordionTrigger>
           <TreeActions isSelected={selectedItemId === item.id}>{item.actions}</TreeActions>
-        </AccordionTrigger>
-        <AccordionContent className="ml-4 pl-1 border-l">
+        </div>
+        <AccordionContent className="ml-4 pl-1 border-l border-input-border">
           <TreeItem
             data={item.children ? item.children : item}
             {...omitUndefined({
@@ -368,7 +382,7 @@ const TreeLeaf = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          'ml-5 flex text-left items-center py-2 cursor-pointer before:right-1',
+          'ml-5 flex text-left items-center py-2 cursor-pointer before:right-1 relative group',
           treeVariants(),
           className,
           selectedItemId === item.id && selectedTreeVariants(),
@@ -392,7 +406,14 @@ const TreeLeaf = React.forwardRef<
           isSelected={selectedItemId === item.id}
           {...(defaultLeafIcon !== undefined && { default: defaultLeafIcon })}
         />
-        <span className="flex-grow text-sm truncate">{item.name}</span>
+        <span
+          className={cn(
+            'flex-grow text-sm truncate relative',
+            selectedItemId === item.id ? 'text-text-primary' : 'text-text-secondary group-hover:text-text-primary',
+          )}
+        >
+          {item.name}
+        </span>
         <TreeActions isSelected={selectedItemId === item.id && !item.disabled}>{item.actions}</TreeActions>
       </div>
     )
@@ -429,7 +450,7 @@ const AccordionContent = React.forwardRef<
     )}
     {...props}
   >
-    <div className="pb-1 pt-0">{children}</div>
+    <div>{children}</div>
   </BaseAccordion.Panel>
 ))
 AccordionContent.displayName = BaseAccordion.Panel.displayName
@@ -457,7 +478,9 @@ const TreeIcon = ({
 }
 
 const TreeActions = ({ children, isSelected }: { children: React.ReactNode; isSelected: boolean }) => {
-  return <div className={cn(isSelected ? 'block' : 'hidden', 'absolute right-3 group-hover:block')}>{children}</div>
+  return (
+    <div className={cn(isSelected ? 'block' : 'hidden', 'absolute right-3 top-2 group-hover:block')}>{children}</div>
+  )
 }
 
 export { TreeView, type TreeDataItem }
