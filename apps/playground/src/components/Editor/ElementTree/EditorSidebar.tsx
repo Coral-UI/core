@@ -2,14 +2,10 @@ import { Button } from '@/components/ui/button'
 import { TreeDataItem, TreeView } from '@/components/ui/tree-view'
 import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
+import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { canContain } from '@/utils/elementHierarchy'
 import { Minus, Plus } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
-
-interface EditorSidebarProps {
-  onElementSelect?: (elementId: string | null) => void
-  selectedElementId?: string | null
-}
 
 // Convert ElementTreeNode to TreeDataItem
 const convertToTreeDataItem = (
@@ -71,7 +67,9 @@ const convertToTreeDataItem = (
   return treeItem
 }
 
-export const EditorSidebar = ({ onElementSelect, selectedElementId }: EditorSidebarProps) => {
+export const EditorSidebar = () => {
+  const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
+  const setSelectedElementId = useElementSelectionStore((state) => state.setSelectedElementId)
   const elementTreeHook = useElementTreeQuery()
   const { getElementTree, addElement, moveElement, removeElement } = elementTreeHook
   const [expandedItems, setExpandedItems] = useState<string[]>(['root'])
@@ -84,10 +82,10 @@ export const EditorSidebar = ({ onElementSelect, selectedElementId }: EditorSide
       removeElement(elementId)
       // Clear selection if the deleted element was selected
       if (selectedElementId === elementId) {
-        onElementSelect?.(null)
+        setSelectedElementId(null)
       }
     },
-    [removeElement, selectedElementId, onElementSelect],
+    [removeElement, selectedElementId, setSelectedElementId],
   )
 
   // Convert element tree to TreeDataItem format
@@ -96,7 +94,7 @@ export const EditorSidebar = ({ onElementSelect, selectedElementId }: EditorSide
       convertToTreeDataItem(
         element,
         selectedElementId || null,
-        (id) => onElementSelect?.(id),
+        (id) => setSelectedElementId(id),
         (parentId) => {
           // Default to adding a div element
           addElement('div', parentId)
@@ -108,15 +106,17 @@ export const EditorSidebar = ({ onElementSelect, selectedElementId }: EditorSide
         handleDelete,
       ),
     )
-  }, [elementTree, selectedElementId, addElement, expandedItems, handleDelete])
+  }, [elementTree, selectedElementId, addElement, expandedItems, handleDelete, setSelectedElementId])
 
   const handleSelectChange = useCallback(
     (item: TreeDataItem | undefined) => {
       if (item) {
-        onElementSelect?.(item.id)
+        setSelectedElementId(item.id)
+      } else {
+        setSelectedElementId(null)
       }
     },
-    [onElementSelect],
+    [setSelectedElementId],
   )
 
   const handleDragDrop = useCallback(

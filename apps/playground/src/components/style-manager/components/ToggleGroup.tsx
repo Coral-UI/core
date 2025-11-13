@@ -24,7 +24,7 @@ const toggleVariants = cva(
           'bg-accent-blue-bg text-accent-blue-fg hover:bg-accent-blue-fg/20 border border-accent-blue-fg/40 data-[pressed]:bg-bg-surface data-[pressed]:text-text-primary data-[pressed]:hover:bg-interactive-bg-primary data-[pressed]:border-transparent',
       },
       size: {
-        default: 'min-w-8 h-6 px-1 flex-1',
+        default: 'min-w-8 h-7 px-1 flex-1',
         sm: 'min-w-5 h-5 px-1',
         square: 'w-4.5 h-4.5 p-0.5 flex-1',
       },

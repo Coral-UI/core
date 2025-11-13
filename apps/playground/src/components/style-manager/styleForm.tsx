@@ -79,26 +79,26 @@ import { useStore } from '@tanstack/react-form'
 import { useEffect, useRef } from 'react'
 
 const defaultValues = {
-  backgroundColor: '#000000',
+  backgroundColor: undefined,
   backgroundColorFormat: 'hex',
-  color: '#ffffff',
+  color: undefined,
   colorFormat: 'hex',
-  paddingInlineStart: 0,
-  paddingInlineEndUnit: 'px',
-  paddingInlineEnd: 0,
-  paddingBlockStartUnit: 'px',
-  paddingBlockStart: 0,
-  paddingBlockEndUnit: 'px',
-  paddingBlockEnd: 0,
-  paddingInlineStartUnit: 'px',
-  marginInlineStart: 0,
-  marginInlineStartUnit: 'px',
-  marginInlineEnd: 0,
-  marginInlineEndUnit: 'px',
-  marginBlockStart: 0,
-  marginBlockStartUnit: 'px',
-  marginBlockEnd: 0,
-  marginBlockEndUnit: 'px',
+  paddingInlineStart: undefined,
+  paddingInlineEndUnit: undefined,
+  paddingInlineEnd: undefined,
+  paddingBlockStartUnit: undefined,
+  paddingBlockStart: undefined,
+  paddingBlockEndUnit: undefined,
+  paddingBlockEnd: undefined,
+  paddingInlineStartUnit: undefined,
+  marginInlineStart: undefined,
+  marginInlineStartUnit: undefined,
+  marginInlineEnd: undefined,
+  marginInlineEndUnit: undefined,
+  marginBlockStart: undefined,
+  marginBlockStartUnit: undefined,
+  marginBlockEnd: undefined,
+  marginBlockEndUnit: undefined,
   borderEnabled: false,
   borderInlineStartWidth: undefined,
   borderInlineStartWidthUnit: undefined,
@@ -116,14 +116,14 @@ const defaultValues = {
   borderInlineEndColor: undefined,
   borderBlockStartColor: undefined,
   borderBlockEndColor: undefined,
-  borderRadiusTopLeft: undefined,
-  borderRadiusTopLeftUnit: undefined,
-  borderRadiusTopRight: undefined,
-  borderRadiusTopRightUnit: undefined,
-  borderRadiusBottomRight: undefined,
-  borderRadiusBottomRightUnit: undefined,
-  borderRadiusBottomLeft: undefined,
-  borderRadiusBottomLeftUnit: undefined,
+  borderTopLeftRadius: undefined,
+  borderTopLeftRadiusUnit: undefined,
+  borderTopRightRadius: undefined,
+  borderTopRightRadiusUnit: undefined,
+  borderBottomRightRadius: undefined,
+  borderBottomRightRadiusUnit: undefined,
+  borderBottomLeftRadius: undefined,
+  borderBottomLeftRadiusUnit: undefined,
   display: 'block',
   flexDirection: 'row',
   flexWrap: 'nowrap',
@@ -153,12 +153,13 @@ const defaultValues = {
   maxHeight: undefined,
   maxHeightUnit: undefined,
   typographyEnabled: false,
-  fontSize: undefined,
-  fontSizeUnit: undefined,
-  fontWeight: undefined,
-  fontFamily: undefined,
-  lineHeight: undefined,
-  lineHeightUnit: undefined,
+  fontSize: 16,
+  fontSizeUnit: 'px',
+  fontWeight: '400',
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, Adwaita Sans, Cantarell, Ubuntu, roboto, noto, helvetica, arial, sans-serif',
+  lineHeight: 1.5,
+  lineHeightUnit: 'em',
   letterSpacing: undefined,
   letterSpacingUnit: undefined,
   textAlign: undefined,
@@ -166,7 +167,7 @@ const defaultValues = {
   textDecoration: undefined,
   textDecorationColor: undefined,
   textDecorationColorFormat: undefined,
-  textDecorationStyle: undefined,
+  textDecorationStyle: 'solid',
   textDecorationThickness: undefined,
   textDecorationThicknessUnit: undefined,
   textUnderlinePosition: undefined,
@@ -184,6 +185,7 @@ const StyleFormLayout = withForm({
           <div className="flex flex-col bg-bg-surface">
             <CardSection legend="Color">
               <form.AppField
+                // @ts-expect-error - Dynamic field name, TypeScript can't infer the exact type
                 name="backgroundColor"
                 children={(field) => {
                   return (
@@ -198,6 +200,7 @@ const StyleFormLayout = withForm({
                 }}
               />
               <form.AppField
+                // @ts-expect-error - Dynamic field name, TypeScript can't infer the exact type
                 name="color"
                 children={(field) => {
                   return (
@@ -665,7 +668,6 @@ const StyleFormLayout = withForm({
 
             <OptionalSection enabledField="typographyEnabled" legend="Typography">
               <form.AppField
-                // @ts-expect-error - Dynamic field name, TypeScript can't infer the exact type
                 name="fontSize"
                 children={(field) => (
                   <field.NumberInputField
@@ -680,21 +682,31 @@ const StyleFormLayout = withForm({
                 )}
               />
               <form.AppField
-                // @ts-expect-error - Dynamic field name, TypeScript can't infer the exact type
                 name="fontFamily"
                 children={(field) => (
                   <field.SelectField
                     label="Font Family"
                     leadingIcon={<IconTypeface />}
                     selectOptions={[
-                      { value: 'Arial, sans-serif', label: 'Arial' },
-                      { value: 'Helvetica, sans-serif', label: 'Helvetica' },
+                      {
+                        value:
+                          '-apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, Adwaita Sans, Cantarell, Ubuntu, roboto, noto, helvetica, arial, sans-serif',
+                        label: 'Sans Serif',
+                      },
+                      {
+                        value:
+                          'Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol',
+                        label: 'Serif',
+                      },
+                      {
+                        value: 'Menlo, Consolas, Monaco, Adwaita Mono, Liberation Mono, Lucida Console, monospace',
+                        label: 'Monospace',
+                      },
                     ]}
                   />
                 )}
               />
               <form.AppField
-                // @ts-expect-error - Dynamic field name, TypeScript can't infer the exact type
                 name="fontWeight"
                 children={(field) => (
                   <field.SelectField
@@ -731,7 +743,6 @@ const StyleFormLayout = withForm({
                   )}
                 />
                 <form.AppField
-                  // @ts-expect-error - Dynamic field name, TypeScript can't infer the exact type
                   name="lineHeight"
                   children={(field) => (
                     <field.NumberInputField
@@ -856,7 +867,6 @@ const StyleFormLayout = withForm({
                 )}
               />
               <form.AppField
-                // @ts-expect-error - Dynamic field name, TypeScript can't infer the exact type
                 name="textDecorationStyle"
                 children={(field) => (
                   <field.ToggleField
@@ -926,16 +936,16 @@ const StyleFormLayout = withForm({
                 // disableDirectionalIcons={true}
                 layout="corner"
                 fields={{
-                  inlineStart: 'borderRadiusTopLeft',
-                  inlineEnd: 'borderRadiusTopRight',
-                  blockEnd: 'borderRadiusBottomRight',
-                  blockStart: 'borderRadiusBottomLeft',
+                  inlineStart: 'borderTopLeftRadius',
+                  inlineEnd: 'borderTopRightRadius',
+                  blockEnd: 'borderBottomRightRadius',
+                  blockStart: 'borderBottomLeftRadius',
                 }}
                 unitFields={{
-                  inlineStart: 'borderRadiusTopLeftUnit',
-                  inlineEnd: 'borderRadiusTopRightUnit',
-                  blockEnd: 'borderRadiusBottomRightUnit',
-                  blockStart: 'borderRadiusBottomLeftUnit',
+                  inlineStart: 'borderTopLeftRadiusUnit',
+                  inlineEnd: 'borderTopRightRadiusUnit',
+                  blockEnd: 'borderBottomRightRadiusUnit',
+                  blockStart: 'borderBottomLeftRadiusUnit',
                 }}
               />
               <DirectionLayoutField
@@ -1128,8 +1138,8 @@ export const StyleForm = ({ onChange, initialValues }: StyleFormProps = {}) => {
     },
   })
 
-  // Only sync initialValues when element ID changes (not when styles change)
-  // This prevents syncing when user updates styles
+  // Sync initialValues when element changes (detected by comparing serialized initialValues)
+  // This ensures the form shows the correct values when switching between elements
   useEffect(() => {
     // Skip if initialValues is undefined (no element selected)
     if (!initialValues) {
@@ -1147,19 +1157,53 @@ export const StyleForm = ({ onChange, initialValues }: StyleFormProps = {}) => {
       return
     }
 
-    // Only sync on first render or when element changes
-    // Don't sync when styles change - let user edits persist
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-      previousInitialValuesRef.current = JSON.stringify(initialValues)
-      // Initialize previousFormValuesRef with current form values
-      // This ensures the first user change will trigger onChange
-      previousFormValuesRef.current = form.state.values as StyleFormValues
-      return
-    }
+    const currentInitialValuesString = JSON.stringify(initialValues)
 
-    // Skip sync - we only want defaults, not syncing styles
-    // User changes will update styles via onChange
+    // Sync when element changes (initialValues content changes)
+    // This happens when switching between elements
+    if (previousInitialValuesRef.current !== currentInitialValuesString) {
+      isSyncingRef.current = true
+      previousInitialValuesRef.current = currentInitialValuesString
+
+      // Preserve enabled states from current form if they're true
+      // This prevents flickering when a user enables a section but hasn't added values yet
+      const currentFormValues = form.state.values
+      const preservedEnabledStates = {
+        typographyEnabled:
+          currentFormValues.typographyEnabled === true
+            ? true
+            : (initialValues.typographyEnabled ?? defaultValues.typographyEnabled),
+        borderEnabled:
+          currentFormValues.borderEnabled === true
+            ? true
+            : (initialValues.borderEnabled ?? defaultValues.borderEnabled),
+        overflowEnabled:
+          currentFormValues.overflowEnabled === true
+            ? true
+            : (initialValues.overflowEnabled ?? defaultValues.overflowEnabled),
+      }
+
+      // Reset form with new initial values, preserving enabled states
+      const mergedValues = {
+        ...defaultValues,
+        ...initialValues,
+        ...preservedEnabledStates,
+      } as StyleFormValues
+      // @ts-expect-error - form.reset expects borderEnabled to be required, but StyleFormValues has it as optional
+      // However, we always provide it from defaultValues, so this is safe at runtime
+      form.reset(mergedValues)
+
+      // Initialize previousFormValuesRef with current form values
+      previousFormValuesRef.current = mergedValues
+
+      setTimeout(() => {
+        isSyncingRef.current = false
+      }, 0)
+
+      if (isFirstRender.current) {
+        isFirstRender.current = false
+      }
+    }
   }, [initialValues, form])
 
   // Subscribe to form values and call onChange whenever they change

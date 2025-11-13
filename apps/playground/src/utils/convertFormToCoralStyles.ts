@@ -12,6 +12,10 @@ const DIMENSION_PROPERTIES: Record<string, string> = {
   letterSpacing: 'letterSpacingUnit',
   width: 'widthUnit',
   height: 'heightUnit',
+  minWidth: 'minWidthUnit',
+  minHeight: 'minHeightUnit',
+  maxWidth: 'maxWidthUnit',
+  maxHeight: 'maxHeightUnit',
   marginInlineStart: 'marginInlineStartUnit',
   marginInlineEnd: 'marginInlineEndUnit',
   marginBlockStart: 'marginBlockStartUnit',
@@ -30,12 +34,23 @@ const DIMENSION_PROPERTIES: Record<string, string> = {
   borderTopRightRadius: 'borderTopRightRadiusUnit',
   borderBottomLeftRadius: 'borderBottomLeftRadiusUnit',
   borderBottomRightRadius: 'borderBottomRightRadiusUnit',
+  borderInlineStartWidth: 'borderInlineStartWidthUnit',
+  borderInlineEndWidth: 'borderInlineEndWidthUnit',
+  borderBlockStartWidth: 'borderBlockStartWidthUnit',
+  borderBlockEndWidth: 'borderBlockEndWidthUnit',
 }
 
 /**
  * Properties that should be converted to Coral color objects
  */
-const COLOR_PROPERTIES = ['backgroundColor', 'color', 'borderColor'] as const
+const COLOR_PROPERTIES = [
+  'backgroundColor',
+  'color',
+  'borderInlineStartColor',
+  'borderInlineEndColor',
+  'borderBlockStartColor',
+  'borderBlockEndColor',
+] as const
 
 /**
  * Format properties that should be excluded from Coral styles
@@ -143,6 +158,11 @@ export function convertFormValuesToCoralStyles(
       return
     }
 
+    // Skip "Enabled" properties - these are form metadata indicating section state
+    if (key.endsWith('Enabled')) {
+      return
+    }
+
     // Skip if this is a unit property - it will be handled with its value property
     if (Object.values(DIMENSION_PROPERTIES).includes(key)) {
       return
@@ -206,8 +226,17 @@ export function convertFormValuesToCoralStyles(
 /**
  * Convert Coral styles to form values
  * Splits dimension objects into separate value and unit fields
+ * Infers "Enabled" properties based on whether related style properties exist
+ *
+ * @param coralStyles - The Coral styles object to convert
+ * @param preserveEnabledStates - Optional object containing current "Enabled" states to preserve.
+ *                                If an enabled state is `true` here, it will be preserved even if
+ *                                there are no corresponding style properties in coralStyles.
  */
-export function convertCoralStylesToFormValues(coralStyles: Record<string, unknown>): Record<string, unknown> {
+export function convertCoralStylesToFormValues(
+  coralStyles: Record<string, unknown>,
+  preserveEnabledStates?: Record<string, boolean>,
+): Record<string, unknown> {
   const formValues: Record<string, unknown> = {}
 
   Object.entries(coralStyles).forEach(([key, value]) => {
@@ -250,6 +279,48 @@ export function convertCoralStylesToFormValues(coralStyles: Record<string, unkno
       formValues[key] = value
     }
   })
+
+  // Infer "Enabled" properties based on whether related style properties exist
+  // This ensures optional sections stay open when they have values
+  const styleKeys = Object.keys(coralStyles)
+
+  // typographyEnabled: true if any typography-related properties exist
+  // OR if it's preserved as true in preserveEnabledStates
+  const typographyProperties = ['fontSize', 'fontFamily', 'fontWeight', 'lineHeight', 'letterSpacing']
+  const hasTypographyProperties = typographyProperties.some((prop) => styleKeys.includes(prop))
+  const preserveTypographyEnabled = preserveEnabledStates?.['typographyEnabled'] === true
+  if (hasTypographyProperties || preserveTypographyEnabled) {
+    formValues['typographyEnabled'] = true
+  }
+
+  // borderEnabled: true if any border-related properties exist
+  // Check both naming conventions (borderTopLeftRadius in Coral styles, borderRadiusTopLeft in form)
+  const borderProperties = [
+    'borderColor',
+    'borderWidth',
+    'borderTopLeftRadius',
+    'borderTopRightRadius',
+    'borderBottomLeftRadius',
+    'borderBottomRightRadius',
+    'borderRadiusTopLeft',
+    'borderRadiusTopRight',
+    'borderRadiusBottomRight',
+    'borderRadiusBottomLeft',
+    'borderRadius',
+  ]
+  const hasBorderProperties = borderProperties.some((prop) => styleKeys.includes(prop))
+  const preserveBorderEnabled = preserveEnabledStates?.['borderEnabled'] === true
+  if (hasBorderProperties || preserveBorderEnabled) {
+    formValues['borderEnabled'] = true
+  }
+
+  // overflowEnabled: true if overflow properties exist
+  const overflowProperties = ['overflowX', 'overflowY', 'overflow']
+  const hasOverflowProperties = overflowProperties.some((prop) => styleKeys.includes(prop))
+  const preserveOverflowEnabled = preserveEnabledStates?.['overflowEnabled'] === true
+  if (hasOverflowProperties || preserveOverflowEnabled) {
+    formValues['overflowEnabled'] = true
+  }
 
   return formValues
 }

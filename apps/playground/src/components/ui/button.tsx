@@ -19,6 +19,7 @@ const buttonVariants = cva(
           'bg-destructive-bg text-destructive-fg hover:bg-destructive-fg/20 focus-visible:ring-destructive-fg focus-visible:border-destructive-fg focus-visible:ring-1 border-destructive-fg/30',
         colorPicker:
           'bg-transparent border-transparent hover:bg-interactive-bg-primary/60 shadow-xs interactive-focus justify-start !pl-0 !h-7 text-xs tracking-wider',
+        elementPreview: 'bg-blue-800 border-blue-600 hover:bg-blue-700  shadow-xs interactive-focus rounded-full',
       },
       size: {
         default: 'h-9  px-4 py-2 has-[>svg]:px-3',

@@ -15,6 +15,7 @@ import { useFieldContext, useFormContext } from '@/components/style-manager/form
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { cva } from 'class-variance-authority'
+import { useCallback, useEffect, useRef } from 'react'
 
 const inputVariants = cva(
   'w-full [&>input]:w-full min-w-0 rounded-input text-text-primary font-sans border placeholder:text-text-muted [&>input]:outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 interactive-invalid-input group interactive-focus-input has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg  overflow-hidden inline-flex items-center  font-normal',
@@ -26,7 +27,7 @@ const inputVariants = cva(
       },
       size: {
         default: 'h-9 text-sm',
-        sm: 'h-6 text-xs tracking-wide',
+        sm: 'h-7 text-xs tracking-wide',
         lg: 'h-12',
       },
       hasLeadingIcon: {
@@ -82,6 +83,38 @@ function ColorInput({
   // Use field.name as the id for proper label association
   const inputId = field.name
 
+  // Normalize undefined to empty string to keep inputs controlled
+  // Convert back to undefined when updating form to match schema expectations
+  const normalizedValue = field.state.value ?? ''
+
+  // Debounce form updates to improve performance when dragging color picker
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const handleValueChange = useCallback(
+    (value: string) => {
+      // Clear any pending debounced update
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
+      }
+
+      // Debounce the form update (150ms delay)
+      debounceTimeoutRef.current = setTimeout(() => {
+        // Convert empty string back to undefined for form state
+        field.handleChange(value === '' ? undefined : value)
+        debounceTimeoutRef.current = null
+      }, 150)
+    },
+    [field],
+  )
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
+      }
+    }
+  }, [])
+
   return (
     <div data-invalid={isInvalid} className="flex w-full max-w-72 flex-col items-start">
       {!hideLabel && (
@@ -107,7 +140,7 @@ function ColorInput({
           type="text"
           id={inputId}
           name={field.name}
-          value={field.state.value}
+          value={normalizedValue}
           readOnly
           aria-hidden="true"
           tabIndex={-1}
@@ -115,8 +148,8 @@ function ColorInput({
           aria-invalid={isInvalid}
         />
         <ColorPicker
-          value={field.state.value}
-          onValueChange={(value) => field.handleChange(value)}
+          value={normalizedValue || undefined}
+          onValueChange={handleValueChange}
           onFormatChange={(format) => {
             // @ts-expect-error - formatName is a dynamic string key, but TypeScript can't infer the field type
             form.setFieldValue(formatName, format)
@@ -138,7 +171,7 @@ function ColorInput({
                 aria-invalid={isInvalid}
               >
                 <ColorPickerSwatch className="size-4" />
-                {field.state.value}
+                {normalizedValue || ''}
               </Button>
             </ColorPickerTrigger>
           </div>

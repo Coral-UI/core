@@ -1,5 +1,4 @@
 // import { IconRestore } from "@tabler/icons-react";
-import { FieldError } from '@/components/style-manager/components/Field'
 import { ToggleGroup } from '@/components/style-manager/components/ToggleGroup'
 import { useFieldContext } from '@/components/style-manager/formContext'
 
@@ -66,7 +65,15 @@ export const ToggleField = ({
           )}
         </InputGroupAddon> */}
       </div>
-      {isInvalid && <FieldError errors={field.state.meta.errors} />}
+      {isInvalid && field.state.meta.errors && (
+        <div className="text-sm text-destructive-fg mt-1 ml-1.5">
+          {field.state.meta.errors.map((error, index) => {
+            // Handle both string errors and Zod error objects
+            const errorMessage = typeof error === 'string' ? error : error?.message || String(error)
+            return <div key={index}>{errorMessage}</div>
+          })}
+        </div>
+      )}
     </fieldset>
   )
 }

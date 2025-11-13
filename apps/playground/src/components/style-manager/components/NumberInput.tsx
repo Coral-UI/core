@@ -75,7 +75,8 @@ function NumberInput({
   const isUnitControlled = unitValue !== undefined && onUnitChange !== undefined
 
   // When value is undefined and we have a placeholder, show "auto" in unit selector
-  const displayUnitValue = value === undefined && placeholder === 'auto' ? 'auto' : (unitValue ?? unitOptions[0]?.value ?? 'px')
+  const displayUnitValue =
+    value === undefined && placeholder === 'auto' ? 'auto' : (unitValue ?? unitOptions[0]?.value ?? 'px')
 
   // Use leadingIcon if provided, otherwise use default IconLetterW
   const iconToUse = leadingIcon || (
@@ -122,7 +123,7 @@ function NumberInput({
         <NumberField.Input
           className={cn(
             'text-base text-text-primary tabular-nums focus:z-1 focus:outline-none min-w-8 w-full tracking-wide flex-1 shrink-0',
-            size === 'sm' ? 'h-6 text-xs' : 'h-9 text-sm ',
+            size === 'sm' ? 'h-7 text-xs' : 'h-9 text-sm ',
             className,
           )}
           min={min}

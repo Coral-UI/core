@@ -63,7 +63,8 @@ export const NumberInputField = ({
   }
 
   // For width/height with showAuto, display "auto" when value is undefined
-  const displayValue = showAuto && field.state.value === undefined ? undefined : field.state.value
+  // Otherwise, normalize undefined to 0 to keep component controlled
+  const displayValue = showAuto && field.state.value === undefined ? undefined : (field.state.value ?? 0)
 
   return (
     <fieldset>
@@ -77,14 +78,24 @@ export const NumberInputField = ({
         leadingIcon={leadingIcon}
         size={size}
         hideControls={hideControls}
-        {...(isInvalid && field.state.meta.errors?.[0] && { error: field.state.meta.errors[0] })}
+        {...(isInvalid &&
+          field.state.meta.errors?.[0] && {
+            error:
+              typeof field.state.meta.errors[0] === 'string'
+                ? field.state.meta.errors[0]
+                : field.state.meta.errors[0]?.message || String(field.state.meta.errors[0]),
+          })}
         {...(min !== undefined && { min })}
         {...(max !== undefined && { max })}
         {...(step !== undefined && { step })}
         placeholder={showAuto && field.state.value === undefined ? 'auto' : undefined}
       />
-      {isInvalid && field.state.meta.errors && (
-        <div className="text-sm text-destructive-fg">{field.state.meta.errors[0]}</div>
+      {isInvalid && field.state.meta.errors && field.state.meta.errors[0] && (
+        <div className="text-sm text-destructive-fg">
+          {typeof field.state.meta.errors[0] === 'string'
+            ? field.state.meta.errors[0]
+            : field.state.meta.errors[0]?.message || String(field.state.meta.errors[0])}
+        </div>
       )}
     </fieldset>
   )

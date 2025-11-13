@@ -60,6 +60,11 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeProps>(
 
     const [draggedItem, setDraggedItem] = React.useState<TreeDataItem | null>(null)
 
+    // Sync internal state with initialSelectedItemId prop when it changes externally
+    React.useEffect(() => {
+      setSelectedItemId(initialSelectedItemId)
+    }, [initialSelectedItemId])
+
     const handleSelectChange = React.useCallback(
       (item: TreeDataItem | undefined) => {
         setSelectedItemId(item?.id)

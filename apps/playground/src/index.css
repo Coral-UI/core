@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Figtree Variable", sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
   /* Theme Colors */
   --color-bg-primary: var(--background-primary);
@@ -156,4 +156,10 @@
   .legend {
     @apply text-sm font-medium text-text-primary/90 h-6 inline-flex items-center ml-1.5;
   }
+}
+
+.preview-background {
+  background: linear-gradient(90deg, var(--background-secondary) 14px, transparent 1%) 50%, linear-gradient(var(--background-secondary) 14px, transparent 1%) 50%, var(--border-primary);
+    background-size: 16px 16px;
+    background-position: 8px 8px;
 }

@@ -22,11 +22,15 @@ const initialElements: ElementTreeNode[] = [
 export const useElementTreeQuery = () => {
   const queryClient = useQueryClient()
 
-  // Query for the element tree
+  // Simple query - just read the data
   const { data: elements = initialElements } = useQuery<ElementTreeNode[]>({
     queryKey: ELEMENT_TREE_QUERY_KEY,
-    queryFn: () => initialElements,
-    initialData: initialElements,
+    queryFn: async () => {
+      // Just return initialElements - mutations will update via setQueryData
+      return initialElements
+    },
+    staleTime: Infinity, // Never refetch - we update via mutations only
+    gcTime: Infinity,
   })
 
   // Helper to create a new element
@@ -34,9 +38,12 @@ export const useElementTreeQuery = () => {
     (elementType: CoralElementType = 'div', parentId?: string, name?: string): ElementTreeNode => {
       const id = `element_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
 
+      // Normalize parentId: treat 'root' as undefined for consistency
+      const normalizedParentId = parentId === 'root' || parentId === undefined ? undefined : parentId
+
       const element: ElementTreeNode = {
         id,
-        parentId: parentId || undefined,
+        parentId: normalizedParentId,
         name: name || `${elementType}_${id.split('_')[1]}`,
         elementType,
         type: 'NODE',
@@ -62,11 +69,30 @@ export const useElementTreeQuery = () => {
   )
 
   // Mutation to add an element
-  const addElementMutation = useMutation({
-    mutationFn: ({ elementType, parentId, name }: { elementType: CoralElementType; parentId?: string; name?: string }) => {
-      const newElement = createElement(elementType, parentId, name)
+  const addElementMutation = useMutation<
+    ElementTreeNode[],
+    Error,
+    { elementType: CoralElementType; parentId?: string; name?: string; elementId?: string; element?: ElementTreeNode }
+  >({
+    mutationFn: ({ elementType, parentId, name, elementId, element }) => {
+      // If element is provided, use it directly (avoids creating duplicate)
+      // Otherwise, create a new element
+      const newElement = element || createElement(elementType, parentId, name)
+
+      // If elementId is provided, ensure it matches
+      if (elementId && newElement.id !== elementId) {
+        newElement.id = elementId
+      }
+
       const currentElements = queryClient.getQueryData<ElementTreeNode[]>(ELEMENT_TREE_QUERY_KEY) || initialElements
-      return [...currentElements, newElement]
+
+      // Check if element already exists (prevent duplicates)
+      if (currentElements.some((el) => el.id === newElement.id)) {
+        return Promise.resolve(currentElements)
+      }
+
+      const newElements = [...currentElements, newElement]
+      return Promise.resolve(newElements)
     },
     onSuccess: (newElements) => {
       queryClient.setQueryData(ELEMENT_TREE_QUERY_KEY, newElements)
@@ -74,20 +100,23 @@ export const useElementTreeQuery = () => {
   })
 
   // Mutation to remove an element
-  const removeElementMutation = useMutation({
+  const removeElementMutation = useMutation<ElementTreeNode[], Error, string>({
     mutationFn: (elementId: string) => {
       const currentElements = queryClient.getQueryData<ElementTreeNode[]>(ELEMENT_TREE_QUERY_KEY) || initialElements
 
       // Don't allow removing the root element
-      if (elementId === 'root') return currentElements
+      if (elementId === 'root') return Promise.resolve(currentElements)
 
       // Verify the element exists
       const elementToDelete = currentElements.find((el) => el.id === elementId)
-      if (!elementToDelete) return currentElements
+      if (!elementToDelete) return Promise.resolve(currentElements)
 
       console.log('Deleting element:', elementId)
       console.log('Element to delete:', elementToDelete)
-      console.log('All elements before deletion:', currentElements.map(el => ({ id: el.id, parentId: el.parentId })))
+      console.log(
+        'All elements before deletion:',
+        currentElements.map((el) => ({ id: el.id, parentId: el.parentId })),
+      )
 
       const toRemove = new Set<string>()
 
@@ -123,7 +152,12 @@ export const useElementTreeQuery = () => {
           return isChild
         })
 
-        console.log('Children found for', id, ':', children.map(c => c.id))
+        console.log(
+          'Children found for',
+          id,
+          ':',
+          children.map((c) => c.id),
+        )
 
         // Recursively collect children's IDs
         children.forEach((child) => {
@@ -136,10 +170,13 @@ export const useElementTreeQuery = () => {
 
       console.log('Elements to remove:', Array.from(toRemove))
       const result = currentElements.filter((el) => !toRemove.has(el.id))
-      console.log('Elements after deletion:', result.map(el => ({ id: el.id, parentId: el.parentId })))
+      console.log(
+        'Elements after deletion:',
+        result.map((el) => ({ id: el.id, parentId: el.parentId })),
+      )
 
       // Filter out all elements that should be removed
-      return result
+      return Promise.resolve(result)
     },
     onSuccess: (newElements) => {
       queryClient.setQueryData(ELEMENT_TREE_QUERY_KEY, newElements)
@@ -147,10 +184,14 @@ export const useElementTreeQuery = () => {
   })
 
   // Mutation to update an element
-  const updateElementMutation = useMutation({
-    mutationFn: ({ elementId, updates }: { elementId: string; updates: Partial<ElementTreeNode> }) => {
+  const updateElementMutation = useMutation<
+    ElementTreeNode[],
+    Error,
+    { elementId: string; updates: Partial<ElementTreeNode> }
+  >({
+    mutationFn: ({ elementId, updates }) => {
       const currentElements = queryClient.getQueryData<ElementTreeNode[]>(ELEMENT_TREE_QUERY_KEY) || initialElements
-      return currentElements.map((el) => (el.id === elementId ? { ...el, ...updates } : el))
+      return Promise.resolve(currentElements.map((el) => (el.id === elementId ? { ...el, ...updates } : el)))
     },
     onSuccess: (newElements) => {
       queryClient.setQueryData(ELEMENT_TREE_QUERY_KEY, newElements)
@@ -158,12 +199,16 @@ export const useElementTreeQuery = () => {
   })
 
   // Mutation to move an element
-  const moveElementMutation = useMutation({
-    mutationFn: ({ elementId, newParentId, index }: { elementId: string; newParentId?: string; index?: number }) => {
+  const moveElementMutation = useMutation<
+    ElementTreeNode[],
+    Error,
+    { elementId: string; newParentId?: string; index?: number }
+  >({
+    mutationFn: ({ elementId, newParentId, index }) => {
       const currentElements = queryClient.getQueryData<ElementTreeNode[]>(ELEMENT_TREE_QUERY_KEY) || initialElements
 
       const element = currentElements.find((el) => el.id === elementId)
-      if (!element) return currentElements
+      if (!element) return Promise.resolve(currentElements)
 
       // Update the parent of the moved element
       let updated = currentElements.map((el) => (el.id === elementId ? { ...el, parentId: newParentId } : el))
@@ -210,7 +255,7 @@ export const useElementTreeQuery = () => {
         })
       }
 
-      return updated
+      return Promise.resolve(updated)
     },
     onSuccess: (newElements) => {
       queryClient.setQueryData(ELEMENT_TREE_QUERY_KEY, newElements)
@@ -218,9 +263,9 @@ export const useElementTreeQuery = () => {
   })
 
   // Mutation to replace all elements (for import functionality)
-  const replaceAllElementsMutation = useMutation({
-    mutationFn: (newElements: ElementTreeNode[]) => {
-      return newElements
+  const replaceAllElementsMutation = useMutation<ElementTreeNode[], Error, ElementTreeNode[]>({
+    mutationFn: (newElements) => {
+      return Promise.resolve(newElements)
     },
     onSuccess: (newElements) => {
       queryClient.setQueryData(ELEMENT_TREE_QUERY_KEY, newElements)
@@ -229,29 +274,73 @@ export const useElementTreeQuery = () => {
 
   // Helper to build tree structure from flat array
   const getElementTree = useCallback(() => {
-    const buildTree = (parentId?: string): ElementTreeNode[] => {
+    const visitedIds = new Set<string>()
+
+    const buildTree = (parentId: string | undefined): ElementTreeNode[] => {
+      // Normalize parentId: treat undefined and 'root' as root level
+      const normalizedParentId = parentId === undefined || parentId === 'root' ? undefined : parentId
+
       const filtered = elements
-        .filter((el) => el.parentId === parentId)
+        .filter((el) => {
+          // Prevent circular references - don't process elements we've already visited
+          if (visitedIds.has(el.id)) return false
+
+          // Normalize element's parentId: treat undefined and 'root' as root level
+          const elParentId = el.parentId === undefined || el.parentId === 'root' ? undefined : el.parentId
+          return elParentId === normalizedParentId
+        })
         .sort((a, b) => {
           if (a.orderIndex !== undefined && b.orderIndex !== undefined) {
             return a.orderIndex - b.orderIndex
           }
           return 0
         })
-      return filtered.map((el) => ({
-        ...el,
-        children: buildTree(el.id) as CoralNode[],
-      }))
+
+      return filtered.map((el) => {
+        // Mark this element as visited to prevent circular references
+        visitedIds.add(el.id)
+        return {
+          ...el,
+          children: buildTree(el.id) as CoralNode[],
+        }
+      })
     }
 
-    return buildTree()
+    // Find the root element and build its tree
+    const rootElement = elements.find((el) => el.id === 'root')
+    if (!rootElement) {
+      // If no root element exists, return empty array
+      return []
+    }
+
+    // Mark root as visited and build its children
+    visitedIds.add('root')
+    return [
+      {
+        ...rootElement,
+        children: buildTree('root') as CoralNode[],
+      },
+    ]
   }, [elements])
 
   return {
     elements,
-    addElement: (elementType: CoralElementType, parentId?: string, name?: string) => {
-      addElementMutation.mutate({ elementType, parentId, name })
-      return addElementMutation.data?.[addElementMutation.data.length - 1]?.id
+    addElement: async (elementType: CoralElementType, parentId?: string, name?: string) => {
+      // Create the element synchronously to get its ID immediately
+      const newElement = createElement(elementType, parentId, name)
+
+      // Trigger the mutation to add it to the query cache, passing the element directly
+      // This avoids creating a duplicate element in the mutation
+      await addElementMutation.mutateAsync({
+        element: newElement,
+        elementType,
+        ...(parentId !== undefined && { parentId }),
+        ...(name !== undefined && { name }),
+        elementId: newElement.id,
+      })
+
+      // Return the new element ID after mutation completes
+      return newElement.id
     },
     removeElement: (elementId: string) => {
       removeElementMutation.mutate(elementId)
@@ -260,7 +349,12 @@ export const useElementTreeQuery = () => {
       updateElementMutation.mutate({ elementId, updates })
     },
     moveElement: (elementId: string, newParentId?: string, index?: number) => {
-      moveElementMutation.mutate({ elementId, newParentId, index })
+      // Only pass optional properties if they're defined to avoid exactOptionalPropertyTypes issues
+      moveElementMutation.mutate({
+        elementId,
+        ...(newParentId !== undefined && { newParentId }),
+        ...(index !== undefined && { index }),
+      })
     },
     toggleExpanded: (elementId: string) => {
       const element = elements.find((el) => el.id === elementId)

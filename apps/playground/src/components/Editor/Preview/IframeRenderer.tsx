@@ -24,7 +24,7 @@ function addElementIds(node: CoralNode, parentId?: string, index?: number): Cora
   const updatedNode: CoralNode = {
     ...node,
     // Preserve styles
-    styles: node.styles,
+    styles: node.styles || {},
     // Preserve element attributes and add data-element-id
     elementAttributes: {
       ...(node.elementAttributes || {}),
@@ -33,55 +33,55 @@ function addElementIds(node: CoralNode, parentId?: string, index?: number): Cora
     // Recursively process children
     children: node.children
       ? (node.children as CoralNode[]).map((child, idx) => addElementIds(child, nodeId, idx))
-      : undefined,
+      : null,
   }
 
   return updatedNode
 }
 
 export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>(
-  ({ spec, selectedElementId, viewportWidth, onLoad }, ref) => {
-  const [htmlContent, setHtmlContent] = useState<string>('')
-  const [isLoading, setIsLoading] = useState(true)
+  ({ spec, viewportWidth, onLoad }, ref) => {
+    const [htmlContent, setHtmlContent] = useState<string>('')
+    const [isLoading, setIsLoading] = useState(true)
 
-  // Generate HTML with element IDs when spec changes
-  useEffect(() => {
-    if (!spec || !spec.name) {
-      setHtmlContent('')
-      setIsLoading(false)
-      return
-    }
-
-    const generateHTML = async () => {
-      try {
-        setIsLoading(true)
-        // Add data-element-id attributes to all nodes
-        const specWithIds = addElementIds(spec)
-        const html = await coralToHTML(specWithIds)
-        setHtmlContent(html)
-      } catch (error) {
-        console.error('Failed to generate HTML:', error)
+    // Generate HTML with element IDs when spec changes
+    useEffect(() => {
+      if (!spec || !spec.name) {
         setHtmlContent('')
-      } finally {
         setIsLoading(false)
+        return
+      }
+
+      const generateHTML = async () => {
+        try {
+          setIsLoading(true)
+          // Add data-element-id attributes to all nodes
+          const specWithIds = addElementIds(spec)
+          const html = await coralToHTML(specWithIds)
+          setHtmlContent(html)
+        } catch (error) {
+          console.error('Failed to generate HTML:', error)
+          setHtmlContent('')
+        } finally {
+          setIsLoading(false)
+        }
+      }
+
+      generateHTML()
+    }, [spec])
+
+    // Note: Selection styling is now handled by InteractionLayer overlays
+    // No need to add styles to iframe content
+
+    // Handle iframe load event
+    const handleIframeLoad = () => {
+      if (onLoad) {
+        onLoad()
       }
     }
 
-    generateHTML()
-  }, [spec])
-
-  // Note: Selection styling is now handled by InteractionLayer overlays
-  // No need to add styles to iframe content
-
-  // Handle iframe load event
-  const handleIframeLoad = () => {
-    if (onLoad) {
-      onLoad()
-    }
-  }
-
-  // Create full HTML document with styles
-  const fullHTML = `
+    // Create full HTML document with styles
+    const fullHTML = `
     <!DOCTYPE html>
     <html>
       <head>
@@ -112,6 +112,10 @@ export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>
       </body>
     </html>
   `
+
+    if (isLoading) {
+      return null
+    }
 
     return (
       <iframe
