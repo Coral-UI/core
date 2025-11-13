@@ -82,6 +82,21 @@ export const zElementSchema = z
     z.literal('line'),
     z.literal('polyline'),
     z.literal('g'),
+    z.literal('defs'),
+    z.literal('use'),
+    z.literal('b'),
+    z.literal('i'),
+    z.literal('u'),
+    z.literal('s'),
+    z.literal('small'),
+    z.literal('mark'),
+    z.literal('abbr'),
+    z.literal('cite'),
+    z.literal('kbd'),
+    z.literal('samp'),
+    z.literal('var'),
+    z.literal('sub'),
+    z.literal('sup'),
   ])
   .default('div')
 

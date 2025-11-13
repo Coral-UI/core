@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 import { cva } from 'class-variance-authority'
 import React from 'react'
 
-const buttonVariants = cva(
+export const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap font-normal rounded-button border border-transparent transition-all disabled:pointer-events-none disabled:opacity-50 shrink-0 outline-none  [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 gap-2 text-sm text-text-primary",
   {
     variants: {

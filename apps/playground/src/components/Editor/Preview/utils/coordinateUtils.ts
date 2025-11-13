@@ -36,13 +36,10 @@ export function getIframeBoundingRect(iframe: HTMLIFrameElement): BoundingBox {
 export function transformIframeToParent(
   iframeRect: BoundingBox,
   elementRect: DOMRect,
-  iframeScrollX: number,
-  iframeScrollY: number,
   containerScrollX: number = 0,
   containerScrollY: number = 0,
   containerRect?: DOMRect,
   iframeElement?: HTMLIFrameElement,
-  containerElement?: HTMLElement,
 ): BoundingBox {
   if (!containerRect || !iframeElement) {
     // Fallback if container rect or iframe element not available

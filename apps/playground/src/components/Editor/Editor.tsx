@@ -16,11 +16,11 @@ import { toast } from 'sonner'
 
 import { CoralRootNode, CoralStyleType, transformHTMLToSpec } from '@reallygoodwork/coral-core'
 
-import type { FormValues as ComponentFormValues } from '../component-manager/formSchema'
-import type { StyleFormValues } from '../style-manager/formSchema'
+import type { FormValues as ComponentFormValues } from './component-manager/formSchema'
+import type { StyleFormValues } from './style-manager/formSchema'
 import { ScrollArea } from '../base/ScrollArea'
-import { ComponentForm } from '../component-manager/componentForm'
-import { StyleForm } from '../style-manager/styleForm'
+import { ComponentForm } from './component-manager/componentForm'
+import { StyleForm } from './style-manager/styleForm'
 
 export const Editor = () => {
   const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)

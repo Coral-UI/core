@@ -12,6 +12,8 @@ import { toast } from 'sonner'
 
 import { CoralRootNode } from '@reallygoodwork/coral-core'
 
+import { Sandbox } from './Sandbox'
+
 type ViewportPreset = {
   name: string
   width: number
@@ -132,8 +134,8 @@ export const EditorPreviewPane = ({ spec }: EditorPreviewPaneProps) => {
         </div>
       </TabsContent>
 
-      <TabsContent value="code" className="flex flex-col h-full w-full">
-        <div className="p-4 text-center text-gray-500">Generated code output will be available here</div>
+      <TabsContent value="code" className="flex flex-col h-full w-full flex-1 shrink-0">
+        <Sandbox specValue={spec} />
       </TabsContent>
     </Tabs>
   )

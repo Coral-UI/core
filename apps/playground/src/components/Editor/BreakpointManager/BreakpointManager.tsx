@@ -123,7 +123,7 @@ export const BreakpointManager = ({
                     variant="outline"
                     size="sm"
                     className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                       e.stopPropagation()
                       onRemoveBreakpoint(breakpoint.id)
                     }}

@@ -7,7 +7,7 @@ import type { CoralRootNode } from '@reallygoodwork/coral-core'
 import { CoralElementType } from '@reallygoodwork/coral-core'
 
 import { AddElementCombobox } from '../ElementTree/AddElementCombobox'
-import { getIframeBoundingRect, getIframeScrollOffsets, transformIframeToParent } from './utils/coordinateUtils'
+import { getIframeBoundingRect, transformIframeToParent } from './utils/coordinateUtils'
 
 interface HitZone {
   elementId: string
@@ -92,7 +92,6 @@ export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionL
       }
 
       const iframeRect = getIframeBoundingRect(iframe)
-      const scrollOffsets = getIframeScrollOffsets(iframe)
       const containerScrollX = containerRef.current?.scrollLeft || 0
       const containerScrollY = containerRef.current?.scrollTop || 0
       const containerRect = containerRef.current?.getBoundingClientRect()
@@ -120,13 +119,10 @@ export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionL
         const transformed = transformIframeToParent(
           iframeRect,
           modifiedRect,
-          scrollOffsets.x,
-          scrollOffsets.y,
           containerScrollX,
           containerScrollY,
           containerRect,
           iframe,
-          containerRef.current || undefined,
         )
 
         return {
