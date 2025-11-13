@@ -33,9 +33,17 @@ const isDimension = (value: unknown): value is { value: number; unit: string } =
   )
 }
 
-// Helper function to check if a value is a color object
+// Helper function to check if a value is a Coral color object
+// Coral colors have hex, rgb, and hsl properties
 const isColor = (value: unknown): value is CoralColorType => {
-  return typeof value === 'object' && value !== null && 'type' in value && (value as any).type === 'color'
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'hex' in value &&
+    'rgb' in value &&
+    'hsl' in value &&
+    typeof (value as any).hex === 'string'
+  )
 }
 
 // Helper function to convert a dimension to CSS string
@@ -46,10 +54,11 @@ const dimensionToCSS = (dimension: Dimension): string => {
   return `${dimension.value}${dimension.unit}`
 }
 
-// Helper function to convert a color object to CSS string
+// Helper function to convert a Coral color object to CSS string
 const colorToCSS = (color: CoralColorType): string => {
-  if (color.type === 'color' && color.value) {
-    return color.value
+  // Coral colors have a hex property that we can use directly
+  if ('hex' in color && typeof color.hex === 'string') {
+    return color.hex
   }
   return 'transparent'
 }

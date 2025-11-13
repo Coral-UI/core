@@ -265,7 +265,7 @@ const TreeNode = ({
   return (
     <BaseAccordion.Root multiple={true} value={value} onValueChange={(s) => setValue(s)}>
       <BaseAccordion.Item value={item.id}>
-        <div className="relative group">
+        <div className="relative group h-10">
           <AccordionTrigger
             className={cn(
               treeVariants(),
@@ -428,7 +428,7 @@ const AccordionTrigger = React.forwardRef<
   <BaseAccordion.Header className="group">
     <BaseAccordion.Trigger
       ref={ref}
-      className={cn('flex flex-1 w-full items-center py-2 transition-all', className)}
+      className={cn('flex flex-1 w-full items-center py-2 transition-all h-10', className)}
       {...props}
     >
       <IconChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 text-text-secondary mr-1 group-data-open:rotate-90" />

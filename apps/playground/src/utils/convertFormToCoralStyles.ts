@@ -49,8 +49,6 @@ const FORMAT_PROPERTIES = ['backgroundColorFormat', 'colorFormat'] as const
 function convertColorStringToCoralColor(colorString: string): CoralColorType {
   const color = colord(colorString)
 
-  console.log('color', color)
-
   if (!color.isValid()) {
     // Fallback to black if invalid
     return {
