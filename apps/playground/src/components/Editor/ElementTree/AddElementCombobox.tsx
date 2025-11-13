@@ -12,17 +12,27 @@ import { CoralElementType } from '@reallygoodwork/coral-core'
 interface AddElementComboboxProps {
   validChildTypes: CoralElementType[]
   onSelect: (elementType: CoralElementType) => void
+  onOpenChange?: (open: boolean) => void
 }
 
-export function AddElementCombobox({ validChildTypes, onSelect }: AddElementComboboxProps) {
+export function AddElementCombobox({ validChildTypes, onSelect, onOpenChange }: AddElementComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [search, setSearch] = React.useState('')
+
+  // Notify parent when open state changes
+  const handleOpenChange = React.useCallback(
+    (newOpen: boolean) => {
+      setOpen(newOpen)
+      onOpenChange?.(newOpen)
+    },
+    [onOpenChange],
+  )
 
   const groups = getElementTypeGroups((elementType) => validChildTypes.includes(elementType.type))
 
   const handleSelect = (elementType: CoralElementType) => {
     onSelect(elementType)
-    setOpen(false)
+    handleOpenChange(false)
     setSearch('')
   }
 
@@ -44,13 +54,25 @@ export function AddElementCombobox({ validChildTypes, onSelect }: AddElementComb
   }, [groups, search])
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="icon-sm" title="Add Child Element">
+        <Button variant="elementPreview" size="icon-sm" title="Add Child Element">
           <IconNewSection />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[280px] p-0" align="end">
+      <PopoverContent
+        className="w-[280px] p-0 z-20000"
+        align="end"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+        onInteractOutside={(e) => {
+          // Prevent closing when clicking on hit zones or interaction layer
+          const target = e.target as HTMLElement
+          if (target.closest('[data-debug-zone]') || target.closest('[data-element-id]')) {
+            e.preventDefault()
+          }
+        }}
+      >
         <Command shouldFilter={false}>
           <CommandInput placeholder="Search elements..." value={search} onValueChange={setSearch} />
           <CommandList>

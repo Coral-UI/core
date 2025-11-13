@@ -1,22 +1,4 @@
 /**
- * Elements that support text content property
- */
-export const TEXT_CAPABLE_ELEMENTS = [
-  'text',
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'p',
-  'span',
-  'button',
-  'a',
-  'label',
-] as const
-
-/**
  * Maps dimension properties to their corresponding unit field names
  * Used for clearing both the value and unit when a dimension field is cleared
  */

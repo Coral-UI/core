@@ -128,6 +128,9 @@ ipcMain.handle('dialog:openFile', async () => {
 
   try {
     const filePath = result.filePaths[0]
+    if (!filePath) {
+      return { success: false, error: 'No file path selected' }
+    }
     const content = await fs.readFile(filePath, 'utf-8')
     return { success: true, data: { path: filePath, content } }
   } catch (error) {

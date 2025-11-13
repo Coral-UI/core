@@ -1,12 +1,13 @@
 import path from 'path'
+import type { PluginOption } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import electron from 'vite-plugin-electron/simple'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
-const isElectron = process.env.ELECTRON === 'true'
+const isElectron = process.env['ELECTRON'] === 'true'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -35,8 +36,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
     // Conditionally add Electron plugin
+    // Type assertion needed due to version mismatch between vite-plugin-electron's Vite dependency and project's Vite version
     ...(isElectron
-      ? [
+      ? ([
           electron({
             main: {
               // Shortcut of `build.lib.entry`
@@ -51,16 +53,16 @@ export default defineConfig({
             // See 👉 https://github.com/electron-vite/vite-plugin-electron-renderer
             renderer: {},
           }),
-        ]
+        ] as unknown as PluginOption[])
       : []),
   ],
   // Electron doesn't support native ES modules
-  build: isElectron
-    ? {
-        outDir: 'dist',
-        rollupOptions: {
-          external: ['electron'],
-        },
-      }
-    : undefined,
+  ...(isElectron && {
+    build: {
+      outDir: 'dist',
+      rollupOptions: {
+        external: ['electron'],
+      },
+    },
+  }),
 })

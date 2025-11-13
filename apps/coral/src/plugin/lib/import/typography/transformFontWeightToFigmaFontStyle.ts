@@ -3,7 +3,7 @@ export const transformFontWeightToFigmaFontStyle = (fontWeight: number) => {
     case 100:
       return 'Thin'
     case 200:
-      return 'ExtraLight'
+      return 'Extra Light'
     case 300:
       return 'Light'
     case 400:
@@ -11,11 +11,11 @@ export const transformFontWeightToFigmaFontStyle = (fontWeight: number) => {
     case 500:
       return 'Medium'
     case 600:
-      return 'SemiBold'
+      return 'Semi Bold'
     case 700:
       return 'Bold'
     case 800:
-      return 'ExtraBold'
+      return 'Extra Bold'
     case 900:
       return 'Black'
     default:

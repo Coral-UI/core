@@ -1,0 +1,13 @@
+{
+  "exclude": ["dist", "node_modules", "./eslint.config.mjs"],
+  "include": ["tsup.config.ts", "src/**/*.ts"],
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "CoralToVue",
+  "extends": "@reallygoodwork/coral-typescript-config/node-library.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

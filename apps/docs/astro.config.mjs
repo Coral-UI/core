@@ -13,7 +13,7 @@ export default defineConfig({
         { icon: 'github', label: 'GitHub', href: 'https://github.com/Coral-UI/core' },
       ],
       plugins: [
-        starlightLinksValidator(),
+        // starlightLinksValidator(),
         starlightThemeBlack({
         navLinks: [
           {

@@ -1,4 +1,4 @@
-import { CoralNode, CoralStyleType } from '@reallygoodwork/coral-core'
+import { CoralNode, CoralStyleType, ResponsiveStyle } from '@reallygoodwork/coral-core'
 
 import { VariantWithBreakpoint } from '../../types'
 import { getStyleDifferences } from './getStyleDifferences'
@@ -18,9 +18,40 @@ export const applyResponsiveStyles = (baseNode: CoralNode, variantsWithBreakpoin
     if (a.breakpoint === 'base') return -1
     if (b.breakpoint === 'base') return 1
 
-    // Extract numeric value for sorting (e.g., "640px" -> 640)
-    const aValue = parseInt(a.breakpoint.split(':')[1] || '0')
-    const bValue = parseInt(b.breakpoint.split(':')[1] || '0')
+    // Parse breakpoints to extract numeric values for sorting
+    const aBreakpoint = parseBreakpoint(a.breakpoint)
+    const bBreakpoint = parseBreakpoint(b.breakpoint)
+
+    if (!aBreakpoint || !bBreakpoint) return 0
+
+    // Extract numeric value for sorting
+    const extractNumericValue = (bp: ResponsiveStyle['breakpoint']): number => {
+      if ('value' in bp) {
+        const match = bp.value.match(/(\d+)/)
+        return match ? parseInt(match[1]!, 10) : 0
+      }
+      if ('min' in bp && bp.min) {
+        const match = bp.min.value.match(/(\d+)/)
+        return match ? parseInt(match[1]!, 10) : 0
+      }
+      if ('max' in bp && bp.max) {
+        const match = bp.max.value.match(/(\d+)/)
+        return match ? parseInt(match[1]!, 10) : 0
+      }
+      return 0
+    }
+
+    const aValue = extractNumericValue(aBreakpoint)
+    const bValue = extractNumericValue(bBreakpoint)
+
+    // For max-width, reverse the order (larger values come first)
+    if ('type' in aBreakpoint && aBreakpoint.type === 'max-width') {
+      return bValue - aValue
+    }
+    if ('type' in bBreakpoint && bBreakpoint.type === 'max-width') {
+      return aValue - bValue
+    }
+
     return aValue - bValue
   })
 

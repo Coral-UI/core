@@ -1,0 +1,59 @@
+{
+  "name": "@reallygoodwork/coral-to-vue",
+  "version": "0.0.0-development",
+  "description": "Convert Coral specifications to Vue 3 component code",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:verbose": "jest --verbose",
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "lint": "eslint src --cache --cache-location node_modules/.cache/.eslintcache",
+    "lint:fix": "eslint src --fix --cache --cache-location node_modules/.cache/.eslintcache",
+    "typecheck": "tsc --noEmit",
+    "semantic-release": "semantic-release"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  },
+  "author": "Really Good Work Inc. <hey@reallygood.work> (https://reallygood.work)",
+  "license": "MIT",
+  "peerDependencies": {
+    "prettier": "^3.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.11.1",
+    "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
+    "@reallygoodwork/coral-typescript-config": "workspace:*",
+    "@types/jest": "^29.5.12",
+    "@typescript-eslint/parser": "^8.35.0",
+    "eslint": "^9.9.1",
+    "eslint-import-resolver-typescript": "^3.6.3",
+    "eslint-plugin-import-x": "^4.3.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "jest": "^29.7.0",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.6.0",
+    "ts-jest": "^29.2.5",
+    "tsup": "^8.2.4",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.35.0"
+  },
+  "dependencies": {
+    "@reallygoodwork/coral-core": "workspace:*"
+  }
+}

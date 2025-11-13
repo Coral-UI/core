@@ -1,8 +1,9 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/base/Tabs'
 import { HTMLRenderer } from '@/components/Editor/Preview/HTMLRenderer'
 import { useTheme } from '@/components/ThemeProvider'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+// import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { Editor } from '@monaco-editor/react'
 import { IconBracketsAngle, IconEyeSearch, IconSchema } from '@tabler/icons-react'
 import { CopyIcon, MonitorIcon, SmartphoneIcon, TabletIcon } from 'lucide-react'
@@ -10,6 +11,8 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { CoralRootNode } from '@reallygoodwork/coral-core'
+
+import { Sandbox } from './Sandbox'
 
 type ViewportPreset = {
   name: string
@@ -23,15 +26,12 @@ const VIEWPORT_PRESETS: ViewportPreset[] = [
   { name: 'Desktop', width: 1440, icon: <MonitorIcon className="size-3" /> },
 ]
 
-export const EditorPreviewPane = ({
-  spec,
-  onElementClick,
-  selectedElementId,
-}: {
+interface EditorPreviewPaneProps {
   spec: CoralRootNode
-  onElementClick?: (elementId: string) => void
-  selectedElementId?: string | null
-}) => {
+}
+
+export const EditorPreviewPane = ({ spec }: EditorPreviewPaneProps) => {
+  // const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const { theme } = useTheme()
   const [specValue, setSpecValue] = useState<string>('')
   const [viewportWidth, setViewportWidth] = useState<number>(VIEWPORT_PRESETS[2]?.width ?? 1440)
@@ -66,34 +66,31 @@ export const EditorPreviewPane = ({
       </div>
 
       <TabsContent value="preview" className="flex flex-col h-full w-full relative">
-        <div className="p-2 flex justify-end gap-2 absolute bottom-6 right-6 bg-background rounded-xl border border-border">
-          <ToggleGroup
-            type="single"
-            variant="outline"
-            size="sm"
-            value={viewportWidth.toString()}
-            onValueChange={(value) => setViewportWidth(parseInt(value))}
-          >
-            {VIEWPORT_PRESETS.map((preset) => (
-              <ToggleGroupItem
-                size="lg"
-                key={preset.name}
-                value={preset.width.toString()}
-                aria-label={`${preset.name} (${preset.width}px)`}
-              >
-                {preset.icon}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-        </div>
-        <div className="h-full w-full p-2">
+        <div className="h-full w-full p-2 bg-bg-primary">
           {spec && spec.name ? (
-            <HTMLRenderer
-              spec={spec}
-              onElementClick={onElementClick}
-              selectedElementId={selectedElementId}
-              viewportWidth={viewportWidth}
-            />
+            <>
+              <HTMLRenderer spec={spec} viewportWidth={viewportWidth} />
+              <div className="px-2 py-1.5 flex justify-end gap-2 absolute bottom-6 right-6 bg-bg-surface rounded-input border border-border">
+                <ToggleGroup
+                  type="single"
+                  variant="outline"
+                  size="sm"
+                  value={viewportWidth.toString()}
+                  onValueChange={(value) => setViewportWidth(parseInt(value))}
+                >
+                  {VIEWPORT_PRESETS.map((preset) => (
+                    <ToggleGroupItem
+                      size="lg"
+                      key={preset.name}
+                      value={preset.width.toString()}
+                      aria-label={`${preset.name} (${preset.width}px)`}
+                    >
+                      {preset.icon}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              </div>
+            </>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">
               <div className="text-center">
@@ -131,14 +128,14 @@ export const EditorPreviewPane = ({
               }}
             />
           </div>
-          <Button variant="default" size="icon-lg" onClick={handleCopySpec} className="absolute bottom-4 right-4">
+          <Button variant="secondary" size="icon-lg" onClick={handleCopySpec} className="absolute bottom-4 right-4">
             <CopyIcon />
           </Button>
         </div>
       </TabsContent>
 
-      <TabsContent value="code" className="flex flex-col h-full w-full">
-        <div className="p-4 text-center text-gray-500">Generated code output will be available here</div>
+      <TabsContent value="code" className="flex flex-col h-full w-full flex-1 shrink-0">
+        <Sandbox specValue={spec} />
       </TabsContent>
     </Tabs>
   )

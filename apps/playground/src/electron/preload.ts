@@ -1,4 +1,3 @@
-import os from 'os'
 import { contextBridge, ipcRenderer } from 'electron'
 
 // Define the API that will be exposed to the renderer process
@@ -28,7 +27,7 @@ export interface ElectronAPI {
 }
 
 contextBridge.exposeInMainWorld('platform', {
-  type: os.platform(), // e.g., 'darwin', 'win32', 'linux'
+  type: process.platform, // e.g., 'darwin', 'win32', 'linux'
 })
 
 // Expose protected methods that allow the renderer process to use

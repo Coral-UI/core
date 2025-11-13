@@ -1,24 +1,182 @@
-import { ElementProperties } from '@/components/Editor/Configuration/ElementProperties'
 import { EditorSidebar } from '@/components/Editor/ElementTree/EditorSidebar'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
 import { EditorPreviewPane } from '@/components/Editor/Preview/EditorPreviewPane'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ElementTreeNode, useElementTree } from '@/hooks/useElementTree'
+import { ElementTreeNode } from '@/hooks/useElementTree'
+import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
+import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
+import { convertCoralStylesToFormValues, convertFormValuesToCoralStyles } from '@/utils/convertFormToCoralStyles'
+import { getDefaultDisplayValue } from '@/utils/elementDisplay'
 import { IconFileImport } from '@tabler/icons-react'
 import { Redo, Undo } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { CoralRootNode, transformHTMLToSpec } from '@reallygoodwork/coral-core'
+import { CoralRootNode, CoralStyleType, transformHTMLToSpec } from '@reallygoodwork/coral-core'
+
+import type { FormValues as ComponentFormValues } from './component-manager/formSchema'
+import type { StyleFormValues } from './style-manager/formSchema'
+import { ScrollArea } from '../base/ScrollArea'
+import { ComponentForm } from './component-manager/componentForm'
+import { StyleForm } from './style-manager/styleForm'
 
 export const Editor = () => {
-  const [selectedElementId, setSelectedElementId] = useState<string | null>(null)
+  const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
+  const setSelectedElementId = useElementSelectionStore((state) => state.setSelectedElementId)
   const [importDialogOpen, setImportDialogOpen] = useState(false)
-  const elementTreeHook = useElementTree()
-  const { elements, updateElement, getElementTree, selectElement, undo, redo, canUndo, canRedo } = elementTreeHook
+  const elementTreeHook = useElementTreeQuery()
+  const { elements, getElementTree, replaceAllElements, updateElement, removeElement } = elementTreeHook
 
-  const selectedElement = selectedElementId ? elements.find((el) => el.id === selectedElementId) : null
+  // Get the selected element
+  const selectedElement = useMemo(() => {
+    return selectedElementId ? elements.find((el) => el.id === selectedElementId) : null
+  }, [elements, selectedElementId])
+
+  // Convert element styles to form values for initial values
+  const formInitialValues = useMemo(() => {
+    if (!selectedElement) {
+      return undefined
+    }
+
+    const baseFormValues = selectedElement.styles
+      ? (convertCoralStylesToFormValues(selectedElement.styles as Record<string, unknown>) as Partial<StyleFormValues>)
+      : {}
+
+    // Set default display value for inline elements if not already set in styles
+    // This only affects the UI - showing 'inline' for elements like span, a, strong, etc.
+    // The value won't be persisted to the element's styles until the user explicitly changes it
+    // because handleStyleChange only persists fields that are in changedFields
+    if (!baseFormValues.display && selectedElement.elementType) {
+      const defaultDisplay = getDefaultDisplayValue(selectedElement.elementType)
+      if (defaultDisplay === 'inline') {
+        baseFormValues.display = 'inline'
+      }
+    }
+
+    return baseFormValues
+  }, [selectedElement])
+
+  // Convert element properties to component form initial values
+  const componentFormInitialValues = useMemo(() => {
+    if (!selectedElement) {
+      return undefined
+    }
+    return {
+      name: selectedElement.name || '',
+      description: selectedElement.description || undefined,
+      type: selectedElement.elementType || 'div',
+      textContent: selectedElement.textContent || undefined,
+    } as Partial<ComponentFormValues>
+  }, [selectedElement])
+
+  // Create a stable key for the form based only on element ID
+  // This ensures the form remounts when switching elements
+  const formKey = selectedElementId
+
+  // Handle style form changes - only merge the changed style
+  const handleStyleChange = useCallback(
+    (formValues: StyleFormValues, changedFields?: Record<string, unknown>) => {
+      if (!selectedElementId || !selectedElement) return
+
+      // Only convert the fields that were actually changed
+      // Include related unit fields for dimension properties
+      const fieldsToConvert: Record<string, unknown> = {}
+
+      if (changedFields && Object.keys(changedFields).length > 0) {
+        // Add changed fields
+        Object.keys(changedFields).forEach((key) => {
+          fieldsToConvert[key] = changedFields[key]
+
+          // If this is a dimension value field, also include its unit field
+          // Check if this key has a corresponding unit field
+          const unitKey = `${key}Unit`
+          if (unitKey in formValues) {
+            fieldsToConvert[unitKey] = formValues[unitKey as keyof StyleFormValues]
+          }
+
+          // If this is a unit field, also include its value field
+          // Check if this is a unit field (ends with Unit)
+          if (key.endsWith('Unit')) {
+            const valueKey = key.replace('Unit', '')
+            if (valueKey in formValues) {
+              fieldsToConvert[valueKey] = formValues[valueKey as keyof StyleFormValues]
+            }
+          }
+        })
+      } else {
+        // Fallback: if no changedFields provided, use all form values
+        // But this shouldn't happen in normal operation
+        Object.assign(fieldsToConvert, formValues)
+      }
+
+      // Convert only the changed fields to Coral styles
+      const coralStyles = convertFormValuesToCoralStyles(
+        fieldsToConvert as Record<string, unknown>,
+        // styleFormDefaultValues,
+        // selectedElement.styles as Record<string, unknown> | undefined,
+      )
+
+      // Only merge the styles that were actually changed
+      const mergedStyles = {
+        ...(selectedElement.styles || {}),
+        ...coralStyles,
+      }
+
+      // Update the element with merged styles
+      updateElement(selectedElementId, { styles: mergedStyles as CoralStyleType })
+    },
+    [selectedElementId, selectedElement, updateElement],
+  )
+
+  // Handle component form changes
+  const handleComponentChange = useCallback(
+    (formValues: ComponentFormValues, changedFields?: Record<string, unknown>) => {
+      if (!selectedElementId || !selectedElement) return
+
+      const updates: Record<string, unknown> = {}
+
+      // Update name if changed
+      if (changedFields && 'name' in changedFields) {
+        updates['name'] = formValues['name']
+      }
+
+      // Update description - remove if empty/undefined, otherwise set it
+      if (changedFields && 'description' in changedFields) {
+        const descriptionValue = formValues['description']
+        if (descriptionValue && descriptionValue.trim() !== '') {
+          updates['description'] = descriptionValue.trim()
+        } else {
+          // Remove description by setting it to undefined
+          // This will be filtered out in convertToCoralSpec
+          updates['description'] = undefined
+        }
+      }
+
+      // Update elementType if changed
+      if (changedFields && 'type' in changedFields) {
+        updates['elementType'] = formValues['type']
+      }
+
+      // Update textContent if changed
+      if (changedFields && 'textContent' in changedFields) {
+        const textContentValue = formValues['textContent']
+        if (textContentValue && textContentValue.trim() !== '') {
+          updates['textContent'] = textContentValue.trim()
+        } else {
+          // Remove textContent by setting it to undefined
+          updates['textContent'] = undefined
+        }
+      }
+
+      // Only update if there are actual changes
+      if (Object.keys(updates).length > 0) {
+        updateElement(selectedElementId, updates as Partial<ElementTreeNode>)
+      }
+    },
+    [selectedElementId, selectedElement, updateElement],
+  )
 
   const convertToCoralSpec = (): CoralRootNode => {
     // Get fresh element tree on each render
@@ -70,35 +228,39 @@ export const Editor = () => {
   // Force re-render when elements change
   const spec = convertToCoralSpec()
 
-  const handleElementSelect = (elementId: string | null) => {
-    selectElement(elementId)
-    setSelectedElementId(elementId)
-  }
-
   const handleImportCode = (code: string) => {
     try {
       const spec = transformHTMLToSpec(code)
 
       // Convert the coral spec to ElementTreeNode format
-      const convertCoralToElements = (node: any, parentId?: string): any[] => {
+      const convertCoralToElements = (node: CoralRootNode, parentId?: string): ElementTreeNode[] => {
         const id = `element_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
-        const element: any = {
+        const element: ElementTreeNode = {
           id,
           parentId,
           name: node.name || node.elementType,
           elementType: node.elementType,
           type: node.type || 'NODE',
-          textContent: node.textContent,
-          elementAttributes: node.elementAttributes,
-          styles: node.styles,
-          responsiveStyles: node.responsiveStyles,
           isExpanded: true,
+        }
+
+        if (node.textContent) {
+          element.textContent = node.textContent
+        }
+        if (node.elementAttributes) {
+          element.elementAttributes = node.elementAttributes
+        }
+        if (node.styles) {
+          element.styles = node.styles
+        }
+        if (node.responsiveStyles) {
+          element.responsiveStyles = node.responsiveStyles
         }
 
         let allElements = [element]
 
         if (node.children && node.children.length > 0) {
-          node.children.forEach((child: any) => {
+          node.children.forEach((child: CoralRootNode) => {
             const childElements = convertCoralToElements(child, id)
             allElements = [...allElements, ...childElements]
           })
@@ -110,8 +272,7 @@ export const Editor = () => {
       const newElements = convertCoralToElements(spec)
 
       // Replace all elements with the imported ones
-      elementTreeHook.clearHistory()
-      elementTreeHook.elements.splice(0, elementTreeHook.elements.length, ...newElements)
+      replaceAllElements(newElements)
 
       toast.success('Component imported successfully')
     } catch (error) {
@@ -119,31 +280,71 @@ export const Editor = () => {
     }
   }
 
-  // Keyboard shortcuts for undo/redo
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Check if user is typing in an input/textarea
-      const target = e.target as HTMLElement
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
-        return
-      }
+  // Handle delete element
+  const handleDelete = useCallback(() => {
+    if (!selectedElementId) return
 
-      if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key === 'z') {
-        e.preventDefault()
-        if (canUndo) undo()
-      } else if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'z') {
-        e.preventDefault()
-        if (canRedo) redo()
-      }
+    // Can't delete root element
+    if (selectedElementId === 'root') {
+      toast.error('Cannot delete root element')
+      return
     }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [undo, redo, canUndo, canRedo])
+    removeElement(selectedElementId)
+    setSelectedElementId(null)
+    toast.success('Element deleted')
+  }, [selectedElementId, removeElement, setSelectedElementId])
+
+  // TODO: Implement undo/redo with TanStack Query
+  const handleUndo = useCallback(() => {
+    // Placeholder for undo functionality
+    toast.info('Undo functionality coming soon')
+  }, [])
+
+  const handleRedo = useCallback(() => {
+    // Placeholder for redo functionality
+    toast.info('Redo functionality coming soon')
+  }, [])
+
+  // Set up keyboard shortcuts
+  const shortcuts = useMemo(
+    () => [
+      {
+        key: 'Delete',
+        handler: handleDelete,
+      },
+      {
+        key: 'Backspace',
+        handler: handleDelete,
+      },
+      {
+        key: 'z',
+        ctrlKey: true,
+        metaKey: true,
+        handler: handleUndo,
+      },
+      {
+        key: 'y',
+        ctrlKey: true,
+        metaKey: true,
+        handler: handleRedo,
+      },
+      {
+        key: 'z',
+        ctrlKey: true,
+        metaKey: true,
+        shiftKey: true,
+        handler: handleRedo,
+      },
+    ],
+    [handleDelete, handleUndo, handleRedo],
+  )
+
+  useKeyboardShortcuts(shortcuts)
 
   return (
     <div className="flex flex-col w-full h-[calc(100dvh-2.5rem)] mt-10 bg-background">
-      <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-background shrink-0 h-10">
+      <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-bg-surface shrink-0 h-10">
         <div className="flex items-center gap-2 place-self-center">
           <p className="text-xs font-medium">Name</p>
           <Badge variant="destructive">Unsaved</Badge>
@@ -158,23 +359,44 @@ export const Editor = () => {
           >
             <IconFileImport className="size-3.5" />
           </Button>
-          <Button variant="secondary" size="icon-sm" onClick={undo} disabled={!canUndo} title="Undo (Ctrl+Z)">
+          {/* TODO: Implement undo/redo with TanStack Query */}
+          <Button variant="secondary" size="icon-sm" onClick={handleUndo} title="Undo (⌘Z / Ctrl+Z)">
             <Undo className="size-3.5" />
           </Button>
-          <Button variant="ghost" size="icon-sm" onClick={redo} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)">
+          <Button variant="ghost" size="icon-sm" onClick={handleRedo} title="Redo (⌘⇧Z / Ctrl+Y)">
             <Redo className="size-3.5" />
           </Button>
         </div>
       </div>
       <div className="flex flex-1 h-[calc(100dvh-2.5rem)] max-h-[calc(100dvh-2.5rem)] overflow-hidden">
-        <aside className="w-64 bg-background flex flex-col h-full overflow-hidden border-r border-border">
-          <EditorSidebar onElementSelect={handleElementSelect} elementTreeHook={elementTreeHook} />
+        <aside className="w-64 bg-bg-surface flex flex-col h-full overflow-hidden border-r border-border">
+          <EditorSidebar />
         </aside>
         <main className="bg-background flex-1 overflow-hidden">
-          <EditorPreviewPane spec={spec} onElementClick={handleElementSelect} selectedElementId={selectedElementId} />
+          <EditorPreviewPane spec={spec} />
         </main>
-        <aside className="w-96 bg-background h-full overflow-hidden border-l border-border">
-          <ElementProperties element={selectedElement || null} onUpdateElement={updateElement} />
+        <aside className="w-72 bg-bg-surface h-full overflow-hidden border-l border-border">
+          {selectedElement ? (
+            <ScrollArea className="bg-bg-surface">
+              <ComponentForm
+                key={`component-form-${formKey || 'none'}`}
+                onChange={handleComponentChange}
+                {...(componentFormInitialValues ? { initialValues: componentFormInitialValues } : {})}
+              />
+              <StyleForm
+                key={`style-form-${formKey || 'none'}`}
+                onChange={handleStyleChange}
+                {...(formInitialValues ? { initialValues: formInitialValues } : {})}
+              />
+            </ScrollArea>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+              <div className="text-muted-foreground">
+                <p className="text-sm font-medium mb-2">No element selected</p>
+                <p className="text-xs">Select an element from the tree to edit its styles</p>
+              </div>
+            </div>
+          )}
         </aside>
       </div>
       <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} />
