@@ -126,6 +126,7 @@
     "@reallygoodwork/coral-eslint-config": "workspace:*",
     "@reallygoodwork/coral-typescript-config": "workspace:*",
     "@tailwindcss/vite": "^4.1.13",
+    "@tanstack/devtools-vite": "^0.3.11",
     "@tanstack/react-query-devtools": "^5.90.2",
     "@tanstack/router-plugin": "^1.132.33",
     "@types/react": "^18.3.12",
