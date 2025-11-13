@@ -1,6 +1,17 @@
 import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 import { hasWidthConstraints } from './extractDimensionValues'
+import { isDimension } from '../../export/assert/isDimension'
+
+/**
+ * Check if a margin value is 'auto'
+ */
+function isAutoMargin(value: unknown): boolean {
+  if (value === 'auto') return true
+  // Dimension objects don't have 'auto' as a unit, so if it's a Dimension object, it's not auto
+  if (isDimension(value)) return false
+  return false
+}
 
 /**
  * Check if a node has centering margin (margin: auto or mx-auto pattern)
@@ -16,7 +27,12 @@ export function hasCenteringMargin(node: CoralNode | CoralRootNode): boolean {
   const marginRight = node.styles['marginRight']
 
   // Check for auto margins (horizontal centering)
-  return marginInlineStart === 'auto' || marginInlineEnd === 'auto' || marginLeft === 'auto' || marginRight === 'auto'
+  return (
+    isAutoMargin(marginInlineStart) ||
+    isAutoMargin(marginInlineEnd) ||
+    isAutoMargin(marginLeft) ||
+    isAutoMargin(marginRight)
+  )
 }
 
 /**
@@ -64,7 +80,13 @@ export function hasMargin(node: CoralNode | CoralRootNode): boolean {
 
   return marginProps.some((prop) => {
     const value = node.styles![prop]
-    // Ignore "auto" margins (used for centering) and undefined
-    return value !== undefined && value !== 'auto'
+    // Ignore "auto" margins (used for centering), undefined, and Dimension objects with 0 value
+    if (value === undefined || isAutoMargin(value)) return false
+    if (isDimension(value)) {
+      // If it's a Dimension object, check if it has a non-zero value
+      if (typeof value === 'number') return value !== 0
+      return value.value !== 0
+    }
+    return true
   })
 }

@@ -161,4 +161,45 @@ describe('transformHTMLToSpec', () => {
     })
     expect(result.textContent).toBe('Content')
   })
+
+  it('should convert dimension properties from CSS strings to Dimension objects', () => {
+    const html =
+      '<div style="padding: 16px; margin: 20px; width: 100%; height: 200px; border-radius: 8px; column-gap: 12px;"></div>'
+    const result = transformHTMLToSpec(html)
+
+    expect(result.elementType).toBe('div')
+    expect(result.styles).toBeDefined()
+
+    // Check that dimension properties are converted to Dimension objects
+    if (result.styles) {
+      expect(result.styles.padding).toEqual({ value: 16, unit: 'px' })
+      expect(result.styles.margin).toEqual({ value: 20, unit: 'px' })
+      expect(result.styles.width).toEqual({ value: 100, unit: '%' })
+      expect(result.styles.height).toEqual({ value: 200, unit: 'px' })
+      expect(result.styles.borderRadius).toEqual({ value: 8, unit: 'px' })
+      expect(result.styles.columnGap).toEqual({ value: 12, unit: 'px' })
+    }
+  })
+
+  it('should convert Tailwind dimension classes to Dimension objects', () => {
+    const html = '<div class="p-4 m-2 w-full h-64 rounded-lg gap-4"></div>'
+    const result = transformHTMLToSpec(html)
+
+    expect(result.elementType).toBe('div')
+    expect(result.styles).toBeDefined()
+
+    // Check that Tailwind classes are converted to Dimension objects
+    // Note: The actual values depend on Tailwind mappings, but they should be Dimension objects
+    if (result.styles) {
+      // Verify that dimension properties are objects with value and unit
+      if (result.styles.padding) {
+        expect(typeof result.styles.padding).not.toBe('string')
+        expect(typeof result.styles.padding).not.toBe('number')
+        if (typeof result.styles.padding === 'object' && result.styles.padding !== null) {
+          expect('value' in result.styles.padding).toBe(true)
+          expect('unit' in result.styles.padding).toBe(true)
+        }
+      }
+    }
+  })
 })

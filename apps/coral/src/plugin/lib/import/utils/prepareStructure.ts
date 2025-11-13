@@ -3,6 +3,7 @@ import { CoralNode, CoralRootNode, ResponsiveStyle } from '@reallygoodwork/coral
 import { loadFont } from '../typography/loadFont'
 import { transformFontWeightToFigmaFontStyle } from '../typography/transformFontWeightToFigmaFontStyle'
 import { needsParentCentering, needsWrapperFrame } from './detectLayoutRequirements'
+import { extractStyleValue } from './extractStyleValue'
 import { generateVariantName } from './generateVariantName'
 
 export const TEXT_STYLE_PROPERTIES = [
@@ -119,9 +120,10 @@ export function collectFontsAndStyles(spec: CoralRootNode): PrepareStructureResu
     const flexDirection = node.styles?.['flexDirection'] as string | undefined
     const justifyContent = node.styles?.['justifyContent'] as string | undefined
     const alignItems = node.styles?.['alignItems'] as string | undefined
-    const gap = node.styles?.['gap'] as number | undefined
-    const columnGap = node.styles?.['columnGap'] as number | undefined
-    const rowGap = node.styles?.['rowGap'] as number | undefined
+    // Extract gap values as numbers (handles Dimension objects)
+    const gap = extractStyleValue(node.styles?.['gap'])
+    const columnGap = extractStyleValue(node.styles?.['columnGap'])
+    const rowGap = extractStyleValue(node.styles?.['rowGap'])
 
     const isFlex = display === 'flex' || display === 'inline-flex'
     const isGrid = display === 'grid'

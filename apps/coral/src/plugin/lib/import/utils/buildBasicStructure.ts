@@ -978,22 +978,19 @@ async function createSimpleTextNode(
   }
 
   // Apply typography styles
-  const fontSize = node.styles?.['fontSize']
-  if (fontSize) {
-    const fontSizeValue = typeof fontSize === 'object' && 'value' in fontSize ? fontSize.value : fontSize
-    textNode.fontSize = Number(fontSizeValue)
+  // Use extractStyleValue to handle Dimension objects properly
+  const fontSize = extractStyleValue(node.styles?.['fontSize'])
+  if (fontSize !== undefined) {
+    textNode.fontSize = fontSize
   }
 
-  const lineHeight = node.styles?.['lineHeight']
-  if (lineHeight) {
-    const lineHeightValue = typeof lineHeight === 'object' && 'value' in lineHeight ? lineHeight.value : lineHeight
-    if (typeof lineHeightValue === 'number') {
-      textNode.lineHeight = { value: lineHeightValue, unit: 'PIXELS' }
-    }
+  const lineHeight = extractStyleValue(node.styles?.['lineHeight'])
+  if (lineHeight !== undefined) {
+    textNode.lineHeight = { value: lineHeight, unit: 'PIXELS' }
   }
 
-  const letterSpacing = node.styles?.['letterSpacing']
-  if (letterSpacing && typeof letterSpacing === 'number') {
+  const letterSpacing = extractStyleValue(node.styles?.['letterSpacing'])
+  if (letterSpacing !== undefined) {
     textNode.letterSpacing = { value: letterSpacing, unit: 'PIXELS' }
   }
 

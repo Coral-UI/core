@@ -1,6 +1,7 @@
-import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
+import { CoralNode, CoralRootNode, Dimension } from '@reallygoodwork/coral-core'
 
 import { extractStyleValue } from './extractStyleValue'
+import { isDimension } from '../../export/assert/isDimension'
 
 export interface DimensionValues {
   width?: number
@@ -29,6 +30,17 @@ export function extractDimensionValues(node: CoralNode | CoralRootNode): Dimensi
 }
 
 /**
+ * Check if a value represents a percentage or auto (not a concrete dimension)
+ */
+function isPercentageOrAuto(value: unknown): boolean {
+  if (value === undefined) return false
+  if (value === 'auto' || value === '100%') return true
+  if (typeof value === 'string' && value.endsWith('%')) return true
+  if (isDimension(value) && typeof value !== 'number' && value.unit === '%') return true
+  return false
+}
+
+/**
  * Check if a node has width constraints (explicit width or maxWidth)
  * @param node - Coral node to check
  * @returns True if node has width constraints
@@ -40,8 +52,8 @@ export function hasWidthConstraints(node: CoralNode | CoralRootNode): boolean {
   const maxWidth = node.styles['maxWidth']
 
   // Check for explicit width or maxWidth (not 100% or auto)
-  const hasExplicitWidth = width !== undefined && width !== '100%' && width !== 'auto'
-  const hasMaxWidth = maxWidth !== undefined
+  const hasExplicitWidth = width !== undefined && !isPercentageOrAuto(width)
+  const hasMaxWidth = maxWidth !== undefined && !isPercentageOrAuto(maxWidth)
 
   return hasExplicitWidth || hasMaxWidth
 }
