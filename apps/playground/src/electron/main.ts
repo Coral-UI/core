@@ -29,6 +29,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1400,
     height: 900,
+    title: 'Coral Playground',
     titleBarStyle: 'hidden',
     trafficLightPosition: { x: 12, y: 14 },
     icon: path.join(process.env['VITE_PUBLIC']!, 'electron-vite.svg'),

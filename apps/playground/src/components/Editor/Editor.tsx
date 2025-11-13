@@ -269,9 +269,31 @@ export const Editor = () => {
         return allElements
       }
 
-      const newElements = convertCoralToElements(spec)
+      const importedElements = convertCoralToElements(spec, 'root')
 
-      // Replace all elements with the imported ones
+      // Create root element and ensure imported elements are children of root
+      const rootElement: ElementTreeNode = {
+        id: 'root',
+        name: 'Root',
+        elementType: 'div',
+        type: 'NODE',
+        isExpanded: true,
+        children: [],
+      }
+
+      // Ensure all top-level imported elements have root as parent
+      const elementsWithRootParent = importedElements.map((el) => {
+        // If element has no parentId or parentId is undefined, set it to 'root'
+        if (!el.parentId) {
+          return { ...el, parentId: 'root' as string }
+        }
+        return el
+      })
+
+      // Combine root element with imported elements
+      const newElements = [rootElement, ...elementsWithRootParent]
+
+      // Replace all elements with the imported ones (including root)
       replaceAllElements(newElements)
 
       toast.success('Component imported successfully')
