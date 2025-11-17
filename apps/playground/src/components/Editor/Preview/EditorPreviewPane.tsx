@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 
 import { CoralRootNode } from '@reallygoodwork/coral-core'
 
+import type { Breakpoint } from '../BreakpointManager/BreakpointManager'
 import { Sandbox } from './Sandbox'
 
 type ViewportPreset = {
@@ -31,9 +32,31 @@ interface EditorPreviewPaneProps {
   setImportDialogOpen: (open: boolean) => void
   handleUndo: () => void
   handleRedo: () => void
+  activeBreakpoint: Breakpoint | null
 }
 
-export const EditorPreviewPane = ({ spec, setImportDialogOpen, handleUndo, handleRedo }: EditorPreviewPaneProps) => {
+/**
+ * Parse breakpoint value string to pixels
+ * Supports px, rem, em units (converts rem/em to px assuming 16px base)
+ */
+const parseBreakpointValueToPixels = (value: string): number => {
+  const trimmed = value.trim()
+
+  if (trimmed.endsWith('px')) {
+    return parseInt(trimmed.replace('px', ''), 10) || 0
+  }
+
+  if (trimmed.endsWith('rem') || trimmed.endsWith('em')) {
+    const numValue = parseFloat(trimmed.replace(/rem|em/, ''))
+    return Math.round(numValue * 16) // Convert rem/em to px (assuming 16px base)
+  }
+
+  // Try parsing as plain number (assume px)
+  const numValue = parseFloat(trimmed)
+  return isNaN(numValue) ? 0 : Math.round(numValue)
+}
+
+export const EditorPreviewPane = ({ spec, setImportDialogOpen, handleUndo, handleRedo, activeBreakpoint }: EditorPreviewPaneProps) => {
   // const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const { theme } = useTheme()
   const [specValue, setSpecValue] = useState<string>('')
@@ -42,6 +65,19 @@ export const EditorPreviewPane = ({ spec, setImportDialogOpen, handleUndo, handl
   useEffect(() => {
     setSpecValue(JSON.stringify(spec, null, 2))
   }, [spec])
+
+  // Update viewport width when breakpoint changes
+  useEffect(() => {
+    if (activeBreakpoint) {
+      // Only resize for width-based breakpoints (not height-based)
+      if (activeBreakpoint.type === 'min-width' || activeBreakpoint.type === 'max-width') {
+        const width = parseBreakpointValueToPixels(activeBreakpoint.value)
+        if (width > 0) {
+          setViewportWidth(width)
+        }
+      }
+    }
+  }, [activeBreakpoint])
 
   const handleSpecChange = (value: string | undefined) => {
     setSpecValue(value || '')
