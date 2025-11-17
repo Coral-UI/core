@@ -734,12 +734,12 @@ export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionL
               width: `${Math.max(0, zone.width)}px`,
               height: `${Math.max(0, zone.height)}px`,
               pointerEvents: 'auto',
-              backgroundColor: isSelected ? 'transparent' : isHovered ? 'rgba(59, 130, 246, 0.4)' : 'transparent',
+              backgroundColor: isSelected ? 'transparent' : isHovered ? 'var(--highlight-transparent)' : 'transparent',
               border:
                 isSelected || isHovered
                   ? isSelected
-                    ? '1px solid #3b82f6'
-                    : '1px dashed #3b82f6'
+                    ? '1px solid var(--highlight)'
+                    : '1px dashed var(--highlight)'
                   : '1px solid transparent',
               boxSizing: 'border-box',
               zIndex: 1001,
@@ -781,7 +781,7 @@ export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionL
             {showTopButton && (
               <div
                 className="absolute top-0 left-1/2 -translate-x-1/2 z-[1002] -translate-y-full"
-                style={{ marginBottom: '4px' }}
+                style={{ marginBottom: '24px' }}
                 onMouseEnter={() => {
                   if (buttonInteractionTimeoutRef.current) {
                     clearTimeout(buttonInteractionTimeoutRef.current)
@@ -850,7 +850,7 @@ export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionL
             {showBottomButton && (
               <div
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 z-[1002] translate-y-full"
-                style={{ marginTop: '4px' }}
+                style={{ marginTop: '24px' }}
                 onMouseEnter={() => {
                   if (buttonInteractionTimeoutRef.current) {
                     clearTimeout(buttonInteractionTimeoutRef.current)

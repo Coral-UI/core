@@ -1,4 +1,5 @@
 import { useFormContext } from '@/components/Editor/style-manager/formContext'
+import { cn } from '@/lib/utils'
 import { useStore } from '@tanstack/react-form'
 import React from 'react'
 
@@ -56,7 +57,7 @@ export const ConditionalSection: React.FC<ConditionalSectionProps> = ({ watch, w
   }
 
   return (
-    <fieldset className={className}>
+    <fieldset className={cn('px-2.5 pb-3 pt-1.5 bg-bg-surface rounded-frame', className)}>
       {legend && <legend className="legend">{legend}</legend>}
       {children}
     </fieldset>

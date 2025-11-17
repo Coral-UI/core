@@ -143,21 +143,9 @@ export const EditorSidebar = () => {
   )
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-4 py-4 border-b border-border">
-        <h3 className="text-xs font-semibold text-foreground tracking-tight">Structure</h3>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          className="h-6 w-6"
-          onClick={() => {
-            // Add element to root
-            addElement('div', 'root')
-          }}
-          title="Add element"
-        >
-          <Plus className="h-3 w-3" />
-        </Button>
+    <div className="flex flex-col h-full bg-bg-surface rounded-frame border border-border-surface shadow-lg shadow-border-surface">
+      <div className="px-4 pt-4">
+        <p className="text-xs font-semibold text-text-secondary tracking-tight">Structure</p>
       </div>
       <div className="flex-1 overflow-auto">
         <TreeView

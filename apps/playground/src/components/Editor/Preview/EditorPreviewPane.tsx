@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 // import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { Editor } from '@monaco-editor/react'
-import { IconBracketsAngle, IconEyeSearch, IconSchema } from '@tabler/icons-react'
-import { CopyIcon, MonitorIcon, SmartphoneIcon, TabletIcon } from 'lucide-react'
+import { IconBracketsAngle, IconEyeSearch, IconFileImport, IconSchema } from '@tabler/icons-react'
+import { CopyIcon, MonitorIcon, Redo, SmartphoneIcon, TabletIcon, Undo } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -28,9 +28,12 @@ const VIEWPORT_PRESETS: ViewportPreset[] = [
 
 interface EditorPreviewPaneProps {
   spec: CoralRootNode
+  setImportDialogOpen: (open: boolean) => void
+  handleUndo: () => void
+  handleRedo: () => void
 }
 
-export const EditorPreviewPane = ({ spec }: EditorPreviewPaneProps) => {
+export const EditorPreviewPane = ({ spec, setImportDialogOpen, handleUndo, handleRedo }: EditorPreviewPaneProps) => {
   // const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const { theme } = useTheme()
   const [specValue, setSpecValue] = useState<string>('')
@@ -50,23 +53,45 @@ export const EditorPreviewPane = ({ spec }: EditorPreviewPaneProps) => {
   }
 
   return (
-    <Tabs defaultValue="preview" className="w-full h-full">
-      <div className="p-2 pb-0">
-        <TabsList>
-          <TabsTrigger value="preview">
-            <IconEyeSearch strokeWidth={1.5} className="size-4" /> Visual Preview
-          </TabsTrigger>
-          <TabsTrigger value="spec">
-            <IconSchema strokeWidth={1.5} className="size-4" /> Coral Spec
-          </TabsTrigger>
-          <TabsTrigger value="code">
-            <IconBracketsAngle strokeWidth={1.5} className="size-4" /> Generated Code
-          </TabsTrigger>
-        </TabsList>
+    <Tabs defaultValue="preview" className="w-full h-full flex">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-medium text-text-secondary tracking-tight">Component</p>
+
+        <div className="flex items-center gap-2 justify-self-end">
+          <div>
+            <Button
+              variant="secondary"
+              size="icon-sm"
+              onClick={() => setImportDialogOpen(true)}
+              title="Import from Code"
+              aria-label="Import from Code"
+            >
+              <IconFileImport className="size-3.5" />
+            </Button>
+            <Button variant="ghost" size="icon-sm" onClick={handleUndo} title="Undo (⌘Z / Ctrl+Z)">
+              <Undo className="size-3.5" />
+            </Button>
+            <Button variant="ghost" size="icon-sm" onClick={handleRedo} title="Redo (⌘⇧Z / Ctrl+Y)">
+              <Redo className="size-3.5" />
+            </Button>
+          </div>
+
+          <TabsList>
+            <TabsTrigger value="preview">
+              <IconEyeSearch strokeWidth={1.5} className="size-4" /> Visual Preview
+            </TabsTrigger>
+            <TabsTrigger value="spec">
+              <IconSchema strokeWidth={1.5} className="size-4" /> Coral Spec
+            </TabsTrigger>
+            <TabsTrigger value="code">
+              <IconBracketsAngle strokeWidth={1.5} className="size-4" /> Generated Code
+            </TabsTrigger>
+          </TabsList>
+        </div>
       </div>
 
-      <TabsContent value="preview" className="flex flex-col h-full w-full relative">
-        <div className="h-full w-full p-2 bg-bg-primary">
+      <TabsContent value="preview" className="flex flex-col h-full w-full relative px-0 py-2.5 ">
+        <div className="h-full w-full bg-bg-primary">
           {spec && spec.name ? (
             <>
               <HTMLRenderer spec={spec} viewportWidth={viewportWidth} />
@@ -102,8 +127,8 @@ export const EditorPreviewPane = ({ spec }: EditorPreviewPaneProps) => {
         </div>
       </TabsContent>
 
-      <TabsContent value="spec" className="flex flex-col h-full w-full flex-1 shrink-0">
-        <div className="h-full w-full relative p-2 flex flex-col">
+      <TabsContent value="spec" className="flex flex-col h-full w-full flex-1 shrink-0 px-0 py-2.5">
+        <div className="h-full w-full relative flex flex-col ">
           <div className="border border-input rounded-xl flex-1 overflow-hidden">
             <Editor
               value={specValue}
@@ -134,7 +159,7 @@ export const EditorPreviewPane = ({ spec }: EditorPreviewPaneProps) => {
         </div>
       </TabsContent>
 
-      <TabsContent value="code" className="flex flex-col h-full w-full flex-1 shrink-0">
+      <TabsContent value="code" className="flex flex-col h-full w-full flex-1 shrink-0 px-0 py-2.5 ">
         <Sandbox specValue={spec} />
       </TabsContent>
     </Tabs>

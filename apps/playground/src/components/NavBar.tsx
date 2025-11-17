@@ -32,6 +32,7 @@ export const NavBar = () => {
     >
       <div
         className={`px-4 mx-auto flex items-center justify-between  ${electron.isElectron ? (electron.isMac ? 'pl-20' : 'pl-20') : ''}`}
+        style={{ appRegion: 'no-drag' } as React.CSSProperties}
       >
         <nav className="flex text-xs divide-x divide-border border-x border-border">
           {links.map((link) => (

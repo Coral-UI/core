@@ -47,11 +47,12 @@
   "license": "MIT",
   "dependencies": {
     "-": "^0.0.1",
-    "@base-ui-components/react": "1.0.0-beta.4",
+    "@base-ui-components/react": "1.0.0-beta.5",
     "@codemirror/lang-javascript": "^6.2.4",
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/language": "^6.11.3",
     "@codesandbox/sandpack-react": "^2.20.0",
+    "@codesandbox/sandpack-themes": "^2.0.21",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",

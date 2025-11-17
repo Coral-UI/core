@@ -182,7 +182,7 @@ const StyleFormLayout = withForm({
     return (
       <div className="max-w-72">
         <form.AppForm>
-          <div className="flex flex-col bg-bg-surface">
+          <div className="flex flex-col gap-2.5">
             <CardSection legend="Color">
               <form.AppField
                 // @ts-expect-error - Dynamic field name, TypeScript can't infer the exact type

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { getElementTypeGroups } from '@/utils/elementTypes'
-import { IconNewSection } from '@tabler/icons-react'
+import { IconPlus } from '@tabler/icons-react'
 import * as React from 'react'
 
 import { CoralElementType } from '@reallygoodwork/coral-core'
@@ -57,7 +57,7 @@ export function AddElementCombobox({ validChildTypes, onSelect, onOpenChange }: 
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button variant="elementPreview" size="icon-sm" title="Add Child Element">
-          <IconNewSection />
+          <IconPlus />
         </Button>
       </PopoverTrigger>
       <PopoverContent
