@@ -8,6 +8,7 @@ import { HTMLElement, TextNode } from 'node-html-parser'
 import { tailwindToCSS } from '@reallygoodwork/coral-tw2css'
 
 import { CoralRootNode } from '../structures/coral'
+import type { ResponsiveStyle } from '../structures/responsiveStyles'
 
 // Dimension properties that should be converted from CSS strings to Dimension objects
 const DIMENSION_PROPERTIES = new Set([
@@ -96,7 +97,46 @@ function convertDimensionProperties(styles: Record<string, unknown>): Record<str
   return converted
 }
 
-export const parseHTMLNodeToSpec = (node: HTMLElement): CoralRootNode => {
+/**
+ * Helper function to match element against a CSS selector
+ * Supports simple selectors: tag names, classes, ids, and attribute selectors
+ */
+function elementMatchesSelector(element: HTMLElement, selector: string): boolean {
+  const trimmedSelector = selector.trim()
+
+  // Tag name selector (e.g., "div")
+  if (/^[a-z]+$/i.test(trimmedSelector)) {
+    return element.rawTagName.toLowerCase() === trimmedSelector.toLowerCase()
+  }
+
+  // Class selector (e.g., ".myclass")
+  if (trimmedSelector.startsWith('.')) {
+    const className = trimmedSelector.slice(1)
+    const classes = element.getAttribute('class')?.split(/\s+/) || []
+    return classes.includes(className)
+  }
+
+  // ID selector (e.g., "#myid")
+  if (trimmedSelector.startsWith('#')) {
+    const id = trimmedSelector.slice(1)
+    return element.getAttribute('id') === id
+  }
+
+  // Attribute selector (e.g., "[data-component='header']")
+  const attrMatch = trimmedSelector.match(/^\[([^=]+)='([^']+)'\]$/)
+  if (attrMatch) {
+    const [, attrName, attrValue] = attrMatch
+    return element.getAttribute(attrName!) === attrValue
+  }
+
+  // For more complex selectors, return false (could be extended in the future)
+  return false
+}
+
+export const parseHTMLNodeToSpec = (
+  node: HTMLElement,
+  selectorToResponsiveStyles?: Map<string, ResponsiveStyle[]>,
+): CoralRootNode => {
   // Combine inline styles and Tailwind classes
   const combinedStyles = {
     ...styleAttributeToObject(node.getAttribute('style')),
@@ -110,6 +150,27 @@ export const parseHTMLNodeToSpec = (node: HTMLElement): CoralRootNode => {
   // Extract responsive styles from media queries (if any exist in the style object)
   const { baseStyles, responsiveStyles } = extractResponsiveStylesFromObject(convertedStyles)
 
+  // Check if any selectors from style tags match this element
+  let matchedResponsiveStyles: ResponsiveStyle[] = []
+  if (selectorToResponsiveStyles) {
+    for (const [selector, styles] of selectorToResponsiveStyles) {
+      if (elementMatchesSelector(node, selector)) {
+        // Convert dimension properties in the matched responsive styles
+        const convertedStyles = styles.map((style) => ({
+          ...style,
+          styles: convertDimensionProperties(style.styles as Record<string, unknown>) as Record<
+            string,
+            unknown
+          >,
+        }))
+        matchedResponsiveStyles = [...matchedResponsiveStyles, ...convertedStyles]
+      }
+    }
+  }
+
+  // Merge inline responsive styles with matched responsive styles from style tags
+  const allResponsiveStyles = [...responsiveStyles, ...matchedResponsiveStyles]
+
   // Create the spec object
   const spec: CoralRootNode = {
     name: pascalCaseString(node.rawTagName),
@@ -118,8 +179,8 @@ export const parseHTMLNodeToSpec = (node: HTMLElement): CoralRootNode => {
   }
 
   // Add responsive styles if any were found (they're already converted)
-  if (responsiveStyles.length > 0) {
-    spec.responsiveStyles = responsiveStyles
+  if (allResponsiveStyles.length > 0) {
+    spec.responsiveStyles = allResponsiveStyles
   }
 
   // If the node has attributes, add them to the spec
@@ -148,7 +209,7 @@ export const parseHTMLNodeToSpec = (node: HTMLElement): CoralRootNode => {
   // Parse child elements and add them to children
   node.childNodes.forEach((childNode) => {
     if (childNode instanceof HTMLElement) {
-      spec.children?.push(parseHTMLNodeToSpec(childNode))
+      spec.children?.push(parseHTMLNodeToSpec(childNode, selectorToResponsiveStyles))
     }
   })
 

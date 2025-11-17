@@ -66,11 +66,7 @@ export const transformHTMLToSpec = (html: string): CoralRootNode => {
     throw new Error('No valid HTML element found (excluding style tags)')
   }
 
-  const spec = parseHTMLNodeToSpec(firstElementChild)
-
-  // TODO: Apply responsive styles from style tags to matching elements
-  // This would require matching selectors to elements, which is complex
-  // For now, inline styles with media queries will work
+  const spec = parseHTMLNodeToSpec(firstElementChild, selectorToResponsiveStyles)
 
   return spec
 }

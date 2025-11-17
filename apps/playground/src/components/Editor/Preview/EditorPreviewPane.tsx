@@ -1,16 +1,18 @@
+// import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/base/Tabs'
+import type { Breakpoint } from '@/components/Editor/BreakpointManager/BreakpointManager'
 import { HTMLRenderer } from '@/components/Editor/Preview/HTMLRenderer'
 import { useTheme } from '@/components/ThemeProvider'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-// import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { Editor } from '@monaco-editor/react'
 import { IconBracketsAngle, IconEyeSearch, IconFileImport, IconSchema } from '@tabler/icons-react'
-import { CopyIcon, MonitorIcon, Redo, SmartphoneIcon, TabletIcon, Undo } from 'lucide-react'
+import { CopyIcon, LinkIcon, MonitorIcon, Redo, SmartphoneIcon, TabletIcon, Undo, UnlinkIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { CoralRootNode } from '@reallygoodwork/coral-core'
+import type { CoralRootNode } from '@reallygoodwork/coral-core'
 
 import { Sandbox } from './Sandbox'
 
@@ -28,12 +30,29 @@ const VIEWPORT_PRESETS: ViewportPreset[] = [
 
 interface EditorPreviewPaneProps {
   spec: CoralRootNode
+  importDialogOpen: boolean
   setImportDialogOpen: (open: boolean) => void
+  handleImportCode: (code: string) => void
   handleUndo: () => void
   handleRedo: () => void
+  activeBreakpoint: Breakpoint | null | undefined
+  viewportSyncEnabled: boolean
+  onViewportSyncToggle: () => void
+  parseBreakpointWidth: (value: string) => number
 }
 
-export const EditorPreviewPane = ({ spec, setImportDialogOpen, handleUndo, handleRedo }: EditorPreviewPaneProps) => {
+export const EditorPreviewPane = ({
+  spec,
+  importDialogOpen: _importDialogOpen,
+  setImportDialogOpen,
+  handleImportCode: _handleImportCode,
+  handleUndo,
+  handleRedo,
+  activeBreakpoint,
+  viewportSyncEnabled,
+  onViewportSyncToggle,
+  parseBreakpointWidth,
+}: EditorPreviewPaneProps) => {
   // const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const { theme } = useTheme()
   const [specValue, setSpecValue] = useState<string>('')
@@ -42,6 +61,14 @@ export const EditorPreviewPane = ({ spec, setImportDialogOpen, handleUndo, handl
   useEffect(() => {
     setSpecValue(JSON.stringify(spec, null, 2))
   }, [spec])
+
+  // Sync viewport width with active breakpoint when sync is enabled
+  useEffect(() => {
+    if (viewportSyncEnabled && activeBreakpoint) {
+      const width = parseBreakpointWidth(activeBreakpoint.value)
+      setViewportWidth(width)
+    }
+  }, [activeBreakpoint, viewportSyncEnabled, parseBreakpointWidth])
 
   const handleSpecChange = (value: string | undefined) => {
     setSpecValue(value || '')
@@ -95,7 +122,31 @@ export const EditorPreviewPane = ({ spec, setImportDialogOpen, handleUndo, handl
           {spec && spec.name ? (
             <>
               <HTMLRenderer spec={spec} viewportWidth={viewportWidth} />
-              <div className="px-2 py-1.5 flex justify-end gap-2 absolute bottom-6 right-6 bg-bg-surface rounded-input border border-border">
+              <div className="px-2 py-1.5 flex items-center gap-2 absolute bottom-6 right-6 bg-bg-surface rounded-input border border-border">
+                {activeBreakpoint && (
+                  <div className="flex items-center gap-2 pr-2 border-r border-border">
+                    <Badge variant={viewportSyncEnabled ? 'default' : 'outline'} className="text-xs">
+                      {activeBreakpoint.label || activeBreakpoint.type}
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={onViewportSyncToggle}
+                      title={
+                        viewportSyncEnabled
+                          ? 'Viewport synced with breakpoint'
+                          : 'Sync viewport with breakpoint'
+                      }
+                      className={viewportSyncEnabled ? 'text-primary' : 'text-muted-foreground'}
+                    >
+                      {viewportSyncEnabled ? (
+                        <LinkIcon className="size-3.5" />
+                      ) : (
+                        <UnlinkIcon className="size-3.5" />
+                      )}
+                    </Button>
+                  </div>
+                )}
                 <ToggleGroup
                   type="single"
                   variant="outline"
