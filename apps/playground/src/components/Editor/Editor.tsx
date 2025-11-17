@@ -1,23 +1,26 @@
+import type { ElementTreeNode } from '@/hooks/useElementTree'
 import { EditorSidebar } from '@/components/Editor/ElementTree/EditorSidebar'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
 import { EditorPreviewPane } from '@/components/Editor/Preview/EditorPreviewPane'
-import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { convertCoralStylesToFormValues, convertFormValuesToCoralStyles } from '@/utils/convertFormToCoralStyles'
 import { getDefaultDisplayValue } from '@/utils/elementDisplay'
-import { IconFileImport } from '@tabler/icons-react'
-import { Redo, Undo } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { CoralRootNode, CoralStyleType, transformHTMLToSpec } from '@reallygoodwork/coral-core'
+import type { CoralRootNode, CoralStyleType } from '@reallygoodwork/coral-core'
+import { transformHTMLToSpec } from '@reallygoodwork/coral-core'
 
 import type { FormValues as ComponentFormValues } from './component-manager/formSchema'
 import type { StyleFormValues } from './style-manager/formSchema'
 import { ScrollArea } from '../base/ScrollArea'
+import { Badge } from '../ui/badge'
+import { BreakpointManager } from './BreakpointManager/BreakpointManager'
 import { ComponentForm } from './component-manager/componentForm'
+import { useBreakpointManager } from './Configuration/hooks/useBreakpointManager'
+import { parseBreakpointIndex } from './Configuration/utils/breakpointHelpers'
 import { StyleForm } from './style-manager/styleForm'
 
 export const Editor = () => {
@@ -32,15 +35,50 @@ export const Editor = () => {
     return selectedElementId ? elements.find((el) => el.id === selectedElementId) : null
   }, [elements, selectedElementId])
 
+  // Create updateProperty wrapper for breakpoint manager
+  const updateProperty = useCallback(
+    (property: keyof ElementTreeNode, value: unknown) => {
+      if (!selectedElementId) return
+      updateElement(selectedElementId, { [property]: value })
+    },
+    [selectedElementId, updateElement],
+  )
+
+  // Breakpoint management hook
+  const breakpointManager = useBreakpointManager(selectedElement, updateProperty)
+
+  // Get active breakpoint info for display
+  const activeBreakpoint = useMemo(() => {
+    if (!breakpointManager.activeBreakpointId) return null
+    const breakpointIndex = parseBreakpointIndex(breakpointManager.activeBreakpointId)
+    return breakpointManager.breakpoints[breakpointIndex] || null
+  }, [breakpointManager.activeBreakpointId, breakpointManager.breakpoints])
+
   // Convert element styles to form values for initial values
   const formInitialValues = useMemo(() => {
     if (!selectedElement) {
       return undefined
     }
 
-    const baseFormValues = selectedElement.styles
-      ? (convertCoralStylesToFormValues(selectedElement.styles as Record<string, unknown>) as Partial<StyleFormValues>)
-      : {}
+    // Get base styles
+    const baseStyles = selectedElement.styles ? (selectedElement.styles as Record<string, unknown>) : {}
+
+    // If a breakpoint is active, merge base styles with breakpoint-specific styles
+    let stylesToConvert: Record<string, unknown> = { ...baseStyles }
+    if (breakpointManager.activeBreakpointId) {
+      const breakpointIndex = parseBreakpointIndex(breakpointManager.activeBreakpointId)
+      const responsiveStyles = selectedElement.responsiveStyles || []
+      const activeBreakpoint = responsiveStyles[breakpointIndex]
+      if (activeBreakpoint?.styles) {
+        // Merge base styles with breakpoint styles (breakpoint styles override base)
+        stylesToConvert = {
+          ...baseStyles,
+          ...activeBreakpoint.styles,
+        }
+      }
+    }
+
+    const baseFormValues = convertCoralStylesToFormValues(stylesToConvert) as Partial<StyleFormValues>
 
     // Set default display value for inline elements if not already set in styles
     // This only affects the UI - showing 'inline' for elements like span, a, strong, etc.
@@ -54,7 +92,7 @@ export const Editor = () => {
     }
 
     return baseFormValues
-  }, [selectedElement])
+  }, [selectedElement, breakpointManager.activeBreakpointId])
 
   // Convert element properties to component form initial values
   const componentFormInitialValues = useMemo(() => {
@@ -70,7 +108,8 @@ export const Editor = () => {
   }, [selectedElement])
 
   // Create a stable key for the form based only on element ID
-  // This ensures the form remounts when switching elements
+  // This ensures the form remounts when switching elements, but NOT when switching breakpoints
+  // Breakpoint changes are handled by updating initialValues, which preserves component state
   const formKey = selectedElementId
 
   // Handle style form changes - only merge the changed style
@@ -110,22 +149,52 @@ export const Editor = () => {
       }
 
       // Convert only the changed fields to Coral styles
-      const coralStyles = convertFormValuesToCoralStyles(
-        fieldsToConvert as Record<string, unknown>,
-        // styleFormDefaultValues,
-        // selectedElement.styles as Record<string, unknown> | undefined,
-      )
+      const coralStyles = convertFormValuesToCoralStyles(fieldsToConvert as Record<string, unknown>)
 
-      // Only merge the styles that were actually changed
-      const mergedStyles = {
-        ...(selectedElement.styles || {}),
-        ...coralStyles,
+      // Check if we're editing a breakpoint or base styles
+      if (breakpointManager.activeBreakpointId) {
+        // Update breakpoint-specific styles
+        const breakpointIndex = parseBreakpointIndex(breakpointManager.activeBreakpointId)
+        const responsiveStyles = [...(selectedElement.responsiveStyles || [])]
+
+        // Ensure the breakpoint exists
+        if (responsiveStyles[breakpointIndex]) {
+          // Merge styles into the breakpoint
+          responsiveStyles[breakpointIndex] = {
+            ...responsiveStyles[breakpointIndex],
+            styles: {
+              ...(responsiveStyles[breakpointIndex].styles || {}),
+              ...coralStyles,
+            },
+          }
+
+          updateElement(selectedElementId, {
+            responsiveStyles,
+          })
+        } else {
+          // Breakpoint doesn't exist, fall back to base styles
+          const mergedStyles = {
+            ...(selectedElement.styles || {}),
+            ...coralStyles,
+          }
+
+          updateElement(selectedElementId, {
+            styles: mergedStyles as CoralStyleType,
+          })
+        }
+      } else {
+        // Update base styles
+        const mergedStyles = {
+          ...(selectedElement.styles || {}),
+          ...coralStyles,
+        }
+
+        updateElement(selectedElementId, {
+          styles: mergedStyles as CoralStyleType,
+        })
       }
-
-      // Update the element with merged styles
-      updateElement(selectedElementId, { styles: mergedStyles as CoralStyleType })
     },
-    [selectedElementId, selectedElement, updateElement],
+    [selectedElementId, selectedElement, updateElement, breakpointManager.activeBreakpointId],
   )
 
   // Handle component form changes
@@ -400,6 +469,7 @@ export const Editor = () => {
             handleImportCode={handleImportCode}
             handleUndo={handleUndo}
             handleRedo={handleRedo}
+            activeBreakpoint={activeBreakpoint}
           />
         </main>
         <aside className="w-72 h-full overflow-hidden">
@@ -410,6 +480,28 @@ export const Editor = () => {
                 onChange={handleComponentChange}
                 {...(componentFormInitialValues ? { initialValues: componentFormInitialValues } : {})}
               />
+              <BreakpointManager
+                breakpoints={breakpointManager.breakpoints}
+                activeBreakpointId={breakpointManager.activeBreakpointId}
+                onAddBreakpoint={breakpointManager.handleAddBreakpoint}
+                onRemoveBreakpoint={breakpointManager.handleRemoveBreakpoint}
+                onSelectBreakpoint={breakpointManager.handleSelectBreakpoint}
+              />
+              {/* Style editing context indicator */}
+              {selectedElement && (
+                <div className="flex items-center gap-2 px-2 py-1.5 bg-muted/50 rounded-md border border-border">
+                  <span className="text-xs font-medium text-muted-foreground">Editing:</span>
+                  {activeBreakpoint ? (
+                    <Badge variant="default" className="text-xs">
+                      {activeBreakpoint.label || `${activeBreakpoint.type}: ${activeBreakpoint.value}`}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-xs">
+                      Base Styles
+                    </Badge>
+                  )}
+                </div>
+              )}
               <StyleForm
                 key={`style-form-${formKey || 'none'}`}
                 onChange={handleStyleChange}
