@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import { headerCentered } from '../../specs/header-centered'
+// import { headerCentered } from '../../specs/header-centered'
 import { simpleStacked } from '../../specs/simple-stacked'
 
 interface SpecValue {

@@ -7,8 +7,6 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
 import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { convertCoralStylesToFormValues, convertFormValuesToCoralStyles } from '@/utils/convertFormToCoralStyles'
 import { getDefaultDisplayValue } from '@/utils/elementDisplay'
-import { IconFileImport } from '@tabler/icons-react'
-import { Redo, Undo } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -395,9 +393,7 @@ export const Editor = () => {
         <main className="bg-background flex-1 overflow-hidden pt-2.5">
           <EditorPreviewPane
             spec={spec}
-            importDialogOpen={importDialogOpen}
             setImportDialogOpen={setImportDialogOpen}
-            handleImportCode={handleImportCode}
             handleUndo={handleUndo}
             handleRedo={handleRedo}
           />
