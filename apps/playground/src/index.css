@@ -36,9 +36,9 @@
   --color-accent-orange-bg: var(--accent-orange-background);
   --color-accent-orange-fg: var(--accent-orange-foreground);
 
-  --color-focus-outline: var(--color-blue-800);
-  --color-highlight: --alpha(var(--color-blue-800) / 0.6);
-  --color-highlight-bg: --alpha(var(--color-blue-800) / 0.1);
+  --color-focus-outline: oklch(0.9119 0.2159 119.9);
+  --color-highlight: var(--highlight);
+  --color-highlight-bg: --alpha(var(--highlight-bg) / 0.6);
 
   /* Text Sizes */
   --text-xs: var(--text-size-xs);
@@ -54,21 +54,22 @@
 
   --radius-input: var(--input-radius);
   --radius-button: var(--button-radius);
+  --radius-frame: var(--frame-radius);
 }
 
 :root {
   /* Colors for backgrounds */
-  --background-primary: #0A0A0A;
-  --background-secondary: #171717;
-  --background-surface: #181818;
+  --background-primary: #F6F6F6;
+  --background-secondary: #fafafa;
+  --background-surface: #fff;
   --background-surface-inner: #262626;
 
   /* Colors for borders */
-  --border-primary: #232323;
-  --border-surface: #303030;
+  --border-primary: #F9F9F9;
+  --border-surface: #ececec;
 
   /* Colors for input components */
-  --input-background: #262626;
+  --input-background: oklch(96% 0 0);
   --input-border: #434343;
 
   /* Colors for Interactive elements */
@@ -77,12 +78,16 @@
   --interactive-border: #434343;
 
   /* Colors for text */
-  --text-primary: #F9F9F9;
-  --text-secondary: #9C9C9C;
+  --text-primary: #333;
+  --text-secondary: #666;
   --text-muted: #666666;
 
   --destructive-bg: #1D0D0C;
   --destructive-fg: #E94136;
+
+  --highlight: #5398FF;
+  --highlight-bg: #17296C;
+  --highlight-transparent: #5398FF60;
 
   /* Colors for Accents */
   --accent-blue-background: #121F27;
@@ -109,8 +114,35 @@
   --text-size-4xl: 2.25rem;
   --text-size-5xl: 2.5rem;
 
-  --input-radius: 0.375rem;
-  --button-radius: 0.375rem;
+  --input-radius: 0.35rem;
+  --button-radius: 0.25rem;
+  --frame-radius: 0.5rem;
+}
+
+.dark {
+    /* Colors for backgrounds */
+    --background-primary: #0A0A0A;
+    --background-secondary: #171717;
+    --background-surface: #181818;
+    --background-surface-inner: #262626;
+
+    /* Colors for borders */
+    --border-primary: #232323;
+    --border-surface: #303030;
+
+    /* Colors for input components */
+    --input-background: #262626;
+    --input-border: #434343;
+
+    /* Colors for Interactive elements */
+    --interactive-primary: #262626;
+    --interactive-secondary: #151515;
+    --interactive-border: #434343;
+
+    /* Colors for text */
+    --text-primary: #F9F9F9;
+    --text-secondary: #9C9C9C;
+    --text-muted: #666666;
 }
 
 @layer base {
@@ -150,11 +182,11 @@
   }
 
   .label-sm {
-    @apply text-xs text-text-secondary font-semibold;
+    @apply text-xs text-text-secondary font-normal;
   }
 
   .legend {
-    @apply text-sm font-medium text-text-primary/90 h-6 inline-flex items-center ml-1.5;
+    @apply text-xs font-semibold text-text-secondary h-6 inline-flex items-center ml-1.5;
   }
 }
 

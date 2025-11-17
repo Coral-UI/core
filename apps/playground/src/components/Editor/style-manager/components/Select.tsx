@@ -18,8 +18,8 @@ function Select({ items = [], size = 'default', leadingIcon, className, ...props
     <SelectPrimitive.Root items={itemsArray} {...props}>
       <SelectPrimitive.Trigger
         className={cn(
-          'flex items-center justify-between gap-1 rounded-md border border-input-border  text-text-primary bg-input-bg select-none hover:bg-input-bg/80 focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-focus-outline data-[popup-open]:bg-bg-input-bg/80 cursor-default tracking-wide',
-          size === 'sm' ? 'h-7 min-w-24 text-xs pr-2 pl-2.5' : 'h-9 min-w-36 text-sm pr-3 pl-3.5',
+          'flex items-center justify-between gap-1 rounded-input  text-text-primary bg-input-bg select-none hover:bg-input-bg/80 focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-focus-outline data-[popup-open]:bg-bg-input-bg/80 cursor-default tracking-wide',
+          size === 'sm' ? 'h-8 min-w-24 text-xs pr-2 pl-2.5' : 'h-9 min-w-36 text-sm pr-3 pl-3.5',
           leadingIcon ? 'pl-0' : 'pl-3',
           className,
         )}
@@ -39,7 +39,7 @@ function Select({ items = [], size = 'default', leadingIcon, className, ...props
         <div className="flex items-center gap-2 justify-between w-full">
           <SelectPrimitive.Value />
           <SelectPrimitive.Icon className="flex">
-            <IconChevronDown className="size-4" />
+            <IconChevronDown className="size-4 text-text-secondary" />
           </SelectPrimitive.Icon>
         </div>
       </SelectPrimitive.Trigger>

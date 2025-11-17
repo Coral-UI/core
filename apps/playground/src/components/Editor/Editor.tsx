@@ -1,8 +1,6 @@
 import { EditorSidebar } from '@/components/Editor/ElementTree/EditorSidebar'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
 import { EditorPreviewPane } from '@/components/Editor/Preview/EditorPreviewPane'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
@@ -366,7 +364,7 @@ export const Editor = () => {
 
   return (
     <div className="flex flex-col w-full h-[calc(100dvh-2.5rem)] mt-10 bg-background">
-      <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-bg-surface shrink-0 h-10">
+      {/* <div className="flex items-center justify-between gap-2 px-4 py-2 shrink-0 h-10">
         <div className="flex items-center gap-2 place-self-center">
           <p className="text-xs font-medium">Name</p>
           <Badge variant="destructive">Unsaved</Badge>
@@ -381,7 +379,7 @@ export const Editor = () => {
           >
             <IconFileImport className="size-3.5" />
           </Button>
-          {/* TODO: Implement undo/redo with TanStack Query */}
+
           <Button variant="secondary" size="icon-sm" onClick={handleUndo} title="Undo (⌘Z / Ctrl+Z)">
             <Undo className="size-3.5" />
           </Button>
@@ -389,17 +387,24 @@ export const Editor = () => {
             <Redo className="size-3.5" />
           </Button>
         </div>
-      </div>
+      </div> */}
       <div className="flex flex-1 h-[calc(100dvh-2.5rem)] max-h-[calc(100dvh-2.5rem)] overflow-hidden">
-        <aside className="w-64 bg-bg-surface flex flex-col h-full overflow-hidden border-r border-border">
+        <aside className="w-64 flex flex-col h-full overflow-hidden p-2.5">
           <EditorSidebar />
         </aside>
-        <main className="bg-background flex-1 overflow-hidden">
-          <EditorPreviewPane spec={spec} />
+        <main className="bg-background flex-1 overflow-hidden pt-2.5">
+          <EditorPreviewPane
+            spec={spec}
+            importDialogOpen={importDialogOpen}
+            setImportDialogOpen={setImportDialogOpen}
+            handleImportCode={handleImportCode}
+            handleUndo={handleUndo}
+            handleRedo={handleRedo}
+          />
         </main>
-        <aside className="w-72 bg-bg-surface h-full overflow-hidden border-l border-border">
+        <aside className="w-72 h-full overflow-hidden">
           {selectedElement ? (
-            <ScrollArea className="bg-bg-surface">
+            <ScrollArea innerClassName="flex flex-col gap-2.5 py-2.5" className="px-2.5">
               <ComponentForm
                 key={`component-form-${formKey || 'none'}`}
                 onChange={handleComponentChange}

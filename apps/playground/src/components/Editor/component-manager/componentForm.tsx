@@ -141,7 +141,7 @@ export const ComponentForm = ({ onChange, initialValues }: ComponentFormProps = 
   }))
 
   return (
-    <div className="max-w-72 px-2 pt-4 pb-4.5 border-b border-input-border">
+    <div className="max-w-72 p-2.5 pb-3 bg-bg-surface rounded-frame border border-border-surface shadow-lg shadow-border-surface">
       <form.AppForm>
         <div className="flex flex-col gap-2.5">
           <form.AppField

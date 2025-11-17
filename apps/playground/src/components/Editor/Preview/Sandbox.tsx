@@ -1,4 +1,5 @@
 import { Sandpack } from '@codesandbox/sandpack-react'
+import { sandpackDark } from '@codesandbox/sandpack-themes'
 import { useEffect, useState } from 'react'
 
 import { CoralRootNode } from '@reallygoodwork/coral-core'
@@ -45,10 +46,10 @@ export default function App() {
     },
   }
   return (
-    <div className="h-full w-full p-2">
+    <div className="h-full w-full">
       <Sandpack
         files={files}
-        theme="dark"
+        theme={sandpackDark}
         template="react"
         options={{
           externalResources: ['https://cdn.tailwindcss.com'],

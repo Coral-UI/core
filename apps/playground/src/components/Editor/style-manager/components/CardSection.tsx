@@ -45,8 +45,10 @@ export const CardSection: React.FC<CardSectionProps> = ({
 }) => {
   if (legend) {
     return (
-      <fieldset className={cn('px-2 pt-4 pb-4.5 border-b border-input-border', className)}>
-        <legend className="legend translate-y-2.5">{legend}</legend>
+      <fieldset
+        className={cn('px-2.5 pb-3 pt-1.5 bg-bg-surface rounded-frame border border-border-surface', className)}
+      >
+        <label className="legend">{legend}</label>
         <div className={cn('flex flex-col gap-2.5', cardClassName)}>{children}</div>
       </fieldset>
     )

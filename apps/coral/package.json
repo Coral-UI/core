@@ -60,7 +60,7 @@
     "zustand": "5.0.0-rc.2"
   },
   "dependencies": {
-    "@base-ui-components/react": "1.0.0-beta.4",
+    "@base-ui-components/react": "1.0.0-beta.5",
     "@fontsource-variable/figtree": "^5.2.10",
     "@fontsource-variable/inter": "^5.2.8",
     "@monaco-editor/react": "^4.7.0",

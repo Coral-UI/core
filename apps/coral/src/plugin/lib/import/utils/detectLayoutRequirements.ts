@@ -2,6 +2,7 @@ import { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 import { hasWidthConstraints } from './extractDimensionValues'
 import { isDimension } from '../../export/assert/isDimension'
+import { extractDimensionValues } from './extractDimensionValues'
 
 /**
  * Check if a margin value is 'auto'
@@ -46,7 +47,7 @@ export function needsParentCentering(node: CoralNode | CoralRootNode): boolean {
 }
 
 /**
- * Check if a node needs a wrapper frame (has margin or padding)
+ * Check if a node needs a wrapper frame (has margin, padding, or width constraints)
  * @param node - Coral node to check
  * @returns True if node needs a wrapper frame
  */
@@ -64,7 +65,15 @@ export function needsWrapperFrame(node: CoralNode | CoralRootNode): boolean {
     'paddingInlineEnd',
   ]
 
-  return spacingProps.some((prop) => node.styles![prop] !== undefined)
+  const hasSpacing = spacingProps.some((prop) => node.styles![prop] !== undefined)
+
+  // Also check for width constraints (maxWidth, minWidth) - these need wrappers for proper application
+  const dimensions = extractDimensionValues(node)
+  const hasWidthConstraints =
+    (dimensions.maxWidth !== undefined && dimensions.maxWidth > 0) ||
+    (dimensions.minWidth !== undefined && dimensions.minWidth > 0)
+
+  return hasSpacing || hasWidthConstraints
 }
 
 /**

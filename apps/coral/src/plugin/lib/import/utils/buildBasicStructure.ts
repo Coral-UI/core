@@ -1,6 +1,7 @@
 import { CoralColorType, CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 import { isCoralColor } from '../../types'
+import { isInlineElement } from '../assert/isInlineElement'
 import { convertCoralColorToRGB, getColorOpacity } from '../color/convertCoralColorToRGB'
 import { applyBorderFromNode } from '../styles/applyBorder'
 import { createSVGFrame } from '../vector/createSVGFrame'
@@ -185,7 +186,10 @@ async function createTextNodeWithWrapper(
     marginWrapper.layoutSizingVertical = 'HUG'
     marginWrapper.primaryAxisSizingMode = 'AUTO'
     marginWrapper.fills = [] // No background on margin wrapper
-    marginWrapper.setPluginData('shouldFillHorizontal', 'true')
+
+    // Check if this is an inline element - inline elements should use HUG sizing, not FILL
+    const isInline = isInlineElement(node)
+    marginWrapper.setPluginData('shouldFillHorizontal', isInline ? 'false' : 'true')
 
     // Apply margin as padding on outer wrapper
     marginWrapper.paddingTop = spacing.marginTop
@@ -296,7 +300,10 @@ async function createTextNodeWithWrapper(
   wrapper.layoutMode = 'VERTICAL'
   wrapper.layoutSizingVertical = 'HUG'
   wrapper.primaryAxisSizingMode = 'AUTO'
-  wrapper.setPluginData('shouldFillHorizontal', 'true')
+
+  // Check if this is an inline element - inline elements should use HUG sizing, not FILL
+  const isInline = isInlineElement(node)
+  wrapper.setPluginData('shouldFillHorizontal', isInline ? 'false' : 'true')
 
   // Apply non-text styles to wrapper (backgroundColor, borderRadius, etc.)
   const backgroundColor = node.styles?.['backgroundColor']
@@ -584,14 +591,21 @@ async function buildNode(
     }
     frame.primaryAxisSizingMode = 'AUTO'
 
-    // Apply padding if present
+    // Apply padding and margin (margins are converted to padding in Figma)
     // Note: For container frames, we apply padding directly
-    // Margins on containers are handled by parent's itemSpacing (from gap)
+    // Margins are converted to padding since Figma doesn't have margin concept
     const spacing = extractSpacingValues(node)
+    // Apply padding
     if (spacing.paddingTop > 0) frame.paddingTop = spacing.paddingTop
     if (spacing.paddingBottom > 0) frame.paddingBottom = spacing.paddingBottom
     if (spacing.paddingLeft > 0) frame.paddingLeft = spacing.paddingLeft
     if (spacing.paddingRight > 0) frame.paddingRight = spacing.paddingRight
+
+    // Convert margins to padding (add to existing padding)
+    if (spacing.marginTop > 0) frame.paddingTop = (frame.paddingTop || 0) + spacing.marginTop
+    if (spacing.marginBottom > 0) frame.paddingBottom = (frame.paddingBottom || 0) + spacing.marginBottom
+    if (spacing.marginLeft > 0) frame.paddingLeft = (frame.paddingLeft || 0) + spacing.marginLeft
+    if (spacing.marginRight > 0) frame.paddingRight = (frame.paddingRight || 0) + spacing.marginRight
 
     // Apply gap/spacing
     if (finalAutoLayoutConfig?.gap) {
@@ -780,17 +794,26 @@ async function buildNode(
       } else if (frame.layoutMode !== 'NONE' && 'layoutSizingHorizontal' in childNode) {
         // NOT absolutely positioned - use auto-layout FILL sizing if needed
         // Check if this child should fill (from plugin data or default block behavior)
-        const shouldFill = childNode.getPluginData('shouldFillHorizontal') === 'true'
+        const shouldFillData = childNode.getPluginData('shouldFillHorizontal')
+        const shouldFill = shouldFillData === 'true'
+        const shouldHug = shouldFillData === 'false'
+
+        // Only check block element if plugin data doesn't explicitly set behavior
         const isBlockElement =
+          !shouldHug &&
           'elementType' in child &&
           !['span', 'a', 'strong', 'em', 'code'].includes((child as CoralNode).elementType || '')
 
-        if (shouldFill || isBlockElement) {
+        if (shouldFill || (isBlockElement && !shouldHug)) {
           childNode.layoutSizingHorizontal = 'FILL'
           // Clear the plugin data
           if (shouldFill) {
             childNode.setPluginData('shouldFillHorizontal', '')
           }
+        } else if (shouldHug) {
+          // Explicitly set to HUG for inline elements
+          childNode.layoutSizingHorizontal = 'HUG'
+          childNode.setPluginData('shouldFillHorizontal', '')
         }
       }
     }

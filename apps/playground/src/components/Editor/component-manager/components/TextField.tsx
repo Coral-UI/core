@@ -34,7 +34,7 @@ function TextField({
       <Field.Control
         required
         placeholder={placeholder}
-        className="flex border border-input-border rounded-input items-center bg-input-bg has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg interactive-focus-input w-full h-7 text-xs text-base text-text-primary tabular-nums focus:z-1 focus:outline-none min-w-8 w-full tracking-wide flex-1 shrink-0 px-2"
+        className="flex rounded-input items-center bg-input-bg has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg interactive-focus-input w-full h-8 text-xs text-base text-text-primary tabular-nums focus:z-1 focus:outline-none min-w-8 w-full tracking-wide flex-1 shrink-0 px-2"
         onValueChange={(value) => {
           field.handleChange(value as string)
           onChange?.(value)

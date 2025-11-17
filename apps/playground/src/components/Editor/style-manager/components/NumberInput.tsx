@@ -103,7 +103,7 @@ function NumberInput({
 
       <NumberField.Group
         className={cn(
-          'flex border border-input-border rounded-input items-center bg-input-bg has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg interactive-focus-input w-full',
+          'flex rounded-input items-center bg-input-bg has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg interactive-focus-input w-full',
           error && 'ring-destructive-fg border-destructive-fg bg-destructive-bg',
         )}
       >
@@ -173,13 +173,13 @@ function NumberInput({
         >
           <SelectPrimitive.Trigger
             className={cn(
-              'flex items-center justify-between gap-1 rounded-tr-md rounded-br-md border-l border-input-border  text-text-primary bg-[#292929] select-none hover:bg-input-bg/80 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-focus-outline data-[popup-open]:bg-bg-input-bg/80 cursor-default tracking-wide',
-              size === 'sm' ? 'h-6 min-w-8 text-xs pr-1 pl-1.5' : 'h-9 min-w-16 text-sm pr-1 pl-1.5',
+              'flex items-center justify-between gap-1 rounded-tr-input rounded-br-input  text-text-primary bg-[#292929] select-none hover:bg-input-bg/80 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-focus-outline data-[popup-open]:bg-bg-input-bg/80 cursor-default tracking-wide',
+              size === 'sm' ? 'h-8 min-w-8 text-xs pr-1 pl-1.5' : 'h-9 min-w-16 text-sm pr-1 pl-1.5',
             )}
           >
             <SelectPrimitive.Value />
             <SelectPrimitive.Icon className="flex">
-              <IconChevronDown className="size-3.5" />
+              <IconChevronDown className="size-3.5 text-text-secondary" />
             </SelectPrimitive.Icon>
           </SelectPrimitive.Trigger>
           <SelectPrimitive.Portal>

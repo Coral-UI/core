@@ -18,11 +18,11 @@ import { cva } from 'class-variance-authority'
 import { useCallback, useEffect, useRef } from 'react'
 
 const inputVariants = cva(
-  'w-full [&>input]:w-full min-w-0 rounded-input text-text-primary font-sans border placeholder:text-text-muted [&>input]:outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 interactive-invalid-input group interactive-focus-input has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg  overflow-hidden inline-flex items-center  font-normal',
+  'w-full [&>input]:w-full min-w-0 rounded-input text-text-primary font-sans placeholder:text-text-muted [&>input]:outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 interactive-invalid-input group interactive-focus-input has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg  overflow-hidden inline-flex items-center  font-normal',
   {
     variants: {
       variant: {
-        default: 'bg-input-bg border-input-border',
+        default: 'bg-input-bg ',
         transparent: 'bg-transparent border-input-border',
       },
       size: {
