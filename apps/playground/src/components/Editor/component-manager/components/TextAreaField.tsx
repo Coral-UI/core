@@ -33,7 +33,7 @@ function TextAreaField({
       <Field.Label className="h-6 flex items-center ml-1.5 label-sm">{label}</Field.Label>
       <textarea
         placeholder={placeholder}
-        className="flex rounded-input items-center bg-input-bg has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg interactive-focus-input w-full min-h-7.5 text-xs text-base text-text-primary tabular-nums focus:z-1 focus:outline-none min-w-8 w-full tracking-wide flex-1 shrink-0 px-2 py-1.5 max-h-32"
+        className="flex rounded-md items-center bg-input border border-input-border has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg interactive-focus-input min-h-7.5 text-sm text-foreground tabular-nums focus:z-1 focus:outline-none min-w-8 w-full flex-1 shrink-0 px-2 py-1.5 max-h-32 inset-shadow-xs inset-shadow-shadow-input font-normal placeholder:text-muted-foreground"
         rows={3}
         value={field.state.value || ''}
         onChange={(e) => {

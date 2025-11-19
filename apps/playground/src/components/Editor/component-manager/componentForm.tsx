@@ -141,7 +141,7 @@ export const ComponentForm = ({ onChange, initialValues }: ComponentFormProps = 
   }))
 
   return (
-    <div className="max-w-72 p-2.5 pb-3 bg-bg-surface rounded-frame border border-border-surface shadow-lg shadow-border-surface">
+    <div className="card max-w-72">
       <form.AppForm>
         <div className="flex flex-col gap-2.5">
           <form.AppField
@@ -153,7 +153,7 @@ export const ComponentForm = ({ onChange, initialValues }: ComponentFormProps = 
           <form.AppField
             name="type"
             children={(field) => {
-              return <field.SelectField label="Type" selectOptions={typeOptions} />
+              return <field.SelectField label="Element Type" selectOptions={typeOptions} />
             }}
           />
           <form.AppField

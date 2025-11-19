@@ -57,7 +57,7 @@ export const ConditionalSection: React.FC<ConditionalSectionProps> = ({ watch, w
   }
 
   return (
-    <fieldset className={cn('px-2.5 pb-3 pt-1.5 bg-bg-surface rounded-frame', className)}>
+    <fieldset className={cn('card', className)}>
       {legend && <legend className="legend">{legend}</legend>}
       {children}
     </fieldset>

@@ -15,3 +15,5 @@ apps/docs/.astro
 dist-electron/
 
 .tanstack/
+*storybook.log
+storybook-static

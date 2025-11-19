@@ -27,8 +27,8 @@ export const SelectField = ({
       <Select
         items={selectOptions}
         value={field.state.value}
-        onValueChange={(value) => {
-          field.handleChange(value as string)
+        onValueChange={(value: string) => {
+          field.handleChange(value)
         }}
         id={field.name}
         size={'sm'}

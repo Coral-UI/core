@@ -27,10 +27,7 @@ type TooltipProps = {
    * How to align the tooltip relative to the trigger
    */
   align?: 'start' | 'center' | 'end'
-  /**
-   * Delay before showing the tooltip in milliseconds
-   */
-  delay?: number
+
   /**
    * Whether the tooltip is disabled
    */
@@ -54,18 +51,17 @@ export const Tooltip: React.FC<TooltipProps> = ({
   side = 'top',
   sideOffset = 8,
   align = 'center',
-  delay = 600,
   disabled = false,
 }) => {
   return (
     <TooltipPrimitive.Provider>
-      <TooltipPrimitive.Root delay={delay} disabled={disabled}>
+      <TooltipPrimitive.Root disabled={disabled}>
         <TooltipPrimitive.Trigger render={children} />
         <TooltipPrimitive.Portal>
           <TooltipPrimitive.Positioner side={side} sideOffset={sideOffset} align={align}>
             <TooltipPrimitive.Popup
               className={cn(
-                'bg-bg-surface text-text-primary rounded-sm px-2 py-1.5 text-xs shadow-lg border border-border-surface z-50',
+                'bg-card text-muted-foreground rounded-sm px-2 py-1.5 text-xs shadow-lg border border-card-border z-50',
                 className,
               )}
             >

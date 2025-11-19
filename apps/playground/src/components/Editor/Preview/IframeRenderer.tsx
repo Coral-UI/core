@@ -1,4 +1,5 @@
-import { forwardRef, useEffect, useState } from 'react'
+import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
+import { forwardRef, useEffect, useMemo, useState } from 'react'
 
 import type { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 import { coralToHTML } from '@reallygoodwork/coral-to-html'
@@ -10,16 +11,75 @@ interface IframeRendererProps {
   onLoad?: () => void
 }
 
-// Extended node type with ID (from playground's element tree)
-type NodeWithId = CoralNode & { id?: string }
+/**
+ * Build a mapping from spec nodes to element IDs by traversing both tree structures in parallel
+ */
+function buildIdMapping(
+  specNode: CoralRootNode,
+  elementTreeNode: { id: string; children?: Array<{ id: string; children?: unknown[] }> },
+  mapping: Map<CoralRootNode, string> = new Map(),
+): Map<CoralRootNode, string> {
+  // Map the current node
+  mapping.set(specNode, elementTreeNode.id)
+
+  // Process children recursively
+  if (specNode.children && specNode.children.length > 0 && elementTreeNode.children) {
+    for (let i = 0; i < specNode.children.length && i < elementTreeNode.children.length; i++) {
+      const childSpec = specNode.children[i] as CoralRootNode
+      const childElement = elementTreeNode.children[i]
+      if (childElement) {
+        buildIdMapping(childSpec, childElement, mapping)
+      }
+    }
+  }
+
+  return mapping
+}
+
+/**
+ * Build ID mapping for the root spec and element tree
+ */
+function buildRootIdMapping(
+  spec: CoralRootNode,
+  elementTree: Array<{ id: string; children?: Array<{ id: string; children?: unknown[] }> }>,
+): Map<CoralRootNode, string> {
+  const mapping = new Map<CoralRootNode, string>()
+
+  if (elementTree.length === 0) {
+    return mapping
+  }
+
+  // Handle case where spec is a single root element
+  if (elementTree.length === 1) {
+    buildIdMapping(spec, elementTree[0]!, mapping)
+  } else {
+    // Handle case where spec has multiple root children
+    // The spec itself doesn't have an ID, but its children do
+    if (spec.children) {
+      for (let i = 0; i < spec.children.length && i < elementTree.length; i++) {
+        const childSpec = spec.children[i] as CoralRootNode
+        const childElement = elementTree[i]
+        if (childElement) {
+          buildIdMapping(childSpec, childElement, mapping)
+        }
+      }
+    }
+  }
+
+  return mapping
+}
 
 /**
  * Recursively add data-element-id attributes to nodes for identification in the iframe
- * Preserves all existing properties including styles
+ * Uses the element tree to get the correct IDs
  */
-function addElementIds(node: CoralNode, parentId?: string, index?: number): CoralNode {
-  const nodeWithId = node as NodeWithId
-  const nodeId = nodeWithId.id || (parentId ? `${parentId}-${index}` : undefined)
+function addElementIds(
+  node: CoralNode,
+  idMapping: Map<CoralRootNode, string>,
+  parentId?: string,
+  index?: number,
+): CoralNode {
+  const nodeId = idMapping.get(node as CoralRootNode) || (parentId ? `${parentId}-${index}` : undefined)
 
   const updatedNode: CoralNode = {
     ...node,
@@ -32,7 +92,7 @@ function addElementIds(node: CoralNode, parentId?: string, index?: number): Cora
     },
     // Recursively process children
     children: node.children
-      ? (node.children as CoralNode[]).map((child, idx) => addElementIds(child, nodeId, idx))
+      ? (node.children as CoralNode[]).map((child, idx) => addElementIds(child, idMapping, nodeId, idx))
       : null,
   }
 
@@ -43,6 +103,16 @@ export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>
   ({ spec, viewportWidth, onLoad }, ref) => {
     const [htmlContent, setHtmlContent] = useState<string>('')
     const [isLoading, setIsLoading] = useState(true)
+    const { getElementTree } = useElementTreeQuery()
+
+    // Build ID mapping from element tree
+    const idMapping = useMemo(() => {
+      if (!spec || !spec.name) {
+        return new Map<CoralRootNode, string>()
+      }
+      const elementTree = getElementTree()
+      return buildRootIdMapping(spec, elementTree)
+    }, [spec, getElementTree])
 
     // Generate HTML with element IDs when spec changes
     useEffect(() => {
@@ -55,8 +125,8 @@ export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>
       const generateHTML = async () => {
         try {
           setIsLoading(true)
-          // Add data-element-id attributes to all nodes
-          const specWithIds = addElementIds(spec)
+          // Add data-element-id attributes to all nodes using the ID mapping
+          const specWithIds = addElementIds(spec, idMapping)
           const html = await coralToHTML(specWithIds)
           setHtmlContent(html)
         } catch (error) {
@@ -68,7 +138,7 @@ export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>
       }
 
       generateHTML()
-    }, [spec])
+    }, [spec, idMapping])
 
     // Note: Selection styling is now handled by InteractionLayer overlays
     // No need to add styles to iframe content

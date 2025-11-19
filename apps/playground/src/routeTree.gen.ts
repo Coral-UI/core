@@ -9,15 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as EditorRouteImport } from './routes/editor'
 import { Route as ConvertRouteImport } from './routes/convert'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OrgsOrgIdIndexRouteImport } from './routes/orgs/$orgId/index'
+import { Route as OrgsOrgIdLibrariesLibraryIdIndexRouteImport } from './routes/orgs/$orgId/libraries/$libraryId/index'
+import { Route as OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRouteImport } from './routes/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
 
-const EditorRoute = EditorRouteImport.update({
-  id: '/editor',
-  path: '/editor',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ConvertRoute = ConvertRouteImport.update({
   id: '/convert',
   path: '/convert',
@@ -28,46 +25,80 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrgsOrgIdIndexRoute = OrgsOrgIdIndexRouteImport.update({
+  id: '/orgs/$orgId/',
+  path: '/orgs/$orgId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrgsOrgIdLibrariesLibraryIdIndexRoute =
+  OrgsOrgIdLibrariesLibraryIdIndexRouteImport.update({
+    id: '/orgs/$orgId/libraries/$libraryId/',
+    path: '/orgs/$orgId/libraries/$libraryId/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute =
+  OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRouteImport.update({
+    id: '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit',
+    path: '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
-  '/editor': typeof EditorRoute
+  '/orgs/$orgId': typeof OrgsOrgIdIndexRoute
+  '/orgs/$orgId/libraries/$libraryId': typeof OrgsOrgIdLibrariesLibraryIdIndexRoute
+  '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit': typeof OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
-  '/editor': typeof EditorRoute
+  '/orgs/$orgId': typeof OrgsOrgIdIndexRoute
+  '/orgs/$orgId/libraries/$libraryId': typeof OrgsOrgIdLibrariesLibraryIdIndexRoute
+  '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit': typeof OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
-  '/editor': typeof EditorRoute
+  '/orgs/$orgId/': typeof OrgsOrgIdIndexRoute
+  '/orgs/$orgId/libraries/$libraryId/': typeof OrgsOrgIdLibrariesLibraryIdIndexRoute
+  '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit': typeof OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/convert' | '/editor'
+  fullPaths:
+    | '/'
+    | '/convert'
+    | '/orgs/$orgId'
+    | '/orgs/$orgId/libraries/$libraryId'
+    | '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/convert' | '/editor'
-  id: '__root__' | '/' | '/convert' | '/editor'
+  to:
+    | '/'
+    | '/convert'
+    | '/orgs/$orgId'
+    | '/orgs/$orgId/libraries/$libraryId'
+    | '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/convert'
+    | '/orgs/$orgId/'
+    | '/orgs/$orgId/libraries/$libraryId/'
+    | '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConvertRoute: typeof ConvertRoute
-  EditorRoute: typeof EditorRoute
+  OrgsOrgIdIndexRoute: typeof OrgsOrgIdIndexRoute
+  OrgsOrgIdLibrariesLibraryIdIndexRoute: typeof OrgsOrgIdLibrariesLibraryIdIndexRoute
+  OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute: typeof OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/editor': {
-      id: '/editor'
-      path: '/editor'
-      fullPath: '/editor'
-      preLoaderRoute: typeof EditorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/convert': {
       id: '/convert'
       path: '/convert'
@@ -82,13 +113,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/orgs/$orgId/': {
+      id: '/orgs/$orgId/'
+      path: '/orgs/$orgId'
+      fullPath: '/orgs/$orgId'
+      preLoaderRoute: typeof OrgsOrgIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orgs/$orgId/libraries/$libraryId/': {
+      id: '/orgs/$orgId/libraries/$libraryId/'
+      path: '/orgs/$orgId/libraries/$libraryId'
+      fullPath: '/orgs/$orgId/libraries/$libraryId'
+      preLoaderRoute: typeof OrgsOrgIdLibrariesLibraryIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit': {
+      id: '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
+      path: '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
+      fullPath: '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
+      preLoaderRoute: typeof OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConvertRoute: ConvertRoute,
-  EditorRoute: EditorRoute,
+  OrgsOrgIdIndexRoute: OrgsOrgIdIndexRoute,
+  OrgsOrgIdLibrariesLibraryIdIndexRoute: OrgsOrgIdLibrariesLibraryIdIndexRoute,
+  OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute:
+    OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

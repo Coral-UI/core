@@ -8,7 +8,7 @@ import { cva } from 'class-variance-authority'
 import React from 'react'
 
 const treeVariants = cva(
-  'group hover:before:opacity-100 before:absolute before:rounded-sm before:left-0 px-2 before:w-full before:opacity-0 before:h-[2rem] relative h-10',
+  'group hover:before:opacity-100 before:absolute before:rounded-sm before:inset-0 px-2 before:w-full before:opacity-0  before:h-8 relative',
 )
 
 const selectedTreeVariants = cva(
@@ -117,7 +117,7 @@ const TreeView = React.forwardRef<HTMLDivElement, TreeProps>(
     }, [data, expandAll, initialSelectedItemId])
 
     return (
-      <div className={cn('overflow-hidden relative p-2', className)}>
+      <div className={cn('overflow-hidden', className)}>
         <TreeItem
           data={data}
           ref={ref}
@@ -270,7 +270,7 @@ const TreeNode = ({
   return (
     <BaseAccordion.Root multiple={true} value={value} onValueChange={(s) => setValue(s)}>
       <BaseAccordion.Item value={item.id}>
-        <div className="relative group h-10">
+        <div className="group">
           <AccordionTrigger
             className={cn(
               treeVariants(),
@@ -287,7 +287,7 @@ const TreeNode = ({
             onDragLeave={onDragLeave}
             onDrop={onDrop}
           >
-            <div className="relative group">
+            <div className=" group">
               <TreeIcon
                 item={item}
                 isSelected={selectedItemId === item.id}
@@ -308,8 +308,9 @@ const TreeNode = ({
           </AccordionTrigger>
           <TreeActions isSelected={selectedItemId === item.id}>{item.actions}</TreeActions>
         </div>
-        <AccordionContent className="ml-4 pl-1 border-l border-input-border">
+        <AccordionContent className="pl-1 border-l border-border">
           <TreeItem
+            className="pl-4"
             data={item.children ? item.children : item}
             {...omitUndefined({
               selectedItemId,
@@ -387,7 +388,7 @@ const TreeLeaf = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          'ml-5 flex text-left items-center py-2 cursor-pointer before:right-1 relative group',
+          'flex text-left items-center py-2 cursor-pointer before:right-1 group',
           treeVariants(),
           className,
           selectedItemId === item.id && selectedTreeVariants(),
@@ -414,7 +415,7 @@ const TreeLeaf = React.forwardRef<
         <span
           className={cn(
             'flex-grow text-sm truncate relative',
-            selectedItemId === item.id ? 'text-text-primary' : 'text-text-secondary group-hover:text-text-primary',
+            selectedItemId === item.id ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground',
           )}
         >
           {item.name}
@@ -433,10 +434,10 @@ const AccordionTrigger = React.forwardRef<
   <BaseAccordion.Header className="group">
     <BaseAccordion.Trigger
       ref={ref}
-      className={cn('flex flex-1 w-full items-center py-2 transition-all h-10', className)}
+      className={cn('flex flex-1 w-full items-center py-1 transition-all', className)}
       {...props}
     >
-      <IconChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 text-text-secondary mr-1 group-data-open:rotate-90" />
+      <IconChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 text-muted-foreground mr-1 group-data-open:rotate-90" />
       {children}
     </BaseAccordion.Trigger>
   </BaseAccordion.Header>

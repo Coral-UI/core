@@ -9,7 +9,7 @@ function TabsList({ className, ...props }: { className?: string } & React.Compon
   return (
     <BaseTabs.List
       className={cn(
-        'bg-interactive-bg-primary inline-flex w-fit items-center justify-center rounded-md p-0.5',
+        'bg-card text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]',
         className,
       )}
       {...props}
@@ -21,7 +21,7 @@ function TabsTrigger({ className, ...props }: { className?: string } & React.Com
   return (
     <BaseTabs.Tab
       className={cn(
-        "h-6 px-2.5 py-4 inline-flex items-center justify-center rounded-sm text-text-secondary text-sm select-none [&>svg:not([class*='size-'])]:size-4 whitespace-nowrap shrink-0 flex-1 gap-1 focus-visible:bg-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-focus-outline active:bg-interactive-bg-primary/80 data-selected:bg-interactive-bg-secondary data-selected:text-text-primary hover:bg-interactive-bg-secondary/60 data-selected:text-text-primary/80",
+        "h-6 px-2.5 py-3.5 inline-flex items-center justify-center rounded-sm text-xs select-none [&>svg:not([class*='size-'])]:size-4 whitespace-nowrap shrink-0 flex-1 gap-1 focus-visible:bg-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-focus-outline active:bg-interactive-bg-primary/80 data-active:bg-primary hover:bg-background border border-transparent data-active:border-card-border text-foreground data-active:text-primary-foreground text-muted-foreground",
         className,
       )}
       {...props}

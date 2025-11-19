@@ -1,11 +1,13 @@
+import { useTheme } from '@/components/ThemeProvider'
 import { Sandpack } from '@codesandbox/sandpack-react'
-import { sandpackDark } from '@codesandbox/sandpack-themes'
+import { githubLight, sandpackDark } from '@codesandbox/sandpack-themes'
 import { useEffect, useState } from 'react'
 
 import { CoralRootNode } from '@reallygoodwork/coral-core'
 import { coralToReact } from '@reallygoodwork/coral-to-react'
 
 export const Sandbox = ({ specValue }: { specValue: CoralRootNode }) => {
+  const { theme } = useTheme()
   const componentName = specValue.componentName || specValue.name || 'Component'
   const [reactCode, setReactCode] = useState<string>('// Loading...')
 
@@ -49,7 +51,7 @@ export default function App() {
     <div className="h-full w-full">
       <Sandpack
         files={files}
-        theme={sandpackDark}
+        theme={theme === 'dark' ? sandpackDark : githubLight}
         template="react"
         options={{
           externalResources: ['https://cdn.tailwindcss.com'],

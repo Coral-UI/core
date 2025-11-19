@@ -34,20 +34,20 @@ function TextField({
       <Field.Control
         required
         placeholder={placeholder}
-        className="flex rounded-input items-center bg-input-bg has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg interactive-focus-input w-full h-8 text-xs text-base text-text-primary tabular-nums focus:z-1 focus:outline-none min-w-8 w-full tracking-wide flex-1 shrink-0 px-2"
-        onValueChange={(value) => {
-          field.handleChange(value as string)
+        className="flex rounded-md items-center bg-input border border-input-border has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg interactive-focus-input w-full h-8 text-sm text-foreground tabular-nums focus:z-1 focus:outline-none min-w-8 flex-1 shrink-0 px-2 font-normal placeholder:text-muted-foreground"
+        onValueChange={(value: string) => {
+          field.handleChange(value)
           onChange?.(value)
         }}
         defaultValue={field.state.value || defaultValue}
       />
 
       {description && (
-        <Field.Description className="text-xs text-text-muted ml-1.5 mt-1">{description}</Field.Description>
+        <Field.Description className="text-xs text-muted-foreground ml-1.5 mt-1">{description}</Field.Description>
       )}
 
       {isInvalid && Array.isArray(field.state.meta.errors) && field.state.meta.errors.length > 0 && (
-        <div className="text-xs text-red-800 mt-1 ml-1.5">
+        <div className="text-xs text-destructive-foreground mt-1 ml-1.5">
           {field.state.meta.errors.map((error, index) => (
             <div key={index}>{error}</div>
           ))}

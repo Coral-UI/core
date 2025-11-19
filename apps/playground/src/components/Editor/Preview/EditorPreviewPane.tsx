@@ -55,12 +55,10 @@ export const EditorPreviewPane = ({ spec, setImportDialogOpen, handleUndo, handl
   return (
     <Tabs defaultValue="preview" className="w-full h-full flex">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm font-medium text-text-secondary tracking-tight">Component</p>
-
         <div className="flex items-center gap-2 justify-self-end">
           <div>
             <Button
-              variant="secondary"
+              variant="ghost"
               size="icon-sm"
               onClick={() => setImportDialogOpen(true)}
               title="Import from Code"
@@ -91,11 +89,11 @@ export const EditorPreviewPane = ({ spec, setImportDialogOpen, handleUndo, handl
       </div>
 
       <TabsContent value="preview" className="flex flex-col h-full w-full relative px-0 py-2.5 ">
-        <div className="h-full w-full bg-bg-primary">
+        <div className="h-full w-full bg-background">
           {spec && spec.name ? (
             <>
               <HTMLRenderer spec={spec} viewportWidth={viewportWidth} />
-              <div className="px-2 py-1.5 flex justify-end gap-2 absolute bottom-6 right-6 bg-bg-surface rounded-input border border-border">
+              <div className="px-1 py-1 flex justify-end gap-2 absolute bottom-6 right-6 bg-card rounded-xl border border-border">
                 <ToggleGroup
                   type="single"
                   variant="outline"

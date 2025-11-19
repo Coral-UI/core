@@ -1,0 +1,146 @@
+{
+  "organizations": [
+    {
+      "id": "org_1763402732376_hzswh65hx",
+      "name": "testing",
+      "createdAt": "2025-11-17T18:05:32.374Z",
+      "updatedAt": "2025-11-17T18:05:32.374Z"
+    }
+  ],
+  "libraries": [
+    {
+      "id": "lib_1763402739374_gmnyzd13b",
+      "organizationId": "org_1763402732376_hzswh65hx",
+      "name": "my library",
+      "createdAt": "2025-11-17T18:05:39.374Z",
+      "updatedAt": "2025-11-17T18:05:39.374Z"
+    }
+  ],
+  "components": [
+    {
+      "id": "comp_1763402743951_mtveaegrc",
+      "libraryId": "lib_1763402739374_gmnyzd13b",
+      "name": "button",
+      "spec": {
+        "name": "Button",
+        "elementType": "button",
+        "type": "NODE",
+        "textContent": "Click Me",
+        "styles": {
+          "backgroundColor": {
+            "hex": "#ff0000",
+            "rgb": {
+              "r": 255,
+              "g": 0,
+              "b": 0,
+              "a": 1
+            },
+            "hsl": {
+              "h": 0,
+              "s": 100,
+              "l": 50,
+              "a": 1
+            }
+          },
+          "color": {
+            "hex": "#ffffff",
+            "rgb": {
+              "r": 255,
+              "g": 255,
+              "b": 255,
+              "a": 1
+            },
+            "hsl": {
+              "h": 0,
+              "s": 0,
+              "l": 100,
+              "a": 1
+            }
+          },
+          "paddingInlineStart": {
+            "value": 12,
+            "unit": "px"
+          },
+          "paddingInlineEnd": {
+            "value": 12,
+            "unit": "px"
+          },
+          "paddingBlockStart": {
+            "value": 5,
+            "unit": "px"
+          },
+          "paddingBlockEnd": {
+            "value": 5,
+            "unit": "px"
+          },
+          "borderInlineStartStyle": "solid",
+          "borderInlineEndStyle": "solid",
+          "borderBlockStartStyle": "solid",
+          "borderBlockEndStyle": "solid",
+          "borderInlineStartColor": {
+            "hex": "#003cff",
+            "rgb": {
+              "r": 0,
+              "g": 60,
+              "b": 255,
+              "a": 1
+            },
+            "hsl": {
+              "h": 226,
+              "s": 100,
+              "l": 50,
+              "a": 1
+            }
+          },
+          "borderInlineEndColor": {
+            "hex": "#003cff",
+            "rgb": {
+              "r": 0,
+              "g": 60,
+              "b": 255,
+              "a": 1
+            },
+            "hsl": {
+              "h": 226,
+              "s": 100,
+              "l": 50,
+              "a": 1
+            }
+          },
+          "borderBlockStartColor": {
+            "hex": "#003cff",
+            "rgb": {
+              "r": 0,
+              "g": 60,
+              "b": 255,
+              "a": 1
+            },
+            "hsl": {
+              "h": 226,
+              "s": 100,
+              "l": 50,
+              "a": 1
+            }
+          },
+          "borderBlockEndColor": {
+            "hex": "#003cff",
+            "rgb": {
+              "r": 0,
+              "g": 60,
+              "b": 255,
+              "a": 1
+            },
+            "hsl": {
+              "h": 226,
+              "s": 100,
+              "l": 50,
+              "a": 1
+            }
+          }
+        }
+      },
+      "createdAt": "2025-11-17T18:05:43.951Z",
+      "updatedAt": "2025-11-17T19:35:44.631Z"
+    }
+  ]
+}

@@ -105,19 +105,14 @@ class ElectronFS implements FileSystemAdapter {
  * Falls back to traditional download/upload for unsupported browsers
  */
 class BrowserFS implements FileSystemAdapter {
-  private hasNativeFileAccess =
-    typeof window !== 'undefined' && 'showOpenFilePicker' in window
+  private hasNativeFileAccess = typeof window !== 'undefined' && 'showOpenFilePicker' in window
 
   async readFile(): Promise<string> {
-    throw new Error(
-      'readFile with path is not supported in browser. Use openFile() instead.',
-    )
+    throw new Error('readFile with path is not supported in browser. Use openFile() instead.')
   }
 
   async writeFile(): Promise<void> {
-    throw new Error(
-      'writeFile with path is not supported in browser. Use saveFile() instead.',
-    )
+    throw new Error('writeFile with path is not supported in browser. Use saveFile() instead.')
   }
 
   async openFile(): Promise<{ content: string; path?: string; name: string }> {

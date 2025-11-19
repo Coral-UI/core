@@ -18,16 +18,16 @@ import { cva } from 'class-variance-authority'
 import { useCallback, useEffect, useRef } from 'react'
 
 const inputVariants = cva(
-  'w-full [&>input]:w-full min-w-0 rounded-input text-text-primary font-sans placeholder:text-text-muted [&>input]:outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 interactive-invalid-input group interactive-focus-input has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg  overflow-hidden inline-flex items-center  font-normal',
+  'w-full [&>input]:w-full min-w-0 rounded-md text-foreground font-sans placeholder:text-muted-foreground [&>input]:outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 interactive-invalid-input group interactive-focus-input has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg  overflow-hidden inline-flex items-center  font-medium tracking-tight inset-shadow-xs inset-shadow-shadow-input bg-input border border-input-border',
   {
     variants: {
       variant: {
-        default: 'bg-input-bg ',
+        default: 'bg-input ',
         transparent: 'bg-transparent border-input-border',
       },
       size: {
         default: 'h-9 text-sm',
-        sm: 'h-7 text-xs tracking-wide',
+        sm: 'h-8 text-sm',
         lg: 'h-12',
       },
       hasLeadingIcon: {
@@ -176,7 +176,7 @@ function ColorInput({
             </ColorPickerTrigger>
           </div>
           <ColorPickerContent
-            className="bg-bg-surface border-border-surface shadow-xl"
+            className="bg-card border-card-border shadow-lg shadow-card"
             side="top"
             sideOffset={-20}
             align="start"

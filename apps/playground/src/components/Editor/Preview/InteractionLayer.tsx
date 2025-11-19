@@ -25,24 +25,6 @@ interface InteractionLayerProps {
 }
 
 /**
- * Recursively collect all element IDs from a Coral spec
- */
-function collectElementIds(node: CoralRootNode, ids: string[] = []): string[] {
-  const nodeWithId = node as CoralRootNode & { id?: string }
-  if (nodeWithId.id) {
-    ids.push(nodeWithId.id)
-  }
-
-  if (node.children) {
-    for (const child of node.children as CoralRootNode[]) {
-      collectElementIds(child, ids)
-    }
-  }
-
-  return ids
-}
-
-/**
  * Debounce function to limit how often we recalculate
  */
 function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number): T {
@@ -70,13 +52,14 @@ export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionL
   const observedElementsRef = useRef<Set<HTMLElement>>(new Set())
   const { addElement, moveElement, elements } = useElementTreeQuery()
 
-  // Collect all element IDs from spec
+  // Collect all element IDs from the element tree (which has IDs) instead of spec (which doesn't)
   const elementIds = useMemo(() => {
-    if (!spec || !spec.name) {
+    if (!elements || elements.length === 0) {
       return []
     }
-    return collectElementIds(spec)
-  }, [spec])
+    // Return all element IDs from the elements array
+    return elements.map((el) => el.id)
+  }, [elements])
 
   // Calculate hit zone positions
   const calculateHitZones = useCallback(() => {

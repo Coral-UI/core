@@ -34,7 +34,6 @@ const useTree = () => {
   return context
 }
 
-
 type TreeViewProps = {
   initialSelectedId?: string
   indicator?: boolean
@@ -131,7 +130,13 @@ const Tree = forwardRef<HTMLDivElement, TreeViewProps>(
               {...(expandedItems !== undefined && { defaultValue: expandedItems })}
               {...(expandedItems !== undefined && { value: expandedItems })}
               className="flex flex-col gap-1"
-              onValueChange={(value) => setExpandedItems((prev) => (prev ? [...prev, value[0] ?? ''].filter((v): v is string => v !== '') : value.filter((v): v is string => v !== undefined)))}
+              onValueChange={(value) =>
+                setExpandedItems((prev) =>
+                  prev
+                    ? [...prev, value[0] ?? ''].filter((v): v is string => v !== '')
+                    : value.filter((v): v is string => v !== undefined),
+                )
+              }
             >
               {children}
             </AccordionPrimitive.Root>
@@ -200,7 +205,11 @@ const Folder = forwardRef<HTMLDivElement, FolderProps & React.HTMLAttributes<HTM
             {...(expandedItems !== undefined && { defaultValue: expandedItems })}
             {...(expandedItems !== undefined && { value: expandedItems })}
             onValueChange={(value) => {
-              setExpandedItems?.((prev) => (prev ? [...prev, value[0] ?? ''].filter((v): v is string => v !== '') : value.filter((v): v is string => v !== undefined)))
+              setExpandedItems?.((prev) =>
+                prev
+                  ? [...prev, value[0] ?? ''].filter((v): v is string => v !== '')
+                  : value.filter((v): v is string => v !== undefined),
+              )
             }}
           >
             {children}

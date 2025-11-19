@@ -1,4 +1,4 @@
-import { convertFormValuesToCoralStyles, convertCoralStylesToFormValues } from '../convertFormToCoralStyles'
+import { convertCoralStylesToFormValues, convertFormValuesToCoralStyles } from '../convertFormToCoralStyles'
 
 describe('convertFormValuesToCoralStyles', () => {
   const defaultValues = {

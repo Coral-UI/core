@@ -1,12 +1,11 @@
 import { Editor } from '@/components/Editor/Editor'
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { memo, useEffect } from 'react'
 
-export const Route = createFileRoute('/editor')({
-  component: EditorRoute,
-})
+// Memoize the route component to prevent re-renders
+const EditorRoute = memo(function EditorRoute() {
+  const { componentId } = Route.useParams()
 
-function EditorRoute() {
   useEffect(() => {
     // Prevent body scroll only on the editor page
     document.body.style.overflow = 'hidden'
@@ -19,5 +18,9 @@ function EditorRoute() {
     }
   }, [])
 
-  return <Editor />
-}
+  return <Editor componentId={componentId} />
+})
+
+export const Route = createFileRoute('/orgs/$orgId/libraries/$libraryId/components/$componentId/edit')({
+  component: EditorRoute,
+})

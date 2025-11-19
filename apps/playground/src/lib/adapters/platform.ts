@@ -1,27 +1,22 @@
-import type { ElectronAPI } from '../../electron/preload'
-
 /**
  * Platform detection utility
- * Determines if the app is running in Electron or browser environment
+ * Browser-only implementation (Electron support removed)
  */
 export function isElectron(): boolean {
-  return typeof window !== 'undefined' && window.electron !== undefined
+  return false
 }
 
 /**
  * Get the platform type
  */
 export function getPlatform(): 'electron' | 'web' {
-  return isElectron() ? 'electron' : 'web'
+  return 'web'
 }
 
 /**
  * Get the Electron API (only available in Electron environment)
- * Throws an error if called in a browser environment
+ * Throws an error since Electron is not supported
  */
-export function getElectronAPI(): ElectronAPI {
-  if (!isElectron()) {
-    throw new Error('Electron API is not available in browser environment')
-  }
-  return window.electron!
+export function getElectronAPI(): never {
+  throw new Error('Electron API is not available - browser-only mode')
 }

@@ -3,11 +3,13 @@ import { Toaster } from '@/components/ui/sonner'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 
 const RootLayout = () => (
-  <>
+  <div>
     <NavBar />
-    <Outlet />
+    <div className="pt-12">
+      <Outlet />
+    </div>
     <Toaster richColors expand={false} />
-  </>
+  </div>
 )
 
 export const Route = createRootRoute({ component: RootLayout })

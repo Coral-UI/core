@@ -218,7 +218,7 @@ const FieldInput = React.memo(
                 type="text"
                 value={value}
                 onChange={handleTextChange}
-                className="flex h-9 w-full rounded-md border border-input-border bg-input-bg px-3 py-1 text-sm text-text-primary shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-focus-outline disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-9 w-full rounded-input border border-input-border bg-input-bg px-3 py-1 text-sm text-text-primary shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-focus-outline disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={label}
               />
             </InputGroup>
@@ -232,7 +232,7 @@ const FieldInput = React.memo(
             <Select
               {...(className !== undefined && { className })}
               items={inputConfig.selectOptions}
-              value={String(value)}
+              value={value as string}
               onValueChange={handleSelectChange}
               id={fieldName}
               aria-label={label}
@@ -247,7 +247,7 @@ const FieldInput = React.memo(
               ? (form.state.values[formatName] as 'hex' | 'rgb' | 'hsl' | 'hsb')
               : inputConfig.defaultColorFormat || 'hex'
           return (
-            <div className="w-full [&>input]:w-full min-w-0 rounded-input text-text-primary font-sans border placeholder:text-text-muted [&>input]:outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 interactive-invalid-input group interactive-focus-input has-[>input[aria-invalid=true]]:ring-destructive-fg has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg overflow-hidden inline-flex items-center font-normal bg-input-bg border-input-border h-8 text-xs tracking-wide px-2">
+            <div className="w-full [&>input]:w-full min-w-0 rounded-md text-foreground font-sans border placeholder:text-muted-foreground [&>input]:outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 interactive-invalid-input group interactive-focus-input has-[>input[aria-invalid=true]]:ring-destructive-fg has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg overflow-hidden inline-flex items-center font-normal bg-input border-input-border h-8 text-xs tracking-wide px-2">
               {/* Hidden input for accessibility and form association */}
               <input
                 type="text"
@@ -279,7 +279,7 @@ const FieldInput = React.memo(
                   </Button>
                 </ColorPickerTrigger>
                 <ColorPickerContent
-                  className="bg-bg-surface border-border-surface shadow-xl"
+                  className="bg-card border-card-border shadow-lg shadow-card"
                   side="top"
                   sideOffset={-20}
                   align="start"
@@ -385,7 +385,7 @@ const CardinalLayout = ({
   const InlineEndIcon = fieldIcons.inlineEnd
   const BlockEndIcon = fieldIcons.blockEnd
   return (
-    <FieldGroup className="flex flex-col gap-2 items-center justify-center border border-input-border rounded-md p-2 bg-input-bg/40 shadow-lg">
+    <FieldGroup className="flex flex-col gap-2 items-center justify-center">
       <div className="flex flex-row gap-2">
         <Field>
           <FieldLabel htmlFor={fields.blockStart} className={hideFieldLabels ? 'sr-only' : ''}>

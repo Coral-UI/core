@@ -4,33 +4,91 @@ import { CoralElementType } from '@reallygoodwork/coral-core'
 export const ELEMENT_CATEGORIES = {
   // Structural block-level elements that can contain other block elements
   STRUCTURAL_BLOCK: [
-    'div', 'section', 'article', 'aside', 'header', 'footer', 'main', 'nav',
-    'blockquote', 'pre', 'ul', 'ol', 'li', 'dl', 'dt', 'dd',
-    'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
-    'form', 'fieldset', 'legend', 'figure', 'figcaption',
-    'address', 'details', 'summary', 'button', 'textarea'
+    'div',
+    'section',
+    'article',
+    'aside',
+    'header',
+    'footer',
+    'main',
+    'nav',
+    'blockquote',
+    'pre',
+    'ul',
+    'ol',
+    'li',
+    'dl',
+    'dt',
+    'dd',
+    'table',
+    'thead',
+    'tbody',
+    'tfoot',
+    'tr',
+    'th',
+    'td',
+    'form',
+    'fieldset',
+    'legend',
+    'figure',
+    'figcaption',
+    'address',
+    'details',
+    'summary',
+    'button',
+    'textarea',
   ] as CoralElementType[],
 
   // Text block elements that can only contain inline elements and text
-  TEXT_BLOCK: [
-    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'
-  ] as CoralElementType[],
+  TEXT_BLOCK: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'] as CoralElementType[],
 
   // Inline elements that can only contain other inline elements and text
   INLINE: [
-    'span', 'a', 'strong', 'em', 'code', 'mark', 'small', 'sub', 'sup',
-    'time', 'abbr', 'cite', 'q', 'samp', 'kbd', 'var', 'dfn',
-    'b', 'i', 'u', 's', 'del', 'ins'
+    'span',
+    'a',
+    'strong',
+    'em',
+    'code',
+    'mark',
+    'small',
+    'sub',
+    'sup',
+    'time',
+    'abbr',
+    'cite',
+    'q',
+    'samp',
+    'kbd',
+    'var',
+    'dfn',
+    'b',
+    'i',
+    'u',
+    's',
+    'del',
+    'ins',
   ] as CoralElementType[],
 
   // Self-closing or void elements
   VOID: [
-    'img', 'br', 'hr', 'input', 'select', 'option',
-    'audio', 'video', 'source', 'canvas', 'embed', 'iframe', 'object', 'param'
+    'img',
+    'br',
+    'hr',
+    'input',
+    'select',
+    'option',
+    'audio',
+    'video',
+    'source',
+    'canvas',
+    'embed',
+    'iframe',
+    'object',
+    'param',
   ] as CoralElementType[],
 
   // Text content elements
-  TEXT: ['text'] as CoralElementType[]
+  TEXT: ['text'] as CoralElementType[],
 }
 
 // Check if an element is a structural block element
@@ -108,7 +166,12 @@ export const getValidChildTypes = (parentType: CoralElementType): CoralElementTy
   }
 
   if (isStructuralBlockElement(parentType)) {
-    return [...ELEMENT_CATEGORIES.STRUCTURAL_BLOCK, ...ELEMENT_CATEGORIES.TEXT_BLOCK, ...ELEMENT_CATEGORIES.INLINE, ...ELEMENT_CATEGORIES.TEXT]
+    return [
+      ...ELEMENT_CATEGORIES.STRUCTURAL_BLOCK,
+      ...ELEMENT_CATEGORIES.TEXT_BLOCK,
+      ...ELEMENT_CATEGORIES.INLINE,
+      ...ELEMENT_CATEGORIES.TEXT,
+    ]
   }
 
   if (isInlineElement(parentType)) {
@@ -119,7 +182,9 @@ export const getValidChildTypes = (parentType: CoralElementType): CoralElementTy
 }
 
 // Get element category for styling purposes
-export const getElementCategory = (elementType: CoralElementType): 'structural-block' | 'text-block' | 'inline' | 'void' | 'text' => {
+export const getElementCategory = (
+  elementType: CoralElementType,
+): 'structural-block' | 'text-block' | 'inline' | 'void' | 'text' => {
   if (isStructuralBlockElement(elementType)) return 'structural-block'
   if (isTextBlockElement(elementType)) return 'text-block'
   if (isInlineElement(elementType)) return 'inline'

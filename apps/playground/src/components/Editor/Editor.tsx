@@ -1,13 +1,19 @@
 import { EditorSidebar } from '@/components/Editor/ElementTree/EditorSidebar'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
 import { EditorPreviewPane } from '@/components/Editor/Preview/EditorPreviewPane'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { useComponent } from '@/hooks/queries/useComponents'
 import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
+import * as componentsApi from '@/lib/api/components'
 import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { convertCoralStylesToFormValues, convertFormValuesToCoralStyles } from '@/utils/convertFormToCoralStyles'
 import { getDefaultDisplayValue } from '@/utils/elementDisplay'
-import { useCallback, useMemo, useState } from 'react'
+import { IconFolderCode } from '@tabler/icons-react'
+import { CheckIcon, SaveIcon } from 'lucide-react'
+import { memo, startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { CoralRootNode, CoralStyleType, transformHTMLToSpec } from '@reallygoodwork/coral-core'
@@ -15,15 +21,54 @@ import { CoralRootNode, CoralStyleType, transformHTMLToSpec } from '@reallygoodw
 import type { FormValues as ComponentFormValues } from './component-manager/formSchema'
 import type { StyleFormValues } from './style-manager/formSchema'
 import { ScrollArea } from '../base/ScrollArea'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty'
 import { ComponentForm } from './component-manager/componentForm'
 import { StyleForm } from './style-manager/styleForm'
 
-export const Editor = () => {
+interface EditorProps {
+  componentId: string
+}
+
+export const Editor = memo(({ componentId }: EditorProps) => {
+  // Use select to only subscribe to the data we need, preventing re-renders on other changes
+  const { data: component, isLoading: componentLoading } = useComponent(componentId)
+  // Don't use the mutation hook - it causes re-renders. Call API directly instead.
+  // const updateComponent = useUpdateComponent()
   const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const setSelectedElementId = useElementSelectionStore((state) => state.setSelectedElementId)
   const [importDialogOpen, setImportDialogOpen] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
+  const [lastSavedSpec, setLastSavedSpec] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isLoadingFromDb, setIsLoadingFromDb] = useState(false)
+  const loadedComponentIdRef = useRef<string | null>(null)
+  const justSavedRef = useRef(false)
+  const saveTimeoutRef = useRef<NodeJS.Timeout>()
+  const lastElementsHashRef = useRef<string | null>(null)
+  const isSavingRef = useRef(false)
+  const isLoadingFromDbRef = useRef(false)
+  const componentRef = useRef(component)
+  const componentSpecRef = useRef<CoralRootNode | null>(null)
+  const lastSavedSpecRef = useRef<string | null>(null)
   const elementTreeHook = useElementTreeQuery()
   const { elements, getElementTree, replaceAllElements, updateElement, removeElement } = elementTreeHook
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    isSavingRef.current = isSaving
+  }, [isSaving])
+  useEffect(() => {
+    isLoadingFromDbRef.current = isLoadingFromDb
+  }, [isLoadingFromDb])
+  useEffect(() => {
+    componentRef.current = component
+    if (component?.spec) {
+      componentSpecRef.current = component.spec
+    }
+  }, [component])
+  useEffect(() => {
+    lastSavedSpecRef.current = lastSavedSpec
+  }, [lastSavedSpec])
 
   // Get the selected element
   const selectedElement = useMemo(() => {
@@ -174,7 +219,7 @@ export const Editor = () => {
     [selectedElementId, selectedElement, updateElement],
   )
 
-  const convertToCoralSpec = (): CoralRootNode => {
+  const convertToCoralSpec = useCallback((): CoralRootNode => {
     // Get fresh element tree on each render
     const elementTree = getElementTree()
 
@@ -189,7 +234,7 @@ export const Editor = () => {
 
     const buildCoralNode = (element: ElementTreeNode): CoralRootNode => {
       const node = {
-        id: element.id, // Preserve ID for click handlers
+        // Don't include internal ID in spec - it's only for editor use
         name: element.name,
         elementType: element.elementType,
         type: element.type || 'NODE',
@@ -219,10 +264,283 @@ export const Editor = () => {
       type: 'NODE',
       children: elementTree.map(buildCoralNode),
     } as CoralRootNode
-  }
+  }, [getElementTree])
 
-  // Force re-render when elements change
-  const spec = convertToCoralSpec()
+  // Create a stable hash of elements to detect actual changes
+  const elementsHash = useMemo(() => JSON.stringify(elements), [elements])
+
+  // Memoize spec generation based on elements hash (not function reference)
+  // This ensures spec only changes when elements actually change
+  const specString = useMemo(() => {
+    return JSON.stringify(convertToCoralSpec())
+  }, [elementsHash, convertToCoralSpec])
+
+  const spec = useMemo(() => JSON.parse(specString) as CoralRootNode, [specString])
+
+  // Check if there are unsaved changes using the stringified spec
+  const hasUnsavedChanges = lastSavedSpec !== null && lastSavedSpec !== specString && isInitialized
+
+  // Load component spec ONLY when component ID changes (not when component object changes)
+  useEffect(() => {
+    // Don't load if:
+    // - Still loading initial data
+    // - Already initialized for this component ID
+    // - Currently loading from DB
+    // - We just saved (to prevent reload loop)
+    // - Currently saving
+    if (
+      componentLoading ||
+      isLoadingFromDb ||
+      isLoadingFromDbRef.current ||
+      justSavedRef.current ||
+      isSavingRef.current ||
+      (isInitialized && loadedComponentIdRef.current === componentId)
+    ) {
+      return
+    }
+
+    // Need component data to load
+    if (!component || !componentSpecRef.current) {
+      return
+    }
+
+    // If component ID changed, reset initialization
+    if (loadedComponentIdRef.current !== null && loadedComponentIdRef.current !== componentId) {
+      setIsInitialized(false)
+      setLastSavedSpec(null)
+      lastSavedSpecRef.current = null
+    }
+
+    // Only load if we haven't loaded this component yet
+    if (isInitialized && loadedComponentIdRef.current === componentId) {
+      return
+    }
+
+    setIsLoadingFromDb(true)
+    isLoadingFromDbRef.current = true
+    const currentComponentId = componentId
+    loadedComponentIdRef.current = currentComponentId
+    const specToLoad = componentSpecRef.current
+    const convertCoralToElements = (node: CoralRootNode, parentId?: string): ElementTreeNode[] => {
+      const id = `element_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+      const element: ElementTreeNode = {
+        id,
+        parentId,
+        name: node.name || node.elementType,
+        elementType: node.elementType,
+        type: node.type || 'NODE',
+        isExpanded: true,
+      }
+
+      if (node.textContent) {
+        element.textContent = node.textContent
+      }
+      if (node.description) {
+        element.description = node.description
+      }
+      if (node.elementAttributes) {
+        element.elementAttributes = node.elementAttributes
+      }
+      if (node.styles) {
+        element.styles = node.styles
+      }
+      if (node.responsiveStyles) {
+        element.responsiveStyles = node.responsiveStyles
+      }
+
+      let allElements = [element]
+
+      if (node.children && node.children.length > 0) {
+        node.children.forEach((child: CoralRootNode) => {
+          const childElements = convertCoralToElements(child, id)
+          allElements = [...allElements, ...childElements]
+        })
+      }
+
+      return allElements
+    }
+
+    // ALWAYS treat the saved spec as the root element
+    // The spec represents the entire component tree, so the top-level node
+    // should always become the 'root' element in the editor
+    const convertedElements = convertCoralToElements(specToLoad)
+
+    // Set the first element (the top-level spec node) to use 'root' as ID
+    if (convertedElements.length > 0) {
+      const originalId = convertedElements[0]!.id
+      convertedElements[0]!.id = 'root'
+      convertedElements[0]!.parentId = undefined
+
+      // Update all children's parentId from the original ID to 'root'
+      convertedElements.slice(1).forEach((el) => {
+        if (el.parentId === originalId) {
+          el.parentId = 'root'
+        }
+      })
+    }
+
+    const newElements = convertedElements
+
+    // Only replace elements if they're actually different to prevent unnecessary re-renders
+    const currentElementsString = JSON.stringify(elements)
+    const newElementsString = JSON.stringify(newElements)
+    if (currentElementsString !== newElementsString) {
+      replaceAllElements(newElements)
+    }
+    setIsInitialized(true)
+
+    // Set the last saved spec to match what we just loaded
+    const loadedSpecString = JSON.stringify(specToLoad)
+    setLastSavedSpec(loadedSpecString)
+    lastSavedSpecRef.current = loadedSpecString
+    lastElementsHashRef.current = loadedSpecString
+    setIsLoadingFromDb(false)
+    isLoadingFromDbRef.current = false
+    justSavedRef.current = false // Reset save flag after loading
+  }, [componentId, componentLoading, replaceAllElements])
+
+  // Reset initialization and saved state when componentId changes
+  useEffect(() => {
+    setIsInitialized(false)
+    setLastSavedSpec(null)
+    lastSavedSpecRef.current = null
+    setIsSaving(false)
+    setIsLoadingFromDb(false)
+    loadedComponentIdRef.current = null
+    justSavedRef.current = false
+    lastElementsHashRef.current = null
+    // Clear any pending save timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+    }
+  }, [componentId])
+
+  // Save function - call API directly to avoid React Query mutation re-renders
+  const handleSave = useCallback(async () => {
+    if (!component || !isInitialized || isSaving) return
+
+    // Use startTransition to prevent immediate re-render flash
+    startTransition(() => {
+      setIsSaving(true)
+    })
+    isSavingRef.current = true
+    justSavedRef.current = true // Mark that we're saving to prevent reload
+    try {
+      const spec = convertToCoralSpec()
+      const specString = JSON.stringify(spec)
+
+      // Call API directly instead of using mutation hook to prevent re-renders
+      await componentsApi.updateComponent(component.id, { spec })
+
+      // Batch state updates in a transition to prevent flashing
+      startTransition(() => {
+        setLastSavedSpec(specString)
+        setIsSaving(false)
+      })
+      lastSavedSpecRef.current = specString
+      lastElementsHashRef.current = specString
+      isSavingRef.current = false
+
+      toast.success('Component saved successfully')
+      // Reset save flag after a delay to prevent any reload attempts
+      setTimeout(() => {
+        justSavedRef.current = false
+      }, 1000)
+    } catch (error) {
+      justSavedRef.current = false
+      isSavingRef.current = false
+      startTransition(() => {
+        setIsSaving(false)
+      })
+      toast.error(`Failed to save: ${(error as Error).message}`)
+    }
+  }, [component, isInitialized, isSaving, convertToCoralSpec])
+
+  // Auto-save component spec when it changes (debounced)
+  // Use interval-based checking to avoid dependency on elements array
+  useEffect(() => {
+    // Don't set up auto-save if component not ready
+    if (!component || !isInitialized) {
+      return
+    }
+
+    // Check for changes periodically instead of on every render
+    const checkInterval = setInterval(() => {
+      const currentComponent = componentRef.current
+      // Skip if component not available, saving, loading, or just saved
+      if (!currentComponent || isSavingRef.current || isLoadingFromDbRef.current || justSavedRef.current) {
+        return
+      }
+
+      // Calculate current spec
+      const currentSpec = convertToCoralSpec()
+      const currentSpecString = JSON.stringify(currentSpec)
+
+      // Skip if nothing has changed (use ref for stable comparison)
+      if (lastSavedSpecRef.current === currentSpecString) {
+        return
+      }
+
+      // Clear any existing timeout
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+
+      // Set new timeout to save after 2 seconds of inactivity
+      saveTimeoutRef.current = setTimeout(() => {
+        // Double-check conditions before saving using refs
+        if (isSavingRef.current || isLoadingFromDbRef.current || justSavedRef.current || !componentRef.current) {
+          return
+        }
+
+        // Recalculate spec at save time
+        const spec = convertToCoralSpec()
+        const specString = JSON.stringify(spec)
+
+        // Double-check we still have changes before saving (use ref)
+        if (lastSavedSpecRef.current === specString) {
+          return
+        }
+
+        startTransition(() => {
+          setIsSaving(true)
+        })
+        isSavingRef.current = true
+        justSavedRef.current = true // Mark that we're saving to prevent reload
+
+        // Call API directly instead of using mutation hook to prevent re-renders
+        componentsApi
+          .updateComponent(componentRef.current.id, { spec })
+          .then(() => {
+            startTransition(() => {
+              setLastSavedSpec(specString)
+              setIsSaving(false)
+            })
+            lastSavedSpecRef.current = specString
+            lastElementsHashRef.current = specString
+            isSavingRef.current = false
+            // Reset save flag after a longer delay to prevent reload loops
+            setTimeout(() => {
+              justSavedRef.current = false
+            }, 500)
+          })
+          .catch(() => {
+            justSavedRef.current = false
+            isSavingRef.current = false
+            startTransition(() => {
+              setIsSaving(false)
+            })
+          })
+      }, 2000)
+    }, 1000) // Check every second
+
+    return () => {
+      clearInterval(checkInterval)
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+    }
+  }, [component?.id, isInitialized, convertToCoralSpec])
 
   const handleImportCode = (code: string) => {
     try {
@@ -336,6 +654,15 @@ export const Editor = () => {
         handler: handleDelete,
       },
       {
+        key: 's',
+        ctrlKey: true,
+        metaKey: true,
+        handler: (e: KeyboardEvent) => {
+          e.preventDefault()
+          handleSave()
+        },
+      },
+      {
         key: 'z',
         ctrlKey: true,
         metaKey: true,
@@ -355,37 +682,59 @@ export const Editor = () => {
         handler: handleRedo,
       },
     ],
-    [handleDelete, handleUndo, handleRedo],
+    [handleDelete, handleUndo, handleRedo, handleSave],
   )
 
   useKeyboardShortcuts(shortcuts)
 
-  return (
-    <div className="flex flex-col w-full h-[calc(100dvh-2.5rem)] mt-10 bg-background">
-      {/* <div className="flex items-center justify-between gap-2 px-4 py-2 shrink-0 h-10">
-        <div className="flex items-center gap-2 place-self-center">
-          <p className="text-xs font-medium">Name</p>
-          <Badge variant="destructive">Unsaved</Badge>
-        </div>
-        <div className="flex items-center gap-2 justify-self-end">
-          <Button
-            variant="secondary"
-            size="icon-sm"
-            onClick={() => setImportDialogOpen(true)}
-            title="Import from Code"
-            aria-label="Import from Code"
-          >
-            <IconFileImport className="size-3.5" />
-          </Button>
+  if (componentLoading) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100dvh-2.5rem)] mt-10">
+        <div className="text-center">Loading component...</div>
+      </div>
+    )
+  }
 
-          <Button variant="secondary" size="icon-sm" onClick={handleUndo} title="Undo (⌘Z / Ctrl+Z)">
-            <Undo className="size-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon-sm" onClick={handleRedo} title="Redo (⌘⇧Z / Ctrl+Y)">
-            <Redo className="size-3.5" />
+  if (!component) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100dvh-2.5rem)] mt-10">
+        <div className="text-center">
+          <p className="text-lg font-semibold mb-2">Component not found</p>
+          <p className="text-muted-foreground">The component you're looking for doesn't exist.</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col w-full h-[calc(100dvh-1.75rem)] bg-background">
+      <div className="flex items-center justify-between gap-2 px-4 py-2 shrink-0 border-b border-border">
+        <div className="flex items-center gap-2">
+          <p className="text-xs font-medium">{component.name}</p>
+          {hasUnsavedChanges ? (
+            <Badge variant="destructive">Unsaved</Badge>
+          ) : isSaving ? (
+            <Badge variant="secondary">Saving...</Badge>
+          ) : (
+            <Badge variant="success">
+              <CheckIcon className="size-3" />
+              Saved
+            </Badge>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleSave}
+            disabled={isSaving || !hasUnsavedChanges}
+            className="gap-2"
+          >
+            <SaveIcon className="size-3.5" />
+            {isSaving ? 'Saving...' : 'Save'}
           </Button>
         </div>
-      </div> */}
+      </div>
       <div className="flex flex-1 h-[calc(100dvh-2.5rem)] max-h-[calc(100dvh-2.5rem)] overflow-hidden">
         <aside className="w-64 flex flex-col h-full overflow-hidden p-2.5">
           <EditorSidebar />
@@ -413,10 +762,17 @@ export const Editor = () => {
               />
             </ScrollArea>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-              <div className="text-muted-foreground">
-                <p className="text-sm font-medium mb-2">No element selected</p>
-                <p className="text-xs">Select an element from the tree to edit its styles</p>
+            <div className="p-2.5 flex flex-col h-full ">
+              <div className="flex flex-col h-full card">
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <IconFolderCode />
+                    </EmptyMedia>
+                    <EmptyTitle>No element selected</EmptyTitle>
+                    <EmptyDescription>Select an element from the tree to edit its styles</EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
               </div>
             </div>
           )}
@@ -425,4 +781,6 @@ export const Editor = () => {
       <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} />
     </div>
   )
-}
+})
+
+Editor.displayName = 'Editor'

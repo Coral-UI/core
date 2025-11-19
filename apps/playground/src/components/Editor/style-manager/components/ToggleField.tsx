@@ -28,15 +28,18 @@ export const ToggleField = ({
   return (
     <fieldset data-invalid={isInvalid}>
       <legend className="label-sm ml-1.5 h-6 flex items-center">{label}</legend>
-      <div className="w-full bg-interactive-bg-primary rounded-input" role="group">
+      <div
+        className="w-full bg-input rounded-sm border border-input-border inset-shadow-xs inset-shadow-shadow-input"
+        role="group"
+      >
         <ToggleGroup
           className="w-full"
           value={field.state.value ? [field.state.value] : []}
-          onValueChange={(value) => {
+          onValueChange={(value: string[] | string) => {
             // BaseUI ToggleGroup returns an array even in single mode
             // Extract the first (and only) value as a string
             const stringValue = Array.isArray(value) && value.length > 0 ? value[0] : ''
-            field.handleChange(stringValue)
+            field.handleChange(stringValue as string)
           }}
           items={items}
         />

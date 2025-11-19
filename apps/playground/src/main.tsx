@@ -8,9 +8,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import '@fontsource/ibm-plex-mono/400.css'
+import '@fontsource-variable/geist'
+
 // Supports weights 100-700
-import '@fontsource-variable/ibm-plex-sans'
-import '@fontsource-variable/figtree'
 
 import { routeTree } from './routeTree.gen'
 

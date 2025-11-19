@@ -88,7 +88,10 @@ function NumberInput({
       id={id}
       {...(isControlled && value !== undefined && { value })}
       {...(!isControlled && { defaultValue: defaultValue ?? 100 })}
-      {...(isControlled && onChange && { onValueChange: (val) => onChange(val ?? undefined) })}
+      {...(isControlled &&
+        onChange && {
+          onValueChange: (val: number | null, _eventDetails: unknown) => onChange(val ?? undefined),
+        })}
       className="flex w-full max-w-72 flex-col items-start "
       {...props}
     >
@@ -103,7 +106,7 @@ function NumberInput({
 
       <NumberField.Group
         className={cn(
-          'flex rounded-input items-center bg-input-bg has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg interactive-focus-input w-full',
+          'flex rounded-md items-center bg-input has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg interactive-focus-input w-full text-foreground border border-input-border inset-shadow-xs inset-shadow-shadow-input',
           error && 'ring-destructive-fg border-destructive-fg bg-destructive-bg',
         )}
       >
@@ -122,7 +125,7 @@ function NumberInput({
         </div>
         <NumberField.Input
           className={cn(
-            'text-base text-text-primary tabular-nums focus:z-1 focus:outline-none min-w-8 w-full tracking-wide flex-1 shrink-0',
+            'text-base text-foreground tabular-nums focus:z-1 focus:outline-none min-w-8 w-full tracking-wide flex-1 shrink-0',
             size === 'sm' ? 'h-7 text-xs' : 'h-9 text-sm ',
             className,
           )}
@@ -136,7 +139,7 @@ function NumberInput({
           <div className="flex items-center gap-0.5 pr-1.5">
             <NumberField.Decrement
               className={cn(
-                'flex items-center justify-center bg-interactive-bg-secondary border border-interactive-border rounded-full p-0.5  bg-clip-padding text-text-primary select-none  hover:bg-interactive-bg-primary/60 active:bg-interactive-bg-primary/80',
+                'flex items-center justify-center bg-interactive-bg border border-interactive-border rounded-full p-0.5  bg-clip-padding text-text-primary select-none  hover:bg-interactive-bg-primary/60 active:bg-interactive-bg-primary/80',
                 // size === "sm" ? "size-8" : "size-9"
               )}
             >
@@ -144,7 +147,7 @@ function NumberInput({
             </NumberField.Decrement>
             <NumberField.Increment
               className={cn(
-                'flex items-center justify-center bg-interactive-bg-secondary border border-interactive-border rounded-full p-0.5 bg-clip-padding text-text-primary select-none  hover:bg-interactive-bg-primary/60 active:bg-interactive-bg-primary/80',
+                'flex items-center justify-center bg-interactive-bg border border-interactive-border rounded-full p-0.5 bg-clip-padding text-text-primary select-none  hover:bg-interactive-bg-primary/60 active:bg-interactive-bg-primary/80',
                 // size === "sm" ? "size-8" : "size-9"
               )}
             >
@@ -173,7 +176,7 @@ function NumberInput({
         >
           <SelectPrimitive.Trigger
             className={cn(
-              'flex items-center justify-between gap-1 rounded-tr-input rounded-br-input  text-text-primary bg-[#292929] select-none hover:bg-input-bg/80 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-focus-outline data-[popup-open]:bg-bg-input-bg/80 cursor-default tracking-wide',
+              'flex items-center justify-between gap-1 rounded-input  text-text-primary select-none hover:bg-input-bg/80 focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-focus-outline data-[popup-open]:bg-bg-input-bg/80 cursor-default',
               size === 'sm' ? 'h-8 min-w-8 text-xs pr-1 pl-1.5' : 'h-9 min-w-16 text-sm pr-1 pl-1.5',
             )}
           >
@@ -184,14 +187,14 @@ function NumberInput({
           </SelectPrimitive.Trigger>
           <SelectPrimitive.Portal>
             <SelectPrimitive.Positioner className="outline-none select-none z-10" sideOffset={8}>
-              <SelectPrimitive.Popup className="group origin-[var(--transform-origin)] bg-clip-padding rounded-md bg-bg-surface text-text-secondary shadow-lg shadow-bg-primary outline outline-1 outline-input-border transition-[transform,scale,opacity] data-[ending-style]:scale-90 data-[ending-style]:opacity-0 data-[side=none]:data-[ending-style]:transition-none data-[starting-style]:scale-90 data-[starting-style]:opacity-0 data-[side=none]:data-[starting-style]:scale-100 data-[side=none]:data-[starting-style]:opacity-100 data-[side=none]:data-[starting-style]:transition-none ">
+              <SelectPrimitive.Popup className="group origin-[var(--transform-origin)] bg-clip-padding rounded-md bg-card text-muted-foreground shadow-lg shadow-card outline outline-1 outline-input-border transition-[transform,scale,opacity] data-[ending-style]:scale-90 data-[ending-style]:opacity-0 data-[side=none]:data-[ending-style]:transition-none data-[starting-style]:scale-90 data-[starting-style]:opacity-0 data-[side=none]:data-[starting-style]:scale-100 data-[side=none]:data-[starting-style]:opacity-100 data-[side=none]:data-[starting-style]:transition-none ">
                 <SelectPrimitive.ScrollUpArrow className="top-0 z-[1] flex h-4 w-full cursor-default items-center justify-center rounded-md bg-[canvas] text-center text-xs before:absolute data-[side=none]:before:top-[-100%] before:left-0 before:h-full before:w-full before:content-['']" />
                 <SelectPrimitive.List className="relative py-1 scroll-py-6 overflow-y-auto max-h-[var(--available-height)]">
                   {unitOptions.map(({ label, value }: { label: string; value: string }) => (
                     <SelectPrimitive.Item
                       key={label}
                       value={value}
-                      className="grid min-w-[var(--anchor-width)] cursor-default grid-cols-[0.75rem_1fr] items-center gap-2 py-2 pr-4 pl-2.5 text-sm leading-4 outline-none select-none group-data-[side=none]:min-w-[calc(var(--anchor-width)+1rem)] group-data-[side=none]:pr-12 group-data-[side=none]:text-sm group-data-[side=none]:leading-4 data-[highlighted]:relative data-[highlighted]:z-0 data-[highlighted]:text-text-primary data-[highlighted]:before:absolute data-[highlighted]:before:inset-x-1 data-[highlighted]:before:inset-y-0 data-[highlighted]:before:z-[-1] data-[highlighted]:before:rounded-sm data-[highlighted]:before:bg-bg-secondary pointer-coarse:py-2.5 pointer-coarse:text-[0.925rem]"
+                      className="grid min-w-[var(--anchor-width)] cursor-default grid-cols-[0.75rem_1fr] items-center gap-2 py-2 pr-4 pl-2.5 text-sm leading-4 outline-none select-none group-data-[side=none]:min-w-[calc(var(--anchor-width)+1rem)] group-data-[side=none]:pr-12 group-data-[side=none]:text-sm group-data-[side=none]:leading-4 data-[highlighted]:relative data-[highlighted]:z-0 data-[highlighted]:text-foreground data-[highlighted]:before:absolute data-[highlighted]:before:inset-x-1 data-[highlighted]:before:inset-y-0 data-[highlighted]:before:z-[-1] data-[highlighted]:before:rounded-sm data-[highlighted]:before:bg-secondary/20 pointer-coarse:py-2.5 pointer-coarse:text-[0.925rem]"
                     >
                       <SelectPrimitive.ItemIndicator className="col-start-1">
                         <IconCheck className="size-3" />

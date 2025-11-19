@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+// import { Button } from '@/components/ui/button'
 import { TreeDataItem, TreeView } from '@/components/ui/tree-view'
 import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
@@ -143,9 +143,9 @@ export const EditorSidebar = () => {
   )
 
   return (
-    <div className="flex flex-col h-full bg-bg-surface rounded-frame border border-border-surface shadow-lg shadow-border-surface">
-      <div className="px-4 pt-4">
-        <p className="text-xs font-semibold text-text-secondary tracking-tight">Structure</p>
+    <div className="flex flex-col h-full card">
+      <div className="pt-1.5">
+        <p className="text-xs font-medium text-muted-foreground">Structure</p>
       </div>
       <div className="flex-1 overflow-auto">
         <TreeView
