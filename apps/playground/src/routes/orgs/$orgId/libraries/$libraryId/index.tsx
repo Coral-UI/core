@@ -41,7 +41,12 @@ function LibraryDetail() {
     <div className="container mx-auto p-8">
       <Breadcrumbs className="mb-4" />
       <PageHeader title={library.name} description="Manage components in this library">
-        <CreateComponentDialog libraryId={libraryId} />
+        <div className="flex items-center gap-2">
+          <Link to="/orgs/$orgId/libraries/$libraryId/tokens" params={{ orgId, libraryId }}>
+            <Button variant="outline">Design Tokens</Button>
+          </Link>
+          <CreateComponentDialog libraryId={libraryId} />
+        </div>
       </PageHeader>
 
       <CardGrid

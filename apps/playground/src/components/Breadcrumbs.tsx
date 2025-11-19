@@ -13,10 +13,12 @@ export function Breadcrumbs({ className }: React.ComponentProps<'div'>) {
   const orgMatch = pathname.match(/\/orgs\/([^/]+)/)
   const libraryMatch = pathname.match(/\/orgs\/[^/]+\/libraries\/([^/]+)/)
   const componentMatch = pathname.match(/\/orgs\/[^/]+\/libraries\/[^/]+\/components\/([^/]+)/)
+  const tokensMatch = pathname.match(/\/orgs\/[^/]+\/libraries\/[^/]+\/tokens/)
 
   const orgId = orgMatch?.[1]
   const libraryId = libraryMatch?.[1]
   const componentId = componentMatch?.[1]
+  const isTokensRoute = !!tokensMatch
 
   const { data: organization } = useOrganization(orgId || '')
   const { data: library } = useLibrary(libraryId || '')
@@ -48,6 +50,15 @@ export function Breadcrumbs({ className }: React.ComponentProps<'div'>) {
     })
   }
 
+  // Add tokens breadcrumb if on tokens route
+  if (isTokensRoute && libraryId && orgId) {
+    items.push({
+      label: 'Design Tokens',
+      href: `/orgs/${orgId}/libraries/${libraryId}/tokens`,
+    })
+  }
+
+  // Add component breadcrumb if on component or editor route
   if (componentId && component) {
     items.push({
       label: component.name,
