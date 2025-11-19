@@ -78,6 +78,10 @@ export async function updateComponent(id: string, input: UpdateComponentInput): 
     component.spec = input.spec
   }
 
+  if (input.accessibility !== undefined) {
+    component.accessibility = input.accessibility
+  }
+
   component.updatedAt = new Date().toISOString()
   await writeMockData(data)
 

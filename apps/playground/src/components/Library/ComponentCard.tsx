@@ -1,7 +1,9 @@
 import type { Component } from '@/types'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useDeleteComponent } from '@/hooks/queries/useComponents'
+import { formatAccessibilityStatus, getAccessibilityBadgeVariant, getAccessibilitySummary } from '@/lib/accessibility/utils'
 import { Link } from '@tanstack/react-router'
 import { EditIcon, Trash2Icon } from 'lucide-react'
 
@@ -13,6 +15,8 @@ interface ComponentCardProps {
 
 export function ComponentCard({ component, organizationId, libraryId }: ComponentCardProps) {
   const deleteComponent = useDeleteComponent()
+  const accessibilitySummary = getAccessibilitySummary(component.accessibility)
+  const badgeVariant = getAccessibilityBadgeVariant(accessibilitySummary)
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -39,6 +43,18 @@ export function ComponentCard({ component, organizationId, libraryId }: Componen
               <CardDescription className="mt-1">
                 Created {new Date(component.createdAt).toLocaleDateString()}
               </CardDescription>
+              {component.accessibility && (
+                <div className="mt-2">
+                  <Badge variant={badgeVariant} className="text-xs">
+                    {formatAccessibilityStatus(accessibilitySummary)}
+                  </Badge>
+                  {component.accessibility.lastChecked && (
+                    <CardDescription className="mt-1 text-xs">
+                      Checked {new Date(component.accessibility.lastChecked).toLocaleDateString()}
+                    </CardDescription>
+                  )}
+                </div>
+              )}
             </div>
             <Button variant="ghost" size="icon-sm" onClick={handleDelete} className="shrink-0">
               <Trash2Icon className="size-4" />

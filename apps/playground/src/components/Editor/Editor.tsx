@@ -1,3 +1,4 @@
+import { AccessibilityPanel } from '@/components/Editor/AccessibilityPanel'
 import { EditorSidebar } from '@/components/Editor/ElementTree/EditorSidebar'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
 import { EditorPreviewPane } from '@/components/Editor/Preview/EditorPreviewPane'
@@ -7,6 +8,7 @@ import { useComponent } from '@/hooks/queries/useComponents'
 import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
+import { checkAccessibility } from '@/lib/accessibility/checkAccessibility'
 import * as componentsApi from '@/lib/api/components'
 import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { convertCoralStylesToFormValues, convertFormValuesToCoralStyles } from '@/utils/convertFormToCoralStyles'
@@ -41,6 +43,7 @@ export const Editor = memo(({ componentId }: EditorProps) => {
   const [lastSavedSpec, setLastSavedSpec] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isLoadingFromDb, setIsLoadingFromDb] = useState(false)
+  const [isCheckingAccessibility, setIsCheckingAccessibility] = useState(false)
   const loadedComponentIdRef = useRef<string | null>(null)
   const justSavedRef = useRef(false)
   const saveTimeoutRef = useRef<NodeJS.Timeout>()
@@ -442,6 +445,21 @@ export const Editor = memo(({ componentId }: EditorProps) => {
       isSavingRef.current = false
 
       toast.success('Component saved successfully')
+
+      // Run accessibility check after successful save
+      try {
+        setIsCheckingAccessibility(true)
+        const accessibilityResults = await checkAccessibility(spec)
+        await componentsApi.updateComponent(component.id, { accessibility: accessibilityResults })
+        toast.success('Accessibility check completed')
+      } catch (error) {
+        // Don't block save if accessibility check fails
+        console.error('Accessibility check failed:', error)
+        toast.error(`Accessibility check failed: ${error instanceof Error ? error.message : String(error)}`)
+      } finally {
+        setIsCheckingAccessibility(false)
+      }
+
       // Reset save flag after a delay to prevent any reload attempts
       setTimeout(() => {
         justSavedRef.current = false
@@ -748,9 +766,9 @@ export const Editor = memo(({ componentId }: EditorProps) => {
             handleRedo={handleRedo}
           />
         </main>
-        <aside className="w-72 h-full overflow-hidden">
+        <aside className="w-72 h-full overflow-hidden flex flex-col">
           {selectedElement ? (
-            <ScrollArea innerClassName="flex flex-col gap-2.5 py-2.5" className="px-2.5">
+            <ScrollArea innerClassName="flex flex-col gap-2.5 py-2.5" className="px-2.5 flex-1">
               <ComponentForm
                 key={`component-form-${formKey || 'none'}`}
                 onChange={handleComponentChange}
@@ -763,7 +781,7 @@ export const Editor = memo(({ componentId }: EditorProps) => {
               />
             </ScrollArea>
           ) : (
-            <div className="p-2.5 flex flex-col h-full ">
+            <div className="p-2.5 flex flex-col h-full flex-1">
               <div className="flex flex-col h-full card">
                 <Empty>
                   <EmptyHeader>
@@ -777,6 +795,9 @@ export const Editor = memo(({ componentId }: EditorProps) => {
               </div>
             </div>
           )}
+          <div className="p-2.5 border-t border-border">
+            <AccessibilityPanel accessibility={component?.accessibility} isChecking={isCheckingAccessibility} />
+          </div>
         </aside>
       </div>
       <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} />
