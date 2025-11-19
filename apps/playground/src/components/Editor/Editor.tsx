@@ -742,6 +742,7 @@ export const Editor = memo(({ componentId }: EditorProps) => {
         <main className="bg-background flex-1 overflow-hidden pt-2.5">
           <EditorPreviewPane
             spec={spec}
+            libraryId={component?.libraryId}
             setImportDialogOpen={setImportDialogOpen}
             handleUndo={handleUndo}
             handleRedo={handleRedo}

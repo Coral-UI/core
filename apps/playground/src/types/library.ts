@@ -3,6 +3,7 @@ export interface Library {
   organizationId: string
   name: string
   description?: string
+  cssReset?: string // Compressed CSS reset (base64-encoded gzip)
   createdAt: string
   updatedAt: string
 }
@@ -16,4 +17,5 @@ export interface CreateLibraryInput {
 export interface UpdateLibraryInput {
   name?: string
   description?: string
+  cssReset?: string // Compressed CSS reset (base64-encoded gzip)
 }

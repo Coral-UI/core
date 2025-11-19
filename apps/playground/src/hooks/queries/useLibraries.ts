@@ -81,3 +81,35 @@ export function useDeleteLibrary() {
     },
   })
 }
+
+/**
+ * Query hook for fetching CSS reset for a library
+ */
+export function useLibraryCssReset(libraryId: string) {
+  return useQuery<string>({
+    queryKey: [...QUERY_KEY, libraryId, 'css-reset'],
+    queryFn: () => librariesApi.getLibraryCssReset(libraryId),
+    enabled: !!libraryId,
+  })
+}
+
+/**
+ * Mutation hook for updating CSS reset for a library
+ */
+export function useUpdateLibraryCssReset() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ libraryId, css }: { libraryId: string; css: string }) =>
+      librariesApi.updateLibraryCssReset(libraryId, css),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, data.id] })
+      queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, data.id, 'css-reset'] })
+      queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, data.organizationId] })
+      toast.success('CSS reset saved successfully')
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to save CSS reset: ${error.message}`)
+    },
+  })
+}

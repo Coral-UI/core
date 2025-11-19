@@ -1,4 +1,5 @@
 import type { CreateLibraryInput, Library, UpdateLibraryInput } from '@/types'
+import { compressCss, decompressCss } from '@/lib/utils/css-compression'
 
 import { readMockData, writeMockData } from './data-store'
 
@@ -73,6 +74,10 @@ export async function updateLibrary(id: string, input: UpdateLibraryInput): Prom
     library.description = input.description
   }
 
+  if (input.cssReset !== undefined) {
+    library.cssReset = input.cssReset
+  }
+
   library.updatedAt = new Date().toISOString()
   await writeMockData(data)
 
@@ -96,4 +101,23 @@ export async function deleteLibrary(id: string): Promise<void> {
   // Delete library
   data.libraries.splice(index, 1)
   await writeMockData(data)
+}
+
+/**
+ * Get CSS reset for a library (decompressed)
+ */
+export async function getLibraryCssReset(libraryId: string): Promise<string> {
+  const library = await getLibrary(libraryId)
+  if (!library || !library.cssReset) {
+    return ''
+  }
+  return decompressCss(library.cssReset)
+}
+
+/**
+ * Update CSS reset for a library (compresses before saving)
+ */
+export async function updateLibraryCssReset(libraryId: string, css: string): Promise<Library> {
+  const compressed = compressCss(css)
+  return updateLibrary(libraryId, { cssReset: compressed })
 }

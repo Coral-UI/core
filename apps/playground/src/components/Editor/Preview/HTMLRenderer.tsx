@@ -9,9 +9,10 @@ import { InteractionLayer } from './InteractionLayer'
 interface HTMLRendererProps {
   spec: CoralRootNode
   viewportWidth: number
+  cssReset?: string
 }
 
-export const HTMLRenderer = ({ spec, viewportWidth }: HTMLRendererProps) => {
+export const HTMLRenderer = ({ spec, viewportWidth, cssReset }: HTMLRendererProps) => {
   const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const containerRef = useRef<HTMLDivElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -32,6 +33,7 @@ export const HTMLRenderer = ({ spec, viewportWidth }: HTMLRendererProps) => {
           spec={spec}
           selectedElementId={selectedElementId}
           viewportWidth={viewportWidth}
+          cssReset={cssReset}
           onLoad={handleIframeLoad}
         />
         {isIframeReady && <InteractionLayer iframeRef={iframeRef} containerRef={containerRef} spec={spec} />}

@@ -14,11 +14,13 @@ export function Breadcrumbs({ className }: React.ComponentProps<'div'>) {
   const libraryMatch = pathname.match(/\/orgs\/[^/]+\/libraries\/([^/]+)/)
   const componentMatch = pathname.match(/\/orgs\/[^/]+\/libraries\/[^/]+\/components\/([^/]+)/)
   const tokensMatch = pathname.match(/\/orgs\/[^/]+\/libraries\/[^/]+\/tokens/)
+  const cssResetMatch = pathname.match(/\/orgs\/[^/]+\/libraries\/[^/]+\/css-reset/)
 
   const orgId = orgMatch?.[1]
   const libraryId = libraryMatch?.[1]
   const componentId = componentMatch?.[1]
   const isTokensRoute = !!tokensMatch
+  const isCssResetRoute = !!cssResetMatch
 
   const { data: organization } = useOrganization(orgId || '')
   const { data: library } = useLibrary(libraryId || '')
@@ -55,6 +57,14 @@ export function Breadcrumbs({ className }: React.ComponentProps<'div'>) {
     items.push({
       label: 'Design Tokens',
       href: `/orgs/${orgId}/libraries/${libraryId}/tokens`,
+    })
+  }
+
+  // Add CSS reset breadcrumb if on css-reset route
+  if (isCssResetRoute && libraryId && orgId) {
+    items.push({
+      label: 'CSS Reset',
+      href: `/orgs/${orgId}/libraries/${libraryId}/css-reset`,
     })
   }
 

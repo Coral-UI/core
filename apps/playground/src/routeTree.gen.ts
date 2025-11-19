@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrgsOrgIdIndexRouteImport } from './routes/orgs/$orgId/index'
 import { Route as OrgsOrgIdLibrariesLibraryIdIndexRouteImport } from './routes/orgs/$orgId/libraries/$libraryId/index'
 import { Route as OrgsOrgIdLibrariesLibraryIdTokensRouteImport } from './routes/orgs/$orgId/libraries/$libraryId/tokens'
+import { Route as OrgsOrgIdLibrariesLibraryIdCssResetRouteImport } from './routes/orgs/$orgId/libraries/$libraryId/css-reset'
 import { Route as OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRouteImport } from './routes/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
 
 const ConvertRoute = ConvertRouteImport.update({
@@ -43,6 +44,12 @@ const OrgsOrgIdLibrariesLibraryIdTokensRoute =
     path: '/orgs/$orgId/libraries/$libraryId/tokens',
     getParentRoute: () => rootRouteImport,
   } as any)
+const OrgsOrgIdLibrariesLibraryIdCssResetRoute =
+  OrgsOrgIdLibrariesLibraryIdCssResetRouteImport.update({
+    id: '/orgs/$orgId/libraries/$libraryId/css-reset',
+    path: '/orgs/$orgId/libraries/$libraryId/css-reset',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute =
   OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRouteImport.update({
     id: '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit',
@@ -54,6 +61,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
   '/orgs/$orgId': typeof OrgsOrgIdIndexRoute
+  '/orgs/$orgId/libraries/$libraryId/css-reset': typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   '/orgs/$orgId/libraries/$libraryId/tokens': typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
   '/orgs/$orgId/libraries/$libraryId': typeof OrgsOrgIdLibrariesLibraryIdIndexRoute
   '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit': typeof OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute
@@ -62,6 +70,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
   '/orgs/$orgId': typeof OrgsOrgIdIndexRoute
+  '/orgs/$orgId/libraries/$libraryId/css-reset': typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   '/orgs/$orgId/libraries/$libraryId/tokens': typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
   '/orgs/$orgId/libraries/$libraryId': typeof OrgsOrgIdLibrariesLibraryIdIndexRoute
   '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit': typeof OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute
@@ -71,6 +80,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
   '/orgs/$orgId/': typeof OrgsOrgIdIndexRoute
+  '/orgs/$orgId/libraries/$libraryId/css-reset': typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   '/orgs/$orgId/libraries/$libraryId/tokens': typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
   '/orgs/$orgId/libraries/$libraryId/': typeof OrgsOrgIdLibrariesLibraryIdIndexRoute
   '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit': typeof OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute
@@ -81,6 +91,7 @@ export interface FileRouteTypes {
     | '/'
     | '/convert'
     | '/orgs/$orgId'
+    | '/orgs/$orgId/libraries/$libraryId/css-reset'
     | '/orgs/$orgId/libraries/$libraryId/tokens'
     | '/orgs/$orgId/libraries/$libraryId'
     | '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
@@ -89,6 +100,7 @@ export interface FileRouteTypes {
     | '/'
     | '/convert'
     | '/orgs/$orgId'
+    | '/orgs/$orgId/libraries/$libraryId/css-reset'
     | '/orgs/$orgId/libraries/$libraryId/tokens'
     | '/orgs/$orgId/libraries/$libraryId'
     | '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
@@ -97,6 +109,7 @@ export interface FileRouteTypes {
     | '/'
     | '/convert'
     | '/orgs/$orgId/'
+    | '/orgs/$orgId/libraries/$libraryId/css-reset'
     | '/orgs/$orgId/libraries/$libraryId/tokens'
     | '/orgs/$orgId/libraries/$libraryId/'
     | '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
@@ -106,6 +119,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConvertRoute: typeof ConvertRoute
   OrgsOrgIdIndexRoute: typeof OrgsOrgIdIndexRoute
+  OrgsOrgIdLibrariesLibraryIdCssResetRoute: typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   OrgsOrgIdLibrariesLibraryIdTokensRoute: typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
   OrgsOrgIdLibrariesLibraryIdIndexRoute: typeof OrgsOrgIdLibrariesLibraryIdIndexRoute
   OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute: typeof OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute
@@ -148,6 +162,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrgsOrgIdLibrariesLibraryIdTokensRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/orgs/$orgId/libraries/$libraryId/css-reset': {
+      id: '/orgs/$orgId/libraries/$libraryId/css-reset'
+      path: '/orgs/$orgId/libraries/$libraryId/css-reset'
+      fullPath: '/orgs/$orgId/libraries/$libraryId/css-reset'
+      preLoaderRoute: typeof OrgsOrgIdLibrariesLibraryIdCssResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit': {
       id: '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
       path: '/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
@@ -162,6 +183,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConvertRoute: ConvertRoute,
   OrgsOrgIdIndexRoute: OrgsOrgIdIndexRoute,
+  OrgsOrgIdLibrariesLibraryIdCssResetRoute:
+    OrgsOrgIdLibrariesLibraryIdCssResetRoute,
   OrgsOrgIdLibrariesLibraryIdTokensRoute:
     OrgsOrgIdLibrariesLibraryIdTokensRoute,
   OrgsOrgIdLibrariesLibraryIdIndexRoute: OrgsOrgIdLibrariesLibraryIdIndexRoute,

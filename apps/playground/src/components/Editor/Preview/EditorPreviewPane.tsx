@@ -9,6 +9,7 @@ import { IconBracketsAngle, IconEyeSearch, IconFileImport, IconSchema } from '@t
 import { CopyIcon, MonitorIcon, Redo, SmartphoneIcon, TabletIcon, Undo } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useLibraryCssReset } from '@/hooks/queries/useLibraries'
 
 import { CoralRootNode } from '@reallygoodwork/coral-core'
 
@@ -28,16 +29,24 @@ const VIEWPORT_PRESETS: ViewportPreset[] = [
 
 interface EditorPreviewPaneProps {
   spec: CoralRootNode
+  libraryId?: string
   setImportDialogOpen: (open: boolean) => void
   handleUndo: () => void
   handleRedo: () => void
 }
 
-export const EditorPreviewPane = ({ spec, setImportDialogOpen, handleUndo, handleRedo }: EditorPreviewPaneProps) => {
+export const EditorPreviewPane = ({
+  spec,
+  libraryId,
+  setImportDialogOpen,
+  handleUndo,
+  handleRedo,
+}: EditorPreviewPaneProps) => {
   // const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const { theme } = useTheme()
   const [specValue, setSpecValue] = useState<string>('')
   const [viewportWidth, setViewportWidth] = useState<number>(VIEWPORT_PRESETS[2]?.width ?? 1440)
+  const { data: cssReset = '' } = useLibraryCssReset(libraryId || '')
 
   useEffect(() => {
     setSpecValue(JSON.stringify(spec, null, 2))
@@ -92,7 +101,7 @@ export const EditorPreviewPane = ({ spec, setImportDialogOpen, handleUndo, handl
         <div className="h-full w-full bg-background">
           {spec && spec.name ? (
             <>
-              <HTMLRenderer spec={spec} viewportWidth={viewportWidth} />
+              <HTMLRenderer spec={spec} viewportWidth={viewportWidth} cssReset={cssReset} />
               <div className="px-1 py-1 flex justify-end gap-2 absolute bottom-6 right-6 bg-card rounded-xl border border-border">
                 <ToggleGroup
                   type="single"

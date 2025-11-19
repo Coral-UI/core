@@ -79,6 +79,7 @@
     "mui-color-input": "^7.0.0",
     "next-themes": "^0.4.6",
     "node-html-parser": "^7.0.1",
+    "pako": "^2.1.0",
     "prettier": "^3.6.0",
     "react": "^18.3.1",
     "react-color": "^2.19.3",

@@ -45,6 +45,9 @@ function LibraryDetail() {
           <Link to="/orgs/$orgId/libraries/$libraryId/tokens" params={{ orgId, libraryId }}>
             <Button variant="outline">Design Tokens</Button>
           </Link>
+          <Link to="/orgs/$orgId/libraries/$libraryId/css-reset" params={{ orgId, libraryId }}>
+            <Button variant="outline">CSS Reset</Button>
+          </Link>
           <CreateComponentDialog libraryId={libraryId} />
         </div>
       </PageHeader>

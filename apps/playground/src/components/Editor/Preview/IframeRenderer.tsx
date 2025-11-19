@@ -8,6 +8,7 @@ interface IframeRendererProps {
   spec: CoralRootNode
   selectedElementId: string | null | undefined
   viewportWidth: number
+  cssReset?: string
   onLoad?: () => void
 }
 
@@ -100,7 +101,7 @@ function addElementIds(
 }
 
 export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>(
-  ({ spec, viewportWidth, onLoad }, ref) => {
+  ({ spec, viewportWidth, cssReset, onLoad }, ref) => {
     const [htmlContent, setHtmlContent] = useState<string>('')
     const [isLoading, setIsLoading] = useState(true)
     const { getElementTree } = useElementTreeQuery()
@@ -173,6 +174,7 @@ export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>
             margin: 0 auto;
             padding: 1rem;
           }
+          ${cssReset ? `/* Custom CSS Reset */\n${cssReset}` : ''}
         </style>
       </head>
       <body>
