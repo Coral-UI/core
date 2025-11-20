@@ -1,29 +1,23 @@
 /**
- * Supabase client singleton
+ * Supabase browser client for Client Components
  *
- * Creates a single instance of the Supabase client for use throughout the app.
+ * Creates a Supabase client for use in Client Components.
  * Environment variables should be set in .env.local:
- * - VITE_SUPABASE_URL
- * - VITE_SUPABASE_ANON_KEY
+ * - NEXT_PUBLIC_SUPABASE_URL
+ * - NEXT_PUBLIC_SUPABASE_ANON_KEY
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 
 import type { Database } from './database.types'
 
-const supabaseUrl = import.meta.env['VITE_SUPABASE_URL']
-const supabaseAnonKey = import.meta.env['VITE_SUPABASE_ANON_KEY']
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
-    'Missing Supabase environment variables. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env.local file.',
+    'Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.',
   )
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  },
-})
+export const supabase = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)

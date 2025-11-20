@@ -3,6 +3,7 @@ import { ScrollArea } from '@/components/base/ScrollArea'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { formatAccessibilityStatus, getAccessibilitySummary } from '@/lib/accessibility/utils'
+import { formatDateTime } from '@/lib/utils/date-format'
 import type { AccessibilityResults } from '@/lib/accessibility/checkAccessibility'
 import { AlertCircleIcon, CheckCircleIcon, InfoIcon, LoaderIcon } from 'lucide-react'
 import { useMemo } from 'react'
@@ -108,7 +109,7 @@ export function AccessibilityPanel({ accessibility, isChecking = false }: Access
         </div>
         {accessibility.lastChecked && (
           <p className="text-xs text-muted-foreground">
-            Last checked: {new Date(accessibility.lastChecked).toLocaleString()}
+            Last checked: {formatDateTime(accessibility.lastChecked)}
           </p>
         )}
       </div>

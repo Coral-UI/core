@@ -72,12 +72,12 @@ export function aggregateAccessibilityResults(components: Component[]): Accessib
  */
 export function getAccessibilityBadgeVariant(
   summary: AccessibilitySummary,
-): 'destructive' | 'warning' | 'success' | 'secondary' {
+): 'destructive' | 'outline' | 'success' | 'secondary' {
   if (summary.errors > 0) {
     return 'destructive'
   }
   if (summary.warnings > 0) {
-    return 'warning'
+    return 'outline'
   }
   if (summary.passes > 0) {
     return 'success'

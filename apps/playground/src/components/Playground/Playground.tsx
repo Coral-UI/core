@@ -1,3 +1,5 @@
+'use client'
+
 import { useTheme } from '@/components/ThemeProvider'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

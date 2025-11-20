@@ -1,5 +1,7 @@
+'use client'
+
 import type { ReactNode } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 import { useAuthContext } from './auth-context'
@@ -16,13 +18,13 @@ interface PublicRouteGuardProps {
 
 export function PublicRouteGuard({ children, redirectTo = '/' }: PublicRouteGuardProps): JSX.Element {
   const { user, loading } = useAuthContext()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   useEffect(() => {
     if (!loading && user) {
-      navigate({ to: redirectTo })
+      router.push(redirectTo)
     }
-  }, [user, loading, navigate, redirectTo])
+  }, [user, loading, router, redirectTo])
 
   if (loading) {
     return <div>Loading...</div>

@@ -1,8 +1,10 @@
+'use client'
+
 import type { CreateLibraryInput, UpdateLibraryInput } from '@/types'
-import * as librariesApi from '@/lib/api/libraries'
+import { createLibraryAction, updateLibraryAction, updateLibraryCssResetAction, deleteLibraryAction } from '@/app/actions/libraries'
 import { librariesQueryOptions, libraryCssResetQueryOptions, libraryQueryOptions } from '@/lib/queries/query-options'
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 /**
@@ -24,10 +26,10 @@ export function useLibrary(id: string) {
  */
 export function useCreateLibrary() {
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   return useMutation({
-    mutationFn: (input: CreateLibraryInput) => librariesApi.createLibrary(input),
+    mutationFn: (input: CreateLibraryInput) => createLibraryAction(input),
     onSuccess: (data) => {
       if (!data?.id) {
         toast.error('Failed to create library: Missing library ID')
@@ -36,7 +38,7 @@ export function useCreateLibrary() {
       queryClient.invalidateQueries({ queryKey: ['libraries', data.organizationId] })
       toast.success('Library created successfully')
       // Navigate to the new library page
-      navigate({ to: '/orgs/$orgId/libraries/$libraryId', params: { orgId: data.organizationId, libraryId: data.id } })
+      router.push(`/orgs/${data.organizationId}/libraries/${data.id}`)
     },
     onError: (error: Error) => {
       toast.error(`Failed to create library: ${error.message}`)
@@ -51,7 +53,7 @@ export function useUpdateLibrary() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: UpdateLibraryInput }) => librariesApi.updateLibrary(id, input),
+    mutationFn: ({ id, input }: { id: string; input: UpdateLibraryInput }) => updateLibraryAction(id, input),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['libraries', data.organizationId] })
       queryClient.invalidateQueries({ queryKey: ['libraries', data.id] })
@@ -70,7 +72,7 @@ export function useDeleteLibrary() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id }: { id: string; organizationId: string }) => librariesApi.deleteLibrary(id),
+    mutationFn: ({ id }: { id: string; organizationId: string }) => deleteLibraryAction(id),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['libraries', variables.organizationId] })
       toast.success('Library deleted successfully')
@@ -96,7 +98,7 @@ export function useUpdateLibraryCssReset() {
 
   return useMutation({
     mutationFn: ({ libraryId, css }: { libraryId: string; css: string }) =>
-      librariesApi.updateLibraryCssReset(libraryId, css),
+      updateLibraryCssResetAction(libraryId, css),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['libraries', data.id] })
       queryClient.invalidateQueries({ queryKey: ['libraries', data.id, 'css-reset'] })

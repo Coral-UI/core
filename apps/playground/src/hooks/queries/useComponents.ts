@@ -1,5 +1,7 @@
+'use client'
+
 import type { Component, CreateComponentInput, UpdateComponentInput } from '@/types'
-import * as componentsApi from '@/lib/api/components'
+import { createComponentAction, updateComponentAction, deleteComponentAction } from '@/app/actions/components'
 import { componentQueryOptions, componentsQueryOptions } from '@/lib/queries/query-options'
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -51,7 +53,7 @@ export function useCreateComponent() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (input: CreateComponentInput) => componentsApi.createComponent(input),
+    mutationFn: (input: CreateComponentInput) => createComponentAction(input),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['components', data.libraryId] })
       toast.success('Component created successfully')
@@ -71,7 +73,7 @@ export function useUpdateComponent() {
 
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: UpdateComponentInput }) =>
-      componentsApi.updateComponent(id, input),
+      updateComponentAction(id, input),
     onSuccess: (_data, variables) => {
       // Explicitly prevent any cache updates by canceling any potential refetches
       // and NOT updating the cache at all
@@ -96,7 +98,7 @@ export function useDeleteComponent() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, libraryId: _libraryId }: { id: string; libraryId: string }) => componentsApi.deleteComponent(id),
+    mutationFn: ({ id, libraryId: _libraryId }: { id: string; libraryId: string }) => deleteComponentAction(id),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['components', variables.libraryId] })
       toast.success('Component deleted successfully')

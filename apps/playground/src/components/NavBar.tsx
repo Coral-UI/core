@@ -1,3 +1,12 @@
+'use client'
+
+import { useAuthContext } from '@/lib/auth/auth-context'
+import { useSignOut } from '@/lib/auth/use-auth'
+import { LogOut, User } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+
+import { ModeToggle } from './ThemeToggle'
 import { Avatar, AvatarFallback } from './ui/avatar'
 import {
   DropdownMenu,
@@ -6,12 +15,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
-import { ModeToggle } from './ThemeToggle'
-import { useAuthContext } from '@/lib/auth/auth-context'
-import { useSignOut } from '@/lib/auth/use-auth'
-import { useNavigate } from '@tanstack/react-router'
-import { LogOut, User } from 'lucide-react'
-import { toast } from 'sonner'
 
 function getUserInitials(email: string | undefined): string {
   if (!email) return 'U'
@@ -25,13 +28,13 @@ function getUserInitials(email: string | undefined): string {
 function UserMenu() {
   const { user } = useAuthContext()
   const { signOut, loading } = useSignOut()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const handleSignOut = async () => {
     try {
       await signOut()
       toast.success('Signed out successfully')
-      navigate({ to: '/login' })
+      router.push('/login')
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to sign out'
       toast.error('Sign out failed', { description: errorMessage })
@@ -39,7 +42,7 @@ function UserMenu() {
   }
 
   const handleProfileClick = () => {
-    navigate({ to: '/profile' })
+    router.push('/profile')
   }
 
   if (!user) {

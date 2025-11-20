@@ -1,3 +1,5 @@
+'use client'
+
 import { useOrganizations } from '@/hooks/queries/useOrganizations'
 
 import { Breadcrumbs } from '../Breadcrumbs'

@@ -1,8 +1,11 @@
+'use client'
+
 import type { Organization } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useDeleteOrganization } from '@/hooks/queries/useOrganizations'
-import { Link } from '@tanstack/react-router'
+import { formatDateReadable } from '@/lib/utils/date-format'
+import Link from 'next/link'
 import { Trash2Icon } from 'lucide-react'
 
 interface OrganizationCardProps {
@@ -23,13 +26,13 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
   }
 
   return (
-    <Link to="/orgs/$orgId" params={{ orgId: organization.id }}>
+    <Link href={`/orgs/${organization.id}`}>
       <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <CardTitle>{organization.name}</CardTitle>
-              <CardDescription>Created {new Date(organization.createdAt).toLocaleDateString()}</CardDescription>
+              <CardDescription>Created {formatDateReadable(organization.createdAt)}</CardDescription>
             </div>
             <Button variant="ghost" size="icon-sm" onClick={handleDelete} className="shrink-0">
               <Trash2Icon className="size-4" />

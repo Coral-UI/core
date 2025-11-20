@@ -1,14 +1,16 @@
+'use client'
+
 import { organizationQueryOptions } from '@/lib/queries/query-options'
 import { libraryQueryOptions } from '@/lib/queries/query-options'
 import { componentQueryOptions } from '@/lib/queries/query-options'
 import { cn } from '@/lib/utils'
 import { IconChevronRight, IconHome } from '@tabler/icons-react'
-import { Link, useRouterState } from '@tanstack/react-router'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 
 export function Breadcrumbs({ className }: React.ComponentProps<'div'>) {
-  const router = useRouterState()
-  const pathname = router.location.pathname
+  const pathname = usePathname()
 
   // Extract route params from pathname
   const orgMatch = pathname.match(/\/orgs\/([^/]+)/)
@@ -101,7 +103,7 @@ export function Breadcrumbs({ className }: React.ComponentProps<'div'>) {
           <div key={item.href} className="flex items-center gap-2">
             {index === 0 ? (
               <Link
-                to={item.href}
+                href={item.href}
                 className="flex items-center gap-1 text-foreground hover:text-primary transition-colors"
               >
                 <IconHome className="size-3.5" />
@@ -113,7 +115,7 @@ export function Breadcrumbs({ className }: React.ComponentProps<'div'>) {
                   <span className="text-foreground font-normal">{item.label}</span>
                 ) : (
                   <Link
-                    to={item.href}
+                    href={item.href}
                     className="text-muted-foreground hover:text-primary hover:underline transition-colors"
                   >
                     {item.label}

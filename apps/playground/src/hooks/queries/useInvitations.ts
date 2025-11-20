@@ -1,9 +1,10 @@
+'use client'
+
 import type { AcceptInvitationInput, CreateInvitationInput } from '@/types/invitation'
 import * as invitationsApi from '@/lib/api/invitations'
 import { invitationsQueryOptions } from '@/lib/queries/query-options'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { useNavigate } from '@tanstack/react-router'
 
 /**
  * Query hook for fetching invitations for an organization

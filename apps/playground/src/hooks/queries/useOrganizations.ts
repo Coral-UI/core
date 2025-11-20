@@ -1,8 +1,14 @@
+'use client'
+
 import type { CreateOrganizationInput, UpdateOrganizationInput } from '@/types'
-import * as organizationsApi from '@/lib/api/organizations'
+import {
+  createOrganizationAction,
+  deleteOrganizationAction,
+  updateOrganizationAction,
+} from '@/app/actions/organizations'
 import { organizationQueryOptions, organizationsQueryOptions } from '@/lib/queries/query-options'
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 const QUERY_KEY = ['organizations'] as const
@@ -26,10 +32,10 @@ export function useOrganization(id: string) {
  */
 export function useCreateOrganization() {
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   return useMutation({
-    mutationFn: (input: CreateOrganizationInput) => organizationsApi.createOrganization(input),
+    mutationFn: (input: CreateOrganizationInput) => createOrganizationAction(input),
     onSuccess: (organization) => {
       if (!organization?.id) {
         toast.error('Failed to create organization: Missing organization ID')
@@ -38,7 +44,7 @@ export function useCreateOrganization() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
       toast.success('Organization created successfully')
       // Navigate to the new organization page
-      navigate({ to: '/orgs/$orgId', params: { orgId: organization.id } })
+      router.push(`/orgs/${organization.id}`)
     },
     onError: (error: Error) => {
       toast.error(`Failed to create organization: ${error.message}`)
@@ -53,8 +59,7 @@ export function useUpdateOrganization() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: UpdateOrganizationInput }) =>
-      organizationsApi.updateOrganization(id, input),
+    mutationFn: ({ id, input }: { id: string; input: UpdateOrganizationInput }) => updateOrganizationAction(id, input),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
       queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, data.id] })
@@ -73,7 +78,7 @@ export function useDeleteOrganization() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => organizationsApi.deleteOrganization(id),
+    mutationFn: (id: string) => deleteOrganizationAction(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
       toast.success('Organization deleted successfully')

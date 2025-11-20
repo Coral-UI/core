@@ -1,8 +1,11 @@
+'use client'
+
 import type { Library } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useDeleteLibrary } from '@/hooks/queries/useLibraries'
-import { Link } from '@tanstack/react-router'
+import { formatDateReadable } from '@/lib/utils/date-format'
+import Link from 'next/link'
 import { Trash2Icon } from 'lucide-react'
 
 interface LibraryCardProps {
@@ -22,7 +25,7 @@ export function LibraryCard({ library, organizationId }: LibraryCardProps) {
   }
 
   return (
-    <Link to="/orgs/$orgId/libraries/$libraryId" params={{ orgId: organizationId, libraryId: library.id }}>
+    <Link href={`/orgs/${organizationId}/libraries/${library.id}`}>
       <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
         <CardHeader>
           <div className="flex items-start justify-between">
@@ -30,7 +33,7 @@ export function LibraryCard({ library, organizationId }: LibraryCardProps) {
               <CardTitle>{library.name}</CardTitle>
               {library.description && <CardDescription className="mt-1">{library.description}</CardDescription>}
               <CardDescription className="mt-1">
-                Created {new Date(library.createdAt).toLocaleDateString()}
+                Created {formatDateReadable(library.createdAt)}
               </CardDescription>
             </div>
             <Button variant="ghost" size="icon-sm" onClick={handleDelete} className="shrink-0">

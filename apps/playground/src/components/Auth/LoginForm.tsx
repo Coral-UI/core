@@ -1,29 +1,20 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useSignIn, useSignInWithFigma, useSignInWithGoogle } from '@/lib/auth/use-auth'
-import { useNavigate, useSearch } from '@tanstack/react-router'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from '@tanstack/react-form'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
 const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: z.email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 })
-
-type LoginFormValues = z.infer<typeof loginSchema>
 
 /**
  * Login form component
@@ -31,42 +22,45 @@ type LoginFormValues = z.infer<typeof loginSchema>
  * Provides email/password login and OAuth options (Google, Figma)
  */
 export function LoginForm() {
-  const navigate = useNavigate()
-  const search = useSearch({ from: '/login' }) as { error?: string }
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
   const { signIn, loading: signInLoading, error: signInError } = useSignIn()
   const { signInWithGoogle, loading: googleLoading } = useSignInWithGoogle()
   const { signInWithFigma, loading: figmaLoading } = useSignInWithFigma()
 
   const [oauthError, setOauthError] = useState<string | null>(null)
 
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm({
     defaultValues: {
       email: '',
       password: '',
+    },
+    validators: {
+      onChange: loginSchema,
+    },
+    onSubmit: async ({ value }) => {
+      try {
+        await signIn(value.email, value.password)
+        toast.success('Signed in successfully')
+        router.push('/')
+      } catch (err) {
+        // Error is handled by the hook
+        const errorMessage = err instanceof Error ? err.message : 'Failed to sign in'
+        toast.error('Sign in failed', { description: errorMessage })
+        throw err
+      }
     },
   })
 
   // Show error from URL search params (e.g., from callback redirect)
   useEffect(() => {
-    if (search.error) {
-      toast.error('Authentication error', { description: search.error })
+    if (error) {
+      toast.error('Authentication error', { description: error })
       // Clear the error from URL
-      navigate({ to: '/login', replace: true })
+      router.replace('/login')
     }
-  }, [search.error, navigate])
-
-  const onSubmit = async (values: LoginFormValues) => {
-    try {
-      await signIn(values.email, values.password)
-      toast.success('Signed in successfully')
-      navigate({ to: '/' })
-    } catch (err) {
-      // Error is handled by the hook
-      const errorMessage = err instanceof Error ? err.message : 'Failed to sign in'
-      toast.error('Sign in failed', { description: errorMessage })
-    }
-  }
+  }, [error, router])
 
   const handleGoogleSignIn = async () => {
     try {
@@ -101,44 +95,76 @@ export function LoginForm() {
         <CardDescription>Enter your credentials to access your account</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="you@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {(signInError || oauthError) && (
-              <div className="text-destructive text-sm">
-                {signInError?.message || oauthError || 'An error occurred'}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            form.handleSubmit()
+          }}
+          className="space-y-4"
+        >
+          <form.Field
+            name="email"
+            children={(field) => (
+              <div className="space-y-2">
+                <Label htmlFor={field.name}>Email</Label>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type="email"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="you@example.com"
+                  aria-invalid={field.state.meta.errors.length > 0}
+                  autoFocus
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-sm text-destructive">
+                    {typeof field.state.meta.errors[0] === 'string'
+                      ? field.state.meta.errors[0]
+                      : field.state.meta.errors[0]?.message || 'Invalid value'}
+                  </p>
+                )}
               </div>
             )}
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {signInLoading ? 'Signing in...' : 'Sign in'}
-            </Button>
-          </form>
-        </Form>
+          />
+          <form.Field
+            name="password"
+            children={(field) => (
+              <div className="space-y-2">
+                <Label htmlFor={field.name}>Password</Label>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type="password"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="••••••••"
+                  aria-invalid={field.state.meta.errors.length > 0}
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-sm text-destructive">
+                    {typeof field.state.meta.errors[0] === 'string'
+                      ? field.state.meta.errors[0]
+                      : field.state.meta.errors[0]?.message || 'Invalid value'}
+                  </p>
+                )}
+              </div>
+            )}
+          />
+          {(signInError || oauthError) && (
+            <div className="text-destructive text-sm">{signInError?.message || oauthError || 'An error occurred'}</div>
+          )}
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+            children={([canSubmit, isSubmitting]) => (
+              <Button type="submit" className="w-full" disabled={isLoading || !canSubmit || isSubmitting}>
+                {signInLoading || isSubmitting ? 'Signing in...' : 'Sign in'}
+              </Button>
+            )}
+          />
+        </form>
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
@@ -150,13 +176,7 @@ export function LoginForm() {
         </div>
 
         <div className="space-y-2">
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleSignIn}
-            disabled={isLoading}
-          >
+          <Button type="button" variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading}>
             <svg className="mr-2 size-4" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -177,13 +197,7 @@ export function LoginForm() {
             </svg>
             {googleLoading ? 'Signing in...' : 'Continue with Google'}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleFigmaSignIn}
-            disabled={isLoading}
-          >
+          <Button type="button" variant="outline" className="w-full" onClick={handleFigmaSignIn} disabled={isLoading}>
             <svg className="mr-2 size-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M15.852 8.981h-4.588v-1.536c0-1.378 1.12-2.494 2.5-2.494 1.378 0 2.5 1.116 2.5 2.494v1.536zm-4.588 0H8.148v-1.536c0-1.378 1.12-2.494 2.5-2.494 1.378 0 2.5 1.116 2.5 2.494v1.536zm-3.164 0H4.984c-.552 0-1 .448-1 1v11.536c0 .552.448 1 1 1h3.116c.552 0 1-.448 1-1V9.981c0-.552-.448-1-1-1zm4.588 0c-.552 0-1 .448-1 1v11.536c0 .552.448 1 1 1h3.116c.552 0 1-.448 1-1V9.981c0-.552-.448-1-1-1zm4.588 0c-.552 0-1 .448-1 1v11.536c0 .552.448 1 1 1h3.116c.552 0 1-.448 1-1V9.981c0-.552-.448-1-1-1z" />
             </svg>
@@ -194,12 +208,7 @@ export function LoginForm() {
       <CardFooter className="flex justify-center">
         <p className="text-muted-foreground text-sm">
           Don't have an account?{' '}
-          <Button
-            type="button"
-            variant="link"
-            className="h-auto p-0"
-            onClick={() => navigate({ to: '/signup' })}
-          >
+          <Button variant="link" className="h-auto p-0" href="/signup">
             Sign up
           </Button>
         </p>

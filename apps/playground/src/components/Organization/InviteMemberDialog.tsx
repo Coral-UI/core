@@ -1,22 +1,19 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useForm } from '@tanstack/react-form'
-import { z } from 'zod'
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
 const inviteSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  role: z.enum(['admin', 'editor', 'viewer'], {
-    required_error: 'Please select a role',
-  }),
+  email: z.email({ error: 'Please enter a valid email address' }),
+  role: z.enum(['admin', 'editor', 'viewer']),
 })
-
-type InviteFormValues = z.infer<typeof inviteSchema>
 
 interface InviteMemberDialogProps {
   organizationId: string
@@ -26,7 +23,7 @@ export function InviteMemberDialog({ organizationId }: InviteMemberDialogProps) 
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const form = useForm<InviteFormValues>({
+  const form = useForm({
     defaultValues: {
       email: '',
       role: 'viewer',
@@ -37,20 +34,11 @@ export function InviteMemberDialog({ organizationId }: InviteMemberDialogProps) 
     onSubmit: async ({ value }) => {
       setIsSubmitting(true)
       try {
-        // Get auth token
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
-        if (!session?.access_token) {
-          throw new Error('Not authenticated')
-        }
-
-        // Call API endpoint
+        // Call API endpoint (auth handled via cookies in middleware)
         const response = await fetch('/api/invite', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
             organizationId,
@@ -111,7 +99,11 @@ export function InviteMemberDialog({ organizationId }: InviteMemberDialogProps) 
                 autoFocus
               />
               {field.state.meta.errors.length > 0 && (
-                <p className="text-sm text-destructive">{field.state.meta.errors[0]}</p>
+                <p className="text-sm text-destructive">
+                  {typeof field.state.meta.errors[0] === 'string'
+                    ? field.state.meta.errors[0]
+                    : field.state.meta.errors[0]?.message || 'Invalid value'}
+                </p>
               )}
             </div>
           )}
@@ -136,7 +128,11 @@ export function InviteMemberDialog({ organizationId }: InviteMemberDialogProps) 
                 </SelectContent>
               </Select>
               {field.state.meta.errors.length > 0 && (
-                <p className="text-sm text-destructive">{field.state.meta.errors[0]}</p>
+                <p className="text-sm text-destructive">
+                  {typeof field.state.meta.errors[0] === 'string'
+                    ? field.state.meta.errors[0]
+                    : field.state.meta.errors[0]?.message || 'Invalid value'}
+                </p>
               )}
             </div>
           )}

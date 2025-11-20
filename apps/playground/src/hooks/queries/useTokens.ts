@@ -1,5 +1,7 @@
+'use client'
+
 import type { CreateDesignTokenInput } from '@/types'
-import * as tokensApi from '@/lib/api/tokens'
+import { createTokenAction, deleteTokenAction } from '@/app/actions/tokens'
 import { tokensQueryOptions } from '@/lib/queries/query-options'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -18,7 +20,7 @@ export function useCreateToken() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (input: CreateDesignTokenInput) => tokensApi.createToken(input),
+    mutationFn: (input: CreateDesignTokenInput) => createTokenAction(input),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['tokens', data.libraryId] })
       toast.success('Token created successfully')
@@ -36,7 +38,7 @@ export function useDeleteToken() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id }: { id: string; libraryId: string }) => tokensApi.deleteToken(id),
+    mutationFn: ({ id }: { id: string; libraryId: string }) => deleteTokenAction(id),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tokens', variables.libraryId] })
       queryClient.invalidateQueries({ queryKey: ['tokenValues'] })

@@ -25,3 +25,8 @@ storybook-static
 .env.production.local
 
 apps/playground/supabase/.temp
+
+# Next.js
+.next
+next-env.d.ts
+out

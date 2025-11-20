@@ -1,10 +1,13 @@
+'use client'
+
 import type { Component } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useDeleteComponent } from '@/hooks/queries/useComponents'
 import { formatAccessibilityStatus, getAccessibilityBadgeVariant, getAccessibilitySummary } from '@/lib/accessibility/utils'
-import { Link } from '@tanstack/react-router'
+import { formatDateReadable } from '@/lib/utils/date-format'
+import Link from 'next/link'
 import { EditIcon, Trash2Icon } from 'lucide-react'
 
 interface ComponentCardProps {
@@ -27,10 +30,7 @@ export function ComponentCard({ component, organizationId, libraryId }: Componen
   }
 
   return (
-    <Link
-      to="/orgs/$orgId/libraries/$libraryId/components/$componentId/edit"
-      params={{ orgId: organizationId, libraryId, componentId: component.id }}
-    >
+    <Link href={`/orgs/${organizationId}/libraries/${libraryId}/components/${component.id}/edit`}>
       <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
         <CardHeader>
           <div className="flex items-start justify-between">
@@ -41,7 +41,7 @@ export function ComponentCard({ component, organizationId, libraryId }: Componen
               </CardTitle>
               {component.description && <CardDescription className="mt-1">{component.description}</CardDescription>}
               <CardDescription className="mt-1">
-                Created {new Date(component.createdAt).toLocaleDateString()}
+                Created {formatDateReadable(component.createdAt)}
               </CardDescription>
               {component.accessibility && (
                 <div className="mt-2">
@@ -50,7 +50,7 @@ export function ComponentCard({ component, organizationId, libraryId }: Componen
                   </Badge>
                   {component.accessibility.lastChecked && (
                     <CardDescription className="mt-1 text-xs">
-                      Checked {new Date(component.accessibility.lastChecked).toLocaleDateString()}
+                      Checked {formatDateReadable(component.accessibility.lastChecked)}
                     </CardDescription>
                   )}
                 </div>

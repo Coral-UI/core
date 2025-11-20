@@ -1,3 +1,5 @@
+'use client'
+
 import { AccessibilityPanel } from '@/components/Editor/AccessibilityPanel'
 import { EditorSidebar } from '@/components/Editor/ElementTree/EditorSidebar'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
