@@ -725,8 +725,8 @@ export const Editor = memo(({ componentId }: EditorProps) => {
   }
 
   return (
-    <div className="flex flex-col w-full h-[calc(100dvh-1.75rem)] bg-background">
-      <div className="flex items-center justify-between gap-2 px-4 py-2 shrink-0 border-b border-border">
+    <div className="flex flex-col w-full h-[calc(100dvh-.75rem)] bg-background">
+      <div className="flex items-center justify-between gap-2 px-4 py-2 shrink-0">
         <div className="flex items-center gap-2">
           <p className="text-xs font-medium">{component.name}</p>
           {hasUnsavedChanges ? (

@@ -13,8 +13,13 @@ export const Sandbox = ({ specValue }: { specValue: CoralRootNode }) => {
 
   useEffect(() => {
     const generateCode = async () => {
+      const ComponentName = componentName.charAt(0).toUpperCase() + componentName.slice(1)
+      const spec = {
+        ...specValue,
+        componentName: ComponentName,
+      }
       try {
-        const code = await coralToReact(specValue, { prettier: true })
+        const code = await coralToReact(spec, { prettier: true })
         setReactCode(code)
       } catch (error) {
         console.error('Failed to generate React code:', error)
@@ -25,15 +30,17 @@ export const Sandbox = ({ specValue }: { specValue: CoralRootNode }) => {
     generateCode()
   }, [specValue])
 
+  const ComponentName = componentName.charAt(0).toUpperCase() + componentName.slice(1)
+
   const files = {
     '/App.js': {
       code: `import React from 'react'
-import { ${componentName} } from './${componentName}.js'
+import { ${ComponentName} } from './${ComponentName}.js'
 
 export default function App() {
   return (
     <div>
-      <${componentName} />
+      <${ComponentName} />
     </div>
   )
 }
@@ -41,7 +48,7 @@ export default function App() {
       active: true,
       readOnly: true,
     },
-    [`/${componentName}.js`]: {
+    [`/${ComponentName}.js`]: {
       code: reactCode,
       active: false,
       readOnly: true,
