@@ -10,9 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ConvertRouteImport } from './routes/convert'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InviteAcceptRouteImport } from './routes/invite/accept'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as OrgsOrgIdIndexRouteImport } from './routes/orgs/$orgId/index'
 import { Route as OrgsOrgIdLibrariesLibraryIdIndexRouteImport } from './routes/orgs/$orgId/libraries/$libraryId/index'
@@ -23,6 +25,11 @@ import { Route as OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRouteImpor
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -38,6 +45,11 @@ const ConvertRoute = ConvertRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InviteAcceptRoute = InviteAcceptRouteImport.update({
+  id: '/invite/accept',
+  path: '/invite/accept',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -79,8 +91,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/invite/accept': typeof InviteAcceptRoute
   '/orgs/$orgId': typeof OrgsOrgIdIndexRoute
   '/orgs/$orgId/libraries/$libraryId/css-reset': typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   '/orgs/$orgId/libraries/$libraryId/tokens': typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
@@ -91,8 +105,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/invite/accept': typeof InviteAcceptRoute
   '/orgs/$orgId': typeof OrgsOrgIdIndexRoute
   '/orgs/$orgId/libraries/$libraryId/css-reset': typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   '/orgs/$orgId/libraries/$libraryId/tokens': typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
@@ -104,8 +120,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/invite/accept': typeof InviteAcceptRoute
   '/orgs/$orgId/': typeof OrgsOrgIdIndexRoute
   '/orgs/$orgId/libraries/$libraryId/css-reset': typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   '/orgs/$orgId/libraries/$libraryId/tokens': typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
@@ -118,8 +136,10 @@ export interface FileRouteTypes {
     | '/'
     | '/convert'
     | '/login'
+    | '/profile'
     | '/signup'
     | '/auth/callback'
+    | '/invite/accept'
     | '/orgs/$orgId'
     | '/orgs/$orgId/libraries/$libraryId/css-reset'
     | '/orgs/$orgId/libraries/$libraryId/tokens'
@@ -130,8 +150,10 @@ export interface FileRouteTypes {
     | '/'
     | '/convert'
     | '/login'
+    | '/profile'
     | '/signup'
     | '/auth/callback'
+    | '/invite/accept'
     | '/orgs/$orgId'
     | '/orgs/$orgId/libraries/$libraryId/css-reset'
     | '/orgs/$orgId/libraries/$libraryId/tokens'
@@ -142,8 +164,10 @@ export interface FileRouteTypes {
     | '/'
     | '/convert'
     | '/login'
+    | '/profile'
     | '/signup'
     | '/auth/callback'
+    | '/invite/accept'
     | '/orgs/$orgId/'
     | '/orgs/$orgId/libraries/$libraryId/css-reset'
     | '/orgs/$orgId/libraries/$libraryId/tokens'
@@ -155,8 +179,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConvertRoute: typeof ConvertRoute
   LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
   SignupRoute: typeof SignupRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  InviteAcceptRoute: typeof InviteAcceptRoute
   OrgsOrgIdIndexRoute: typeof OrgsOrgIdIndexRoute
   OrgsOrgIdLibrariesLibraryIdCssResetRoute: typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   OrgsOrgIdLibrariesLibraryIdTokensRoute: typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
@@ -171,6 +197,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -192,6 +225,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invite/accept': {
+      id: '/invite/accept'
+      path: '/invite/accept'
+      fullPath: '/invite/accept'
+      preLoaderRoute: typeof InviteAcceptRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
@@ -243,8 +283,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConvertRoute: ConvertRoute,
   LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
   SignupRoute: SignupRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  InviteAcceptRoute: InviteAcceptRoute,
   OrgsOrgIdIndexRoute: OrgsOrgIdIndexRoute,
   OrgsOrgIdLibrariesLibraryIdCssResetRoute:
     OrgsOrgIdLibrariesLibraryIdCssResetRoute,

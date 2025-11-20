@@ -16,6 +16,7 @@ import * as organizationMembersApi from '@/lib/api/organization-members'
 import * as tokensApi from '@/lib/api/tokens'
 import * as themesApi from '@/lib/api/themes'
 import * as tokenValuesApi from '@/lib/api/token-values'
+import * as invitationsApi from '@/lib/api/invitations'
 
 // Organizations
 export const organizationsQueryOptions = () =>
@@ -119,4 +120,11 @@ export const tokenValuesForLibraryQueryOptions = (libraryId: string) =>
   queryOptions({
     queryKey: ['tokenValues', 'library', libraryId],
     queryFn: () => tokenValuesApi.getTokenValuesForLibrary(libraryId),
+  })
+
+// Invitations
+export const invitationsQueryOptions = (organizationId: string) =>
+  queryOptions({
+    queryKey: ['invitations', organizationId],
+    queryFn: () => invitationsApi.getInvitations(organizationId),
   })

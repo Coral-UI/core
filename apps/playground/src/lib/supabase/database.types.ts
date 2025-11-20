@@ -234,6 +234,44 @@ export interface Database {
           updated_at?: string
         }
       }
+      organization_invitations: {
+        Row: {
+          id: string
+          organization_id: string
+          email: string
+          role: OrgRole
+          invited_by: string
+          token: string
+          expires_at: string
+          accepted_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          email: string
+          role: OrgRole
+          invited_by: string
+          token: string
+          expires_at?: string
+          accepted_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          email?: string
+          role?: OrgRole
+          invited_by?: string
+          token?: string
+          expires_at?: string
+          accepted_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,6 +1,7 @@
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CardGrid } from '@/components/CardGrid'
 import { CreateLibraryDialog } from '@/components/Organization/CreateLibraryDialog'
+import { InviteMemberDialog } from '@/components/Organization/InviteMemberDialog'
 import { LibraryCard } from '@/components/Organization/LibraryCard'
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/ui/button'
@@ -60,7 +61,10 @@ function OrganizationDetailRoute() {
     <div className="container mx-auto p-8">
       <Breadcrumbs className="mb-4" />
       <PageHeader title={organization.name} description="Manage libraries and components">
-        <CreateLibraryDialog organizationId={orgId} />
+        <div className="flex gap-2">
+          <InviteMemberDialog organizationId={orgId} />
+          <CreateLibraryDialog organizationId={orgId} />
+        </div>
       </PageHeader>
 
       <CardGrid
