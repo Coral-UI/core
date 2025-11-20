@@ -1,23 +1,42 @@
 import { Breadcrumbs } from '@/components/Breadcrumbs'
-import { LoadingContent } from '@/components/LoadingContent'
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/ui/button'
-import { useLibrary, useLibraryCssReset, useUpdateLibraryCssReset } from '@/hooks/queries/useLibraries'
+import { useLibraryCssReset, useUpdateLibraryCssReset } from '@/hooks/queries/useLibraries'
 import { useTheme } from '@/components/ThemeProvider'
+import { libraryCssResetQueryOptions, libraryQueryOptions } from '@/lib/queries/query-options'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useState, useEffect } from 'react'
 import MonacoEditor from '@monaco-editor/react'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 
 export const Route = createFileRoute('/orgs/$orgId/libraries/$libraryId/css-reset')({
+  loaderDeps: ({ params }) => {
+    // Defensively handle params being undefined
+    if (!params) {
+      return { libraryId: '' }
+    }
+    const libraryId = params.libraryId || ''
+    return { libraryId }
+  },
+  loader: ({ context, deps }) => {
+    if (!deps.libraryId || deps.libraryId.trim() === '') {
+      // Don't throw error, just return empty promises - component will handle missing libraryId
+      return Promise.resolve([])
+    }
+    return Promise.all([
+      context.queryClient.ensureQueryData(libraryQueryOptions(deps.libraryId)),
+      context.queryClient.ensureQueryData(libraryCssResetQueryOptions(deps.libraryId)),
+    ])
+  },
   component: CssResetRoute,
 })
 
 function CssResetRoute() {
   const { orgId, libraryId } = Route.useParams()
   const { theme } = useTheme()
-  const { data: library, isLoading: libLoading } = useLibrary(libraryId)
-  const { data: cssReset = '', isLoading: cssLoading } = useLibraryCssReset(libraryId)
+  const { data: library } = useSuspenseQuery(libraryQueryOptions(libraryId))
+  const { data: cssReset = '' } = useSuspenseQuery(libraryCssResetQueryOptions(libraryId))
   const updateCssReset = useUpdateLibraryCssReset()
 
   const [cssValue, setCssValue] = useState<string>('')
@@ -25,11 +44,11 @@ function CssResetRoute() {
 
   // Initialize CSS value when data loads
   useEffect(() => {
-    if (!cssLoading && cssReset !== undefined) {
+    if (cssReset !== undefined) {
       setCssValue(cssReset)
       setHasChanges(false)
     }
-  }, [cssReset, cssLoading])
+  }, [cssReset])
 
   // Track changes
   const handleEditorChange = (value: string | undefined) => {
@@ -47,10 +66,6 @@ function CssResetRoute() {
         },
       },
     )
-  }
-
-  if (libLoading || cssLoading) {
-    return <LoadingContent type="libraries" />
   }
 
   if (!library) {

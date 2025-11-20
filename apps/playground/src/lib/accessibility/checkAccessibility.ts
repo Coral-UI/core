@@ -1,6 +1,7 @@
+import axe from 'axe-core'
+
 import type { CoralRootNode } from '@reallygoodwork/coral-core'
 import { coralToHTML } from '@reallygoodwork/coral-to-html'
-import axe from 'axe-core'
 
 export interface AccessibilityResults {
   violations: AxeViolation[]

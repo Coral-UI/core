@@ -9,14 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ConvertRouteImport } from './routes/convert'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as OrgsOrgIdIndexRouteImport } from './routes/orgs/$orgId/index'
 import { Route as OrgsOrgIdLibrariesLibraryIdIndexRouteImport } from './routes/orgs/$orgId/libraries/$libraryId/index'
 import { Route as OrgsOrgIdLibrariesLibraryIdTokensRouteImport } from './routes/orgs/$orgId/libraries/$libraryId/tokens'
 import { Route as OrgsOrgIdLibrariesLibraryIdCssResetRouteImport } from './routes/orgs/$orgId/libraries/$libraryId/css-reset'
 import { Route as OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRouteImport } from './routes/orgs/$orgId/libraries/$libraryId/components/$componentId/edit'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConvertRoute = ConvertRouteImport.update({
   id: '/convert',
   path: '/convert',
@@ -25,6 +38,11 @@ const ConvertRoute = ConvertRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrgsOrgIdIndexRoute = OrgsOrgIdIndexRouteImport.update({
@@ -60,6 +78,9 @@ const OrgsOrgIdLibrariesLibraryIdComponentsComponentIdEditRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/orgs/$orgId': typeof OrgsOrgIdIndexRoute
   '/orgs/$orgId/libraries/$libraryId/css-reset': typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   '/orgs/$orgId/libraries/$libraryId/tokens': typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
@@ -69,6 +90,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/orgs/$orgId': typeof OrgsOrgIdIndexRoute
   '/orgs/$orgId/libraries/$libraryId/css-reset': typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   '/orgs/$orgId/libraries/$libraryId/tokens': typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
@@ -79,6 +103,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/convert': typeof ConvertRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/orgs/$orgId/': typeof OrgsOrgIdIndexRoute
   '/orgs/$orgId/libraries/$libraryId/css-reset': typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   '/orgs/$orgId/libraries/$libraryId/tokens': typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
@@ -90,6 +117,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/convert'
+    | '/login'
+    | '/signup'
+    | '/auth/callback'
     | '/orgs/$orgId'
     | '/orgs/$orgId/libraries/$libraryId/css-reset'
     | '/orgs/$orgId/libraries/$libraryId/tokens'
@@ -99,6 +129,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/convert'
+    | '/login'
+    | '/signup'
+    | '/auth/callback'
     | '/orgs/$orgId'
     | '/orgs/$orgId/libraries/$libraryId/css-reset'
     | '/orgs/$orgId/libraries/$libraryId/tokens'
@@ -108,6 +141,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/convert'
+    | '/login'
+    | '/signup'
+    | '/auth/callback'
     | '/orgs/$orgId/'
     | '/orgs/$orgId/libraries/$libraryId/css-reset'
     | '/orgs/$orgId/libraries/$libraryId/tokens'
@@ -118,6 +154,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConvertRoute: typeof ConvertRoute
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   OrgsOrgIdIndexRoute: typeof OrgsOrgIdIndexRoute
   OrgsOrgIdLibrariesLibraryIdCssResetRoute: typeof OrgsOrgIdLibrariesLibraryIdCssResetRoute
   OrgsOrgIdLibrariesLibraryIdTokensRoute: typeof OrgsOrgIdLibrariesLibraryIdTokensRoute
@@ -127,6 +166,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/convert': {
       id: '/convert'
       path: '/convert'
@@ -139,6 +192,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/orgs/$orgId/': {
@@ -182,6 +242,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConvertRoute: ConvertRoute,
+  LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   OrgsOrgIdIndexRoute: OrgsOrgIdIndexRoute,
   OrgsOrgIdLibrariesLibraryIdCssResetRoute:
     OrgsOrgIdLibrariesLibraryIdCssResetRoute,

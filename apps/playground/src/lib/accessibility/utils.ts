@@ -15,9 +15,7 @@ export interface AccessibilitySummary {
 /**
  * Get accessibility summary counts from accessibility results
  */
-export function getAccessibilitySummary(
-  accessibility?: AccessibilityResults,
-): AccessibilitySummary {
+export function getAccessibilitySummary(accessibility?: AccessibilityResults): AccessibilitySummary {
   if (!accessibility) {
     return { errors: 0, warnings: 0, passes: 0 }
   }
@@ -72,7 +70,9 @@ export function aggregateAccessibilityResults(components: Component[]): Accessib
 /**
  * Get accessibility status badge variant based on results
  */
-export function getAccessibilityBadgeVariant(summary: AccessibilitySummary): 'destructive' | 'warning' | 'success' | 'secondary' {
+export function getAccessibilityBadgeVariant(
+  summary: AccessibilitySummary,
+): 'destructive' | 'warning' | 'success' | 'secondary' {
   if (summary.errors > 0) {
     return 'destructive'
   }

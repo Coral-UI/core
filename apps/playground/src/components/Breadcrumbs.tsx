@@ -1,9 +1,10 @@
-import { useComponent } from '@/hooks/queries/useComponents'
-import { useLibrary } from '@/hooks/queries/useLibraries'
-import { useOrganization } from '@/hooks/queries/useOrganizations'
+import { organizationQueryOptions } from '@/lib/queries/query-options'
+import { libraryQueryOptions } from '@/lib/queries/query-options'
+import { componentQueryOptions } from '@/lib/queries/query-options'
 import { cn } from '@/lib/utils'
 import { IconChevronRight, IconHome } from '@tabler/icons-react'
 import { Link, useRouterState } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
 
 export function Breadcrumbs({ className }: React.ComponentProps<'div'>) {
   const router = useRouterState()
@@ -22,11 +23,27 @@ export function Breadcrumbs({ className }: React.ComponentProps<'div'>) {
   const isTokensRoute = !!tokensMatch
   const isCssResetRoute = !!cssResetMatch
 
-  const { data: organization } = useOrganization(orgId || '')
-  const { data: library } = useLibrary(libraryId || '')
-  const { data: component } = useComponent(componentId || '')
+  // Use conditional queries to avoid fetching with empty strings
+  // Only fetch if we have valid IDs (prevents UUID validation errors)
+  // IMPORTANT: All hooks must be called before any conditional returns
+  const { data: organization } = useQuery({
+    queryKey: ['organizations', orgId || ''],
+    queryFn: () => (orgId ? organizationQueryOptions(orgId).queryFn() : Promise.resolve(null)),
+    enabled: !!orgId && orgId.length > 0,
+  })
+  const { data: library } = useQuery({
+    queryKey: ['libraries', libraryId || ''],
+    queryFn: () => (libraryId ? libraryQueryOptions(libraryId).queryFn() : Promise.resolve(null)),
+    enabled: !!libraryId && libraryId.length > 0,
+  })
+  const { data: component } = useQuery({
+    queryKey: ['components', componentId || ''],
+    queryFn: () => (componentId ? componentQueryOptions(componentId).queryFn() : Promise.resolve(null)),
+    enabled: !!componentId && componentId.length > 0,
+  })
 
   // Don't show breadcrumbs on home page
+  // This check must come AFTER all hooks are called
   if (pathname === '/') {
     return null
   }

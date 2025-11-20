@@ -1,12 +1,4 @@
-import type {
-  Component,
-  DesignToken,
-  Library,
-  Organization,
-  Theme,
-  ThemeOption,
-  TokenValue,
-} from '@/types'
+import type { Component, DesignToken, Library, Organization, Theme, ThemeOption, TokenValue } from '@/types'
 import { fs } from '@/lib/adapters/fs'
 import { isElectron } from '@/lib/adapters/platform'
 import { storage } from '@/lib/adapters/storage'
@@ -52,12 +44,7 @@ export async function readMockData(): Promise<MockData> {
       const normalized = normalizeMockData(parsed)
 
       // If the data was missing new fields, write it back with normalized structure
-      if (
-        !('tokens' in parsed) ||
-        !('themes' in parsed) ||
-        !('themeOptions' in parsed) ||
-        !('tokenValues' in parsed)
-      ) {
+      if (!('tokens' in parsed) || !('themes' in parsed) || !('themeOptions' in parsed) || !('tokenValues' in parsed)) {
         await writeMockData(normalized)
       }
 
@@ -72,13 +59,7 @@ export async function readMockData(): Promise<MockData> {
     const normalized = normalizeMockData(data)
 
     // If the data was missing new fields, write it back with normalized structure
-    if (
-      data &&
-      (!('tokens' in data) ||
-        !('themes' in data) ||
-        !('themeOptions' in data) ||
-        !('tokenValues' in data))
-    ) {
+    if (data && (!('tokens' in data) || !('themes' in data) || !('themeOptions' in data) || !('tokenValues' in data))) {
       await storage.set(DATA_KEY, normalized)
     }
 

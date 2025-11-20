@@ -18,13 +18,16 @@ import './index.css'
 
 import { ThemeProvider } from './components/ThemeProvider'
 import { getPlatform } from './lib/adapters'
+import { AuthProvider } from './lib/auth/auth-context'
+import { AnalyticsProvider } from './lib/analytics/analytics-context'
 
 // Create a client for TanStack Query
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: Infinity, // For client-side state, data never goes stale
-      gcTime: Infinity, // Keep data in cache indefinitely
+      staleTime: 60 * 1000, // 1 minute - data is fresh for 1 minute
+      gcTime: 5 * 60 * 1000, // 5 minutes - keep in cache for 5 minutes
+      retry: 1,
     },
   },
 })
@@ -32,8 +35,13 @@ const queryClient = new QueryClient({
 // Log platform on startup
 console.log(`🚀 Coral Playground running on: ${getPlatform()}`)
 
-// Create a new router instance
-const router = createRouter({ routeTree })
+// Create a new router instance with context
+const router = createRouter({
+  routeTree,
+  context: {
+    queryClient,
+  },
+})
 
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {
@@ -45,9 +53,13 @@ declare module '@tanstack/react-router' {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="coral-ui-theme">
-        <RouterProvider router={router} />
-      </ThemeProvider>
+      <AuthProvider>
+        <AnalyticsProvider>
+          <ThemeProvider defaultTheme="dark" storageKey="coral-ui-theme">
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </AnalyticsProvider>
+      </AuthProvider>
       <TanStackDevtools
         plugins={[
           {

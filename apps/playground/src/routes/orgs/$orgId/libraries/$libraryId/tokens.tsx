@@ -3,29 +3,42 @@ import { CreateThemeDialog } from '@/components/Library/CreateThemeDialog'
 import { CreateTokenDialog } from '@/components/Library/CreateTokenDialog'
 import { DesignTokensTable } from '@/components/Library/DesignTokensTable'
 import { ThemesManager } from '@/components/Library/ThemesManager'
-import { LoadingContent } from '@/components/LoadingContent'
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/ui/button'
-import { useLibrary } from '@/hooks/queries/useLibraries'
-import { useTokens } from '@/hooks/queries/useTokens'
-import { useThemes } from '@/hooks/queries/useThemes'
+import { libraryQueryOptions, themesQueryOptions, tokensQueryOptions } from '@/lib/queries/query-options'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/orgs/$orgId/libraries/$libraryId/tokens')({
+  loaderDeps: ({ params }) => {
+    // Defensively handle params being undefined
+    if (!params) {
+      return { libraryId: '' }
+    }
+    const libraryId = params.libraryId || ''
+    return { libraryId }
+  },
+  loader: ({ context, deps }) => {
+    if (!deps.libraryId || deps.libraryId.trim() === '') {
+      // Don't throw error, just return empty promises - component will handle missing libraryId
+      return Promise.resolve([])
+    }
+    return Promise.all([
+      context.queryClient.ensureQueryData(libraryQueryOptions(deps.libraryId)),
+      context.queryClient.ensureQueryData(tokensQueryOptions(deps.libraryId)),
+      context.queryClient.ensureQueryData(themesQueryOptions(deps.libraryId)),
+    ])
+  },
   component: TokensRoute,
 })
 
 function TokensRoute() {
   const { orgId, libraryId } = Route.useParams()
   const [activeTab, setActiveTab] = useState<'tokens' | 'themes'>('tokens')
-  const { data: library, isLoading: libLoading } = useLibrary(libraryId)
-  const { data: tokens = [], isLoading: tokensLoading } = useTokens(libraryId)
-  const { data: themes = [], isLoading: themesLoading } = useThemes(libraryId)
-
-  if (libLoading || tokensLoading || themesLoading) {
-    return <LoadingContent type="libraries" />
-  }
+  const { data: library } = useSuspenseQuery(libraryQueryOptions(libraryId))
+  const { data: tokens = [] } = useSuspenseQuery(tokensQueryOptions(libraryId))
+  const { data: themes = [] } = useSuspenseQuery(themesQueryOptions(libraryId))
 
   if (!library) {
     return (

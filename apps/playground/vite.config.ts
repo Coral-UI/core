@@ -15,7 +15,6 @@ export default defineConfig({
     },
   },
   plugins: [
-    // Skip DevTools in Storybook to avoid port conflicts
     devtools(),
     nodePolyfills({
       globals: {

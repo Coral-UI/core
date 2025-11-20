@@ -796,7 +796,10 @@ export const Editor = memo(({ componentId }: EditorProps) => {
             </div>
           )}
           <div className="p-2.5 border-t border-border">
-            <AccessibilityPanel accessibility={component?.accessibility} isChecking={isCheckingAccessibility} />
+            <AccessibilityPanel
+              {...(component?.accessibility ? { accessibility: component.accessibility } : {})}
+              isChecking={isCheckingAccessibility}
+            />
           </div>
         </aside>
       </div>

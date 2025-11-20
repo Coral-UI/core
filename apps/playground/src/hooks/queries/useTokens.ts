@@ -1,19 +1,14 @@
-import type { CreateDesignTokenInput, DesignToken } from '@/types'
+import type { CreateDesignTokenInput } from '@/types'
 import * as tokensApi from '@/lib/api/tokens'
+import { tokensQueryOptions } from '@/lib/queries/query-options'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-
-const QUERY_KEY = ['tokens'] as const
 
 /**
  * Query hook for fetching tokens for a library
  */
 export function useTokens(libraryId: string) {
-  return useQuery<DesignToken[]>({
-    queryKey: [...QUERY_KEY, libraryId],
-    queryFn: () => tokensApi.getTokens(libraryId),
-    enabled: !!libraryId,
-  })
+  return useQuery(tokensQueryOptions(libraryId))
 }
 
 /**
@@ -25,7 +20,7 @@ export function useCreateToken() {
   return useMutation({
     mutationFn: (input: CreateDesignTokenInput) => tokensApi.createToken(input),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, data.libraryId] })
+      queryClient.invalidateQueries({ queryKey: ['tokens', data.libraryId] })
       toast.success('Token created successfully')
     },
     onError: (error: Error) => {
@@ -41,9 +36,9 @@ export function useDeleteToken() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, libraryId }: { id: string; libraryId: string }) => tokensApi.deleteToken(id),
+    mutationFn: ({ id }: { id: string; libraryId: string }) => tokensApi.deleteToken(id),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: [...QUERY_KEY, variables.libraryId] })
+      queryClient.invalidateQueries({ queryKey: ['tokens', variables.libraryId] })
       queryClient.invalidateQueries({ queryKey: ['tokenValues'] })
       toast.success('Token deleted successfully')
     },

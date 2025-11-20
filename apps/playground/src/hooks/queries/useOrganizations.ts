@@ -1,6 +1,8 @@
-import type { CreateOrganizationInput, Organization, UpdateOrganizationInput } from '@/types'
+import type { CreateOrganizationInput, UpdateOrganizationInput } from '@/types'
 import * as organizationsApi from '@/lib/api/organizations'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { organizationQueryOptions, organizationsQueryOptions } from '@/lib/queries/query-options'
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 const QUERY_KEY = ['organizations'] as const
@@ -9,21 +11,14 @@ const QUERY_KEY = ['organizations'] as const
  * Query hook for fetching all organizations
  */
 export function useOrganizations() {
-  return useQuery<Organization[]>({
-    queryKey: QUERY_KEY,
-    queryFn: () => organizationsApi.getOrganizations(),
-  })
+  return useQuery(organizationsQueryOptions())
 }
 
 /**
- * Query hook for fetching a single organization
+ * Query hook for fetching a single organization (with Suspense)
  */
 export function useOrganization(id: string) {
-  return useQuery<Organization | null>({
-    queryKey: [...QUERY_KEY, id],
-    queryFn: () => organizationsApi.getOrganization(id),
-    enabled: !!id,
-  })
+  return useSuspenseQuery(organizationQueryOptions(id))
 }
 
 /**
@@ -31,12 +26,19 @@ export function useOrganization(id: string) {
  */
 export function useCreateOrganization() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   return useMutation({
     mutationFn: (input: CreateOrganizationInput) => organizationsApi.createOrganization(input),
-    onSuccess: () => {
+    onSuccess: (organization) => {
+      if (!organization?.id) {
+        toast.error('Failed to create organization: Missing organization ID')
+        return
+      }
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
       toast.success('Organization created successfully')
+      // Navigate to the new organization page
+      navigate({ to: '/orgs/$orgId', params: { orgId: organization.id } })
     },
     onError: (error: Error) => {
       toast.error(`Failed to create organization: ${error.message}`)
