@@ -1,6 +1,6 @@
 import { useTheme } from '@/components/ThemeProvider'
-import { Button } from '@/components/ui/button'
-import { Dialog } from '@/components/ui/dialog'
+import { Button } from '@/components/primitives/Button/button'
+import { Dialog } from '@/components/primitives/Dialog/dialog'
 import MonacoEditor from '@monaco-editor/react'
 import { useState } from 'react'
 

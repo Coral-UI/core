@@ -5,8 +5,8 @@ import { CardGrid } from '@/components/CardGrid'
 import { ComponentCard } from '@/components/Library/ComponentCard'
 import { CreateComponentDialog } from '@/components/Library/CreateComponentDialog'
 import { PageHeader } from '@/components/PageHeader'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/primitives/Badge/badge'
+import { Button } from '@/components/primitives/Button/button'
 import {
   aggregateAccessibilityResults,
   formatAccessibilityStatus,

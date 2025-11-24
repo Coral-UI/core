@@ -1,6 +1,6 @@
 import type { VariantProps } from 'class-variance-authority'
-import { Button, buttonVariants } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button, buttonVariants } from '@/components/primitives/Button/button'
+import { Input } from '@/components/primitives/Input/input'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { cva } from 'class-variance-authority'

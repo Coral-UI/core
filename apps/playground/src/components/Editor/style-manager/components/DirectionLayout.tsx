@@ -14,7 +14,7 @@ import {
 import { defaultUnitOptions, NumberInput } from '@/components/Editor/style-manager/components/NumberInput'
 import { Select } from '@/components/Editor/style-manager/components/Select'
 import { Toggle } from '@/components/Editor/style-manager/components/ToggleGroup'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/primitives/Button/button'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'

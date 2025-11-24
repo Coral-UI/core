@@ -1,9 +1,9 @@
 'use client'
 
 import type { Component } from '@/types'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/primitives/Button/button'
+import { Badge } from '@/components/primitives/Badge/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/primitives/Card/card'
 import { useDeleteComponent } from '@/hooks/queries/useComponents'
 import { formatAccessibilityStatus, getAccessibilityBadgeVariant, getAccessibilitySummary } from '@/lib/accessibility/utils'
 import { formatDateReadable } from '@/lib/utils/date-format'

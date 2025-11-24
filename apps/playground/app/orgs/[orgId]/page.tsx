@@ -1,5 +1,5 @@
 import { makeQueryClient } from '@/app/get-query-client'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/primitives/Button/button'
 import { librariesQueryOptions, organizationQueryOptions } from '@/lib/queries/query-options'
 import { getLibrariesServer, getOrganizationServer } from '@/lib/queries/server-query-functions'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'

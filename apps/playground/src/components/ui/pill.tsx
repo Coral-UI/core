@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/primitives/Avatar/avatar'
+import { Badge } from '@/components/primitives/Badge/badge'
+import { Button } from '@/components/primitives/Button/button'
 import { cn } from '@/lib/utils'
 import { ChevronDownIcon, ChevronUpIcon, MinusIcon } from 'lucide-react'
 

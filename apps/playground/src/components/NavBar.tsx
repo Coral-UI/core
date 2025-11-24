@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { ModeToggle } from './ThemeToggle'
-import { Avatar, AvatarFallback } from './ui/avatar'
+import { Avatar, AvatarFallback } from './primitives/Avatar/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,

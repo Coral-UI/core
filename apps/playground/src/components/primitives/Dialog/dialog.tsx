@@ -1,7 +1,8 @@
 import { Dialog as BaseDialog } from '@base-ui-components/react/dialog'
 import { IconPlus } from '@tabler/icons-react'
+import * as React from 'react'
 
-import { Button, ButtonProps } from './button'
+import { Button, ButtonProps } from '../Button/button'
 
 function Dialog({
   buttonVariant = 'default',

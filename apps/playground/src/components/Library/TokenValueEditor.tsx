@@ -1,5 +1,5 @@
 import type { DesignToken } from '@/types'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/primitives/Input/input'
 import { useSetTokenValue } from '@/hooks/queries/useTokenValues'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'

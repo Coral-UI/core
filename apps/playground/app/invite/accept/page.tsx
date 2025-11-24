@@ -1,8 +1,8 @@
 'use client'
 
 import type { OrganizationInvitation } from '@/types/invitation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/primitives/Button/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/primitives/Card/card'
 import { useAcceptInvitation } from '@/hooks/queries/useInvitations'
 import { getInvitationByToken } from '@/lib/api/invitations'
 import { useAuthContext } from '@/lib/auth/auth-context'

@@ -2,10 +2,10 @@
 
 import type { VariantProps } from 'class-variance-authority'
 import { VisuallyHiddenInput } from '@/components/Editor/style-manager/components/VisuallyHiddenInput'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/primitives/Button/button'
+import { Input } from '@/components/primitives/Input/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/Select/select'
 import { useComposedRefs } from '@/lib/compose-refs'
 import { cn } from '@/lib/utils'
 import * as SliderPrimitive from '@radix-ui/react-slider'

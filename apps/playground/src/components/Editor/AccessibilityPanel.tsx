@@ -1,10 +1,16 @@
-import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/base/ScrollArea'
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { formatAccessibilityStatus, getAccessibilitySummary } from '@/lib/accessibility/utils'
-import { formatDateTime } from '@/lib/utils/date-format'
 import type { AccessibilityResults } from '@/lib/accessibility/checkAccessibility'
+import { ScrollArea } from '@/components/base/ScrollArea'
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from '@/components/primitives/Accordion/accordion'
+import { Badge } from '@/components/primitives/Badge/badge'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { getAccessibilitySummary } from '@/lib/accessibility/utils'
+import { formatDateTime } from '@/lib/utils/date-format'
 import { AlertCircleIcon, CheckCircleIcon, InfoIcon, LoaderIcon } from 'lucide-react'
 import { useMemo } from 'react'
 
@@ -16,7 +22,7 @@ interface AccessibilityPanelProps {
 const IMPACT_COLORS = {
   critical: 'destructive',
   serious: 'destructive',
-  moderate: 'warning',
+  moderate: 'secondary',
   minor: 'secondary',
 } as const
 
@@ -34,8 +40,8 @@ export function AccessibilityPanel({ accessibility, isChecking = false }: Access
     }
 
     accessibility.violations.forEach((violation) => {
-      if (violation.impact && grouped[violation.impact]) {
-        grouped[violation.impact].push(violation)
+      if (violation.impact && violation.impact in grouped) {
+        grouped[violation.impact]?.push(violation)
       }
     })
 
@@ -95,7 +101,7 @@ export function AccessibilityPanel({ accessibility, isChecking = false }: Access
             </Badge>
           )}
           {summary.warnings > 0 && (
-            <Badge variant="warning">
+            <Badge variant="secondary">
               <InfoIcon className="size-3" />
               {summary.warnings} {summary.warnings === 1 ? 'warning' : 'warnings'}
             </Badge>
@@ -108,9 +114,7 @@ export function AccessibilityPanel({ accessibility, isChecking = false }: Access
           )}
         </div>
         {accessibility.lastChecked && (
-          <p className="text-xs text-muted-foreground">
-            Last checked: {formatDateTime(accessibility.lastChecked)}
-          </p>
+          <p className="text-xs text-muted-foreground">Last checked: {formatDateTime(accessibility.lastChecked)}</p>
         )}
       </div>
 
@@ -119,22 +123,24 @@ export function AccessibilityPanel({ accessibility, isChecking = false }: Access
           {hasViolations && (
             <div>
               <h3 className="text-sm font-medium mb-2">Violations</h3>
-              <Accordion type="multiple" className="w-full">
+              <Accordion multiple={true} className="w-full">
                 {Object.entries(violationsByImpact).map(([impact, violations]) => {
                   if (violations.length === 0) return null
                   return (
                     <AccordionItem key={impact} value={impact}>
-                      <AccordionTrigger className="text-sm">
-                        <div className="flex items-center gap-2">
-                          <Badge variant={IMPACT_COLORS[impact as keyof typeof IMPACT_COLORS] || 'secondary'}>
-                            {impact}
-                          </Badge>
-                          <span>
-                            {violations.length} {violations.length === 1 ? 'violation' : 'violations'}
-                          </span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
+                      <AccordionHeader>
+                        <AccordionTrigger className="text-sm">
+                          <div className="flex items-center gap-2">
+                            <Badge variant={IMPACT_COLORS[impact as keyof typeof IMPACT_COLORS] || 'secondary'}>
+                              {impact}
+                            </Badge>
+                            <span>
+                              {violations.length} {violations.length === 1 ? 'violation' : 'violations'}
+                            </span>
+                          </div>
+                        </AccordionTrigger>
+                      </AccordionHeader>
+                      <AccordionPanel>
                         <div className="flex flex-col gap-4">
                           {violations.map((violation) => (
                             <div key={violation.id} className="border-l-2 border-destructive pl-3 py-2">
@@ -175,7 +181,7 @@ export function AccessibilityPanel({ accessibility, isChecking = false }: Access
                             </div>
                           ))}
                         </div>
-                      </AccordionContent>
+                      </AccordionPanel>
                     </AccordionItem>
                   )
                 })}
@@ -186,16 +192,18 @@ export function AccessibilityPanel({ accessibility, isChecking = false }: Access
           {hasWarnings && (
             <div>
               <h3 className="text-sm font-medium mb-2">Warnings</h3>
-              <Accordion type="multiple" className="w-full">
+              <Accordion multiple={true} className="w-full">
                 {accessibility.incomplete.map((incomplete) => (
                   <AccordionItem key={incomplete.id} value={incomplete.id}>
-                    <AccordionTrigger className="text-sm">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="warning">Warning</Badge>
-                        <span>{incomplete.help}</span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionHeader>
+                      <AccordionTrigger className="text-sm">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary">Warning</Badge>
+                          <span>{incomplete.help}</span>
+                        </div>
+                      </AccordionTrigger>
+                    </AccordionHeader>
+                    <AccordionPanel>
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">{incomplete.description}</p>
                         <a
@@ -216,7 +224,7 @@ export function AccessibilityPanel({ accessibility, isChecking = false }: Access
                           </div>
                         )}
                       </div>
-                    </AccordionContent>
+                    </AccordionPanel>
                   </AccordionItem>
                 ))}
               </Accordion>

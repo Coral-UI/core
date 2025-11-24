@@ -1,5 +1,5 @@
 import { useFormContext } from '@/components/Editor/style-manager/formContext'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/primitives/Button/button'
 import { cn } from '@/lib/utils'
 import { IconMinus, IconPlus } from '@tabler/icons-react'
 import { useStore } from '@tanstack/react-form'

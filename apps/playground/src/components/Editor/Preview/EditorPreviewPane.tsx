@@ -1,15 +1,15 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/base/Tabs'
 import { HTMLRenderer } from '@/components/Editor/Preview/HTMLRenderer'
+import { Button } from '@/components/primitives/Button/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/Tabs/Tabs'
 import { useTheme } from '@/components/ThemeProvider'
-import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { useLibraryCssReset } from '@/hooks/queries/useLibraries'
 // import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { Editor } from '@monaco-editor/react'
 import { IconBracketsAngle, IconEyeSearch, IconFileImport, IconSchema } from '@tabler/icons-react'
 import { CopyIcon, MonitorIcon, Redo, SmartphoneIcon, TabletIcon, Undo } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { useLibraryCssReset } from '@/hooks/queries/useLibraries'
 
 import { CoralRootNode } from '@reallygoodwork/coral-core'
 

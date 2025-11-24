@@ -6,10 +6,10 @@ import { supabase } from '@/lib/supabase/client'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/primitives/Button/button'
+import { Input } from '@/components/primitives/Input/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/primitives/Card/card'
 import { useEffect, useState } from 'react'
 
 const profileSchema = z.object({
@@ -129,4 +129,3 @@ export default function ProfilePage() {
     </AuthGuard>
   )
 }
-

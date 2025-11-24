@@ -1,6 +1,6 @@
 'use client'
 
-import { Dialog } from '@/components/ui/dialog'
+import { Dialog } from '@/components/primitives/Dialog/dialog'
 import { cn } from '@/lib/utils'
 import { Command as CommandPrimitive } from 'cmdk'
 import { SearchIcon } from 'lucide-react'

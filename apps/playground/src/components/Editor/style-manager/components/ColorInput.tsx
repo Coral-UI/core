@@ -12,7 +12,7 @@ import {
   ColorPickerTrigger,
 } from '@/components/Editor/style-manager/components/ColorPicker'
 import { useFieldContext, useFormContext } from '@/components/Editor/style-manager/formContext'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/primitives/Button/button'
 import { cn } from '@/lib/utils'
 import { cva } from 'class-variance-authority'
 import { useCallback, useEffect, useRef } from 'react'

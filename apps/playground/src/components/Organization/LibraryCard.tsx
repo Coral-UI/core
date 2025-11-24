@@ -1,8 +1,8 @@
 'use client'
 
 import type { Library } from '@/types'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/primitives/Button/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/primitives/Card/card'
 import { useDeleteLibrary } from '@/hooks/queries/useLibraries'
 import { formatDateReadable } from '@/lib/utils/date-format'
 import Link from 'next/link'

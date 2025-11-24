@@ -1,5 +1,5 @@
 import { useTheme } from '@/components/ThemeProvider'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/primitives/Button/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { IconMoonStars, IconSun } from '@tabler/icons-react'
 

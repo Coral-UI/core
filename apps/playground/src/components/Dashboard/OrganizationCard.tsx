@@ -1,12 +1,12 @@
 'use client'
 
 import type { Organization } from '@/types'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/primitives/Button/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/primitives/Card/card'
 import { useDeleteOrganization } from '@/hooks/queries/useOrganizations'
 import { formatDateReadable } from '@/lib/utils/date-format'
-import Link from 'next/link'
 import { Trash2Icon } from 'lucide-react'
+import Link from 'next/link'
 
 interface OrganizationCardProps {
   organization: Organization

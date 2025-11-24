@@ -1,11 +1,11 @@
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Badge } from '@/components/primitives/Badge/badge'
+import { Button } from '@/components/primitives/Button/button'
+import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/primitives/Collapsible/collapsible'
+import { Dialog } from '@/components/primitives/Dialog/dialog'
+import { Input } from '@/components/primitives/Input/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/Select/select'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { IconDevices } from '@tabler/icons-react'
 import { ChevronRight, Monitor, Plus, Smartphone, Tablet, Trash2 } from 'lucide-react'
 import { useState } from 'react'
@@ -75,12 +75,12 @@ export const BreakpointManager = ({
   return (
     <div className="border-b border-border pb-6">
       <Collapsible defaultOpen>
-        <CollapsibleTrigger className="group flex items-center gap-2 w-full">
+        <CollapsibleTrigger className="group flex items-center gap-2 w-full [&>svg:last-child]:hidden">
           <p className="text-xs font-normal">Responsive Styles</p>
-          <ChevronRight className="size-4 group-data-[state=open]:rotate-90" />
+          <ChevronRight className="size-4 group-data-[panel-open]:rotate-90" />
         </CollapsibleTrigger>
 
-        <CollapsibleContent className="mt-4 space-y-3">
+        <CollapsiblePanel className="mt-4 space-y-3">
           {/* Base styles indicator */}
           <div
             className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${
@@ -136,116 +136,105 @@ export const BreakpointManager = ({
           })}
 
           {/* Add breakpoint button */}
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="secondary" size="sm" className="w-full">
-                <Plus className="h-3 w-3 mr-1" />
-                Add Breakpoint
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add Responsive Breakpoint</DialogTitle>
-              </DialogHeader>
-
-              <div className="space-y-4">
-                {/* Presets */}
-                <div>
-                  <Label className="text-xs font-medium mb-2 block">Quick Presets</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {BREAKPOINT_PRESETS.map((preset) => {
-                      const Icon = preset.icon
-                      return (
-                        <Button
-                          key={preset.label}
-                          variant="outline"
-                          // size="sm"
-                          className="justify-start"
-                          onClick={() => handleAddPreset(preset)}
-                        >
-                          <Icon className="h-3 w-3 mr-2" />
-                          <div>
-                            <span className="text-xs font-medium">{preset.label}</span>
-                            <span className="text-xs text-muted-foreground font-mono ml-2 tabular-nums">
-                              {preset.value}
-                            </span>
-                          </div>
-                        </Button>
-                      )
-                    })}
-                  </div>
+          <Dialog
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+            buttonText="Add Breakpoint"
+            title="Add Responsive Breakpoint"
+            description="Add a new responsive breakpoint to the element"
+          >
+            <div className="space-y-4">
+              {/* Presets */}
+              <div>
+                <Label className="text-xs font-medium mb-2 block">Quick Presets</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {BREAKPOINT_PRESETS.map((preset) => {
+                    const Icon = preset.icon
+                    return (
+                      <Button
+                        key={preset.label}
+                        variant="outline"
+                        // size="sm"
+                        className="justify-start"
+                        onClick={() => handleAddPreset(preset)}
+                      >
+                        <Icon className="h-3 w-3 mr-2" />
+                        <div>
+                          <span className="text-xs font-medium">{preset.label}</span>
+                          <span className="text-xs text-muted-foreground font-mono ml-2 tabular-nums">
+                            {preset.value}
+                          </span>
+                        </div>
+                      </Button>
+                    )
+                  })}
                 </div>
-
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">Or Custom</span>
-                  </div>
-                </div>
-
-                {/* Custom breakpoint */}
-                <FieldGroup>
-                  <Field>
-                    <FieldLabel htmlFor="breakpoint-label" className="text-xs">
-                      Label (Optional)
-                    </FieldLabel>
-                    <Input
-                      id="breakpoint-label"
-                      value={newBreakpointLabel}
-                      onChange={(e) => setNewBreakpointLabel(e.target.value)}
-                      placeholder="e.g., Mobile, Tablet"
-                      className="text-xs h-8"
-                    />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="breakpoint-type" className="text-xs">
-                      Type
-                    </FieldLabel>
-                    <Select
-                      value={newBreakpointType}
-                      onValueChange={(value) => setNewBreakpointType(value as BreakpointType)}
-                    >
-                      <SelectTrigger id="breakpoint-type" className="text-xs h-8">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="min-width">min-width</SelectItem>
-                        <SelectItem value="max-width">max-width</SelectItem>
-                        <SelectItem value="min-height">min-height</SelectItem>
-                        <SelectItem value="max-height">max-height</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="breakpoint-value" className="text-xs">
-                      Value
-                    </FieldLabel>
-                    <Input
-                      id="breakpoint-value"
-                      value={newBreakpointValue}
-                      onChange={(e) => setNewBreakpointValue(e.target.value)}
-                      placeholder="e.g., 768px, 50rem"
-                      className="text-xs h-8"
-                    />
-                  </Field>
-                </FieldGroup>
-
-                <Button
-                  onClick={handleAddBreakpoint}
-                  disabled={!newBreakpointValue.trim()}
-                  className="w-full"
-                  size="sm"
-                >
-                  Add Custom Breakpoint
-                </Button>
               </div>
-            </DialogContent>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Or Custom</span>
+                </div>
+              </div>
+
+              {/* Custom breakpoint */}
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="breakpoint-label" className="text-xs">
+                    Label (Optional)
+                  </FieldLabel>
+                  <Input
+                    id="breakpoint-label"
+                    value={newBreakpointLabel}
+                    onChange={(e) => setNewBreakpointLabel(e.target.value)}
+                    placeholder="e.g., Mobile, Tablet"
+                    className="text-xs h-8"
+                  />
+                </Field>
+
+                <Field>
+                  <FieldLabel htmlFor="breakpoint-type" className="text-xs">
+                    Type
+                  </FieldLabel>
+                  <Select
+                    value={newBreakpointType}
+                    onValueChange={(value) => setNewBreakpointType(value as BreakpointType)}
+                  >
+                    <SelectTrigger id="breakpoint-type" className="text-xs h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="min-width">min-width</SelectItem>
+                      <SelectItem value="max-width">max-width</SelectItem>
+                      <SelectItem value="min-height">min-height</SelectItem>
+                      <SelectItem value="max-height">max-height</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+
+                <Field>
+                  <FieldLabel htmlFor="breakpoint-value" className="text-xs">
+                    Value
+                  </FieldLabel>
+                  <Input
+                    id="breakpoint-value"
+                    value={newBreakpointValue}
+                    onChange={(e) => setNewBreakpointValue(e.target.value)}
+                    placeholder="e.g., 768px, 50rem"
+                    className="text-xs h-8"
+                  />
+                </Field>
+              </FieldGroup>
+
+              <Button onClick={handleAddBreakpoint} disabled={!newBreakpointValue.trim()} className="w-full" size="sm">
+                Add Custom Breakpoint
+              </Button>
+            </div>
           </Dialog>
-        </CollapsibleContent>
+        </CollapsiblePanel>
       </Collapsible>
     </div>
   )

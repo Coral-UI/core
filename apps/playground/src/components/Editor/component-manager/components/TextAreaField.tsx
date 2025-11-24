@@ -1,60 +1,69 @@
 import { useFieldContext } from '@/components/Editor/component-manager/formContext'
-import { Field } from '@base-ui-components/react/field'
+import { Field } from '@/components/primitives/Field/Field'
+import { TextAreaField as TextAreaFieldPrimitive } from '@/components/primitives/TextAreaField/TextAreaField'
 import * as React from 'react'
 
-type TextAreaFieldProps = React.ComponentProps<typeof Field.Root> & {
-  label: string
-  description?: string
-  error?: string
-  value?: string | undefined
+type TextAreaFieldProps = Omit<React.ComponentProps<typeof Field>, 'children' | 'error'> & {
   onChange?: (value: string | undefined) => void
-  defaultValue?: string | undefined
   id?: string
   placeholder?: string
+  rows?: number
+  disabled?: boolean
+  required?: boolean
+  defaultValue?: string | undefined
 }
 
 function TextAreaField({
   label,
   description,
-  error,
-  value,
   onChange,
-  defaultValue,
   id,
   placeholder,
+  rows = 3,
+  disabled,
+  required,
+  defaultValue,
   ...props
 }: TextAreaFieldProps) {
   const field = useFieldContext<string | undefined>()
 
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+  const errors: string | string[] | undefined =
+    isInvalid && Array.isArray(field.state.meta.errors) && field.state.meta.errors.length > 0
+      ? field.state.meta.errors.length === 1
+        ? typeof field.state.meta.errors[0] === 'string'
+          ? field.state.meta.errors[0]
+          : field.state.meta.errors[0]?.message || String(field.state.meta.errors[0])
+        : field.state.meta.errors.map((error) => (typeof error === 'string' ? error : error?.message || String(error)))
+      : undefined
+
+  const handleChange = React.useCallback(
+    (value: string | undefined) => {
+      field.handleChange(value)
+      onChange?.(value)
+    },
+    [field, onChange],
+  )
 
   return (
-    <Field.Root {...props}>
-      <Field.Label className="h-6 flex items-center ml-1.5 label-sm">{label}</Field.Label>
-      <textarea
+    <Field
+      {...props}
+      {...(label !== undefined && { label })}
+      {...(description !== undefined && { description })}
+      {...(errors !== undefined && { error: errors })}
+      invalid={isInvalid}
+    >
+      <TextAreaFieldPrimitive
+        id={id}
         placeholder={placeholder}
-        className="flex rounded-md items-center bg-input border border-input-border has-[>input[aria-invalid=true]]:ring-destructive-fg  has-[>input[aria-invalid=true]]:border-destructive-fg has-[>input[aria-invalid=true]]:bg-destructive-bg interactive-focus-input min-h-7.5 text-sm text-foreground tabular-nums focus:z-1 focus:outline-none min-w-8 w-full flex-1 shrink-0 px-2 py-1.5 max-h-32 inset-shadow-xs inset-shadow-shadow-input font-normal placeholder:text-muted-foreground"
-        rows={3}
-        value={field.state.value || ''}
-        onChange={(e) => {
-          const newValue = e.target.value || undefined
-          field.handleChange(newValue)
-          onChange?.(newValue)
-        }}
+        rows={rows}
+        disabled={disabled}
+        required={required}
+        defaultValue={defaultValue}
+        value={field.state.value}
+        onChange={handleChange}
       />
-
-      {description && (
-        <Field.Description className="text-xs text-text-muted ml-1.5 mt-1">{description}</Field.Description>
-      )}
-
-      {isInvalid && Array.isArray(field.state.meta.errors) && field.state.meta.errors.length > 0 && (
-        <div className="text-xs text-red-800 mt-1 ml-1.5">
-          {field.state.meta.errors.map((error, index) => (
-            <div key={index}>{error}</div>
-          ))}
-        </div>
-      )}
-    </Field.Root>
+    </Field>
   )
 }
 

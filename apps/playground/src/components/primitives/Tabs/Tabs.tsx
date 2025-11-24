@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import { Tabs as BaseTabs } from '@base-ui-components/react/tabs'
+import * as React from 'react'
 
 function Tabs({ className, ...props }: { className?: string } & React.ComponentProps<typeof BaseTabs.Root>) {
   return <BaseTabs.Root className={cn('flex flex-col', className)} {...props} />

@@ -1,8 +1,8 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/primitives/Button/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/primitives/Card/card'
+import { Input } from '@/components/primitives/Input/input'
 import { Label } from '@/components/ui/label'
 import { useSignInWithFigma, useSignInWithGoogle, useSignUp } from '@/lib/auth/use-auth'
 import { useForm } from '@tanstack/react-form'

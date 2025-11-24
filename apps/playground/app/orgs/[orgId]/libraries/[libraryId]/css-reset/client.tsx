@@ -3,7 +3,7 @@
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { PageHeader } from '@/components/PageHeader'
 import { useTheme } from '@/components/ThemeProvider'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/primitives/Button/button'
 import { useUpdateLibraryCssReset } from '@/hooks/queries/useLibraries'
 import { libraryCssResetQueryOptions, libraryQueryOptions } from '@/lib/queries/query-options'
 import MonacoEditor from '@monaco-editor/react'

@@ -1,6 +1,6 @@
 import type { Theme, ThemeOption } from '@/types'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/primitives/Button/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/primitives/Card/card'
 import { CreateThemeOptionDialog } from '@/components/Library/CreateThemeOptionDialog'
 import { useDeleteTheme, useDeleteThemeOption, useThemeOptions, useUpdateThemeOption } from '@/hooks/queries/useThemes'
 import { Trash2Icon } from 'lucide-react'

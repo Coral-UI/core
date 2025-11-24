@@ -1,5 +1,5 @@
 import type { DesignToken, Theme } from '@/types'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/primitives/Button/button'
 import {
   Table,
   TableBody,

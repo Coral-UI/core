@@ -20,9 +20,6 @@ export const SelectField = ({
   // Use isDefaultValue instead of isDirty for non-persistent dirty state
   // const hasChanged = !field.state.meta.isDefaultValue;
 
-  // Normalize undefined to empty string to keep component controlled
-  const normalizedValue = field.state.value ?? ''
-
   return (
     <div data-invalid={isInvalid}>
       <label htmlFor={field.name} className={hideLabel ? 'sr-only' : 'label-sm ml-1.5 h-6 flex items-center'}>
@@ -31,7 +28,8 @@ export const SelectField = ({
 
       <Select
         items={selectOptions}
-        value={normalizedValue}
+        // @ts-expect-error - Base UI Select has strict discriminated union types that conflict when value and onValueChange are both provided
+        value={field.state.value ?? undefined}
         onValueChange={(value) => {
           // Store the value - convert empty string to undefined for form state
           // to match schema expectations (empty string would fail min(1) validation)

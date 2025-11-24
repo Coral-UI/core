@@ -6,7 +6,7 @@ import { CreateLibraryDialog } from '@/components/Organization/CreateLibraryDial
 import { InviteMemberDialog } from '@/components/Organization/InviteMemberDialog'
 import { LibraryCard } from '@/components/Organization/LibraryCard'
 import { PageHeader } from '@/components/PageHeader'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/primitives/Button/button'
 import { librariesQueryOptions, organizationQueryOptions } from '@/lib/queries/query-options'
 import { Library } from '@/types'
 import { useSuspenseQuery } from '@tanstack/react-query'
