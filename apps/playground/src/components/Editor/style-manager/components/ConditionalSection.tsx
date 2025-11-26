@@ -1,5 +1,5 @@
 import { useFormContext } from '@/components/Editor/style-manager/formContext'
-import { cn } from '@/lib/utils'
+import { ConditionalSection as ConditionalSectionPrimitive } from '@/components/primitives/ConditionalSection/conditional-section'
 import { useStore } from '@tanstack/react-form'
 import React from 'react'
 
@@ -29,6 +29,7 @@ type ConditionalSectionProps = {
 
 /**
  * ConditionalSection - A reusable component that shows/hides content based on form field values
+ * This is a wrapper around the primitive ConditionalSection that integrates with TanStack Form
  *
  * @example
  * ```tsx
@@ -52,14 +53,13 @@ export const ConditionalSection: React.FC<ConditionalSectionProps> = ({ watch, w
     watchedValue !== undefined &&
     (Array.isArray(when) ? when.includes(watchedValue as string | number | boolean) : watchedValue === when)
 
-  if (!shouldShow) {
-    return null
-  }
-
   return (
-    <fieldset className={cn('card', className)}>
-      {legend && <legend className="legend">{legend}</legend>}
+    <ConditionalSectionPrimitive
+      show={shouldShow}
+      {...(className !== undefined && { className })}
+      {...(legend !== undefined && { legend })}
+    >
       {children}
-    </fieldset>
+    </ConditionalSectionPrimitive>
   )
 }

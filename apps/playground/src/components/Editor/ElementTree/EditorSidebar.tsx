@@ -1,5 +1,6 @@
 // import { Button } from '@/components/ui/button'
-import { TreeDataItem, TreeView } from '@/components/ui/tree-view'
+import { Card } from '@/components/primitives/Card/card'
+import { TreeDataItem, TreeView } from '@/components/primitives/TreeView/tree-view'
 import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
 import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
@@ -143,8 +144,8 @@ export const EditorSidebar = () => {
   )
 
   return (
-    <div className="flex flex-col h-full card">
-      <div className="pt-1.5">
+    <Card className="h-full" tight>
+      <div>
         <p className="text-xs font-medium text-muted-foreground">Structure</p>
       </div>
       <div className="flex-1 overflow-auto">
@@ -156,6 +157,6 @@ export const EditorSidebar = () => {
           expandAll={false}
         />
       </div>
-    </div>
+    </Card>
   )
 }

@@ -1,0 +1,123 @@
+.color-picker-content {
+  display: flex;
+  width: 340px;
+  flex-direction: column;
+  gap: calc(var(--spacing) * 4);
+  padding: calc(var(--spacing) * 4);
+}
+
+.color-picker-area {
+  position: relative;
+  height: calc(var(--spacing) * 40);
+  width: 100%;
+  cursor: crosshair;
+  touch-action: none;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+
+  &:.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}
+
+.color-picker-area-inner {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+.color-picker-area-gradient {
+  position: absolute;
+  inset: 0;
+}
+
+.color-picker-area-gradient-hue {
+  transform: translateX(-50%) translateY(-50%);
+  position: absolute;
+  height: calc(var(--spacing) * 3);
+  width: calc(var(--spacing) * 3);
+  border-radius: calc(infinity * 1px);
+  border: 2px solid var(--input-border);
+}
+
+.color-picker-hue-slider {
+  position: relative;
+  display: flex;
+  width: 100%;
+  touch-action: none;
+  user-select: none;
+  align-items: center;
+}
+
+.color-picker-hue-slider-track {
+  position: relative;
+  height: calc(var(--spacing) * 3);
+  width: 100%;
+  grow: 1;
+  overflow: hidden;
+  border-radius: calc(infinity * 1px);
+  background: linear-gradient(to right, #ff0000 0%, #ffff00 16.66%, #00ff00 33.33%, #00ffff 50%, #0000ff 66.66%, #ff00ff 83.33%, #ff0000 100%);
+}
+
+.color-picker-hue-slider-range {
+  position: absolute;
+  height: 100%;
+}
+
+.color-picker-hue-slider-thumb {
+  display: block;
+  width: calc(var(--spacing) * 4);
+  height: calc(var(--spacing) * 4);
+  border-radius: 50%;
+  background: var(--input);
+  border: 1px solid var(--input-border);
+}
+
+.color-picker-alpha-slider {
+  position: relative;
+  display: flex;
+  width: 100%;
+  touch-action: none;
+  user-select: none;
+  align-items: center;
+}
+
+.color-picker-alpha-slider-track {
+  position: relative;
+  height: calc(var(--spacing) * 3);
+  width: 100%;
+  grow: 1;
+  overflow: hidden;
+  border-radius: calc(infinity * 1px);
+  background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+}
+
+.color-picker-alpha-slider-wrapper {
+  position: absolute;
+  inset: 0;
+  border-radius: calc(infinity * 1px);
+}
+
+.color-picker-alpha-slider-range {
+  position: absolute;
+  width: 100%;
+}
+
+.color-picker-alpha-slider-thumb {
+  display: block;
+  width: calc(var(--spacing) * 4);
+  height: calc(var(--spacing) * 4);
+  border: 1px solid var(--input-border);
+  background: var(--input);
+  border-radius: calc(infinity * 1px);
+}
+
+.color-picker-swatch {
+  width: calc(var(--spacing) * 8);
+  height: calc(var(--spacing) * 8);
+  border-radius: var(--radius-sm);
+}

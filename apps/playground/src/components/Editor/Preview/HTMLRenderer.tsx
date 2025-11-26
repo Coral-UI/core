@@ -25,7 +25,7 @@ export const HTMLRenderer = ({ spec, viewportWidth, cssReset }: HTMLRendererProp
   return (
     <div ref={containerRef} className="w-full h-full overflow-auto   relative flex items-center justify-center">
       <div
-        className="preview-background h-full border border-border p-4 rounded-xl"
+        className="preview-background h-full border border-border rounded-lg overflow-hidden"
         style={{ width: viewportWidth + 'px' }}
       >
         <IframeRenderer
@@ -33,7 +33,7 @@ export const HTMLRenderer = ({ spec, viewportWidth, cssReset }: HTMLRendererProp
           spec={spec}
           selectedElementId={selectedElementId}
           viewportWidth={viewportWidth}
-          cssReset={cssReset}
+          cssReset={cssReset || ''}
           onLoad={handleIframeLoad}
         />
         {isIframeReady && <InteractionLayer iframeRef={iframeRef} containerRef={containerRef} spec={spec} />}

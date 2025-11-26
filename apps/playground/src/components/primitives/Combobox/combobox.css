@@ -1,0 +1,12 @@
+.combobox-input {
+  height: calc(var(--spacing) * 9);
+  width: 100%;
+  min-width: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--input-border);
+  padding-inline: var(--input-spacing);
+  padding-block: calc(var(--spacing) * 2);
+  font-size: var(--text-sm);
+  background-color: var(--input);
+
+}

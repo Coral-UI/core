@@ -1,7 +1,9 @@
+'use client'
+
 import { Button } from '@/components/primitives/Button/button'
-import { Input } from '@/components/primitives/Input/input'
 import { Dialog } from '@/components/primitives/Dialog/dialog'
-import { Label } from '@/components/ui/label'
+import { Field } from '@/components/primitives/Field/Field'
+import { Input } from '@/components/primitives/Input/input'
 import { useCreateOrganization } from '@/hooks/queries/useOrganizations'
 import { useState } from 'react'
 
@@ -32,8 +34,7 @@ export function CreateOrganizationDialog() {
       description="Create a new organization to manage your component libraries"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
+        <Field label="Name">
           <Input
             id="name"
             value={name}
@@ -42,7 +43,7 @@ export function CreateOrganizationDialog() {
             required
             autoFocus
           />
-        </div>
+        </Field>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => setOpen(false)}>
             Cancel

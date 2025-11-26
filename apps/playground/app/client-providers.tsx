@@ -1,6 +1,6 @@
 'use client'
 
-import { Toaster } from '@/components/ui/sonner'
+import { Toaster } from '@/components/primitives/Sonner/sonner'
 import { AnalyticsProvider } from '@/lib/analytics/analytics-context'
 import { AuthProvider } from '@/lib/auth/auth-context'
 import { TanStackDevtools } from '@tanstack/react-devtools'

@@ -4,38 +4,34 @@ import { Button as BaseButton } from '@base-ui-components/react/button'
 import { cva } from 'class-variance-authority'
 import React from 'react'
 
-export const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary/30 border border-primary/40 text-foreground hover:bg-primary/60',
-        destructive:
-          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
-        outline:
-          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
-        link: 'text-primary underline-offset-4 hover:underline',
-        colorPicker:
-          'bg-transparent border-transparent hover:bg-interactive-bg-primary/60 shadow-xs interactive-focus justify-start !pl-0 !h-8 text-sm font-medium tracking-tight',
-        elementPreview: 'bg-blue-800 border-blue-600 hover:bg-blue-700  shadow-xs interactive-focus rounded-full',
-      },
-      size: {
-        default: 'h-7 px-4 py-2 has-[>svg]:px-3 text-sm',
-        sm: 'h-8 has-[>svg]:px-2.5 gap-1.5 text-xs',
-        lg: 'h-12 px-6 has-[>svg]:px-4',
-        icon: 'size-9',
-        'icon-sm': "size-7 [&_svg:not([class*='size-'])]:size-3.5",
-        'icon-lg': 'size-10',
-      },
+import './button.css'
+
+export const buttonVariants = cva('button', {
+  variants: {
+    variant: {
+      default: 'button-default',
+      destructive: 'button-destructive',
+      outline: 'button-outline',
+      secondary: 'button-secondary',
+      ghost: 'button-ghost',
+      link: 'button-link',
+      colorPicker: 'button-color-picker',
+      elementPreview: 'element-preview',
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
+    size: {
+      default: 'button-size-default',
+      sm: 'button-size-sm',
+      lg: 'button-size-lg',
+      icon: 'size-9',
+      'icon-sm': "size-7 [&_svg:not([class*='size-'])]:size-3.5",
+      'icon-lg': 'size-10',
     },
   },
-)
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+  },
+})
 
 type ButtonProps = (React.ComponentPropsWithoutRef<typeof BaseButton> | React.ComponentPropsWithoutRef<'a'>) &
   VariantProps<typeof buttonVariants> & { href?: string }

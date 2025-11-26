@@ -1,10 +1,11 @@
 import type { Theme, ThemeOption } from '@/types'
+import { CreateThemeDialog } from '@/components/Library/CreateThemeDialog'
+import { CreateThemeOptionDialog } from '@/components/Library/CreateThemeOptionDialog'
 import { Button } from '@/components/primitives/Button/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/primitives/Card/card'
-import { CreateThemeOptionDialog } from '@/components/Library/CreateThemeOptionDialog'
 import { useDeleteTheme, useDeleteThemeOption, useThemeOptions, useUpdateThemeOption } from '@/hooks/queries/useThemes'
-import { Trash2Icon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Trash2Icon } from 'lucide-react'
 
 interface ThemesManagerProps {
   themes: Theme[]
@@ -16,36 +17,50 @@ export function ThemesManager({ themes, libraryId }: ThemesManagerProps) {
   const deleteThemeOption = useDeleteThemeOption()
 
   const handleDeleteTheme = (theme: Theme) => {
-    if (confirm(`Are you sure you want to delete theme "${theme.name}"? This will delete all theme options and token values for this theme.`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete theme "${theme.name}"? This will delete all theme options and token values for this theme.`,
+      )
+    ) {
       deleteTheme.mutate({ id: theme.id, libraryId })
     }
   }
 
   const handleDeleteThemeOption = (option: ThemeOption, theme: Theme) => {
-    if (confirm(`Are you sure you want to delete option "${option.name}"? This will delete all token values for this option.`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete option "${option.name}"? This will delete all token values for this option.`,
+      )
+    ) {
       deleteThemeOption.mutate({ id: option.id, themeId: theme.id })
     }
   }
 
   if (themes.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
+      <div className="text-center py-8 text-muted-foreground gap-4 flex flex-col items-center justify-center">
         <p>No themes yet. Create your first theme to organize token values.</p>
+        <CreateThemeDialog libraryId={libraryId} />
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
-      {themes.map((theme) => (
-        <ThemeCard
-          key={theme.id}
-          theme={theme}
-          libraryId={libraryId}
-          onDelete={handleDeleteTheme}
-          onDeleteOption={handleDeleteThemeOption}
-        />
-      ))}
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-end">
+        <CreateThemeDialog libraryId={libraryId} />
+      </div>
+      <div className="space-y-4">
+        {themes.map((theme) => (
+          <ThemeCard
+            key={theme.id}
+            theme={theme}
+            libraryId={libraryId}
+            onDelete={handleDeleteTheme}
+            onDeleteOption={handleDeleteThemeOption}
+          />
+        ))}
+      </div>
     </div>
   )
 }

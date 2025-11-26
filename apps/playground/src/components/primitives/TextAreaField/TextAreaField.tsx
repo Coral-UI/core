@@ -1,6 +1,8 @@
 import { cn } from '@/lib/utils'
 import * as React from 'react'
 
+import './textarea.css'
+
 type TextAreaFieldProps = Omit<React.ComponentProps<'textarea'>, 'onChange' | 'value'> & {
   value?: string | undefined
   onChange?: (value: string | undefined) => void
@@ -24,17 +26,7 @@ function TextAreaField({ value, onChange, defaultValue, className, ...props }: T
     [isControlled, onChange],
   )
 
-  return (
-    <textarea
-      value={displayValue}
-      onChange={handleChange}
-      className={cn(
-        'flex rounded-md items-center bg-input border border-input-border interactive-focus-input min-h-7.5 text-sm text-foreground tabular-nums focus:z-1 focus:outline-none min-w-8 w-full flex-1 shrink-0 px-2 py-1.5 max-h-32 inset-shadow-xs inset-shadow-shadow-input font-normal placeholder:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed aria-invalid:ring-destructive-fg aria-invalid:border-destructive-fg aria-invalid:bg-destructive-bg',
-        className,
-      )}
-      {...props}
-    />
-  )
+  return <textarea value={displayValue} onChange={handleChange} className={cn('textarea', className)} {...props} />
 }
 
 export { TextAreaField }

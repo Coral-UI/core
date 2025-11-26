@@ -1,8 +1,9 @@
 'use client'
 
 import { Button } from '@/components/primitives/Button/button'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+// import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { CommandPanel } from '@/components/primitives/CommandPanel/command-panel'
+import { Popover } from '@/components/primitives/Popover/popover'
 import { getElementTypeGroups } from '@/utils/elementTypes'
 import { IconPlus } from '@tabler/icons-react'
 import * as React from 'react'
@@ -16,23 +17,13 @@ interface AddElementComboboxProps {
 }
 
 export function AddElementCombobox({ validChildTypes, onSelect, onOpenChange }: AddElementComboboxProps) {
-  const [open, setOpen] = React.useState(false)
   const [search, setSearch] = React.useState('')
-
-  // Notify parent when open state changes
-  const handleOpenChange = React.useCallback(
-    (newOpen: boolean) => {
-      setOpen(newOpen)
-      onOpenChange?.(newOpen)
-    },
-    [onOpenChange],
-  )
 
   const groups = getElementTypeGroups((elementType) => validChildTypes.includes(elementType.type))
 
-  const handleSelect = (elementType: CoralElementType) => {
-    onSelect(elementType)
-    handleOpenChange(false)
+  const handleSelect = (elementType: string) => {
+    onSelect(elementType as CoralElementType)
+    onOpenChange?.(false)
     setSearch('')
   }
 
@@ -54,13 +45,21 @@ export function AddElementCombobox({ validChildTypes, onSelect, onOpenChange }: 
   }, [groups, search])
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
+    <Popover
+      trigger={
         <Button variant="elementPreview" size="icon-sm" title="Add Child Element">
           <IconPlus />
         </Button>
-      </PopoverTrigger>
-      <PopoverContent
+      }
+    >
+      <CommandPanel
+        items={filteredGroups.flatMap((group) =>
+          group.items.map((item) => ({ label: item.label, icon: item.icon, shortcut: item.type })),
+        )}
+        suggestions={[]}
+        onSuggestionSelect={handleSelect}
+      />
+      {/* <PopoverContent
         className="w-[280px] p-0 z-20000"
         align="end"
         onPointerDown={(e) => e.stopPropagation()}
@@ -72,32 +71,32 @@ export function AddElementCombobox({ validChildTypes, onSelect, onOpenChange }: 
             e.preventDefault()
           }
         }}
-      >
-        <Command shouldFilter={false}>
-          <CommandInput placeholder="Search elements..." value={search} onValueChange={setSearch} />
-          <CommandList>
-            <CommandEmpty>No elements found.</CommandEmpty>
-            {filteredGroups.map((group) => (
-              <CommandGroup key={group.name} heading={group.name}>
-                {group.items.map((elementType) => (
-                  <CommandItem
-                    key={elementType.type}
-                    value={elementType.type}
-                    onSelect={() => handleSelect(elementType.type)}
-                    className="flex items-center gap-2"
-                  >
-                    {elementType.icon}
-                    <span className="text-xs flex-1">{elementType.label}</span>
-                    <span className="text-xxs text-muted-foreground font-mono tabular-nums uppercase tracking-widest">
-                      {elementType.type}
-                    </span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            ))}
-          </CommandList>
-        </Command>
-      </PopoverContent>
+      > */}
+      {/* <Command shouldFilter={false}>
+        <CommandInput placeholder="Search elements..." value={search} onValueChange={setSearch} />
+        <CommandList>
+          <CommandEmpty>No elements found.</CommandEmpty>
+          {filteredGroups.map((group) => (
+            <CommandGroup key={group.name} heading={group.name}>
+              {group.items.map((elementType) => (
+                <CommandItem
+                  key={elementType.type}
+                  value={elementType.type}
+                  onSelect={() => handleSelect(elementType.type)}
+                  className="flex items-center gap-2"
+                >
+                  {elementType.icon}
+                  <span className="text-xs flex-1">{elementType.label}</span>
+                  <span className="text-xxs text-muted-foreground font-mono tabular-nums uppercase tracking-widest">
+                    {elementType.type}
+                  </span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          ))}
+        </CommandList>
+      </Command> */}
+      {/* </PopoverContent> */}
     </Popover>
   )
 }

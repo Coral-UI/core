@@ -1,12 +1,12 @@
 'use client'
 
 import { Breadcrumbs } from '@/components/Breadcrumbs'
-import { CardGrid } from '@/components/CardGrid'
 import { CreateLibraryDialog } from '@/components/Organization/CreateLibraryDialog'
 import { InviteMemberDialog } from '@/components/Organization/InviteMemberDialog'
 import { LibraryCard } from '@/components/Organization/LibraryCard'
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/primitives/Button/button'
+import { CardGrid } from '@/components/primitives/CardGrid/CardGrid'
 import { librariesQueryOptions, organizationQueryOptions } from '@/lib/queries/query-options'
 import { Library } from '@/types'
 import { useSuspenseQuery } from '@tanstack/react-query'

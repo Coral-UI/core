@@ -1,13 +1,24 @@
 import { HTMLRenderer } from '@/components/Editor/Preview/HTMLRenderer'
+import { Badge } from '@/components/primitives/Badge/badge'
 import { Button } from '@/components/primitives/Button/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/Tabs/Tabs'
-import { useTheme } from '@/components/ThemeProvider'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useLibraryCssReset } from '@/hooks/queries/useLibraries'
 // import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { Editor } from '@monaco-editor/react'
 import { IconBracketsAngle, IconEyeSearch, IconFileImport, IconSchema } from '@tabler/icons-react'
-import { CopyIcon, MonitorIcon, Redo, SmartphoneIcon, TabletIcon, Undo } from 'lucide-react'
+import {
+  CheckIcon,
+  CopyIcon,
+  Loader2,
+  MonitorIcon,
+  Redo,
+  SaveIcon,
+  SmartphoneIcon,
+  TabletIcon,
+  Undo,
+} from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -33,6 +44,10 @@ interface EditorPreviewPaneProps {
   setImportDialogOpen: (open: boolean) => void
   handleUndo: () => void
   handleRedo: () => void
+  handleSave: () => void
+  isSaving: boolean
+  hasUnsavedChanges: boolean
+  componentName: string
 }
 
 export const EditorPreviewPane = ({
@@ -41,6 +56,10 @@ export const EditorPreviewPane = ({
   setImportDialogOpen,
   handleUndo,
   handleRedo,
+  handleSave,
+  isSaving,
+  hasUnsavedChanges,
+  componentName,
 }: EditorPreviewPaneProps) => {
   // const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const { theme } = useTheme()
@@ -64,9 +83,32 @@ export const EditorPreviewPane = ({
   return (
     <Tabs defaultValue="preview" className="w-full h-full flex">
       <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <p className="text-xs font-medium">{componentName}</p>
+          {hasUnsavedChanges ? (
+            <Badge variant="destructive">Unsaved</Badge>
+          ) : isSaving ? (
+            <Badge variant="secondary">Saving...</Badge>
+          ) : (
+            <Badge variant="success">
+              <CheckIcon className="size-3" />
+              Saved
+            </Badge>
+          )}
+        </div>
         <div className="flex items-center gap-2 justify-self-end">
           <div>
             <Button
+              variant="ghost"
+              title="Save"
+              size="icon-sm"
+              onClick={handleSave}
+              disabled={isSaving || !hasUnsavedChanges}
+            >
+              {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : <SaveIcon className="size-3.5" />}
+              {/* {isSaving ? 'Saving...' : 'Save'} */}
+            </Button>
+            {/* <Button
               variant="ghost"
               size="icon-sm"
               onClick={() => setImportDialogOpen(true)}
@@ -74,7 +116,7 @@ export const EditorPreviewPane = ({
               aria-label="Import from Code"
             >
               <IconFileImport className="size-3.5" />
-            </Button>
+            </Button> */}
             <Button variant="ghost" size="icon-sm" onClick={handleUndo} title="Undo (⌘Z / Ctrl+Z)">
               <Undo className="size-3.5" />
             </Button>
@@ -102,7 +144,7 @@ export const EditorPreviewPane = ({
           {spec && spec.name ? (
             <>
               <HTMLRenderer spec={spec} viewportWidth={viewportWidth} cssReset={cssReset} />
-              <div className="px-1 py-1 flex justify-end gap-2 absolute bottom-6 right-6 bg-card rounded-xl border border-border">
+              <div className="px-1 py-1 flex justify-end gap-2 absolute bottom-6 right-6 bg-card rounded-xl border border-border z-50">
                 <ToggleGroup
                   type="single"
                   variant="outline"

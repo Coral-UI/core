@@ -1,11 +1,10 @@
-'use client'
-
+import { Container } from '@/components/primitives/Stack/stack'
 import { useOrganizations } from '@/hooks/queries/useOrganizations'
 
 import { Breadcrumbs } from '../Breadcrumbs'
-import { CardGrid } from '../CardGrid'
 import { LoadingContent } from '../LoadingContent'
 import { PageHeader } from '../PageHeader'
+import { CardGrid } from '../primitives/CardGrid/CardGrid'
 import { CreateOrganizationDialog } from './CreateOrganizationDialog'
 import { OrganizationCard } from './OrganizationCard'
 
@@ -17,7 +16,7 @@ export function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto p-8">
+    <Container className="pt-8">
       <Breadcrumbs className="mb-4" />
       <PageHeader title="Organizations" description="Manage your organizations and their component libraries">
         <CreateOrganizationDialog />
@@ -30,6 +29,6 @@ export function Dashboard() {
       >
         <CreateOrganizationDialog />
       </CardGrid>
-    </div>
+    </Container>
   )
 }

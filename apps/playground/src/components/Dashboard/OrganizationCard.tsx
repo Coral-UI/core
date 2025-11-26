@@ -39,9 +39,6 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">Click to view libraries</p>
-        </CardContent>
       </Card>
     </Link>
   )

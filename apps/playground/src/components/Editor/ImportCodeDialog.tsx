@@ -1,7 +1,7 @@
-import { useTheme } from '@/components/ThemeProvider'
 import { Button } from '@/components/primitives/Button/button'
 import { Dialog } from '@/components/primitives/Dialog/dialog'
 import MonacoEditor from '@monaco-editor/react'
+import { useTheme } from 'next-themes'
 import { useState } from 'react'
 
 interface ImportCodeDialogProps {

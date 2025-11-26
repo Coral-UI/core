@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+
 @custom-variant dark (&:is(.dark *));
 
 /* @theme inline {
@@ -200,24 +201,29 @@
 } */
 
 :root {
-  --background: oklch(1 0 0);
+  --preview-background: #fff;
+  --background: oklch(0.95 0 0);
   --foreground: oklch(0.1450 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.1450 0 0);
+  --tone: var(--foreground);
+  --card: oklch(0.99 0 0);
+  --card-foreground: oklch(0.1913 0 0);
+  --card-border: oklch(0.9461 0 0);
+  --card-shadow: oklch(0.7252 0 0 / 20%);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.1450 0 0);
   --primary: oklch(0.7680 0.2330 130.8500);
-  --primary-foreground: oklch(0.2740 0.0720 132.1090);
+  --primary-foreground: oklch(0.3657 0.072 132.109);
   --secondary: oklch(0.8700 0 0);
   --secondary-foreground: oklch(0.2050 0 0);
-  --muted: oklch(0.9700 0 0);
-  --muted-foreground: oklch(0.5560 0 0);
-  --accent: oklch(0.9702 0 0);
-  --accent-foreground: oklch(0.2050 0 0);
+  --muted: oklch(0.9900 0 0);
+  --muted-foreground: oklch(0.61 0 0);
+  --accent: oklch(0.8568 0.0297 153.2744);
+  --accent-foreground: oklch(0.1913 0 0);
   --destructive: oklch(0.5770 0.2450 27.3250);
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.9037 0 0);
-  --input: oklch(0.8699 0 0);
+  --input: oklch(0.96 0 0);
+  --input-border: oklch(0.934 0 0);
   --ring: oklch(0.7080 0 0);
   --chart-1: oklch(0.8100 0.1000 252);
   --chart-2: oklch(0.6200 0.1900 260);
@@ -252,27 +258,39 @@
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+
+  --text-xxs: 0.625rem;
+
+  --input-spacing: calc(var(--spacing) * 1.5);
+
+  --highlight: oklch(0.623 0.214 259.815);
+  --highlight-transparent: oklch(0.623 0.214 259.815 / 50.43%);
+  --highlight-button: #fff;
 }
 
 .dark {
+  --preview-background: #111;
   --background: oklch(0.2046 0 0);
   --foreground: oklch(0.9851 0 0);
   --card: oklch(0.2393 0 0);
-  --card-foreground: oklch(0.9850 0 0);
+  --card-foreground: oklch(0.9461 0 0);
+  --card-border: oklch(0.2972 0 0);
+  --card-shadow: oklch(0.1867 0 0 / 26%);
   --popover: oklch(0.2690 0 0);
   --popover-foreground: oklch(0.9850 0 0);
   --primary: oklch(0.8410 0.2380 128.8500);
-  --primary-foreground: oklch(0.2740 0.0720 132.1090);
+  --primary-foreground: oklch(0.9197 0.072 132.109);
   --secondary: oklch(0.3710 0 0);
   --secondary-foreground: oklch(0.9850 0 0);
   --muted: oklch(0.2690 0 0);
   --muted-foreground: oklch(0.7080 0 0);
-  --accent: oklch(0.2603 0 0);
-  --accent-foreground: oklch(0.9850 0 0);
+  --accent: oklch(0.3587 0.0229 142.6208);
+  --accent-foreground: oklch(0.9581 0 0);
   --destructive: oklch(0.7040 0.1910 22.2160);
   --destructive-foreground: oklch(0.9850 0 0);
   --border: oklch(0.3012 0 0);
   --input: oklch(0.3012 0 0);
+  --input-border: oklch(0.3677 0 0);
   --ring: oklch(0.5560 0 0);
   --chart-1: oklch(0.8100 0.1000 252);
   --chart-2: oklch(0.6200 0.1900 260);
@@ -390,17 +408,17 @@
 } */
 
 @layer components {
-  .label {
+  /* .label {
     @apply text-sm font-medium ;
-  }
+  } */
 
-  .label-sm {
+  /* .label-sm {
     @apply text-xs font-normal;
-  }
+  } */
 
-  .legend {
+  /* .legend {
     @apply text-xs font-semibold  h-6 inline-flex items-center ml-1.5;
-  }
+  } */
 }
 
 .preview-background {
@@ -412,8 +430,57 @@
   background-position: 8px 8px;
 }
 
-@layer components {
-  .card {
-    @apply px-2.5 pb-3 pt-1.5 rounded-xl  shadow-sm ;
+
+  .legend {
+    float: left;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--muted-foreground);
+    /* letter-spacing: var(--tracking-wide); */
+    line-height: 1;
+    margin-inline-start: var(--input-spacing);
+    /* margin-block-start: calc(var(--spacing) * 1.5); */
   }
-}
+
+  .field-label {
+    height: calc(var(--spacing) * 6);
+    display: flex;
+    align-items: center;
+    margin-inline-start: var(--input-spacing);
+    font-size: var(--text-xs);
+    line-height: 1;
+    color: var(--muted-foreground);
+  }
+
+  .field-description {
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    margin-inline-start: var(--input-spacing);
+    margin-block-start: var(--spacing);
+    color: var(--muted-foreground);
+  }
+
+  .field-error {
+    font-size: var(--text-xs);
+    margin-inline-start: var(--input-spacing);
+    margin-block-start: var(--spacing);
+    color: var(--destructive);
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 2);
+    padding-block: calc(var(--spacing) * 5);
+    padding-inline: calc(var(--spacing) * 4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background-color: var(--card);
+
+
+
+    &.tight {
+      padding-block: calc(var(--spacing) * 3);
+      padding-inline: calc(var(--spacing) * 2.5);
+    }
+  }

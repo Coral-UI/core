@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import React from 'react'
 
 import { Button } from '../Button/button'
+import { ColorInput } from '../ColorInput/color-input'
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card'
 
 const meta = {
@@ -19,7 +20,7 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     children: (
-      <Card>
+      <>
         <CardHeader>
           <CardTitle>Card Title</CardTitle>
         </CardHeader>
@@ -30,7 +31,27 @@ export const Default: Story = {
         <CardFooter>
           <Button>Card Footer Action</Button>
         </CardFooter>
-      </Card>
+      </>
+    ),
+  },
+}
+
+export const CardWithInput: Story = {
+  args: {
+    tight: true,
+    children: (
+      <>
+        <CardHeader>
+          <CardTitle>Card Title</CardTitle>
+          <CardDescription>Card Description</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ColorInput label="Color Input" value="#000000" onValueChange={() => {}} />
+        </CardContent>
+        <CardFooter>
+          <Button>Card Footer Action</Button>
+        </CardFooter>
+      </>
     ),
   },
 }

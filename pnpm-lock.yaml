@@ -246,9 +246,6 @@ importers:
 
   apps/playground:
     dependencies:
-      '-':
-        specifier: ^0.0.1
-        version: 0.0.1
       '@base-ui-components/react':
         specifier: 1.0.0-beta.5
         version: 1.0.0-beta.5(@types/react@18.3.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1057,9 +1054,6 @@ importers:
   utilities/typescript-config: {}
 
 packages:
-
-  '-@0.0.1':
-    resolution: {integrity: sha512-3HfneK3DGAm05fpyj20sT3apkNcvPpCuccOThOPdzz8sY7GgQGe0l93XH9bt+YzibcTIgUAIMoyVJI740RtgyQ==}
 
   '@acemir/cssom@0.9.23':
     resolution: {integrity: sha512-2kJ1HxBKzPLbmhZpxBiTZggjtgCwKg1ma5RHShxvd6zgqhDEdEkzpiwe7jLkI2p2BrZvFCXIihdoMkl1H39VnA==}
@@ -8727,8 +8721,6 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
-
-  '-@0.0.1': {}
 
   '@acemir/cssom@0.9.23': {}
 

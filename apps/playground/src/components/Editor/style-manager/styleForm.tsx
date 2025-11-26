@@ -1,5 +1,4 @@
 import type { StyleFormValues } from '@/components/Editor/style-manager/formSchema'
-import { CardSection } from '@/components/Editor/style-manager/components/CardSection'
 import { ConditionalSection } from '@/components/Editor/style-manager/components/ConditionalSection'
 import { DirectionLayoutField } from '@/components/Editor/style-manager/components/DirectionLayout'
 import { ExpandableFieldGroup } from '@/components/Editor/style-manager/components/ExpandableFieldGroup'
@@ -25,6 +24,7 @@ import {
   JustifyContentSpaceBetween,
   JustifyContentSpaceEvenly,
 } from '@/components/Editor/style-manager/icons'
+import { CardSection } from '@/components/primitives/CardSection/CardSection'
 import {
   IconAlignCenter,
   IconAlignJustified,

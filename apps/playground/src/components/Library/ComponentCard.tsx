@@ -1,14 +1,18 @@
 'use client'
 
 import type { Component } from '@/types'
-import { Button } from '@/components/primitives/Button/button'
 import { Badge } from '@/components/primitives/Badge/badge'
+import { Button } from '@/components/primitives/Button/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/primitives/Card/card'
 import { useDeleteComponent } from '@/hooks/queries/useComponents'
-import { formatAccessibilityStatus, getAccessibilityBadgeVariant, getAccessibilitySummary } from '@/lib/accessibility/utils'
+import {
+  formatAccessibilityStatus,
+  getAccessibilityBadgeVariant,
+  getAccessibilitySummary,
+} from '@/lib/accessibility/utils'
 import { formatDateReadable } from '@/lib/utils/date-format'
-import Link from 'next/link'
 import { EditIcon, Trash2Icon } from 'lucide-react'
+import Link from 'next/link'
 
 interface ComponentCardProps {
   component: Component
@@ -35,19 +39,13 @@ export function ComponentCard({ component, organizationId, libraryId }: Componen
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <CardTitle className="flex items-center gap-2">
-                {component.name}
-                <EditIcon className="size-4 text-muted-foreground" />
-              </CardTitle>
+              <CardTitle className="flex items-center gap-2">{component.name}</CardTitle>
               {component.description && <CardDescription className="mt-1">{component.description}</CardDescription>}
-              <CardDescription className="mt-1">
-                Created {formatDateReadable(component.createdAt)}
-              </CardDescription>
+              <CardDescription className="mt-1">Created {formatDateReadable(component.createdAt)}</CardDescription>
+              <CardDescription className="mt-1">Last updated {formatDateReadable(component.updatedAt)}</CardDescription>
               {component.accessibility && (
                 <div className="mt-2">
-                  <Badge variant={badgeVariant} className="text-xs">
-                    {formatAccessibilityStatus(accessibilitySummary)}
-                  </Badge>
+                  <Badge variant={badgeVariant}>{formatAccessibilityStatus(accessibilitySummary)}</Badge>
                   {component.accessibility.lastChecked && (
                     <CardDescription className="mt-1 text-xs">
                       Checked {formatDateReadable(component.accessibility.lastChecked)}
@@ -61,9 +59,6 @@ export function ComponentCard({ component, organizationId, libraryId }: Componen
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">Click to edit component</p>
-        </CardContent>
       </Card>
     </Link>
   )

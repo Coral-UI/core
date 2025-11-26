@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import React, { useState } from 'react'
 
+import { Button } from '../Button/button'
 import { Dialog } from './dialog'
 
 const meta = {
@@ -43,13 +44,9 @@ export const WithChildren: Story = {
       >
         <div className="space-y-4">
           <p>This is custom dialog content.</p>
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
-          >
+          <Button variant="secondary" onClick={() => setOpen(false)}>
             Close
-          </button>
+          </Button>
         </div>
       </Dialog>
     )

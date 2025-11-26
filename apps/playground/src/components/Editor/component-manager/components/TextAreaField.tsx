@@ -1,28 +1,28 @@
 import { useFieldContext } from '@/components/Editor/component-manager/formContext'
-import { Field } from '@/components/primitives/Field/Field'
+import { Field, FieldControl } from '@/components/primitives/Field/Field'
 import { TextAreaField as TextAreaFieldPrimitive } from '@/components/primitives/TextAreaField/TextAreaField'
 import * as React from 'react'
 
 type TextAreaFieldProps = Omit<React.ComponentProps<typeof Field>, 'children' | 'error'> & {
   onChange?: (value: string | undefined) => void
-  id?: string
   placeholder?: string
   rows?: number
   disabled?: boolean
   required?: boolean
   defaultValue?: string | undefined
+  id?: string
 }
 
 function TextAreaField({
   label,
   description,
   onChange,
-  id,
   placeholder,
   rows = 3,
   disabled,
   required,
   defaultValue,
+  id,
   ...props
 }: TextAreaFieldProps) {
   const field = useFieldContext<string | undefined>()
@@ -53,15 +53,20 @@ function TextAreaField({
       {...(errors !== undefined && { error: errors })}
       invalid={isInvalid}
     >
-      <TextAreaFieldPrimitive
-        id={id}
-        placeholder={placeholder}
-        rows={rows}
-        disabled={disabled}
-        required={required}
-        defaultValue={defaultValue}
-        value={field.state.value}
-        onChange={handleChange}
+      <FieldControl
+        render={
+          <TextAreaFieldPrimitive
+            placeholder={placeholder}
+            rows={rows}
+            disabled={disabled}
+            required={required}
+            defaultValue={defaultValue}
+            value={field.state.value}
+            onChange={handleChange}
+            {...(id !== undefined && { id })}
+            className="w-full"
+          />
+        }
       />
     </Field>
   )

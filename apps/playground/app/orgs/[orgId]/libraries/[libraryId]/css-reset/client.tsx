@@ -2,13 +2,13 @@
 
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { PageHeader } from '@/components/PageHeader'
-import { useTheme } from '@/components/ThemeProvider'
 import { Button } from '@/components/primitives/Button/button'
 import { useUpdateLibraryCssReset } from '@/hooks/queries/useLibraries'
 import { libraryCssResetQueryOptions, libraryQueryOptions } from '@/lib/queries/query-options'
 import MonacoEditor from '@monaco-editor/react'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 

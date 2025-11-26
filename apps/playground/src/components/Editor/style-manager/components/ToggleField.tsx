@@ -1,6 +1,7 @@
 // import { IconRestore } from "@tabler/icons-react";
-import { ToggleGroup } from '@/components/Editor/style-manager/components/ToggleGroup'
 import { useFieldContext } from '@/components/Editor/style-manager/formContext'
+import { Field, FieldControl } from '@/components/primitives/Field/Field'
+import { ToggleGroup } from '@/components/primitives/ToggleGroup/toggle-group'
 
 export const ToggleField = ({
   label,
@@ -27,56 +28,22 @@ export const ToggleField = ({
 
   return (
     <fieldset data-invalid={isInvalid}>
-      <legend className="label-sm ml-1.5 h-6 flex items-center">{label}</legend>
-      <div
-        className="w-full bg-input rounded-sm border border-input-border inset-shadow-xs inset-shadow-shadow-input"
-        role="group"
-      >
-        <ToggleGroup
-          className="w-full"
-          value={field.state.value ? [field.state.value] : []}
-          onValueChange={(value: string[] | string) => {
-            // BaseUI ToggleGroup returns an array even in single mode
-            // Extract the first (and only) value as a string
-            const stringValue = Array.isArray(value) && value.length > 0 ? value[0] : ''
-            field.handleChange(stringValue as string)
-          }}
-          items={items}
-        />
-        {/* <InputGroupAddon align="inline-end">
-          {hasChanged && (
-            <InputGroupButton
-              aria-label="Reset"
-              variant="secondary"
-              size="icon-xs"
-              title="Reset"
-              onClick={() => {
-                // Get the default value from the form's defaultValues
-                const defaultValue = form.options.defaultValues?.[field.name as keyof typeof form.options.defaultValues];
-                if (defaultValue !== undefined) {
-                  // Use resetField to properly reset the field value and metadata
-                  // @ts-expect-error - field.name is a dynamic string key, but TypeScript can't infer the field type
-                  form.resetField(field.name);
-                  // Then set it to the default value to ensure it matches
-                  // @ts-expect-error - field.name is a dynamic string key, but TypeScript can't infer the field type
-                  form.setFieldValue(field.name, defaultValue);
-                }
-              }}
-            >
-              <IconRestore />
-            </InputGroupButton>
-          )}
-        </InputGroupAddon> */}
-      </div>
-      {isInvalid && field.state.meta.errors && (
-        <div className="text-sm text-destructive-fg mt-1 ml-1.5">
-          {field.state.meta.errors.map((error, index) => {
-            // Handle both string errors and Zod error objects
-            const errorMessage = typeof error === 'string' ? error : error?.message || String(error)
-            return <div key={index}>{errorMessage}</div>
-          })}
+      <Field label={label} error={isInvalid ? field.state.meta.errors : undefined}>
+        <div className="" role="group">
+          <FieldControl render={<input type="hidden" value={field.state.value} />} />
+          <ToggleGroup
+            className="w-full"
+            value={field.state.value ? [field.state.value] : []}
+            onValueChange={(value: string[] | string) => {
+              // BaseUI ToggleGroup returns an array even in single mode
+              // Extract the first (and only) value as a string
+              const stringValue = Array.isArray(value) && value.length > 0 ? value[0] : ''
+              field.handleChange(stringValue as string)
+            }}
+            items={items}
+          />
         </div>
-      )}
+      </Field>
     </fieldset>
   )
 }

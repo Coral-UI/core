@@ -1,0 +1,64 @@
+
+
+  .dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: #000000;
+    opacity: 0.2;
+    transition: all 0.15s ease-in-out;
+
+
+    &:[data-ending-style],
+    &:[data-starting-style] {
+      opacity: 0;
+    }
+
+    &:supports(-webkit-touch-callout:none) {
+      position: absolute;
+    }
+  }
+
+  .dialog {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: calc(var(--spacing) * 4);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 50;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 2rem);
+    gap: calc(var(--spacing) * 4);
+    padding-block: calc(var(--spacing) * 5);
+    padding-inline: calc(var(--spacing) * 4);
+
+    @media (width >= 40rem) {
+      max-width: var(--container-lg);
+    }
+
+    &:[data-ending-style]
+    {
+      animation: fade-out 0.15s ease-in-out;
+    }
+
+    &:[data-starting-style] {
+      animation: fade-in 0.15s ease-in-out;
+    }
+
+
+  }
+
+  .dialog-title {
+    font-size: var(--text-lg);
+    font-weight: 500;
+  }
+
+  .dialog-description {
+    font-size: var(--text-sm);
+    color: var(--muted-foreground);
+
+    &:has(+ *) {
+      margin-block-end: calc(var(--spacing) * 4);
+    }
+  }

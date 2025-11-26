@@ -1,5 +1,5 @@
-import { NumberInput } from '@/components/Editor/style-manager/components/NumberInput'
 import { useFieldContext, useFormContext } from '@/components/Editor/style-manager/formContext'
+import { NumberInput } from '@/components/primitives/NumberInput/number-input'
 import { useStore } from '@tanstack/react-form'
 import React from 'react'
 

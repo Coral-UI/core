@@ -1,6 +1,6 @@
-import { useTheme } from '@/components/ThemeProvider'
 import { Sandpack } from '@codesandbox/sandpack-react'
 import { githubLight, sandpackDark } from '@codesandbox/sandpack-themes'
+import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 
 import { CoralRootNode } from '@reallygoodwork/coral-core'

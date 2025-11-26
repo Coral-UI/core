@@ -1,0 +1,30 @@
+
+
+
+  .card-title {
+    font-size: var(--text-base);
+    line-height: 1;
+    color: var(--card-foreground);
+  }
+
+  .card-description {
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    color: var(--muted-foreground);
+  }
+
+  .card-content {
+  }
+
+  .card-action {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: calc(var(--spacing) * 4);
+  }
+
+  .card-footer {
+    display: flex;
+    /* align-items: flex-start; */
+    gap: calc(var(--spacing) * 4);
+  }

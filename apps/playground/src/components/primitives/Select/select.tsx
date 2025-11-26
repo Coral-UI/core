@@ -1,10 +1,11 @@
 import { cn } from '@/lib/utils'
 import { Select as BaseSelect } from '@base-ui-components/react/select'
 import { IconCheck, IconSelector } from '@tabler/icons-react'
-import { CheckIcon, ChevronDownIcon } from 'lucide-react'
 import * as React from 'react'
 
-// Root component
+import './select.css'
+
+// Root component - export Base UI Root directly
 const Select = BaseSelect.Root
 
 // Trigger component
@@ -13,7 +14,7 @@ const SelectTrigger = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof BaseSelect.Trigger>
 >(({ className, children, ...props }, ref) => {
   return (
-    <BaseSelect.Trigger ref={ref} className={cn('flex items-center justify-between', className)} {...props}>
+    <BaseSelect.Trigger ref={ref} className={cn('select-trigger', className)} {...props}>
       {children}
     </BaseSelect.Trigger>
   )
@@ -29,8 +30,8 @@ const SelectIcon = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof BaseSelect.Icon>
 >(({ className, ...props }, ref) => {
   return (
-    <BaseSelect.Icon ref={ref} className={cn('opacity-50', className)} {...props}>
-      <ChevronDownIcon className="size-4" />
+    <BaseSelect.Icon ref={ref} className={cn('select-icon', className)} {...props}>
+      <IconSelector />
     </BaseSelect.Icon>
   )
 })
@@ -44,7 +45,7 @@ const SelectPositioner = React.forwardRef<
   React.ElementRef<typeof BaseSelect.Positioner>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.Positioner>
 >(({ className, ...props }, ref) => {
-  return <BaseSelect.Positioner ref={ref} className={cn('z-50', className)} sideOffset={8} {...props} />
+  return <BaseSelect.Positioner ref={ref} className={cn('select-positioner', className)} sideOffset={8} {...props} />
 })
 SelectPositioner.displayName = 'SelectPositioner'
 
@@ -57,7 +58,7 @@ const SelectPopup = React.forwardRef<
     <BaseSelect.Popup
       ref={ref}
       className={cn(
-        'bg-popover text-popover-foreground relative z-50 min-w-[8rem] overflow-hidden rounded-md border shadow-md',
+        'select-popup',
         'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
         className,
       )}
@@ -72,7 +73,7 @@ const SelectList = React.forwardRef<
   React.ElementRef<typeof BaseSelect.List>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.List>
 >(({ className, ...props }, ref) => {
-  return <BaseSelect.List ref={ref} className={cn('max-h-[300px] overflow-y-auto p-1', className)} {...props} />
+  return <BaseSelect.List ref={ref} className={cn('select-list', className)} {...props} />
 })
 SelectList.displayName = 'SelectList'
 
@@ -85,16 +86,15 @@ const SelectItem = React.forwardRef<
     <BaseSelect.Item
       ref={ref}
       className={cn(
-        'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none',
-        'focus:bg-accent focus:text-accent-foreground',
-        'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        'select-item',
+        // 'focus:bg-accent focus:text-accent-foreground',
         className,
       )}
       {...props}
     >
-      <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+      <span className="select-item-indicator">
         <BaseSelect.ItemIndicator>
-          <CheckIcon className="h-4 w-4" />
+          <IconCheck />
         </BaseSelect.ItemIndicator>
       </span>
       <BaseSelect.ItemText>{children}</BaseSelect.ItemText>
@@ -178,81 +178,145 @@ const SelectArrow = BaseSelect.Arrow
 // Backdrop component (optional, for overlay)
 const SelectBackdrop = BaseSelect.Backdrop
 
+// Content component - convenience wrapper combining Portal, Positioner, Popup, and List
+const SelectContent = React.forwardRef<
+  React.ElementRef<typeof SelectPopup>,
+  React.ComponentPropsWithoutRef<typeof SelectPopup>
+>(({ className, children, ...props }, ref) => {
+  return (
+    <SelectPortal>
+      <SelectPositioner>
+        <SelectPopup ref={ref} {...(className ? { className } : {})} {...props}>
+          <SelectList>{children}</SelectList>
+        </SelectPopup>
+      </SelectPositioner>
+    </SelectPortal>
+  )
+})
+SelectContent.displayName = 'SelectContent'
+
 // Complete Select component built from composable primitives
-type SelectInputProps = Omit<React.ComponentProps<typeof Select>, 'items'> & {
+export type SelectInputProps<TValue extends string = string> = Omit<
+  React.ComponentProps<typeof Select>,
+  'items' | 'value' | 'defaultValue' | 'onValueChange'
+> & {
   size?: 'default' | 'sm'
   leadingIcon?: React.ReactNode
   className?: string
-  items?: { value: string; label: string }[]
-}
+  items?: { value: TValue; label: string }[]
+} & (
+    | {
+        value?: TValue | undefined
+        onValueChange: (value: TValue) => void
+        defaultValue?: never
+      }
+    | {
+        defaultValue?: TValue
+        value?: never
+        onValueChange?: never
+      }
+  )
 
-function SelectInput({ items = [], size = 'default', leadingIcon, className, ...props }: SelectInputProps) {
+function SelectInput<TValue extends string = string>({
+  items = [],
+  size = 'default',
+  leadingIcon,
+  className,
+  value,
+  defaultValue,
+  onValueChange,
+  ...props
+}: SelectInputProps<TValue>) {
   const itemsArray = Array.isArray(items) ? items : []
 
   if (itemsArray.length === 0) return null
 
-  // Extract value-related props to handle controlled/uncontrolled
-  const { value, defaultValue, onValueChange, ...restProps } = props
+  const handleValueChange = React.useCallback(
+    (newValue: unknown, _eventDetails?: unknown) => {
+      if (onValueChange && typeof newValue === 'string') {
+        onValueChange(newValue as TValue)
+      }
+    },
+    [onValueChange],
+  )
 
-  // Build props object conditionally for controlled vs uncontrolled
-  const baseProps = {
-    items: itemsArray,
-    ...restProps,
+  // Base UI Select has discriminated union types:
+  // - Controlled: requires 'value' when 'onValueChange' is provided
+  // - Uncontrolled: uses 'defaultValue' when 'onValueChange' is not provided
+  // When onValueChange is provided, always use controlled mode to avoid switching between modes
+  const isControlled = onValueChange !== undefined
+
+  if (isControlled) {
+    // For controlled mode, always provide a value (use empty string if undefined to maintain controlled state)
+    const controlledValue = value ?? ('' as TValue)
+    return (
+      <Select
+        {...props}
+        items={itemsArray}
+        value={controlledValue}
+        onValueChange={handleValueChange as (value: TValue | TValue[], eventDetails: unknown) => void}
+      >
+        <SelectTrigger className={cn(size === 'sm' ? 'sm' : '', leadingIcon ? 'leading-icon' : '', className)}>
+          {leadingIcon && <div className={cn('select-leading-icon', size === 'sm' ? 'sm' : '')}>{leadingIcon}</div>}
+          <div className="select-trigger-content">
+            <SelectValue />
+            <SelectIcon>
+              <IconSelector />
+            </SelectIcon>
+          </div>
+        </SelectTrigger>
+        <SelectPortal>
+          <SelectPositioner sideOffset={8}>
+            <SelectPopup>
+              <SelectScrollUpArrow className="select-scroll-up-arrow select-scroll-arrow" />
+              <SelectList>
+                {itemsArray.map(({ label, value }: { label: string; value: string }) => (
+                  <SelectItem key={label} value={value} className="select-item">
+                    <SelectItemText>{label}</SelectItemText>
+                  </SelectItem>
+                ))}
+              </SelectList>
+              <SelectScrollDownArrow className="select-scroll-down-arrow select-scroll-arrow" />
+            </SelectPopup>
+          </SelectPositioner>
+        </SelectPortal>
+      </Select>
+    )
   }
 
-  const selectProps =
-    value !== undefined
-      ? { ...baseProps, value: value as string, ...(onValueChange && { onValueChange }) }
-      : defaultValue !== undefined
-        ? { ...baseProps, defaultValue: defaultValue as string, ...(onValueChange && { onValueChange }) }
-        : baseProps
-
   return (
-    <Select {...(selectProps as React.ComponentProps<typeof Select>)}>
-      <SelectTrigger
-        className={cn(
-          'flex items-center justify-between gap-1 rounded-md text-foreground bg-input border border-input-border select-none hover:bg-input-bg/80 focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-focus-outline data-[popup-open]:bg-bg-input-bg/80 cursor-default font-medium',
-          size === 'sm' ? 'h-8 min-w-24 text-xs pr-2 pl-2.5' : 'h-9 min-w-36 text-sm pr-3 pl-3.5',
-          leadingIcon ? 'pl-0' : 'pl-3',
-          className,
-        )}
-      >
-        {leadingIcon && (
-          <div
-            className={cn(
-              'shrink-0 text-text-secondary flex items-center justify-center',
-              size === 'sm'
-                ? "[&>svg:not([class*='size-'])]:size-3.5 w-6"
-                : "[&>svg:not([class*='size-'])]:size-4 w-8 ",
-            )}
-          >
-            {leadingIcon}
-          </div>
-        )}
-        <div className="flex items-center gap-2 justify-between w-full">
+    <Select
+      {...props}
+      items={itemsArray}
+      {...(defaultValue !== undefined && { defaultValue })}
+      {...(onValueChange && {
+        onValueChange: handleValueChange as (value: TValue | TValue[] | null, eventDetails: unknown) => void,
+      })}
+    >
+      <SelectTrigger className={cn(size === 'sm' ? 'sm' : '', leadingIcon ? 'leading-icon' : '', className)}>
+        {leadingIcon && <div className={cn('select-leading-icon', size === 'sm' ? 'sm' : '')}>{leadingIcon}</div>}
+        <div className="select-trigger-content">
           <SelectValue />
-          <div className="flex">
-            <IconSelector className="size-4 text-muted-foreground" />
-          </div>
+          <SelectIcon>
+            <IconSelector />
+          </SelectIcon>
         </div>
       </SelectTrigger>
       <SelectPortal>
-        <SelectPositioner className="outline-none select-none z-50" sideOffset={8}>
-          <SelectPopup className="group origin-[var(--transform-origin)] bg-clip-padding rounded-md bg-card text-muted-foreground shadow-lg shadow-card outline-1 outline-input-border transition-[transform,scale,opacity] data-[ending-style]:scale-90 data-[ending-style]:opacity-0 data-[side=none]:data-[ending-style]:transition-none data-[starting-style]:scale-90 data-[starting-style]:opacity-0 data-[side=none]:data-[starting-style]:scale-100 data-[side=none]:data-[starting-style]:opacity-100 data-[side=none]:data-[starting-style]:transition-none ">
-            <SelectList className="relative py-1 scroll-py-6 overflow-y-auto max-h-[var(--available-height)]">
+        <SelectPositioner sideOffset={8}>
+          <SelectPopup>
+            <SelectScrollUpArrow className="select-scroll-up-arrow select-scroll-arrow" />
+            <SelectList>
               {itemsArray.map(({ label, value }: { label: string; value: string }) => (
-                <SelectItem
-                  key={value}
-                  value={value}
-                  className="grid min-w-[var(--anchor-width)] cursor-default grid-cols-[0.75rem_1fr] items-center gap-2 py-2 pr-4 pl-2.5 text-sm leading-4 outline-none select-none group-data-[side=none]:min-w-[calc(var(--anchor-width)+1rem)] group-data-[side=none]:pr-12 group-data-[side=none]:text-sm group-data-[side=none]:leading-4 data-[highlighted]:relative data-[highlighted]:z-0 data-[highlighted]:text-text-primary data-[highlighted]:before:absolute data-[highlighted]:before:inset-x-1 data-[highlighted]:before:inset-y-0 data-[highlighted]:before:z-[-1] data-[highlighted]:before:rounded-sm data-[highlighted]:before:bg-bg-secondary pointer-coarse:py-2.5 pointer-coarse:text-[0.925rem]"
-                >
-                  <SelectItemIndicator className="col-start-1">
+                <SelectItem key={label} value={value} className="select-item">
+                  {/* <SelectItemIndicator className="col-start-1">
                     <IconCheck className="size-3" />
-                  </SelectItemIndicator>
-                  <SelectItemText className="col-start-2">{label}</SelectItemText>
+                  </SelectItemIndicator> */}
+                  <SelectItemText>{label}</SelectItemText>
                 </SelectItem>
               ))}
             </SelectList>
+            <SelectScrollDownArrow className="select-scroll-down-arrow select-scroll-arrow" />
           </SelectPopup>
         </SelectPositioner>
       </SelectPortal>
@@ -264,6 +328,7 @@ export {
   Select,
   SelectArrow,
   SelectBackdrop,
+  SelectContent,
   SelectGroup,
   SelectGroupLabel,
   SelectIcon,
@@ -281,4 +346,3 @@ export {
   SelectTrigger,
   SelectValue,
 }
-export type { SelectInputProps }

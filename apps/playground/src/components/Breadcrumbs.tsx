@@ -1,13 +1,11 @@
 'use client'
 
-import { organizationQueryOptions } from '@/lib/queries/query-options'
-import { libraryQueryOptions } from '@/lib/queries/query-options'
-import { componentQueryOptions } from '@/lib/queries/query-options'
+import { componentQueryOptions, libraryQueryOptions, organizationQueryOptions } from '@/lib/queries/query-options'
 import { cn } from '@/lib/utils'
 import { IconChevronRight, IconHome } from '@tabler/icons-react'
+import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
 
 export function Breadcrumbs({ className }: React.ComponentProps<'div'>) {
   const pathname = usePathname()

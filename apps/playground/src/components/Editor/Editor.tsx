@@ -6,6 +6,7 @@ import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
 import { EditorPreviewPane } from '@/components/Editor/Preview/EditorPreviewPane'
 import { Badge } from '@/components/primitives/Badge/badge'
 import { Button } from '@/components/primitives/Button/button'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/primitives/Empty/Empty'
 import { useComponent } from '@/hooks/queries/useComponents'
 import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
@@ -24,8 +25,7 @@ import { CoralRootNode, CoralStyleType, transformHTMLToSpec } from '@reallygoodw
 
 import type { FormValues as ComponentFormValues } from './component-manager/formSchema'
 import type { StyleFormValues } from './style-manager/formSchema'
-import { ScrollArea } from '../base/ScrollArea'
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty'
+import { ScrollArea } from '../primitives/ScrollArea/ScrollArea'
 import { ComponentForm } from './component-manager/componentForm'
 import { StyleForm } from './style-manager/styleForm'
 
@@ -728,44 +728,21 @@ export const Editor = memo(({ componentId }: EditorProps) => {
 
   return (
     <div className="flex flex-col w-full h-[calc(100dvh-.75rem)] bg-background">
-      <div className="flex items-center justify-between gap-2 px-4 py-2 shrink-0">
-        <div className="flex items-center gap-2">
-          <p className="text-xs font-medium">{component.name}</p>
-          {hasUnsavedChanges ? (
-            <Badge variant="destructive">Unsaved</Badge>
-          ) : isSaving ? (
-            <Badge variant="secondary">Saving...</Badge>
-          ) : (
-            <Badge variant="success">
-              <CheckIcon className="size-3" />
-              Saved
-            </Badge>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="default"
-            size="sm"
-            onClick={handleSave}
-            disabled={isSaving || !hasUnsavedChanges}
-            className="gap-2"
-          >
-            <SaveIcon className="size-3.5" />
-            {isSaving ? 'Saving...' : 'Save'}
-          </Button>
-        </div>
-      </div>
       <div className="flex flex-1 h-[calc(100dvh-2.5rem)] max-h-[calc(100dvh-2.5rem)] overflow-hidden">
         <aside className="w-64 flex flex-col h-full overflow-hidden p-2.5">
           <EditorSidebar />
         </aside>
-        <main className="bg-background flex-1 overflow-hidden pt-2.5">
+        <main className="bg-background flex-1 overflow-hidden pt-2.5 px-2.5">
           <EditorPreviewPane
             spec={spec}
             libraryId={component?.libraryId}
             setImportDialogOpen={setImportDialogOpen}
             handleUndo={handleUndo}
             handleRedo={handleRedo}
+            handleSave={handleSave}
+            isSaving={isSaving}
+            hasUnsavedChanges={hasUnsavedChanges}
+            componentName={component.name}
           />
         </main>
         <aside className="w-72 h-full overflow-hidden flex flex-col">
@@ -797,7 +774,7 @@ export const Editor = memo(({ componentId }: EditorProps) => {
               </div>
             </div>
           )}
-          <div className="p-2.5 border-t border-border">
+          <div className="px-2.5 pb-2.5">
             <AccessibilityPanel
               {...(component?.accessibility ? { accessibility: component.accessibility } : {})}
               isChecking={isCheckingAccessibility}
@@ -805,7 +782,7 @@ export const Editor = memo(({ componentId }: EditorProps) => {
           </div>
         </aside>
       </div>
-      <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} />
+      {/* <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} /> */}
     </div>
   )
 })

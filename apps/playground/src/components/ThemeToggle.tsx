@@ -1,25 +1,38 @@
-import { useTheme } from '@/components/ThemeProvider'
 import { Button } from '@/components/primitives/Button/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { IconMoonStars, IconSun } from '@tabler/icons-react'
+import { useTheme } from 'next-themes'
+
+import { DropdownMenu } from './primitives/DropdownMenu/dropdown-menu'
 
 export function ModeToggle() {
   const { setTheme } = useTheme()
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon-sm">
+    <DropdownMenu
+      trigger={
+        <Button variant="ghost" size="icon-sm">
           <IconSun className="size-3.5 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
           <IconMoonStars className="absolute size-3.5 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
           <span className="sr-only">Toggle theme</span>
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="z-10000">
-        <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      }
+      items={[
+        {
+          key: 'light',
+          children: 'Light',
+          onClick: () => setTheme('light'),
+        },
+        {
+          key: 'dark',
+          children: 'Dark',
+          onClick: () => setTheme('dark'),
+        },
+        {
+          key: 'system',
+          children: 'System',
+          onClick: () => setTheme('system'),
+        },
+      ]}
+    />
   )
 }

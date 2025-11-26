@@ -1,0 +1,33 @@
+.dropdown-menu-positioner {
+  outline: none;
+  z-index: 20000;
+}
+
+.popover-content {
+  transform-origin: var(--transform-origin);
+    border-radius: var(--radius-md);
+    background-color: var(--card);
+    /* padding-block-start: var(--spacing); */
+    border: 1px solid var(--border);
+    transition: transform 0.15s ease-in-out, opacity 0.15s ease-in-out, scale 0.15s ease-in-out;
+    overflow: hidden;
+
+    &:[data-ending-style],
+    &:[data-starting-style] {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+}
+
+.dropdown-menu-arrow {
+  right: -13px;
+  rotate: 90deg;
+}
+
+.dropdown-arrow-path {
+  fill: var(--card);
+}
+
+.dropdown-arrow-border {
+  fill: var(--border);
+}

@@ -2,9 +2,9 @@
 
 import { Button } from '@/components/primitives/Button/button'
 import { Dialog } from '@/components/primitives/Dialog/dialog'
+import { Field } from '@/components/primitives/Field/Field'
 import { Input } from '@/components/primitives/Input/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/Select/select'
+import { SelectInput } from '@/components/primitives/Select/select'
 import { useForm } from '@tanstack/react-form'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -29,7 +29,7 @@ export function InviteMemberDialog({ organizationId }: InviteMemberDialogProps) 
       role: 'viewer',
     },
     validators: {
-      onChange: inviteSchema,
+      onSubmit: inviteSchema,
     },
     onSubmit: async ({ value }) => {
       setIsSubmitting(true)
@@ -85,8 +85,10 @@ export function InviteMemberDialog({ organizationId }: InviteMemberDialogProps) 
         <form.Field
           name="email"
           children={(field) => (
-            <div className="space-y-2">
-              <Label htmlFor={field.name}>Email</Label>
+            <Field
+              label="Email"
+              error={field.state.meta.errors.length > 0 ? field.state.meta.errors[0]?.message : undefined}
+            >
               <Input
                 id={field.name}
                 name={field.name}
@@ -98,43 +100,26 @@ export function InviteMemberDialog({ organizationId }: InviteMemberDialogProps) 
                 aria-invalid={field.state.meta.errors.length > 0}
                 autoFocus
               />
-              {field.state.meta.errors.length > 0 && (
-                <p className="text-sm text-destructive">
-                  {typeof field.state.meta.errors[0] === 'string'
-                    ? field.state.meta.errors[0]
-                    : field.state.meta.errors[0]?.message || 'Invalid value'}
-                </p>
-              )}
-            </div>
+            </Field>
           )}
         />
 
         <form.Field
           name="role"
           children={(field) => (
-            <div className="space-y-2">
-              <Label htmlFor={field.name}>Role</Label>
-              <Select
+            <Field label="Role" error={field.state.meta.errors.length > 0 ? field.state.meta.errors[0] : undefined}>
+              <SelectInput
+                size="sm"
+                id={field.name}
                 value={field.state.value}
                 onValueChange={(value) => field.handleChange(value as 'admin' | 'editor' | 'viewer')}
-              >
-                <SelectTrigger id={field.name} aria-invalid={field.state.meta.errors.length > 0}>
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="viewer">Viewer</SelectItem>
-                  <SelectItem value="editor">Editor</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors.length > 0 && (
-                <p className="text-sm text-destructive">
-                  {typeof field.state.meta.errors[0] === 'string'
-                    ? field.state.meta.errors[0]
-                    : field.state.meta.errors[0]?.message || 'Invalid value'}
-                </p>
-              )}
-            </div>
+                items={[
+                  { label: 'Viewer', value: 'viewer' },
+                  { label: 'Editor', value: 'editor' },
+                  { label: 'Admin', value: 'admin' },
+                ]}
+              />
+            </Field>
           )}
         />
 

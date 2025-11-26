@@ -1,0 +1,48 @@
+.toggle-group {
+  display: flex;
+  gap: 1px;
+  background-color: var(--input);
+  padding: calc(var(--spacing) * 0.5);
+  width: 100%;
+  flex: 1;
+  border-radius: var(--radius-md);
+}
+
+.toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--muted-foreground);
+  user-select: none;
+  flex: 1;
+  flex-shrink: 0;
+  whitespace: nowrap;
+  font-size: var(--text-xs);
+  border: 1px solid transparent;
+  min-width: calc(var(--spacing) * 8);
+  height: calc(var(--spacing) * 7);
+  padding: calc(var(--spacing) * 1);
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--muted-foreground) 10%, transparent);
+    color: color-mix(in srgb, var(--foreground) 60%, transparent);
+  }
+
+  & > svg:not([class*='size-']) {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+  }
+
+  &[data-pressed] {
+    background-color: color-mix(in srgb, var(--primary) 20%, transparent);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+  }
+
+  .dark & {
+    &[data-pressed] {
+      border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+    }
+  }
+}

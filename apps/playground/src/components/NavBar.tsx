@@ -2,27 +2,22 @@
 
 import { useAuthContext } from '@/lib/auth/auth-context'
 import { useSignOut } from '@/lib/auth/use-auth'
-import { LogOut, User } from 'lucide-react'
+import Link from 'next/link'
+// import { LogOut, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
-import { ModeToggle } from './ThemeToggle'
 import { Avatar, AvatarFallback } from './primitives/Avatar/avatar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from './ui/dropdown-menu'
+import { DropdownMenu } from './primitives/DropdownMenu/dropdown-menu'
+import { ModeToggle } from './ThemeToggle'
 
 function getUserInitials(email: string | undefined): string {
   if (!email) return 'U'
-  const parts = email.split('@')[0].split(/[._-]/)
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase()
+  const parts = email.split('@')[0]?.split(/[._-]/)
+  if (parts?.length && parts.length >= 2) {
+    return (parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '').toUpperCase()
   }
-  return email[0].toUpperCase()
+  return email[0]?.toUpperCase() ?? 'U'
 }
 
 function UserMenu() {
@@ -52,8 +47,8 @@ function UserMenu() {
   const initials = getUserInitials(user.email)
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <DropdownMenu
+      trigger={
         <button
           type="button"
           className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -64,7 +59,22 @@ function UserMenu() {
             </AvatarFallback>
           </Avatar>
         </button>
-      </DropdownMenuTrigger>
+      }
+      items={[
+        {
+          key: 'profile',
+          label: 'Profile',
+          onClick: handleProfileClick,
+        },
+        {
+          key: 'sign-out',
+          label: 'Sign Out',
+          onClick: handleSignOut,
+          disabled: loading,
+        },
+      ]}
+    >
+      {/* <DropdownMenuTrigger asChild></DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <div className="px-2 py-1.5">
           <p className="text-sm font-medium">{user.email}</p>
@@ -82,7 +92,7 @@ function UserMenu() {
           <LogOut className="mr-2 size-4" />
           Sign Out
         </DropdownMenuItem>
-      </DropdownMenuContent>
+      </DropdownMenuContent> */}
     </DropdownMenu>
   )
 }
@@ -93,7 +103,9 @@ export const NavBar = () => {
   return (
     <div className="border-b border-border bg-muted fixed top-0 left-0 right-0 z-50">
       <div className={`px-4 mx-auto flex items-center justify-between py-2`}>
-        <h1 className="text-base font-medium tracking-tight">Coral</h1>
+        <Link href="/">
+          <h1 className="text-base font-medium tracking-tight">Coral</h1>
+        </Link>
         <div className="flex items-center gap-2">
           <ModeToggle />
           {!loading && user && <UserMenu />}

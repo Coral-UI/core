@@ -18,6 +18,7 @@ function SelectField({
   size = 'sm',
   hideLabel = false,
   onChange,
+  className,
   ...props
 }: SelectFieldProps) {
   const field = useFieldContext<string>()
@@ -50,10 +51,11 @@ function SelectField({
     >
       <SelectInput
         items={selectOptions}
-        defaultValue={field.state.value}
+        value={field.state.value}
         onValueChange={handleChange}
         size={size}
         leadingIcon={leadingIcon}
+        {...(typeof className === 'string' && { className })}
       />
     </Field>
   )

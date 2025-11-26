@@ -1,12 +1,12 @@
 'use client'
 
 import { Breadcrumbs } from '@/components/Breadcrumbs'
-import { CardGrid } from '@/components/CardGrid'
 import { ComponentCard } from '@/components/Library/ComponentCard'
 import { CreateComponentDialog } from '@/components/Library/CreateComponentDialog'
 import { PageHeader } from '@/components/PageHeader'
 import { Badge } from '@/components/primitives/Badge/badge'
 import { Button } from '@/components/primitives/Button/button'
+import { CardGrid } from '@/components/primitives/CardGrid/CardGrid'
 import {
   aggregateAccessibilityResults,
   formatAccessibilityStatus,

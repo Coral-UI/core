@@ -1,0 +1,53 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  padding: calc(var(--spacing) * 0.5) calc(var(--spacing) * 1);
+  font-size: var(--text-xxs);
+  font-weight: 400;
+  width: fit-content;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: var(--tracking-wide);
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+
+  overflow: hidden;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  gap: var(--spacing);
+
+  & > svg {
+    width: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 3);
+    pointer-events: none;
+  }
+}
+
+.badge-default {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.badge-secondary {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.badge-destructive {
+  background-color: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+.badge-outline {
+  background-color: var(--background);
+  border-color: color-mix(in srgb, var(--foreground) 20%, transparent);
+  color: var(--foreground);
+}
+
+.badge-success {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}

@@ -1,5 +1,4 @@
 import type { AccessibilityResults } from '@/lib/accessibility/checkAccessibility'
-import { ScrollArea } from '@/components/base/ScrollArea'
 import {
   Accordion,
   AccordionHeader,
@@ -8,7 +7,8 @@ import {
   AccordionTrigger,
 } from '@/components/primitives/Accordion/accordion'
 import { Badge } from '@/components/primitives/Badge/badge'
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/primitives/Empty/Empty'
+import { ScrollArea } from '@/components/primitives/ScrollArea/ScrollArea'
 import { getAccessibilitySummary } from '@/lib/accessibility/utils'
 import { formatDateTime } from '@/lib/utils/date-format'
 import { AlertCircleIcon, CheckCircleIcon, InfoIcon, LoaderIcon } from 'lucide-react'

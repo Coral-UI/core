@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Label } from '@/components/ui/label'
 import { IconDevices } from '@tabler/icons-react'
-import { ChevronRight, Monitor, Plus, Smartphone, Tablet, Trash2 } from 'lucide-react'
+import { ChevronRight, Monitor, Smartphone, Tablet, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { BREAKPOINT_PRESETS } from './BreakpointsPresents'

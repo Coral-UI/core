@@ -727,6 +727,7 @@ export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionL
               boxSizing: 'border-box',
               zIndex: 1001,
               position: 'absolute',
+              boxShadow: isSelected ? '0 0 0 1px var(--highlight)' : 'none',
             }}
             onClick={(e) => handleHitZoneClick(zone.elementId, e)}
             onKeyDown={(e) => handleHitZoneKeyDown(zone.elementId, e)}

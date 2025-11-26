@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { IconPlus } from '@tabler/icons-react'
 import React from 'react'
 
 import { Button } from './button'
@@ -90,11 +91,34 @@ export const Disabled: Story = {
   },
 }
 
+export const Icon: Story = {
+  args: {
+    size: 'icon',
+    children: <IconPlus />,
+  },
+}
+
+export const IconSmall: Story = {
+  args: {
+    size: 'icon-sm',
+    children: <IconPlus />,
+  },
+}
+
+export const IconLarge: Story = {
+  args: {
+    size: 'icon-lg',
+    children: <IconPlus />,
+  },
+}
+
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 flex-wrap">
-        <Button variant="default">Default</Button>
+        <Button variant="default">
+          Default <IconPlus />
+        </Button>
         <Button variant="destructive">Destructive</Button>
         <Button variant="outline">Outline</Button>
         <Button variant="secondary">Secondary</Button>
@@ -105,6 +129,17 @@ export const AllVariants: Story = {
         <Button size="sm">Small</Button>
         <Button size="default">Default</Button>
         <Button size="lg">Large</Button>
+      </div>
+      <div className="flex gap-2 flex-wrap">
+        <Button size="icon">
+          <IconPlus />
+        </Button>
+        <Button size="icon-sm">
+          <IconPlus />
+        </Button>
+        <Button size="icon-lg">
+          <IconPlus />
+        </Button>
       </div>
     </div>
   ),

@@ -1,4 +1,4 @@
-import { ColorInput } from '@/components/Editor/style-manager/components/ColorInput'
+import { ColorInputField } from '@/components/Editor/style-manager/components/ColorInputField'
 import { DirectionLayoutField } from '@/components/Editor/style-manager/components/DirectionLayout'
 import { NumberInputField } from '@/components/Editor/style-manager/components/NumberInputField'
 import { SelectField } from '@/components/Editor/style-manager/components/SelectField'
@@ -11,7 +11,7 @@ export const { useAppForm, withForm } = createFormHook({
   fieldContext,
   formContext,
   fieldComponents: {
-    ColorInput,
+    ColorInput: ColorInputField,
     DirectionLayoutField,
     ToggleField,
     NumberInputField,

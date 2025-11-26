@@ -1,6 +1,7 @@
 import type { FormValues } from '@/components/Editor/component-manager/formSchema'
 import { useAppForm } from '@/components/Editor/component-manager/formContext'
 import { formSchema } from '@/components/Editor/component-manager/formSchema'
+import { Card } from '@/components/primitives/Card/card'
 import { ELEMENT_TYPE_DEFINITIONS } from '@/utils/elementTypes'
 import { useStore } from '@tanstack/react-form'
 import { useEffect, useRef } from 'react'
@@ -141,7 +142,7 @@ export const ComponentForm = ({ onChange, initialValues }: ComponentFormProps = 
   }))
 
   return (
-    <div className="card max-w-72">
+    <Card className="max-w-72" tight>
       <form.AppForm>
         <div className="flex flex-col gap-2.5">
           <form.AppField
@@ -153,7 +154,7 @@ export const ComponentForm = ({ onChange, initialValues }: ComponentFormProps = 
           <form.AppField
             name="type"
             children={(field) => {
-              return <field.SelectField label="Element Type" selectOptions={typeOptions} />
+              return <field.SelectField label="Element Type" selectOptions={typeOptions} className="w-full" />
             }}
           />
           <form.AppField
@@ -170,6 +171,6 @@ export const ComponentForm = ({ onChange, initialValues }: ComponentFormProps = 
           />
         </div>
       </form.AppForm>
-    </div>
+    </Card>
   )
 }

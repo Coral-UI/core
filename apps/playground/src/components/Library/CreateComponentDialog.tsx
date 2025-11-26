@@ -1,7 +1,7 @@
 import { Button } from '@/components/primitives/Button/button'
 import { Dialog } from '@/components/primitives/Dialog/dialog'
+import { Field } from '@/components/primitives/Field/Field'
 import { Input } from '@/components/primitives/Input/input'
-import { Label } from '@/components/ui/label'
 import { useCreateComponent } from '@/hooks/queries/useComponents'
 import { useState } from 'react'
 
@@ -55,8 +55,7 @@ export function CreateComponentDialog({ libraryId }: CreateComponentDialogProps)
       description="Create a new component to start designing"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
+        <Field label="Name">
           <Input
             id="name"
             value={name}
@@ -65,16 +64,15 @@ export function CreateComponentDialog({ libraryId }: CreateComponentDialogProps)
             required
             autoFocus
           />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="description">Description (optional)</Label>
+        </Field>
+        <Field label="Description (optional)">
           <Input
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="A description of this component"
           />
-        </div>
+        </Field>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => setOpen(false)}>
             Cancel

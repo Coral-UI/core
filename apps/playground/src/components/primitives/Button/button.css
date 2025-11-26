@@ -1,0 +1,160 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing) * 2);
+  white-space: nowrap;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  flex-shrink: 0;
+  outline: none;
+  border: 1px solid transparent;
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  svg {
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  svg:not([class*='size-']) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &[aria-invalid='true'] {
+    border: 1px solid var(--destructive);
+  }
+}
+
+.button-default {
+  background-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+
+  .dark & {
+    /* color: color-mix(in srgb, var(--primary) 10%, var(--foreground)); */
+    border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+  }
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--primary) 60%, transparent);
+  }
+}
+
+.button-destructive {
+  background-color: color-mix(in srgb, var(--destructive) 20%, transparent);
+  border-color: color-mix(in srgb, var(--destructive) 40%, transparent);
+  color: var(--destructive);
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--destructive) 60%, transparent);
+  }
+
+  .dark & {
+    color: color-mix(in srgb, var(--destructive) 25%, #fff);
+  }
+
+
+}
+
+.button-outline {
+  background-color: var(--background);
+  border-color: color-mix(in srgb, var(--foreground) 20%, transparent);
+
+  .dark & {
+    background: color-mix(in srgb, var(--input) 30%, transparent);
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--foreground) 40%, transparent);
+    }
+  }
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--foreground) 30%, transparent);
+  }
+}
+
+.button-secondary {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--secondary) 40%, transparent);
+  }
+}
+
+.button-ghost {
+  &:hover {
+    background-color: color-mix(in srgb, var(--secondary) 40%, transparent);
+  }
+}
+
+.button-link {
+  color: var(--primary);
+  /* text-decoration: underline; */
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.button-color-picker {
+  background-color: transparent;
+  border-color: transparent;
+  justify-content: start;
+  padding-inline-start: 0 !important;
+  height: calc(var(--spacing) * 8);
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--text-sm);
+  border-radius: 0;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--interactive-bg-primary) 60%, transparent);
+  }
+
+  &[aria-invalid='true'] {
+    border: 1px solid transparent;
+  }
+}
+
+.button-size-default {
+  height: calc(var(--spacing) * 9);
+  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+  font-size: var(--text-sm);
+
+  &:has(> svg) {
+    padding-inline: calc(var(--spacing) * 3);
+  }
+}
+
+.button-size-sm {
+  height: calc(var(--spacing) * 8);
+  padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 2.5);
+  font-size: var(--text-xs);
+
+  &:has(> svg) {
+    padding-inline: calc(var(--spacing) * 2.5);
+  }
+}
+
+.button-size-lg {
+  height: calc(var(--spacing) * 12);
+  padding: calc(var(--spacing) * 3) calc(var(--spacing) * 5);
+  font-size: var(--text-sm);
+
+  &:has(> svg) {
+    padding-inline: calc(var(--spacing) * 4.5);
+  }
+}
+
+.element-preview {
+  background-color: var(--highlight);
+  color: white;
+}

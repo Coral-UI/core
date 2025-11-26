@@ -1,5 +1,6 @@
-import { Select } from '@/components/Editor/style-manager/components/Select'
 import { useFieldContext } from '@/components/Editor/style-manager/formContext'
+import { Field } from '@/components/primitives/Field/Field'
+import { SelectInput } from '@/components/primitives/Select/select'
 import React from 'react'
 
 export const SelectField = ({
@@ -7,6 +8,7 @@ export const SelectField = ({
   selectOptions,
   leadingIcon,
   hideLabel = false,
+  ...props
 }: {
   label: string
   selectOptions: { value: string; label: string }[]
@@ -17,39 +19,35 @@ export const SelectField = ({
   const field = useFieldContext<string | undefined>()
 
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-  // Use isDefaultValue instead of isDirty for non-persistent dirty state
-  // const hasChanged = !field.state.meta.isDefaultValue;
+  const errors: string | string[] | undefined =
+    isInvalid && Array.isArray(field.state.meta.errors) && field.state.meta.errors.length > 0
+      ? field.state.meta.errors.length === 1
+        ? typeof field.state.meta.errors[0] === 'string'
+          ? field.state.meta.errors[0]
+          : field.state.meta.errors[0]?.message || String(field.state.meta.errors[0])
+        : field.state.meta.errors.map((error) => (typeof error === 'string' ? error : error?.message || String(error)))
+      : undefined
 
   return (
-    <div data-invalid={isInvalid}>
-      <label htmlFor={field.name} className={hideLabel ? 'sr-only' : 'label-sm ml-1.5 h-6 flex items-center'}>
-        {label}
-      </label>
-
-      <Select
+    <Field
+      {...props}
+      {...(label !== undefined && !hideLabel && { label })}
+      {...(errors !== undefined && { error: errors })}
+      invalid={isInvalid}
+    >
+      <SelectInput
         items={selectOptions}
-        // @ts-expect-error - Base UI Select has strict discriminated union types that conflict when value and onValueChange are both provided
-        value={field.state.value ?? undefined}
+        value={field.state.value}
         onValueChange={(value) => {
           // Store the value - convert empty string to undefined for form state
           // to match schema expectations (empty string would fail min(1) validation)
           const stringValue = typeof value === 'string' ? value : String(value)
           field.setValue(stringValue === '' ? undefined : stringValue)
         }}
-        id={field.name}
         size={'sm'}
+        className="w-full"
         leadingIcon={leadingIcon}
       />
-
-      {isInvalid && field.state.meta.errors && (
-        <div className="text-sm text-destructive-fg mt-1 ml-1.5">
-          {field.state.meta.errors.map((error, index) => {
-            // Handle both string errors and Zod error objects
-            const errorMessage = typeof error === 'string' ? error : error?.message || String(error)
-            return <div key={index}>{errorMessage}</div>
-          })}
-        </div>
-      )}
-    </div>
+    </Field>
   )
 }

@@ -1,6 +1,8 @@
-import { Popover } from '@/components/Editor/style-manager/components/Popover'
 import { useFormContext } from '@/components/Editor/style-manager/formContext'
+import { Button } from '@/components/primitives/Button/button'
+import { Popover } from '@/components/primitives/Popover/popover'
 import { cn } from '@/lib/utils'
+import { IconDots } from '@tabler/icons-react'
 import { useStore } from '@tanstack/react-form'
 import React, { useEffect, useState } from 'react'
 
@@ -123,23 +125,20 @@ export const ExpandableFieldGroup: React.FC<ExpandableFieldGroupProps> = ({ opti
     <div className={cn('flex flex-col', className)}>
       <div className="flex items-end gap-2">
         <div className="flex-1">{children}</div>
-        <Popover>
+        <Popover
+          trigger={
+            <Button variant="ghost" size="icon-sm" className="-translate-y-1" aria-label="Toggle fields">
+              <IconDots />
+            </Button>
+          }
+        >
           <span className="flex flex-col gap-1">
             {options.map((option) => {
               const isEnabled = enabledFields.has(option.fieldName)
               return (
-                <button
-                  key={option.fieldName}
-                  type="button"
-                  onClick={() => toggleField(option)}
-                  className={cn(
-                    'flex items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-xs transition-colors hover:bg-bg-secondary text-text-secondary',
-                  )}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>{isEnabled ? option.label.replace('Add ', 'Remove ') : option.label}</span>
-                  </span>
-                </button>
+                <Button key={option.fieldName} variant="ghost" size="sm" onClick={() => toggleField(option)}>
+                  {isEnabled ? option.label.replace('Add ', 'Remove ') : option.label}
+                </Button>
               )
             })}
           </span>

@@ -1,0 +1,129 @@
+.number-input-group {
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  background-color: var(--input);
+  width: 100%;
+  color: var(--foreground);
+  border: 1px solid var(--input-border);
+
+  :has(> input[aria-invalid='true']) {
+    border-color: var(--destructive);
+  }
+}
+
+.number-input-scrub-area-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: calc(var(--spacing) * 8);
+
+  &.sm {
+    width: calc(var(--spacing) * 6);
+  }
+}
+
+.number-input-scrub-area {
+  cursor: ew-resize;
+  svg:not([class*='size-']) {
+    width: calc(var(--spacing) * 4);
+    color: var(--text-secondary);
+
+    &.sm {
+      width: calc(var(--spacing) * 3.5);
+    }
+  }
+}
+
+.number-input-scrub-area-cursor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: calc(var(--spacing) * 4);
+  color: var(--text-secondary);
+
+  &.sm {
+    width: calc(var(--spacing) * 3.5);
+  }
+}
+
+.number-input-input {
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+  min-width: calc(var(--spacing) * 8);
+  width: 100%;
+  letter-spacing: var(--tracking-wide);
+  flex: 1;
+  flex-shrink: 0;
+  height: calc(var(--spacing) * 9);
+  font-size: var(--text-sm);
+
+  &:focus {
+    outline: none;
+    z-index: 1;
+  }
+
+  &.sm {
+    height: calc(var(--spacing) * 7);
+    font-size: var(--text-xs);
+  }
+}
+
+.number-input-controls {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 0.5);
+  padding-inline-end: calc(var(--spacing) * 1.5);
+}
+
+.number-input-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--input-border) 70%, var(--tone));
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--input) 80%, var(--tone));
+  padding: calc(var(--spacing) * 0.5);
+  background-clip: padding-box;
+  color: var(--foreground);
+  user-select: none;
+
+  &:hover {
+    background-color: var(--input-bg-hover);
+  }
+
+  &:active {
+    background-color: var(--input-bg-active);
+  }
+}
+
+.number-input-unit-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing);
+  user-select: none;
+  height: calc(var(--spacing) * 9);
+  min-width: calc(var(--spacing) * 16);
+  font-size: var(--text-sm);
+  padding-inline-start: calc(var(--spacing) * 1.5);
+  padding-inline-end: var(--spacing);
+
+  &.sm {
+    height: calc(var(--spacing) * 8);
+    min-width: calc(var(--spacing) * 8);
+    font-size: var(--text-xs);
+  }
+}
+
+.number-input-unit-select-icon {
+  display: flex;
+
+  svg {
+    color: var(--text-secondary);
+    width: calc(var(--spacing) * 3.5);
+    height: calc(var(--spacing) * 3.5);
+  }
+}

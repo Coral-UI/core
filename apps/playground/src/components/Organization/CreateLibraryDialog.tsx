@@ -1,7 +1,7 @@
 import { Button } from '@/components/primitives/Button/button'
 import { Dialog } from '@/components/primitives/Dialog/dialog'
+import { Field } from '@/components/primitives/Field/Field'
 import { Input } from '@/components/primitives/Input/input'
-import { Label } from '@/components/ui/label'
 import { useCreateLibrary } from '@/hooks/queries/useLibraries'
 import { useState } from 'react'
 
@@ -43,8 +43,7 @@ export function CreateLibraryDialog({ organizationId }: CreateLibraryDialogProps
       onOpenChange={setOpen}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
+        <Field label="Name">
           <Input
             id="name"
             value={name}
@@ -53,16 +52,15 @@ export function CreateLibraryDialog({ organizationId }: CreateLibraryDialogProps
             required
             autoFocus
           />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="description">Description (optional)</Label>
+        </Field>
+        <Field label="Description (optional)">
           <Input
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="A description of this library"
           />
-        </div>
+        </Field>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => setOpen(false)}>
             Cancel
@@ -74,46 +72,4 @@ export function CreateLibraryDialog({ organizationId }: CreateLibraryDialogProps
       </form>
     </Dialog>
   )
-
-  // return (
-  //   <Dialog open={open} onOpenChange={setOpen}>
-  //     <DialogTrigger render={() => <Button>Create New Library</Button>} />
-  //     <DialogContent>
-  //       <DialogHeader>
-  //         <DialogTitle>Create Library</DialogTitle>
-  //         <DialogDescription>Create a new library to organize your components</DialogDescription>
-  //       </DialogHeader>
-  //       <form onSubmit={handleSubmit} className="space-y-4">
-  //         <div className="space-y-2">
-  //           <Label htmlFor="name">Name</Label>
-  //           <Input
-  //             id="name"
-  //             value={name}
-  //             onChange={(e) => setName(e.target.value)}
-  //             placeholder="My Library"
-  //             required
-  //             autoFocus
-  //           />
-  //         </div>
-  //         <div className="space-y-2">
-  //           <Label htmlFor="description">Description (optional)</Label>
-  //           <Input
-  //             id="description"
-  //             value={description}
-  //             onChange={(e) => setDescription(e.target.value)}
-  //             placeholder="A description of this library"
-  //           />
-  //         </div>
-  //         <div className="flex justify-end gap-2">
-  //           <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-  //             Cancel
-  //           </Button>
-  //           <Button type="submit" disabled={createLibrary.isPending || !name.trim()}>
-  //             {createLibrary.isPending ? 'Creating...' : 'Create'}
-  //           </Button>
-  //         </div>
-  //       </form>
-  //     </DialogContent>
-  //   </Dialog>
-  // )
 }
