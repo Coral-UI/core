@@ -83,7 +83,7 @@ function NumberInput({
 
   // Use leadingIcon if provided, otherwise use default IconLetterW
   const iconToUse = leadingIcon || (
-    <IconLetterW className={cn(' text-text-secondary ', size === 'sm' ? 'size-3.5' : 'size-4')} />
+    <IconLetterW className={cn('text-muted-foreground', size === 'sm' ? 'size-3.5' : 'size-4')} />
   )
 
   return (

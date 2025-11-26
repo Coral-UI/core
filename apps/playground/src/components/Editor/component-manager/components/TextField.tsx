@@ -57,6 +57,7 @@ function TextField({
         defaultValue={defaultValue}
         value={field.state.value || ''}
         onChange={handleChange}
+        small
       />
     </Field>
   )

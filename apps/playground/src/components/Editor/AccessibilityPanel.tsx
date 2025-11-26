@@ -13,6 +13,7 @@ import { getAccessibilitySummary } from '@/lib/accessibility/utils'
 import { formatDateTime } from '@/lib/utils/date-format'
 import { AlertCircleIcon, CheckCircleIcon, InfoIcon, LoaderIcon } from 'lucide-react'
 import { useMemo } from 'react'
+import { Card } from '@/components/primitives/Card/card'
 
 interface AccessibilityPanelProps {
   accessibility?: AccessibilityResults
@@ -50,9 +51,9 @@ export function AccessibilityPanel({ accessibility, isChecking = false }: Access
 
   if (isChecking) {
     return (
-      <div className="flex flex-col h-full card">
+      <div className="flex flex-col h-full">
         <div className="pt-1.5 px-2.5">
-          <p className="text-xs font-medium text-muted-foreground">Accessibility</p>
+          <p className="text-sm font-medium text-muted-foreground">Accessibility</p>
         </div>
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="flex flex-col items-center gap-2">
@@ -66,9 +67,9 @@ export function AccessibilityPanel({ accessibility, isChecking = false }: Access
 
   if (!accessibility) {
     return (
-      <div className="flex flex-col h-full card">
+      <div className="flex flex-col h-full ">
         <div className="pt-1.5 px-2.5">
-          <p className="text-xs font-medium text-muted-foreground">Accessibility</p>
+          <p className="text-sm font-medium text-muted-foreground">Accessibility</p>
         </div>
         <div className="flex-1 flex items-center justify-center p-4">
           <Empty>
@@ -90,7 +91,7 @@ export function AccessibilityPanel({ accessibility, isChecking = false }: Access
   const hasPasses = accessibility.passes.length > 0
 
   return (
-    <div className="flex flex-col h-full card">
+    <div >
       <div className="pt-1.5 px-2.5 pb-2">
         <p className="text-xs font-medium text-muted-foreground mb-2">Accessibility</p>
         <div className="flex flex-wrap gap-1.5 mb-2">

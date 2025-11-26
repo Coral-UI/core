@@ -65,6 +65,7 @@ function TextAreaField({
             onChange={handleChange}
             {...(id !== undefined && { id })}
             className="w-full"
+            small
           />
         }
       />

@@ -83,63 +83,48 @@ export const EditorPreviewPane = ({
   return (
     <Tabs defaultValue="preview" className="w-full h-full flex">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <p className="text-xs font-medium">{componentName}</p>
-          {hasUnsavedChanges ? (
-            <Badge variant="destructive">Unsaved</Badge>
-          ) : isSaving ? (
-            <Badge variant="secondary">Saving...</Badge>
-          ) : (
-            <Badge variant="success">
-              <CheckIcon className="size-3" />
-              Saved
-            </Badge>
-          )}
-        </div>
-        <div className="flex items-center gap-2 justify-self-end">
-          <div>
-            <Button
-              variant="ghost"
-              title="Save"
-              size="icon-sm"
-              onClick={handleSave}
-              disabled={isSaving || !hasUnsavedChanges}
-            >
-              {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : <SaveIcon className="size-3.5" />}
-              {/* {isSaving ? 'Saving...' : 'Save'} */}
-            </Button>
-            {/* <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => setImportDialogOpen(true)}
-              title="Import from Code"
-              aria-label="Import from Code"
-            >
-              <IconFileImport className="size-3.5" />
-            </Button> */}
-            <Button variant="ghost" size="icon-sm" onClick={handleUndo} title="Undo (⌘Z / Ctrl+Z)">
-              <Undo className="size-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon-sm" onClick={handleRedo} title="Redo (⌘⇧Z / Ctrl+Y)">
-              <Redo className="size-3.5" />
-            </Button>
-          </div>
+        <TabsList>
+          <TabsTrigger value="preview">
+            <IconEyeSearch strokeWidth={1.5} className="size-4" /> Visual Preview
+          </TabsTrigger>
+          <TabsTrigger value="spec">
+            <IconSchema strokeWidth={1.5} className="size-4" /> Coral Spec
+          </TabsTrigger>
+          <TabsTrigger value="code">
+            <IconBracketsAngle strokeWidth={1.5} className="size-4" /> Generated Code
+          </TabsTrigger>
+        </TabsList>
 
-          <TabsList>
-            <TabsTrigger value="preview">
-              <IconEyeSearch strokeWidth={1.5} className="size-4" /> Visual Preview
-            </TabsTrigger>
-            <TabsTrigger value="spec">
-              <IconSchema strokeWidth={1.5} className="size-4" /> Coral Spec
-            </TabsTrigger>
-            <TabsTrigger value="code">
-              <IconBracketsAngle strokeWidth={1.5} className="size-4" /> Generated Code
-            </TabsTrigger>
-          </TabsList>
+        <div>
+          <Button
+            variant="ghost"
+            title="Save"
+            size="icon-sm"
+            onClick={handleSave}
+            disabled={isSaving || !hasUnsavedChanges}
+          >
+            {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : <SaveIcon className="size-3.5" />}
+            {/* {isSaving ? 'Saving...' : 'Save'} */}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setImportDialogOpen(true)}
+            title="Import from Code"
+            aria-label="Import from Code"
+          >
+            <IconFileImport className="size-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon-sm" onClick={handleUndo} title="Undo (⌘Z / Ctrl+Z)">
+            <Undo className="size-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon-sm" onClick={handleRedo} title="Redo (⌘⇧Z / Ctrl+Y)">
+            <Redo className="size-3.5" />
+          </Button>
         </div>
       </div>
 
-      <TabsContent value="preview" className="flex flex-col h-full w-full relative px-0 py-2.5 ">
+      <TabsContent value="preview" className="flex flex-col h-full w-full relative px-0 pb-2.5  pt-1.5">
         <div className="h-full w-full bg-background">
           {spec && spec.name ? (
             <>
@@ -176,7 +161,7 @@ export const EditorPreviewPane = ({
         </div>
       </TabsContent>
 
-      <TabsContent value="spec" className="flex flex-col h-full w-full flex-1 shrink-0 px-0 py-2.5">
+      <TabsContent value="spec" className="flex flex-col h-full w-full flex-1 shrink-0 px-0 pb-2.5  pt-1.5">
         <div className="h-full w-full relative flex flex-col ">
           <div className="border border-input rounded-xl flex-1 overflow-hidden">
             <Editor
@@ -208,7 +193,7 @@ export const EditorPreviewPane = ({
         </div>
       </TabsContent>
 
-      <TabsContent value="code" className="flex flex-col h-full w-full flex-1 shrink-0 px-0 py-2.5 ">
+      <TabsContent value="code" className="flex flex-col h-full w-full flex-1 shrink-0 px-0 pb-2.5  pt-1.5 ">
         <Sandbox specValue={spec} />
       </TabsContent>
     </Tabs>

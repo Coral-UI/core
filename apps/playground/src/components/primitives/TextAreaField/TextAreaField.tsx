@@ -7,9 +7,10 @@ type TextAreaFieldProps = Omit<React.ComponentProps<'textarea'>, 'onChange' | 'v
   value?: string | undefined
   onChange?: (value: string | undefined) => void
   defaultValue?: string | undefined
+  small?: boolean
 }
 
-function TextAreaField({ value, onChange, defaultValue, className, ...props }: TextAreaFieldProps) {
+function TextAreaField({ value, onChange, defaultValue, className, small = false, ...props }: TextAreaFieldProps) {
   const [internalValue, setInternalValue] = React.useState<string>(defaultValue || '')
 
   const isControlled = value !== undefined
@@ -26,7 +27,7 @@ function TextAreaField({ value, onChange, defaultValue, className, ...props }: T
     [isControlled, onChange],
   )
 
-  return <textarea value={displayValue} onChange={handleChange} className={cn('textarea', className)} {...props} />
+  return <textarea value={displayValue} onChange={handleChange} className={cn('textarea', small && 'small', className)} {...props} />
 }
 
 export { TextAreaField }

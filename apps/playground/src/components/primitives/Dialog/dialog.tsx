@@ -15,6 +15,7 @@ function Dialog({
   children,
   open = false,
   onOpenChange,
+  hideTrigger = false,
 }: {
   buttonVariant?: ButtonProps['variant']
   buttonText?: string
@@ -24,17 +25,20 @@ function Dialog({
   children?: React.ReactNode
   open?: React.ComponentProps<typeof BaseDialog.Root>['open']
   onOpenChange?: (open: boolean, eventDetails: BaseDialog.Root.ChangeEventDetails) => void
+  hideTrigger?: boolean
 }) {
   return (
     <BaseDialog.Root open={open} {...(onOpenChange ? { onOpenChange } : {})}>
+      {!hideTrigger && (
       <BaseDialog.Trigger
         render={(props) => (
           <Button {...props} variant={buttonVariant}>
             {buttonIcon}
-            {buttonText}
-          </Button>
-        )}
-      />
+              {buttonText}
+            </Button>
+          )}
+        />
+      )}
 
       <BaseDialog.Portal>
         <BaseDialog.Backdrop className="dialog-backdrop" />

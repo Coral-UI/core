@@ -4,9 +4,9 @@ import { AccessibilityPanel } from '@/components/Editor/AccessibilityPanel'
 import { EditorSidebar } from '@/components/Editor/ElementTree/EditorSidebar'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
 import { EditorPreviewPane } from '@/components/Editor/Preview/EditorPreviewPane'
-import { Badge } from '@/components/primitives/Badge/badge'
-import { Button } from '@/components/primitives/Button/button'
+import { Card } from '@/components/primitives/Card/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/primitives/Empty/Empty'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/Tabs/Tabs'
 import { useComponent } from '@/hooks/queries/useComponents'
 import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
@@ -17,7 +17,6 @@ import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { convertCoralStylesToFormValues, convertFormValuesToCoralStyles } from '@/utils/convertFormToCoralStyles'
 import { getDefaultDisplayValue } from '@/utils/elementDisplay'
 import { IconFolderCode } from '@tabler/icons-react'
-import { CheckIcon, SaveIcon } from 'lucide-react'
 import { memo, startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -727,12 +726,12 @@ export const Editor = memo(({ componentId }: EditorProps) => {
   }
 
   return (
-    <div className="flex flex-col w-full h-[calc(100dvh-.75rem)] bg-background">
+    <div className="flex flex-col w-full h-[calc(100dvh-3rem)] bg-background">
       <div className="flex flex-1 h-[calc(100dvh-2.5rem)] max-h-[calc(100dvh-2.5rem)] overflow-hidden">
-        <aside className="w-64 flex flex-col h-full overflow-hidden p-2.5">
-          <EditorSidebar />
+        <aside className="w-64 flex flex-col h-full overflow-hidden">
+          <EditorSidebar componentName={component.name} hasUnsavedChanges={hasUnsavedChanges} isSaving={isSaving} />
         </aside>
-        <main className="bg-background flex-1 overflow-hidden pt-2.5 px-2.5">
+        <main className="bg-background flex-1 overflow-hidden pt-1.5 px-4">
           <EditorPreviewPane
             spec={spec}
             libraryId={component?.libraryId}
@@ -746,43 +745,63 @@ export const Editor = memo(({ componentId }: EditorProps) => {
           />
         </main>
         <aside className="w-72 h-full overflow-hidden flex flex-col">
-          {selectedElement ? (
-            <ScrollArea innerClassName="flex flex-col gap-2.5 py-2.5" className="px-2.5 flex-1">
-              <ComponentForm
-                key={`component-form-${formKey || 'none'}`}
-                onChange={handleComponentChange}
-                {...(componentFormInitialValues ? { initialValues: componentFormInitialValues } : {})}
-              />
-              <StyleForm
-                key={`style-form-${formKey || 'none'}`}
-                onChange={handleStyleChange}
-                {...(formInitialValues ? { initialValues: formInitialValues } : {})}
-              />
-            </ScrollArea>
-          ) : (
-            <div className="p-2.5 flex flex-col h-full flex-1">
-              <div className="flex flex-col h-full card">
-                <Empty>
-                  <EmptyHeader>
-                    <EmptyMedia variant="icon">
-                      <IconFolderCode />
-                    </EmptyMedia>
-                    <EmptyTitle>No element selected</EmptyTitle>
-                    <EmptyDescription>Select an element from the tree to edit its styles</EmptyDescription>
-                  </EmptyHeader>
-                </Empty>
+          <Card noPadding className="flex-1 !pt-1.5">
+            {selectedElement ? (
+              <Tabs defaultValue="style" className="flex-1 flex flex-col overflow-hidden">
+                <div className="px-1.5 pb-2.5">
+                <TabsList className="!w-full">
+                  <TabsTrigger value="style">Style</TabsTrigger>
+                  <TabsTrigger value="component">Details</TabsTrigger>
+                </TabsList>
+                </div>
+
+                  <TabsContent value="component">
+                  <ScrollArea innerClassName="" className="flex-1 pb-12">
+                    <ComponentForm
+                      key={`component-form-${formKey || 'none'}`}
+                      onChange={handleComponentChange}
+                      {...(componentFormInitialValues ? { initialValues: componentFormInitialValues } : {})}
+                    />
+                    </ScrollArea>
+                  </TabsContent>
+                  <TabsContent value="style" className="flex-1 h-full">
+                  <ScrollArea innerClassName="" className="flex-1 pb-12">
+                    <StyleForm
+                      key={`style-form-${formKey || 'none'}`}
+                      onChange={handleStyleChange}
+                      {...(formInitialValues ? { initialValues: formInitialValues } : {})}
+                    />
+                    </ScrollArea>
+                  </TabsContent>
+
+              </Tabs>
+            ) : (
+              <div className="flex flex-col h-full flex-1">
+                <ScrollArea innerClassName="flex flex-col gap-2.5 py-2.5" className="flex-1">
+                  <div className="px-2.5 pb-2.5">
+                    <AccessibilityPanel
+                      {...(component?.accessibility ? { accessibility: component.accessibility } : {})}
+                      isChecking={isCheckingAccessibility}
+                    />
+                  </div>
+                  <div className="flex flex-col h-full">
+                    <Empty>
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon">
+                          <IconFolderCode />
+                        </EmptyMedia>
+                        <EmptyTitle>No element selected</EmptyTitle>
+                        <EmptyDescription>Select an element from the tree to edit its styles</EmptyDescription>
+                      </EmptyHeader>
+                    </Empty>
+                  </div>
+                </ScrollArea>
               </div>
-            </div>
-          )}
-          <div className="px-2.5 pb-2.5">
-            <AccessibilityPanel
-              {...(component?.accessibility ? { accessibility: component.accessibility } : {})}
-              isChecking={isCheckingAccessibility}
-            />
-          </div>
+            )}
+          </Card>
         </aside>
       </div>
-      {/* <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} /> */}
+      <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} />
     </div>
   )
 })

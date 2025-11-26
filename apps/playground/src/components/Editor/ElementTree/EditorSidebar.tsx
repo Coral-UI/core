@@ -1,10 +1,12 @@
 // import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/primitives/Badge/badge'
 import { Card } from '@/components/primitives/Card/card'
 import { TreeDataItem, TreeView } from '@/components/primitives/TreeView/tree-view'
 import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
 import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { canContain } from '@/utils/elementHierarchy'
+import { IconCheck } from '@tabler/icons-react'
 import { Minus, Plus } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
@@ -68,7 +70,15 @@ const convertToTreeDataItem = (
   return treeItem
 }
 
-export const EditorSidebar = () => {
+export const EditorSidebar = ({
+  componentName,
+  hasUnsavedChanges,
+  isSaving,
+}: {
+  componentName: string
+  hasUnsavedChanges: boolean
+  isSaving: boolean
+}) => {
   const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const setSelectedElementId = useElementSelectionStore((state) => state.setSelectedElementId)
   const elementTreeHook = useElementTreeQuery()
@@ -144,11 +154,21 @@ export const EditorSidebar = () => {
   )
 
   return (
-    <Card className="h-full" tight>
-      <div>
-        <p className="text-xs font-medium text-muted-foreground">Structure</p>
+    <Card className="h-full" noPadding>
+      <div className="px-2 border-b border-border pb-2.5 flex items-center gap-2">
+        <p className="text-xs font-medium">{componentName}</p>
+        {hasUnsavedChanges ? (
+          <Badge variant="destructive">Unsaved</Badge>
+        ) : isSaving ? (
+          <Badge variant="secondary">Saving...</Badge>
+        ) : (
+          <Badge variant="success">
+            <IconCheck className="size-3" />
+            Saved
+          </Badge>
+        )}
       </div>
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto px-1 bg-layer rounded-md pt-2.5">
         <TreeView
           data={treeData}
           {...(selectedElementId && { initialSelectedItemId: selectedElementId })}

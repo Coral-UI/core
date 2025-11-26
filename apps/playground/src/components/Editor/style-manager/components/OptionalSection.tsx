@@ -86,7 +86,7 @@ export const OptionalSection: React.FC<OptionalSectionProps> = ({
   }
 
   return (
-    <fieldset className={cn('card tight', className)}>
+    <fieldset className={cn('gap-2.5 pb-2.5  border-b border-border px-2.5 flex flex-col', className)}>
       <div className={cn('flex items-center justify-between gap-3', className)}>
         <legend className="legend">{legend}</legend>
         <Button

@@ -1,0 +1,8 @@
+.conditional-section {
+  display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 2);
+    padding-block-end: calc(var(--spacing) * 2.5);
+    padding-inline: calc(var(--spacing) * 2.5);
+    border-bottom: 1px solid var(--border);
+}

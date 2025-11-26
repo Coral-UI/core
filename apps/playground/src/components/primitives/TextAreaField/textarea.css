@@ -8,6 +8,12 @@
   min-width: calc(var(--spacing) * 8);
   min-height: calc(var(--spacing) * 7.5);
 
+  &.small {
+    padding-inline-start: calc(var(--spacing) * 2.5);
+    padding-inline-end: calc(var(--spacing) * 2);
+    font-size: var(--text-xs);
+  }
+
   &::selection {
     background-color: var(--primary);
     color: var(--primary-foreground);

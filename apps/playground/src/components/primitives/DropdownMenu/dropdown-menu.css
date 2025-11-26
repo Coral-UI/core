@@ -9,7 +9,7 @@
     transform-origin: var(--transform-origin);
     border-radius: var(--radius-md);
     background-color: var(--card);
-    /* padding-block-start: var(--spacing); */
+    padding-block-start: var(--spacing);
     border: 1px solid var(--border);
     transition: transform 0.15s ease-in-out, opacity 0.15s ease-in-out, scale 0.15s ease-in-out;
     overflow: hidden;
@@ -35,7 +35,7 @@
   }
 
   .dropdown-menu-item {
-    font-size: var(--text-sm);
+    font-size: var(--text-xs);
     padding-block: var(--spacing);
     padding-inline: calc(var(--spacing) * 4);
     cursor: default;

@@ -215,15 +215,18 @@
   --primary-foreground: oklch(0.3657 0.072 132.109);
   --secondary: oklch(0.8700 0 0);
   --secondary-foreground: oklch(0.2050 0 0);
-  --muted: oklch(0.9900 0 0);
+  --muted: oklch(0.9700 0 0);
   --muted-foreground: oklch(0.61 0 0);
   --accent: oklch(0.8568 0.0297 153.2744);
   --accent-foreground: oklch(0.1913 0 0);
-  --destructive: oklch(0.5770 0.2450 27.3250);
+  --destructive: oklch(0.64 0.24 25.14);
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.9037 0 0);
-  --input: oklch(0.96 0 0);
-  --input-border: oklch(0.934 0 0);
+  --input: oklch(0.94 0 0);
+  --input-selected: oklch(0.80 0 0);
+  --input-selected-foreground: oklch(0.44 0 0);
+  --layer: oklch(0.9985 0 0);
+  --input-border: oklch(0.89 0 0);
   --ring: oklch(0.7080 0 0);
   --chart-1: oklch(0.8100 0.1000 252);
   --chart-2: oklch(0.6200 0.1900 260);
@@ -259,7 +262,7 @@
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
-  --text-xxs: 0.625rem;
+  --text-xxs: 0.6125rem;
 
   --input-spacing: calc(var(--spacing) * 1.5);
 
@@ -286,10 +289,13 @@
   --muted-foreground: oklch(0.7080 0 0);
   --accent: oklch(0.3587 0.0229 142.6208);
   --accent-foreground: oklch(0.9581 0 0);
-  --destructive: oklch(0.7040 0.1910 22.2160);
+  --destructive: oklch(0.37 0.16 28.55);
   --destructive-foreground: oklch(0.9850 0 0);
   --border: oklch(0.3012 0 0);
   --input: oklch(0.3012 0 0);
+  --input-selected: oklch(0.4 0 0);
+  --input-selected-foreground: oklch(0.9850 0 0);
+  --layer: oklch(0.25 0 0);
   --input-border: oklch(0.3677 0 0);
   --ring: oklch(0.5560 0 0);
   --chart-1: oklch(0.8100 0.1000 252);
@@ -358,6 +364,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-layer: var(--layer);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -478,9 +485,18 @@
     background-color: var(--card);
 
 
-
     &.tight {
       padding-block: calc(var(--spacing) * 3);
       padding-inline: calc(var(--spacing) * 2.5);
+    }
+
+    &.no-padding {
+      padding-block-start: calc(var(--spacing) * 3);
+      padding-block-end: 0;
+      padding-inline: 0;
+      gap: 0;
+      border-radius: 0;
+      overflow: hidden;
+      background-color: var(--layer);
     }
   }

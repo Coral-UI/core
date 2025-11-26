@@ -29,12 +29,14 @@ export const ImportCodeDialog = ({ open, onOpenChange, onImport }: ImportCodeDia
 
   return (
     <Dialog
+      hideTrigger
       open={open}
       onOpenChange={onOpenChange}
       buttonText="Import from Code"
       title="Import from Code"
       description="Paste your HTML code below to import it into the editor"
     >
+      <div className="flex flex-col gap-2.5">
       <div className="flex-1 min-h-[400px] border border-border rounded-lg overflow-hidden flex flex-col">
         <MonacoEditor
           height={400}
@@ -54,7 +56,9 @@ export const ImportCodeDialog = ({ open, onOpenChange, onImport }: ImportCodeDia
             contextmenu: false,
           }}
         />
-        <div className="flex justify-end gap-2">
+
+      </div>
+      <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>
@@ -62,7 +66,7 @@ export const ImportCodeDialog = ({ open, onOpenChange, onImport }: ImportCodeDia
             Import
           </Button>
         </div>
-      </div>
+        </div>
     </Dialog>
   )
 }

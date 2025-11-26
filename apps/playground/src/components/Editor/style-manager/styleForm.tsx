@@ -460,7 +460,9 @@ const StyleFormLayout = withForm({
                 )}
               />
 
-              <ConditionalSection watch="display" when="flex" legend="Flex">
+
+            </CardSection>
+            <ConditionalSection watch="display" when="flex" legend="Flex">
                 <div className="flex flex-col gap-2">
                   <form.AppField
                     name="flexDirection"
@@ -664,7 +666,6 @@ const StyleFormLayout = withForm({
                   />
                 </div>
               </ConditionalSection>
-            </CardSection>
 
             <OptionalSection enabledField="typographyEnabled" legend="Typography">
               <form.AppField

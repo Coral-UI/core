@@ -9,6 +9,14 @@
   font-size: var(--text-sm);
   background-color: var(--input);
 
+  &.small {
+    height: calc(var(--spacing) * 8);
+    min-width: calc(var(--spacing) * 24);
+    padding-inline-start: calc(var(--spacing) * 2.5);
+    padding-inline-end: calc(var(--spacing) * 2);
+    font-size: var(--text-xs);
+  }
+
   &::selection {
     background-color: var(--primary);
     color: var(--primary-foreground);

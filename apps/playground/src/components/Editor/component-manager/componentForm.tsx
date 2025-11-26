@@ -142,13 +142,13 @@ export const ComponentForm = ({ onChange, initialValues }: ComponentFormProps = 
   }))
 
   return (
-    <Card className="max-w-72" tight>
+    <div className="max-w-72 flex flex-col gap-2.5 border-b border-border pb-2.5  px-2.5" >
       <form.AppForm>
         <div className="flex flex-col gap-2.5">
           <form.AppField
             name="name"
             children={(field) => {
-              return <field.TextField label="Name" placeholder="Name" />
+              return <field.TextField label="Element Name" placeholder="Name" />
             }}
           />
           <form.AppField
@@ -166,11 +166,11 @@ export const ComponentForm = ({ onChange, initialValues }: ComponentFormProps = 
           <form.AppField
             name="description"
             children={(field) => {
-              return <field.TextAreaField label="Description" placeholder="Description" />
+              return <field.TextAreaField label="Element Description" placeholder="Description" />
             }}
           />
         </div>
       </form.AppForm>
-    </Card>
+    </div>
   )
 }

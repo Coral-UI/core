@@ -3,8 +3,13 @@ import * as React from 'react'
 
 import './card.css'
 
-function Card({ className, tight, ...props }: React.ComponentProps<'div'> & { tight?: boolean }) {
-  return <div className={cn('card', tight && 'tight', className)} {...props} />
+function Card({
+  className,
+  tight,
+  noPadding,
+  ...props
+}: React.ComponentProps<'div'> & { tight?: boolean; noPadding?: boolean }) {
+  return <div className={cn('card', tight && 'tight', noPadding && 'no-padding', className)} {...props} />
 }
 
 function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {

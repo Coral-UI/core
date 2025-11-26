@@ -89,7 +89,9 @@
 }
 
 .button-ghost {
+  color: color-mix(in srgb, var(--foreground) 60%, transparent);
   &:hover {
+    color: var(--foreground);
     background-color: color-mix(in srgb, var(--secondary) 40%, transparent);
   }
 }

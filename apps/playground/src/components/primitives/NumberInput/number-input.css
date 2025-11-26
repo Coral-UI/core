@@ -27,8 +27,8 @@
 .number-input-scrub-area {
   cursor: ew-resize;
   svg:not([class*='size-']) {
-    width: calc(var(--spacing) * 4);
-    color: var(--text-secondary);
+    width: calc(var(--spacing) * 3.5);
+    color: var(--muted-foreground);
 
     &.sm {
       width: calc(var(--spacing) * 3.5);
@@ -110,6 +110,7 @@
   font-size: var(--text-sm);
   padding-inline-start: calc(var(--spacing) * 1.5);
   padding-inline-end: var(--spacing);
+  color: var(--muted-foreground);
 
   &.sm {
     height: calc(var(--spacing) * 8);

@@ -4,8 +4,9 @@
     position: fixed;
     inset: 0;
     background-color: #000000;
-    opacity: 0.2;
+    opacity: 0.5;
     transition: all 0.15s ease-in-out;
+    z-index: 30000;
 
 
     &:[data-ending-style],
@@ -32,9 +33,10 @@
     gap: calc(var(--spacing) * 4);
     padding-block: calc(var(--spacing) * 5);
     padding-inline: calc(var(--spacing) * 4);
+    z-index: 30001;
 
     @media (width >= 40rem) {
-      max-width: var(--container-lg);
+      max-width: var(--container-2xl);
     }
 
     &:[data-ending-style]
