@@ -72,7 +72,7 @@
 }
 
 .select-positioner {
-  z-index: 50;
+  z-index: 50001;
 }
 
 .select-popup {
@@ -80,7 +80,7 @@
   color: var(--foreground);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  z-index: 50;
+  z-index: 50001;
   min-width: calc(var(--spacing) * 8);
   overflow: hidden;
   outline: none;

@@ -1,9 +1,17 @@
 import { Popover as BasePopover } from '@base-ui-components/react/popover'
 import * as React from 'react'
 
-export const Popover = ({ children, trigger }: { children: React.ReactNode; trigger: React.ReactNode }) => {
+export const Popover = ({
+  children,
+  trigger,
+  onOpenChange,
+}: {
+  children: React.ReactNode
+  trigger: React.ReactNode
+  onOpenChange?: (open: boolean) => void
+}) => {
   return (
-    <BasePopover.Root>
+    <BasePopover.Root onOpenChange={onOpenChange}>
       <BasePopover.Trigger
         render={(props) => {
           // If trigger is a React element, clone it and merge props

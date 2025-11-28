@@ -1,21 +1,16 @@
 import { HTMLRenderer } from '@/components/Editor/Preview/HTMLRenderer'
-import { Badge } from '@/components/primitives/Badge/badge'
 import { Button } from '@/components/primitives/Button/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/Tabs/Tabs'
-import { ToggleGroup, ToggleItem } from '@/components/primitives/ToggleGroup/toggle-group'
+import { ToggleGroup } from '@/components/primitives/ToggleGroup/toggle-group'
 import { useLibraryCssReset } from '@/hooks/queries/useLibraries'
 // import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { Editor } from '@monaco-editor/react'
-import { IconBracketsAngle, IconEyeSearch, IconFileImport, IconSchema } from '@tabler/icons-react'
+import { IconBracketsAngle, IconEyeSearch, IconFileImport, IconSchema, IconDeviceMobile, IconDeviceIpad, IconDeviceImac } from '@tabler/icons-react'
 import {
-  CheckIcon,
   CopyIcon,
   Loader2,
-  MonitorIcon,
   Redo,
   SaveIcon,
-  SmartphoneIcon,
-  TabletIcon,
   Undo,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -33,9 +28,9 @@ type ViewportPreset = {
 }
 
 const VIEWPORT_PRESETS: ViewportPreset[] = [
-  { name: 'Mobile', width: 375, icon: <SmartphoneIcon className="size-3" /> },
-  { name: 'Tablet', width: 768, icon: <TabletIcon className="size-3" /> },
-  { name: 'Desktop', width: 1440, icon: <MonitorIcon className="size-3" /> },
+  { name: 'Mobile', width: 375, icon: <IconDeviceMobile className="size-3" /> },
+  { name: 'Tablet', width: 768, icon: <IconDeviceIpad className="size-3" /> },
+  { name: 'Desktop', width: 1440, icon: <IconDeviceImac className="size-3" /> },
 ]
 
 interface EditorPreviewPaneProps {

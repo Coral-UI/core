@@ -40,7 +40,7 @@ export function TokensClient({ orgId, libraryId }: Props) {
         <div className="flex items-center gap-2"></div>
       </PageHeader>
 
-      <Tabs>
+      <Tabs defaultValue="tokens">
         <TabsList>
           <TabsTrigger value="tokens">Tokens</TabsTrigger>
           <TabsTrigger value="themes">Themes</TabsTrigger>

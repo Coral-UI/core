@@ -22,55 +22,123 @@ export const CommandPanel = ({
   onSuggestionSelect: (suggestion: string) => void
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const [shouldFocus, setShouldFocus] = React.useState(false)
 
-  // Prevent scroll when popover opens and input auto-focuses
+  // Store scroll position before component mounts (when popover opens)
   React.useEffect(() => {
-    const input = inputRef.current
-    if (!input) return
+    // Store scroll positions for all scrollable containers BEFORE any focus happens
+    const scrollPositions = new Map<Element, { x: number; y: number }>()
 
-    // Store initial scroll position
-    let scrollY = window.scrollY
-    let scrollX = window.scrollX
-    let isRestoring = false
+    const findAllScrollableContainers = () => {
+      const containers: HTMLElement[] = []
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT)
+      let node: Node | null = walker.nextNode()
 
-    // Function to restore scroll position
+      while (node) {
+        const element = node as HTMLElement
+        const style = window.getComputedStyle(element)
+        if (
+          (style.overflow === 'auto' || style.overflowY === 'auto' || style.overflow === 'scroll' || style.overflowY === 'scroll') &&
+          (element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth)
+        ) {
+          containers.push(element)
+        }
+        node = walker.nextNode()
+      }
+      return containers
+    }
+
+    const scrollableContainers = findAllScrollableContainers()
+    scrollableContainers.forEach((container) => {
+      scrollPositions.set(container, {
+        x: container.scrollLeft,
+        y: container.scrollTop,
+      })
+    })
+    scrollPositions.set(window as unknown as Element, {
+      x: window.scrollX,
+      y: window.scrollY,
+    })
+
+    // Prevent any scroll from happening
     const restoreScroll = () => {
-      if (isRestoring) return
-      isRestoring = true
-      window.scrollTo({ left: scrollX, top: scrollY, behavior: 'instant' })
-      requestAnimationFrame(() => {
-        isRestoring = false
+      scrollPositions.forEach((position, container) => {
+        try {
+          if (container === (window as unknown as Element)) {
+            window.scrollTo({
+              left: position.x,
+              top: position.y,
+              behavior: 'instant',
+            })
+          } else {
+            const element = container as HTMLElement
+            if (element && element.isConnected) {
+              element.scrollTo({
+                left: position.x,
+                top: position.y,
+                behavior: 'instant',
+              })
+            }
+          }
+        } catch (e) {
+          // Ignore errors
+        }
       })
     }
 
-    // Monitor scroll changes and restore if needed
-    const handleScroll = () => {
-      if (!isRestoring && (window.scrollY !== scrollY || window.scrollX !== scrollX)) {
+    // Prevent scrollIntoView globally
+    const originalScrollIntoView = HTMLElement.prototype.scrollIntoView
+    HTMLElement.prototype.scrollIntoView = function () {
+      // Prevent all scrollIntoView calls
+      return
+    }
+
+    // Prevent focus from causing scroll
+    const handleFocus = (e: FocusEvent) => {
+      const target = e.target as HTMLElement
+      if (target === inputRef.current) {
+        // Prevent scroll when input focuses
         restoreScroll()
       }
     }
 
-    // Focus input without scrolling after a short delay
-    const timeoutId = setTimeout(() => {
-      scrollY = window.scrollY
-      scrollX = window.scrollX
+    // Monitor scroll events
+    const handleScroll = () => {
+      restoreScroll()
+    }
 
-      // Try to focus with preventScroll
-      input.focus({ preventScroll: true })
+    document.addEventListener('focus', handleFocus, { capture: true })
+    window.addEventListener('scroll', handleScroll, { passive: false, capture: true })
+    document.addEventListener('scroll', handleScroll, { passive: false, capture: true })
 
-      // Monitor for scroll changes and restore
-      window.addEventListener('scroll', handleScroll, { passive: false, once: true })
+    // Restore scroll aggressively
+    const restoreInterval = setInterval(restoreScroll, 16) // ~60fps
 
-      // Also restore after focus event
-      requestAnimationFrame(() => {
+    // Allow focus after a delay, but still prevent scroll
+    setTimeout(() => {
+      setShouldFocus(true)
+      const input = inputRef.current
+      if (input) {
+        input.focus({ preventScroll: true })
         restoreScroll()
-        setTimeout(restoreScroll, 0)
-      })
-    }, 10)
+      }
+    }, 100)
+
+    // Clean up after 500ms
+    setTimeout(() => {
+      clearInterval(restoreInterval)
+      HTMLElement.prototype.scrollIntoView = originalScrollIntoView
+      document.removeEventListener('focus', handleFocus, { capture: true })
+      window.removeEventListener('scroll', handleScroll, { capture: true })
+      document.removeEventListener('scroll', handleScroll, { capture: true })
+    }, 500)
 
     return () => {
-      clearTimeout(timeoutId)
-      window.removeEventListener('scroll', handleScroll)
+      clearInterval(restoreInterval)
+      HTMLElement.prototype.scrollIntoView = originalScrollIntoView
+      document.removeEventListener('focus', handleFocus, { capture: true })
+      window.removeEventListener('scroll', handleScroll, { capture: true })
+      document.removeEventListener('scroll', handleScroll, { capture: true })
     }
   }, [])
 

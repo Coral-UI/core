@@ -731,7 +731,7 @@ export const Editor = memo(({ componentId }: EditorProps) => {
         <aside className="w-64 flex flex-col h-full overflow-hidden">
           <EditorSidebar componentName={component.name} hasUnsavedChanges={hasUnsavedChanges} isSaving={isSaving} />
         </aside>
-        <main className="bg-area-background flex-1 overflow-hidden pt-2 px-4 rounded-lg">
+        <main className="bg-area-background flex-1 overflow-hidden pt-2 px-4 rounded-t-lg shadow-hairline border border-border border-b-0">
           <EditorPreviewPane
             spec={spec}
             libraryId={component?.libraryId}

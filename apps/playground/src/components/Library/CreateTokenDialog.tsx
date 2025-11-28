@@ -1,8 +1,9 @@
 import type { DesignTokenType } from '@/types'
 import { Button } from '@/components/primitives/Button/button'
 import { Dialog } from '@/components/primitives/Dialog/dialog'
+import { SelectInput } from '@/components/primitives/Select/select'
 import { Input } from '@/components/primitives/Input/input'
-import { Label } from '@/components/ui/label'
+import { Field } from '@/components/primitives/Field/Field'
 import { useCreateToken } from '@/hooks/queries/useTokens'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -21,7 +22,7 @@ const TOKEN_TYPES: { value: DesignTokenType; label: string }[] = [
 export function CreateTokenDialog({ libraryId }: CreateTokenDialogProps) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
-  const [type, setType] = useState<DesignTokenType | ''>('')
+  const [type, setType] = useState<DesignTokenType | ''>('string' as DesignTokenType | '')
   const [description, setDescription] = useState('')
   const createToken = useCreateToken()
 
@@ -66,8 +67,8 @@ export function CreateTokenDialog({ libraryId }: CreateTokenDialogProps) {
       description="Create a new design token. You can set values for different theme options after creating the token."
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
+        <Field label="Name" className="space-y-2" error={name.trim() && !validateName(name.trim()) ? 'Token name cannot contain $, {, }, or . characters' : undefined} description="Cannot contain $, {'{'}, {'}'}, or . characters">
+
           <Input
             id="name"
             value={name}
@@ -76,43 +77,29 @@ export function CreateTokenDialog({ libraryId }: CreateTokenDialogProps) {
             required
             autoFocus
           />
-          <p className="text-xs text-muted-foreground">Cannot contain $, {'{'}, {'}'}, or . characters</p>
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="type">Type</Label>
-          <div className="relative">
-            <select
-              id="type"
-              value={type}
-              onChange={(e) => setType(e.target.value as DesignTokenType | '')}
-              className={cn(
-                'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs',
-                'focus-visible:border-popover-foreground focus-visible:ring-popover-foreground focus-visible:ring-[3px]',
-                'disabled:cursor-not-allowed disabled:opacity-50',
-                'appearance-none',
-              )}
-              required
-            >
-              <option value="">Select a type</option>
-              {TOKEN_TYPES.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        </Field>
 
-        <div className="space-y-2">
-          <Label htmlFor="description">Description (optional)</Label>
+        <Field label="Type" className="space-y-2"  description="The type of the token">
+
+          <SelectInput
+            id="type"
+            value={type}
+            onValueChange={(value) => setType(value as DesignTokenType | '')}
+            items={TOKEN_TYPES.map((option) => ({ label: option.label, value: option.value }))}
+          />
+
+        </Field>
+
+        <Field label="Description (optional)" className="space-y-2" description="A description of the token">
+
           <Input
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="A description of this token"
           />
-        </div>
+        </Field>
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => setOpen(false)}>
