@@ -25,9 +25,11 @@ function Field({ label, description, error, required, children, invalid, labelCl
 
   return (
     <BaseField.Root {...props} invalid={hasError}>
+      {label && <div className="field-group">
       {label && <BaseField.Label className={cn('field-label', labelClassName)}>{label}</BaseField.Label>}
-      {children}
       {description && <BaseField.Description className="field-description">{description}</BaseField.Description>}
+      </div>}
+      {children}
       {hasError && errors.length > 0 && (
         <div className="field-error" role="alert">
           {errors.map((err, index) => (

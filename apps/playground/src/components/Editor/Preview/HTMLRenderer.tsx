@@ -23,9 +23,9 @@ export const HTMLRenderer = ({ spec, viewportWidth, cssReset }: HTMLRendererProp
   }
 
   return (
-    <div ref={containerRef} className="w-full h-full overflow-auto   relative flex items-center justify-center">
+    <div ref={containerRef} className="w-full h-full    relative flex items-center justify-center" >
       <div
-        className="preview-background h-full border border-border rounded-lg overflow-hidden"
+        className="preview-background h-full rounded-lg overflow-hidden shadow-popover"
         style={{ width: viewportWidth + 'px' }}
       >
         <IframeRenderer

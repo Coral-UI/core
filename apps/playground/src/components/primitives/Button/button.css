@@ -4,16 +4,23 @@
   justify-content: center;
   gap: calc(var(--spacing) * 2);
   white-space: nowrap;
-  border-radius: var(--radius-md);
-  font-weight: 500;
+  border-radius: var(--radius-sm);
+  font-weight: 400;
   transition: all 0.2s ease-in-out;
   flex-shrink: 0;
   outline: none;
   border: 1px solid transparent;
+  font-weight: 300;
 
   &:disabled {
     pointer-events: none;
     opacity: 0.5;
+  }
+
+  &:focus-visible {
+
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 
   svg {
@@ -31,51 +38,39 @@
   }
 }
 
+.button-rounded {
+  border-radius: calc(infinity * 1px);
+}
+
 .button-default {
-  background-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  background-color: var(--primary);
   border-color: var(--primary);
   color: var(--primary-foreground);
 
-  .dark & {
-    /* color: color-mix(in srgb, var(--primary) 10%, var(--foreground)); */
-    border-color: color-mix(in srgb, var(--primary) 40%, transparent);
-  }
 
   &:hover {
-    background-color: color-mix(in srgb, var(--primary) 60%, transparent);
+    background-color: var(--primary-hover);
   }
 }
 
 .button-destructive {
-  background-color: color-mix(in srgb, var(--destructive) 20%, transparent);
-  border-color: color-mix(in srgb, var(--destructive) 40%, transparent);
-  color: var(--destructive);
+  background-color: var(--danger);
+  border-color: var(--danger);
+  color: var(--danger-foreground);
 
   &:hover {
-    background-color: color-mix(in srgb, var(--destructive) 60%, transparent);
+    background-color: var(--danger-hover);
   }
-
-  .dark & {
-    color: color-mix(in srgb, var(--destructive) 25%, #fff);
-  }
-
-
 }
 
 .button-outline {
   background-color: var(--background);
-  border-color: color-mix(in srgb, var(--foreground) 20%, transparent);
+  border-color: var(--input-border);
+  color: var(--foreground);
 
-  .dark & {
-    background: color-mix(in srgb, var(--input) 30%, transparent);
-
-    &:hover {
-      background-color: color-mix(in srgb, var(--foreground) 40%, transparent);
-    }
-  }
 
   &:hover {
-    background-color: color-mix(in srgb, var(--foreground) 30%, transparent);
+    background-color: var(--secondary);
   }
 }
 
@@ -84,20 +79,20 @@
   color: var(--secondary-foreground);
 
   &:hover {
-    background-color: color-mix(in srgb, var(--secondary) 40%, transparent);
+    background-color: var(--secondary-hover);
   }
 }
 
 .button-ghost {
-  color: color-mix(in srgb, var(--foreground) 60%, transparent);
+  color: var(--foreground);
   &:hover {
-    color: var(--foreground);
-    background-color: color-mix(in srgb, var(--secondary) 40%, transparent);
+    background-color: var(--secondary);
   }
 }
 
 .button-link {
-  color: var(--primary);
+  color: var(--foreground);
+  font-weight: 500;
   /* text-decoration: underline; */
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
@@ -128,12 +123,8 @@
 
 .button-size-default {
   height: calc(var(--spacing) * 9);
-  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4.5);
   font-size: var(--text-sm);
-
-  &:has(> svg) {
-    padding-inline: calc(var(--spacing) * 3);
-  }
 }
 
 .button-size-sm {
@@ -157,6 +148,7 @@
 }
 
 .element-preview {
-  background-color: var(--highlight);
+  background-color: var(--accent);
   color: white;
+  border-radius: calc(infinity * 1px);
 }

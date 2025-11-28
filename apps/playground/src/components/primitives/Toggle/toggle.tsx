@@ -4,6 +4,8 @@ import { Toggle as BaseToggle } from '@base-ui-components/react/toggle'
 import { cva } from 'class-variance-authority'
 import * as React from 'react'
 
+import './toggle.css'
+
 const toggleVariants = cva(
   "flex items-center justify-center rounded-sm text-muted-foreground select-none focus-visible:bg-none focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-focus-outline active:bg-interactive-bg-primary/80  [&>svg:not([class*='size-'])]:size-4 text-xs whitespace-nowrap shrink-0",
   {
@@ -32,7 +34,7 @@ export type ToggleProps = React.ComponentProps<typeof BaseToggle> &
 
 function Toggle({ ariaLabel, className, icon, variant = 'default', size = 'default', tooltip, ...props }: ToggleProps) {
   const toggleElement = (
-    <BaseToggle aria-label={ariaLabel} className={cn(toggleVariants({ variant, size }), className)} {...props}>
+    <BaseToggle aria-label={ariaLabel} className={cn('toggle', className)} {...props}>
       {icon}
     </BaseToggle>
   )

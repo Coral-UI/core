@@ -87,21 +87,11 @@ export function ColorInput({
   return (
     <div data-invalid={invalid} className="color-input">
       {!hideLabel && (
-        <label htmlFor={inputId} className="color-input-label">
+        <label htmlFor={inputId} className="field-label">
           {label}
         </label>
       )}
-      <input
-        type="hidden"
-        id={inputId}
-        name={name}
-        value={value}
-        readOnly
-        aria-hidden="true"
-        tabIndex={-1}
-        className="sr-only"
-        aria-invalid={invalid}
-      />
+
       <div className={clsx('color-input-input', leadingIcon && 'color-input-input-with-icon')} role="group">
         {leadingIcon && <div className={cn('color-input-input-icon')}>{leadingIcon}</div>}
         {/* Hidden input for accessibility and form association */}
@@ -150,6 +140,17 @@ export function ColorInput({
           </ColorPickerContent>
         </ColorPicker>
       </div>
+      <input
+        type="hidden"
+        id={inputId}
+        name={name}
+        value={value}
+        readOnly
+        aria-hidden="true"
+        tabIndex={-1}
+        className="sr-only"
+        aria-invalid={invalid}
+      />
     </div>
   )
 }

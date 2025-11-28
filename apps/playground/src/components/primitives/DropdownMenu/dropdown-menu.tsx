@@ -13,11 +13,9 @@ export const DropdownMenu = ({ items, trigger }: DropdownMenuProps) => {
     <Menu.Root>
       <Menu.Trigger render={(props) => React.cloneElement(trigger as React.ReactElement, props)} />
       <Menu.Portal>
-        <Menu.Positioner className="dropdown-menu-positioner" sideOffset={8} side="left" align="end">
+        <Menu.Positioner className="dropdown-menu-positioner" sideOffset={8} side="bottom" align="start">
           <Menu.Popup className="dropdown-menu-popup">
-            <Menu.Arrow className="dropdown-menu-arrow">
-              <ArrowSvg />
-            </Menu.Arrow>
+
             {items.map(({ key, ...item }) => (
               <Menu.Item key={key} {...item} className="dropdown-menu-item" />
             ))}

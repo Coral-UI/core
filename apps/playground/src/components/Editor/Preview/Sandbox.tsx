@@ -55,7 +55,7 @@ export default function App() {
     },
   }
   return (
-    <div className="h-full w-full">
+    <div className="w-full shadow-popover rounded-lg overflow-hidden">
       <Sandpack
         files={files}
         theme={theme === 'dark' ? sandpackDark : githubLight}

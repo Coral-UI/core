@@ -731,7 +731,7 @@ export const Editor = memo(({ componentId }: EditorProps) => {
         <aside className="w-64 flex flex-col h-full overflow-hidden">
           <EditorSidebar componentName={component.name} hasUnsavedChanges={hasUnsavedChanges} isSaving={isSaving} />
         </aside>
-        <main className="bg-background flex-1 overflow-hidden pt-1.5 px-4">
+        <main className="bg-area-background flex-1 overflow-hidden pt-2 px-4 rounded-lg">
           <EditorPreviewPane
             spec={spec}
             libraryId={component?.libraryId}
@@ -744,11 +744,11 @@ export const Editor = memo(({ componentId }: EditorProps) => {
             componentName={component.name}
           />
         </main>
-        <aside className="w-72 h-full overflow-hidden flex flex-col">
-          <Card noPadding className="flex-1 !pt-1.5">
+        <aside className="w-72 h-[calc(100dvh-3rem)] max-h-[calc(100dvh-3rem)] flex flex-col">
+          <div className="flex-1 flex flex-col gap-2 bg-background">
             {selectedElement ? (
-              <Tabs defaultValue="style" className="flex-1 flex flex-col overflow-hidden">
-                <div className="px-1.5 pb-2.5">
+              <Tabs defaultValue="style" className="flex-1 flex flex-col">
+                <div className="px-1.5">
                 <TabsList className="!w-full">
                   <TabsTrigger value="style">Style</TabsTrigger>
                   <TabsTrigger value="component">Details</TabsTrigger>
@@ -756,22 +756,22 @@ export const Editor = memo(({ componentId }: EditorProps) => {
                 </div>
 
                   <TabsContent value="component">
-                  <ScrollArea innerClassName="" className="flex-1 pb-12">
+
                     <ComponentForm
                       key={`component-form-${formKey || 'none'}`}
                       onChange={handleComponentChange}
                       {...(componentFormInitialValues ? { initialValues: componentFormInitialValues } : {})}
                     />
-                    </ScrollArea>
+
                   </TabsContent>
-                  <TabsContent value="style" className="flex-1 h-full">
-                  <ScrollArea innerClassName="" className="flex-1 pb-12">
+                  <TabsContent value="style" className="flex-1 h-[calc(100dvh-5.5rem)] max-h-[calc(100dvh-5.5rem)] overflow-y-auto pb-6" style={{ scrollbarWidth: 'thin', scrollbarGutter: 'stable' }}>
+                  {/* <ScrollArea innerClassName="" className="flex-1 pb-12"> */}
                     <StyleForm
                       key={`style-form-${formKey || 'none'}`}
                       onChange={handleStyleChange}
                       {...(formInitialValues ? { initialValues: formInitialValues } : {})}
                     />
-                    </ScrollArea>
+                    {/* </ScrollArea> */}
                   </TabsContent>
 
               </Tabs>
@@ -798,7 +798,7 @@ export const Editor = memo(({ componentId }: EditorProps) => {
                 </ScrollArea>
               </div>
             )}
-          </Card>
+          </div>
         </aside>
       </div>
       <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} />

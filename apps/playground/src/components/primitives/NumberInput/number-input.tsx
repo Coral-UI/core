@@ -83,7 +83,7 @@ function NumberInput({
 
   // Use leadingIcon if provided, otherwise use default IconLetterW
   const iconToUse = leadingIcon || (
-    <IconLetterW className={cn('text-muted-foreground', size === 'sm' ? 'size-3.5' : 'size-4')} />
+    <IconLetterW  />
   )
 
   return (
@@ -95,7 +95,7 @@ function NumberInput({
         onChange && {
           onValueChange: (val: number | null, _eventDetails: unknown) => onChange(val ?? undefined),
         })}
-      className="flex w-full max-w-72 flex-col items-start "
+      className="flex w-full flex-col items-start "
       {...props}
     >
       {label && !hideLabel && (
@@ -115,7 +115,7 @@ function NumberInput({
             </NumberField.ScrubAreaCursor>
           </NumberField.ScrubArea>
         </div>
-        <NumberField.Input className={cn('number-input-input', size === 'sm' ? 'sm' : '', className)} />
+        <NumberField.Input className={cn('number-input-input', size === 'sm' ? 'sm' : '', className)} aria-invalid={error ? true : false}   />
         {!hideControls && (
           <div className="number-input-controls">
             <NumberField.Decrement className={cn('number-input-control')}>

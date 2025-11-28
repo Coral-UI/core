@@ -709,7 +709,7 @@ export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionL
             tabIndex={0}
             aria-label={`Select ${elementName} element`}
             aria-pressed={isSelected}
-            className="absolute cursor-pointer transition-all"
+            className="absolute cursor-pointer"
             data-debug-zone={zone.elementId}
             style={{
               left: `${zone.x}px`,
@@ -717,17 +717,17 @@ export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionL
               width: `${Math.max(0, zone.width)}px`,
               height: `${Math.max(0, zone.height)}px`,
               pointerEvents: 'auto',
-              backgroundColor: isSelected ? 'transparent' : isHovered ? 'var(--highlight-transparent)' : 'transparent',
+              backgroundColor: isSelected ? 'transparent' : isHovered ? 'var(--accent-transparent)' : 'transparent',
               border:
                 isSelected || isHovered
                   ? isSelected
-                    ? '1px solid var(--highlight)'
-                    : '1px dashed var(--highlight)'
+                    ? '1px solid var(--accent)'
+                    : '1px dashed var(--accent)'
                   : '1px solid transparent',
               boxSizing: 'border-box',
               zIndex: 1001,
               position: 'absolute',
-              boxShadow: isSelected ? '0 0 0 1px var(--highlight)' : 'none',
+              boxShadow: isSelected ? '0 0 0 1px var(--accent)' : 'none',
             }}
             onClick={(e) => handleHitZoneClick(zone.elementId, e)}
             onKeyDown={(e) => handleHitZoneKeyDown(zone.elementId, e)}

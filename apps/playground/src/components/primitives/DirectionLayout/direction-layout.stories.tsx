@@ -202,6 +202,11 @@ export const UniformMode: Story = {
       })
     }
 
+    const handleToggleChange = (pressed: boolean) => {
+      console.log('pressed', pressed)
+      setIsUniform(pressed)
+    }
+
     return (
       <div className="w-96">
         <DirectionLayout
@@ -235,7 +240,7 @@ export const UniformMode: Story = {
             blockEnd: (unit) => setUnits((u) => ({ ...u, blockEnd: unit })),
           }}
           onUniformUnitChange={handleUniformUnitChange}
-          onToggleChange={setIsUniform}
+          onToggleChange={handleToggleChange}
         />
       </div>
     )

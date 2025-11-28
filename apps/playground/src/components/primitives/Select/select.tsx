@@ -45,7 +45,7 @@ const SelectPositioner = React.forwardRef<
   React.ElementRef<typeof BaseSelect.Positioner>,
   React.ComponentPropsWithoutRef<typeof BaseSelect.Positioner>
 >(({ className, ...props }, ref) => {
-  return <BaseSelect.Positioner ref={ref} className={cn('select-positioner', className)} sideOffset={8} {...props} />
+  return <BaseSelect.Positioner ref={ref} className={cn('select-positioner', className)} sideOffset={2} {...props} />
 })
 SelectPositioner.displayName = 'SelectPositioner'
 
@@ -289,9 +289,9 @@ function SelectInput<TValue extends string = string>({
       {...props}
       items={itemsArray}
       {...(defaultValue !== undefined && { defaultValue })}
-      {...(onValueChange && {
+      {...(onValueChange && typeof onValueChange === 'function' ? {
         onValueChange: handleValueChange as (value: TValue | TValue[] | null, eventDetails: unknown) => void,
-      })}
+      } : {})}
     >
       <SelectTrigger className={cn(size === 'sm' ? 'sm' : '', leadingIcon ? 'leading-icon' : '', className)}>
         {leadingIcon && <div className={cn('select-leading-icon', size === 'sm' ? 'sm' : '')}>{leadingIcon}</div>}
@@ -303,7 +303,7 @@ function SelectInput<TValue extends string = string>({
         </div>
       </SelectTrigger>
       <SelectPortal>
-        <SelectPositioner sideOffset={8}>
+        <SelectPositioner sideOffset={2} align="end">
           <SelectPopup>
             <SelectScrollUpArrow className="select-scroll-up-arrow select-scroll-arrow" />
             <SelectList>

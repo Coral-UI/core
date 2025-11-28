@@ -60,7 +60,7 @@ export const WithLeadingIcon: Story = {
     items,
     defaultValue: 'cherry',
     leadingIcon: (
-      <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
         <path d="M12 2v20M2 12h20" strokeWidth="2" />
       </svg>
     ),

@@ -1,15 +1,4 @@
-.toggle-group {
-  display: flex;
-  gap: 1px;
-  background-color: var(--muted);
-  padding: 3px;
-  width: 100%;
-  flex: 1;
-  border-radius: var(--radius-md);
-  height: calc(var(--spacing) * 9);
-}
-
-.toggle-item {
+.toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -21,7 +10,9 @@
   flex-shrink: 0;
   whitespace: nowrap;
   font-size: var(--text-xs);
-  border: 1px solid transparent;
+  background-color: var(--background);
+  border: 1px solid var(--input-border);
+  color: var(--foreground);
   min-width: calc(var(--spacing) * 8);
   height: calc(var(--spacing) * 7);
   padding-inline: calc(var(--spacing) * 2);
@@ -36,7 +27,7 @@
   }
 
   &:hover {
-    background-color: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
+    background-color: var(--secondary);
     color: color-mix(in srgb, var(--foreground) 90%, transparent);
   }
 
@@ -47,7 +38,10 @@
 
   &[data-pressed] {
     background-color: var(--background);
-    color: var(--foreground);
+
+    & > svg {
+      color: var(--accent);
+    }
   }
 
   .dark & {

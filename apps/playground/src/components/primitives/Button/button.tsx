@@ -26,10 +26,14 @@ export const buttonVariants = cva('button', {
       'icon-sm': "size-7 [&_svg:not([class*='size-'])]:size-3.5",
       'icon-lg': 'size-10',
     },
+    rounded: {
+      true: 'button-rounded',
+    }
   },
   defaultVariants: {
     variant: 'default',
     size: 'default',
+    rounded: false,
   },
 })
 

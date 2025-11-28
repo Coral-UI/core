@@ -1,47 +1,60 @@
+.dropdown-menu-positioner {
+  outline: none;
+  z-index: 50;
+}
 
+.dropdown-menu-popup {
+  transform-origin: var(--transform-origin);
+  border-radius: var(--radius-sm);
+  background-color: var(--popover);
+  box-shadow: var(--popover-shadow), var(--popover-shadow-hairline);
+  transition:
+    transform 0.15s ease-in-out,
+    opacity 0.15s ease-in-out,
+    scale 0.15s ease-in-out;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: var(--available-height);
+  min-width: 8rem;
+  transform-origin: var(--transform-origin);
+  padding: var(--spacing);
 
-  .dropdown-menu-positioner {
-    outline: none;
-    z-index: 50;
-  }
-
-  .dropdown-menu-popup {
-    transform-origin: var(--transform-origin);
-    border-radius: var(--radius-md);
-    background-color: var(--card);
-    padding-block-start: var(--spacing);
-    border: 1px solid var(--border);
-    transition: transform 0.15s ease-in-out, opacity 0.15s ease-in-out, scale 0.15s ease-in-out;
-    overflow: hidden;
-
-    &:[data-ending-style],
+  &:[data-ending-style],
     &:[data-starting-style] {
-      transform: scale(0.9);
-      opacity: 0;
-    }
+    transform: scale(0.9);
+    opacity: 0;
   }
+}
 
-  .dropdown-menu-arrow {
-    right: -13px;
-    rotate: 90deg;
+.dropdown-menu-arrow {
+  right: -13px;
+  rotate: 90deg;
+}
+
+.dropdown-arrow-path {
+  fill: var(--card);
+}
+
+.dropdown-arrow-border {
+  fill: var(--border);
+}
+
+.dropdown-menu-item {
+  font-size: var(--text-sm);
+  padding-block: var(--spacing);
+  padding-inline: calc(var(--spacing) * 4);
+  cursor: default;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 1.5);
+  outline: none;
+  user-select: none;
+
+  &:hover {
+    background-color: var(--secondary-hover);
+    color: var(--secondary-foreground);
   }
-
-  .dropdown-arrow-path {
-    fill: var(--card);
-  }
-
-  .dropdown-arrow-border {
-    fill: var(--border);
-  }
-
-  .dropdown-menu-item {
-    font-size: var(--text-xs);
-    padding-block: var(--spacing);
-    padding-inline: calc(var(--spacing) * 4);
-    cursor: default;
-
-    &:hover {
-      background-color: var(--accent);
-      color: var(--accent-foreground);
-    }
-  }
+}

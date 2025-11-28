@@ -2,7 +2,7 @@ import { HTMLRenderer } from '@/components/Editor/Preview/HTMLRenderer'
 import { Badge } from '@/components/primitives/Badge/badge'
 import { Button } from '@/components/primitives/Button/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/Tabs/Tabs'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { ToggleGroup, ToggleItem } from '@/components/primitives/ToggleGroup/toggle-group'
 import { useLibraryCssReset } from '@/hooks/queries/useLibraries'
 // import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { Editor } from '@monaco-editor/react'
@@ -59,11 +59,11 @@ export const EditorPreviewPane = ({
   handleSave,
   isSaving,
   hasUnsavedChanges,
-  componentName,
 }: EditorPreviewPaneProps) => {
   // const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const { theme } = useTheme()
   const [specValue, setSpecValue] = useState<string>('')
+  const [activeTab, setActiveTab] = useState<string>('preview')
   const [viewportWidth, setViewportWidth] = useState<number>(VIEWPORT_PRESETS[2]?.width ?? 1440)
   const { data: cssReset = '' } = useLibraryCssReset(libraryId || '')
 
@@ -80,9 +80,13 @@ export const EditorPreviewPane = ({
     navigator.clipboard.writeText(specValue)
   }
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+  }
+
   return (
-    <Tabs defaultValue="preview" className="w-full h-full flex">
-      <div className="flex items-center justify-between gap-2">
+    <Tabs defaultValue="preview" className="w-full h-full flex" onValueChange={handleTabChange} value={activeTab}>
+      <div className="flex items-center justify-between">
         <TabsList>
           <TabsTrigger value="preview">
             <IconEyeSearch strokeWidth={1.5} className="size-4" /> Visual Preview
@@ -95,7 +99,26 @@ export const EditorPreviewPane = ({
           </TabsTrigger>
         </TabsList>
 
-        <div>
+        <div className="flex items-center gap-2">
+          {activeTab === 'preview' && (
+            <div className="">
+              <ToggleGroup
+                value={[viewportWidth.toString()]}
+                onValueChange={(value) => {
+                  const stringValue = Array.isArray(value) && value.length > 0 ? value[0] : ''
+                  if (stringValue) {
+                    setViewportWidth(parseInt(stringValue))
+                  }
+                }}
+                items={VIEWPORT_PRESETS.map((preset) => ({
+                  value: preset.width.toString(),
+                  ariaLabel: `${preset.name} (${preset.width}px)`,
+                  icon: preset.icon,
+                }))}
+              ></ToggleGroup>
+            </div>
+          )}
+
           <Button
             variant="ghost"
             title="Save"
@@ -124,31 +147,11 @@ export const EditorPreviewPane = ({
         </div>
       </div>
 
-      <TabsContent value="preview" className="flex flex-col h-full w-full relative px-0 pb-2.5  pt-1.5">
-        <div className="h-full w-full bg-background">
+      <TabsContent value="preview" className="flex flex-col h-full w-full relative px-0 pb-2.5">
+        <div className="h-full w-full">
           {spec && spec.name ? (
             <>
               <HTMLRenderer spec={spec} viewportWidth={viewportWidth} cssReset={cssReset} />
-              <div className="px-1 py-1 flex justify-end gap-2 absolute bottom-6 right-6 bg-card rounded-xl border border-border z-50">
-                <ToggleGroup
-                  type="single"
-                  variant="outline"
-                  size="sm"
-                  value={viewportWidth.toString()}
-                  onValueChange={(value) => setViewportWidth(parseInt(value))}
-                >
-                  {VIEWPORT_PRESETS.map((preset) => (
-                    <ToggleGroupItem
-                      size="lg"
-                      key={preset.name}
-                      value={preset.width.toString()}
-                      aria-label={`${preset.name} (${preset.width}px)`}
-                    >
-                      {preset.icon}
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-              </div>
             </>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">
@@ -163,7 +166,7 @@ export const EditorPreviewPane = ({
 
       <TabsContent value="spec" className="flex flex-col h-full w-full flex-1 shrink-0 px-0 pb-2.5  pt-1.5">
         <div className="h-full w-full relative flex flex-col ">
-          <div className="border border-input rounded-xl flex-1 overflow-hidden">
+          <div className="rounded-xl flex-1 overflow-hidden shadow-popover">
             <Editor
               value={specValue}
               onChange={handleSpecChange}

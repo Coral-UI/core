@@ -1,6 +1,5 @@
 // import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/primitives/Badge/badge'
-import { Card } from '@/components/primitives/Card/card'
 import { TreeDataItem, TreeView } from '@/components/primitives/TreeView/tree-view'
 import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
@@ -154,8 +153,8 @@ export const EditorSidebar = ({
   )
 
   return (
-    <Card className="h-full" noPadding>
-      <div className="px-2 border-b border-border pb-2.5 flex items-center gap-2">
+    <div className="h-full bg-background pt-3">
+      <div className="px-4 border-b border-border pb-2.5 flex items-center gap-2">
         <p className="text-xs font-medium">{componentName}</p>
         {hasUnsavedChanges ? (
           <Badge variant="destructive">Unsaved</Badge>
@@ -177,6 +176,6 @@ export const EditorSidebar = ({
           expandAll={false}
         />
       </div>
-    </Card>
+    </div>
   )
 }

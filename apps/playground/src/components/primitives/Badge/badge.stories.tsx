@@ -41,6 +41,13 @@ export const Destructive: Story = {
   },
 }
 
+export const Warning: Story = {
+  args: {
+    variant: 'warning',
+    children: 'Warning',
+  },
+}
+
 export const Outline: Story = {
   args: {
     variant: 'outline',
@@ -60,8 +67,10 @@ export const AllVariants: Story = {
     <div className="flex flex-col gap-4">
       <Badge variant="default">Default</Badge>
       <Badge variant="secondary">Secondary</Badge>
-      <Badge variant="destructive">Destructive</Badge>
       <Badge variant="outline">Outline</Badge>
+      <Badge variant="destructive">Destructive</Badge>
+      <Badge variant="warning">Warning</Badge>
+      <Badge variant="success">Success</Badge>
     </div>
   ),
 }

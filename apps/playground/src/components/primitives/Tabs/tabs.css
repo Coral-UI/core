@@ -1,6 +1,7 @@
 .tabs {
   display: flex;
   flex-direction: column;
+  gap: calc(var(--spacing) * 2);
 }
 
 .tabs-list {
@@ -13,26 +14,31 @@
   justify-content: center;
   border-radius: var(--radius-md);
   padding: 3px;
-  border: 1px solid var(--border);
-  gap: 2px;
 }
 
 .tabs-trigger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: calc(var(--spacing) * 7);
+  height: calc(100% - 1px);
   font-size: var(--text-xs);
   user-select: none;
   white-space: nowrap;
   flex: 1;
   flex-shrink: 0;
-  gap: var(--spacing);
-  padding-inline: calc(var(--spacing) * 2.5);
-  padding-block: calc(var(--spacing) * 1.5);
+  font-weight: 500;
+  gap: calc(var(--spacing) * 1.5);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: var(--spacing);
   border-radius: var(--radius-md);
+  color: var(--caption);
   border: 1px solid transparent;
-  color: var(--muted-foreground);
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 2px var(--ring);
+  }
 
   &:hover {
     background-color: color-mix(in srgb, var(--muted-foreground) 10%, transparent);
@@ -40,15 +46,14 @@
   }
 
   &[data-active] {
-    background-color: color-mix(in srgb, var(--primary) 20%, transparent);
-    color: var(--primary-foreground);
-    border-color: var(--primary);
+    background-color: var(--background);
+    color: var(--foreground);
   }
 
   .dark & {
     &[data-active] {
-
-      border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+      border-color: var(--input-border);
+      background-color: color-mix(in srgb, var(--background) 80%, transparent);
     }
   }
 }

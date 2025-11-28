@@ -4,6 +4,7 @@
   align-items: start;
   width: 100%;
   max-width: calc(var(--spacing) * 72);
+
 }
 
 .color-input-label {
@@ -19,17 +20,17 @@
 .color-input-input {
   width: 100%;
   min-width: 0;
-  border-radius: var(--radius-md);
   color: var(--foreground);
-  font-size: var(--text-sm);
-  background-color: var(--input);
-  border: 1px solid var(--input-border);
   overflow: hidden;
   display: inline-flex;
   align-items: center;
-  padding-inline: calc(var(--spacing) * 3);
   height: calc(var(--spacing) * 9);
-  gap: calc(var(--spacing) * 0.5);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--input-border);
+  padding-inline: var(--input-spacing-x);
+  padding-block: var(--input-spacing-y);
+  font-size: var(--text-sm);
+  background-color: var(--input);
 
   &:disabled {
     opacity: 0.5;
@@ -38,7 +39,7 @@
   }
 
   &::placeholder {
-    color: var(--muted-foreground);
+    color: var(--input-placeholder);
   }
 
   & > input {
@@ -46,12 +47,18 @@
     outline: none;
   }
 
-  &:has(> input[aria-invalid="true"]) {
-    border-color: var(--destructive);
+  &:has(+ input:focus-visible) {
+    border-color: var(--input-border-focus);
+    box-shadow: var(--input-shadow-focus);
+  }
+
+  &:has(+ input[aria-invalid="true"]) {
+    border-color: var(--danger);
+    box-shadow: var(--input-shadow-error);
   }
 
   &.color-input-input-with-icon {
-    padding-inline-start: calc(var(--spacing) * 1.5);
+    padding-inline-start: 0;
   }
 }
 
@@ -63,6 +70,8 @@
   color: var(--muted-foreground);
     width: calc(var(--spacing) * 3.5);
     height: calc(var(--spacing) * 3.5);
+    margin-inline-start: calc(var(--spacing) * 3);
+  margin-inline-end: calc(var(--spacing) * 2);
 }
 
 .color-picker-wrapper {

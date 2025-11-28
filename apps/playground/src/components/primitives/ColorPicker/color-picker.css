@@ -4,6 +4,8 @@
   flex-direction: column;
   gap: calc(var(--spacing) * 4);
   padding: calc(var(--spacing) * 4);
+  max-height: var(--radix-popper-available-height);
+  transform-origin: var(--radix-popover-content-transform-origin);
 }
 
 .color-picker-area {
