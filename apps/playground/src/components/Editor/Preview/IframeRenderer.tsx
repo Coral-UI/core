@@ -4,6 +4,8 @@ import { forwardRef, useEffect, useMemo, useState } from 'react'
 import type { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 import { coralToHTML } from '@reallygoodwork/coral-to-html'
 
+import { generateBaseCSS, generateResponsiveCSS } from './utils/generateResponsiveCSS'
+
 interface IframeRendererProps {
   spec: CoralRootNode
   selectedElementId: string | null | undefined
@@ -71,7 +73,8 @@ function buildRootIdMapping(
 }
 
 /**
- * Recursively add data-element-id attributes to nodes for identification in the iframe
+ * Recursively add data-element-id attributes and class names to nodes for identification in the iframe
+ * Removes inline styles since we're using CSS classes instead
  * Uses the element tree to get the correct IDs
  */
 function addElementIds(
@@ -82,14 +85,26 @@ function addElementIds(
 ): CoralNode {
   const nodeId = idMapping.get(node as CoralRootNode) || (parentId ? `${parentId}-${index}` : undefined)
 
+  // Build class name from element ID
+  const className = nodeId ? `coral-element-${nodeId}` : undefined
+
+  // Combine existing class with new class name
+  const existingClass = node.elementAttributes?.['class'] || node.elementAttributes?.className
+  const classValue = className
+    ? existingClass
+      ? `${existingClass} ${className}`
+      : className
+    : existingClass
+
   const updatedNode: CoralNode = {
     ...node,
-    // Preserve styles
-    styles: node.styles || {},
-    // Preserve element attributes and add data-element-id
+    // Remove inline styles - we'll use CSS classes instead
+    styles: undefined,
+    // Preserve element attributes and add data-element-id and class
     elementAttributes: {
       ...(node.elementAttributes || {}),
       ...(nodeId ? { 'data-element-id': nodeId } : {}),
+      ...(classValue ? { class: classValue } : {}),
     },
     // Recursively process children
     children: node.children
@@ -104,7 +119,7 @@ export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>
   ({ spec, viewportWidth, cssReset, onLoad }, ref) => {
     const [htmlContent, setHtmlContent] = useState<string>('')
     const [isLoading, setIsLoading] = useState(true)
-    const { getElementTree } = useElementTreeQuery()
+    const { getElementTree, elements } = useElementTreeQuery()
 
     // Build ID mapping from element tree
     const idMapping = useMemo(() => {
@@ -114,6 +129,17 @@ export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>
       const elementTree = getElementTree()
       return buildRootIdMapping(spec, elementTree)
     }, [spec, getElementTree])
+
+    // Generate base CSS and responsive CSS from element tree
+    const baseCSS = useMemo(() => {
+      const elementTree = getElementTree()
+      return generateBaseCSS(elementTree)
+    }, [elements, getElementTree])
+
+    const responsiveCSS = useMemo(() => {
+      const elementTree = getElementTree()
+      return generateResponsiveCSS(elementTree)
+    }, [elements, getElementTree])
 
     // Generate HTML with element IDs when spec changes
     useEffect(() => {
@@ -176,6 +202,8 @@ export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>
             padding: 1rem;
           }
           ${cssReset ? `/* Custom CSS Reset */\n${cssReset}` : ''}
+          ${baseCSS ? `/* Base Styles */\n${baseCSS}\n\n` : ''}
+          ${responsiveCSS ? `/* Responsive Styles */\n${responsiveCSS}` : ''}
         </style>
       </head>
       <body>

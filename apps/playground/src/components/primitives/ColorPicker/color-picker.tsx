@@ -3,7 +3,7 @@
 import type { VariantProps } from 'class-variance-authority'
 import { Button } from '@/components/primitives/Button/button'
 import { Input } from '@/components/primitives/Input/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/Select/select'
+import { SelectInput, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/Select/select'
 import { VisuallyHiddenInput } from '@/components/primitives/VisuallyHiddenInput'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useComposedRefs } from '@/lib/compose-refs'
@@ -730,25 +730,40 @@ function ColorPickerRootImpl(props: ColorPickerRootImplProps) {
   React.useEffect(() => {
     if (valueProp !== undefined) {
       const currentState = store.getState()
-      const currentHex = rgbToHex(currentState.color)
-      // Only update if the value actually changed
-      // Use a more lenient comparison to avoid unnecessary updates
-      const propHex = valueProp.toLowerCase().trim()
-      const stateHex = currentHex.toLowerCase().trim()
 
-      // Skip if values are the same (avoid unnecessary syncs)
-      if (propHex === stateHex) {
+      // Use parseColorString to handle all formats (hex, rgb, hsl, hsb)
+      const parsedColor = parseColorString(valueProp)
+      if (!parsedColor) {
+        // If parsing fails, try hexToRgb as fallback for backward compatibility
+        const fallbackColor = hexToRgb(valueProp, currentState.color.a)
+        const hsv = rgbToHsv(fallbackColor)
+        store.syncFromProp(fallbackColor, hsv)
         return
       }
 
-      const color = hexToRgb(valueProp, currentState.color.a)
-      const hsv = rgbToHsv(color)
+      // Preserve alpha if not specified in the parsed color
+      const finalColor = { ...parsedColor, a: parsedColor.a ?? currentState.color.a }
+
+      // Check if the color values actually changed (compare RGB values, not string format)
+      const colorChanged =
+        finalColor.r !== currentState.color.r ||
+        finalColor.g !== currentState.color.g ||
+        finalColor.b !== currentState.color.b ||
+        finalColor.a !== currentState.color.a
+
+      // Skip if color values are the same (avoid unnecessary syncs)
+      // This handles cases where the format changes but the color is the same
+      if (!colorChanged) {
+        return
+      }
+
+      const hsv = rgbToHsv(finalColor)
 
       // Use syncFromProp to update without triggering callbacks
       // This prevents onValueChange from being called when syncing from props
       // Don't wrap in setTimeout - syncFromProp already doesn't trigger callbacks
       // and we want the UI to update immediately
-      store.syncFromProp(color, hsv)
+      store.syncFromProp(finalColor, hsv)
     }
   }, [valueProp, store])
 
@@ -1199,7 +1214,7 @@ function ColorPickerEyeDropper(props: React.ComponentProps<typeof Button>) {
 }
 
 interface ColorPickerFormatSelectProps
-  extends Omit<React.ComponentProps<typeof Select>, 'value' | 'onValueChange'>,
+  extends Omit<React.ComponentProps<typeof SelectInput>, 'value' | 'onValueChange'>,
     Pick<React.ComponentProps<typeof SelectTrigger>, 'className'> {}
 
 function ColorPickerFormatSelect(props: ColorPickerFormatSelectProps) {
@@ -1226,24 +1241,15 @@ function ColorPickerFormatSelect(props: ColorPickerFormatSelectProps) {
   )
 
   return (
-    <Select
-      data-slot="color-picker-format-select"
+    <SelectInput
       {...selectProps}
       value={format}
       onValueChange={handleValueChange}
       {...(context.disabled !== undefined && { disabled: context.disabled })}
+      items={colorFormats.map((format) => ({ label: format.toUpperCase(), value: format }))}
+      size="sm"
     >
-      <SelectTrigger data-slot="color-picker-format-select-trigger" className={cn(className)}>
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        {colorFormats.map((format) => (
-          <SelectItem key={format} value={format}>
-            {format.toUpperCase()}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    </SelectInput>
   )
 }
 
@@ -1285,28 +1291,13 @@ function ColorPickerInput(props: ColorPickerInputProps) {
   }
 }
 
-const inputGroupItemVariants = cva(
-  'h-8 [-moz-appearance:_textfield] focus-visible:z-10 focus-visible:ring-1 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none',
-  {
-    variants: {
-      position: {
-        first: 'rounded-e-none',
-        middle: '-ms-px rounded-none border-l-0',
-        last: '-ms-px rounded-s-none border-l-0',
-        isolated: '',
-      },
-    },
-    defaultVariants: {
-      position: 'isolated',
-    },
-  },
-)
 
-interface InputGroupItemProps extends React.ComponentProps<typeof Input>, VariantProps<typeof inputGroupItemVariants> {}
 
-function InputGroupItem({ className, position, ...props }: InputGroupItemProps) {
+interface InputGroupItemProps extends React.ComponentProps<typeof Input> {}
+
+function InputGroupItem({ className, ...props }: InputGroupItemProps) {
   return (
-    <Input data-slot="color-picker-input" className={cn(inputGroupItemVariants({ position }), className)} {...props} />
+    <Input data-slot="color-picker-input" className={cn('flex-1 !min-w-0', className)} {...props} small />
   )
 }
 
@@ -1347,7 +1338,7 @@ function HexInput(props: FormatInputProps) {
     return (
       <InputGroupItem
         aria-label="Hex color value"
-        position="isolated"
+
         {...inputProps}
         placeholder="#000000"
         className={cn('font-mono', className)}
@@ -1359,27 +1350,27 @@ function HexInput(props: FormatInputProps) {
   }
 
   return (
-    <div data-slot="color-picker-input-wrapper" className={cn('flex items-center', className)}>
+    <div data-slot="color-picker-input-wrapper" className={cn('flex items-center gap-1', className)}>
       <InputGroupItem
         aria-label="Hex color value"
-        position="first"
+
         {...inputProps}
         placeholder="#000000"
-        className="flex-1 font-mono"
+        className="flex-2 font-mono"
         value={hexValue}
         onChange={onHexChange}
         disabled={context.disabled}
       />
       <InputGroupItem
         aria-label="Alpha transparency percentage"
-        position="last"
+
         {...inputProps}
         placeholder="100"
         inputMode="numeric"
         pattern="[0-9]*"
         min="0"
         max="100"
-        className="w-14"
+        className="flex-1"
         value={alphaValue}
         onChange={onAlphaChange}
         disabled={context.disabled}
@@ -1409,10 +1400,10 @@ function RgbInput(props: FormatInputProps) {
   )
 
   return (
-    <div data-slot="color-picker-input-wrapper" className={cn('flex items-center', className)}>
+    <div data-slot="color-picker-input-wrapper" className={cn('flex items-center gap-1', className)}>
       <InputGroupItem
         aria-label="Red color component (0-255)"
-        position="first"
+
         {...inputProps}
         placeholder="0"
         inputMode="numeric"
@@ -1426,7 +1417,7 @@ function RgbInput(props: FormatInputProps) {
       />
       <InputGroupItem
         aria-label="Green color component (0-255)"
-        position="middle"
+
         {...inputProps}
         placeholder="0"
         inputMode="numeric"
@@ -1440,7 +1431,7 @@ function RgbInput(props: FormatInputProps) {
       />
       <InputGroupItem
         aria-label="Blue color component (0-255)"
-        position={withoutAlpha ? 'last' : 'middle'}
+
         {...inputProps}
         placeholder="0"
         inputMode="numeric"
@@ -1455,7 +1446,7 @@ function RgbInput(props: FormatInputProps) {
       {!withoutAlpha && (
         <InputGroupItem
           aria-label="Alpha transparency percentage"
-          position="last"
+
           {...inputProps}
           placeholder="100"
           inputMode="numeric"
@@ -1501,10 +1492,10 @@ function HslInput(props: FormatInputProps) {
   )
 
   return (
-    <div data-slot="color-picker-input-wrapper" className={cn('flex items-center', className)}>
+    <div data-slot="color-picker-input-wrapper" className={cn('flex items-center gap-1', className)}>
       <InputGroupItem
         aria-label="Hue degree (0-360)"
-        position="first"
+
         {...inputProps}
         placeholder="0"
         inputMode="numeric"
@@ -1518,7 +1509,7 @@ function HslInput(props: FormatInputProps) {
       />
       <InputGroupItem
         aria-label="Saturation percentage (0-100)"
-        position="middle"
+
         {...inputProps}
         placeholder="0"
         inputMode="numeric"
@@ -1532,7 +1523,7 @@ function HslInput(props: FormatInputProps) {
       />
       <InputGroupItem
         aria-label="Lightness percentage (0-100)"
-        position={withoutAlpha ? 'last' : 'middle'}
+
         {...inputProps}
         placeholder="0"
         inputMode="numeric"
@@ -1547,7 +1538,7 @@ function HslInput(props: FormatInputProps) {
       {!withoutAlpha && (
         <InputGroupItem
           aria-label="Alpha transparency percentage"
-          position="last"
+
           {...inputProps}
           placeholder="100"
           inputMode="numeric"
@@ -1597,10 +1588,10 @@ function HsbInput(props: HsbInputProps) {
   )
 
   return (
-    <div data-slot="color-picker-input-wrapper" className={cn('flex items-center', className)}>
+    <div data-slot="color-picker-input-wrapper" className={cn('flex items-center gap-1', className)}>
       <InputGroupItem
         aria-label="Hue degree (0-360)"
-        position="first"
+
         {...inputProps}
         placeholder="0"
         inputMode="numeric"
@@ -1614,7 +1605,7 @@ function HsbInput(props: HsbInputProps) {
       />
       <InputGroupItem
         aria-label="Saturation percentage (0-100)"
-        position="middle"
+
         {...inputProps}
         placeholder="0"
         inputMode="numeric"
@@ -1628,7 +1619,7 @@ function HsbInput(props: HsbInputProps) {
       />
       <InputGroupItem
         aria-label="Brightness percentage (0-100)"
-        position={withoutAlpha ? 'last' : 'middle'}
+
         {...inputProps}
         placeholder="0"
         inputMode="numeric"
@@ -1643,7 +1634,7 @@ function HsbInput(props: HsbInputProps) {
       {!withoutAlpha && (
         <InputGroupItem
           aria-label="Alpha transparency percentage"
-          position="last"
+
           {...inputProps}
           placeholder="100"
           inputMode="numeric"

@@ -3,16 +3,19 @@ import { Button } from '@/components/primitives/Button/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/Tabs/Tabs'
 import { ToggleGroup } from '@/components/primitives/ToggleGroup/toggle-group'
 import { useLibraryCssReset } from '@/hooks/queries/useLibraries'
+import { useSetViewportWidth, useViewportBreakpoint } from '@/hooks/queries/useViewportBreakpoint'
 // import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { Editor } from '@monaco-editor/react'
-import { IconBracketsAngle, IconEyeSearch, IconFileImport, IconSchema, IconDeviceMobile, IconDeviceIpad, IconDeviceImac } from '@tabler/icons-react'
 import {
-  CopyIcon,
-  Loader2,
-  Redo,
-  SaveIcon,
-  Undo,
-} from 'lucide-react'
+  IconBracketsAngle,
+  IconDeviceImac,
+  IconDeviceIpad,
+  IconDeviceMobile,
+  IconEyeSearch,
+  IconFileImport,
+  IconSchema,
+} from '@tabler/icons-react'
+import { CopyIcon, Loader2, Redo, SaveIcon, Undo } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -59,7 +62,9 @@ export const EditorPreviewPane = ({
   const { theme } = useTheme()
   const [specValue, setSpecValue] = useState<string>('')
   const [activeTab, setActiveTab] = useState<string>('preview')
-  const [viewportWidth, setViewportWidth] = useState<number>(VIEWPORT_PRESETS[2]?.width ?? 1440)
+  const { data: viewportBreakpointState } = useViewportBreakpoint()
+  const viewportWidth = viewportBreakpointState?.viewportWidth ?? VIEWPORT_PRESETS[2]?.width ?? 1440
+  const setViewportWidth = useSetViewportWidth()
   const { data: cssReset = '' } = useLibraryCssReset(libraryId || '')
 
   useEffect(() => {
@@ -102,7 +107,7 @@ export const EditorPreviewPane = ({
                 onValueChange={(value) => {
                   const stringValue = Array.isArray(value) && value.length > 0 ? value[0] : ''
                   if (stringValue) {
-                    setViewportWidth(parseInt(stringValue))
+                    setViewportWidth.mutate(parseInt(stringValue))
                   }
                 }}
                 items={VIEWPORT_PRESETS.map((preset) => ({

@@ -9,6 +9,7 @@ import { Button, ButtonProps } from '../Button/button'
 function Dialog({
   buttonVariant = 'default',
   buttonText = 'Create New',
+  buttonSize = 'default',
   buttonIcon = <IconPlus className="size-4" />,
   title = 'Create New',
   description = 'Create a new item',
@@ -20,6 +21,7 @@ function Dialog({
   buttonVariant?: ButtonProps['variant']
   buttonText?: string
   buttonIcon?: React.ReactNode
+  buttonSize?: ButtonProps['size']
   title?: string
   description?: string
   children?: React.ReactNode
@@ -30,10 +32,10 @@ function Dialog({
   return (
     <BaseDialog.Root open={open} {...(onOpenChange ? { onOpenChange } : {})}>
       {!hideTrigger && (
-      <BaseDialog.Trigger
-        render={(props) => (
-          <Button {...props} variant={buttonVariant}>
-            {buttonIcon}
+        <BaseDialog.Trigger
+          render={(props) => (
+            <Button {...props} variant={buttonVariant} size={buttonSize}>
+              {buttonIcon}
               {buttonText}
             </Button>
           )}

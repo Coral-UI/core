@@ -128,3 +128,25 @@ export const invitationsQueryOptions = (organizationId: string) =>
     queryKey: ['invitations', organizationId],
     queryFn: () => invitationsApi.getInvitations(organizationId),
   })
+
+// Viewport/Breakpoint State (client-side only)
+export interface ViewportBreakpointState {
+  viewportWidth: number
+  activeBreakpointId: string | null
+}
+
+const VIEWPORT_BREAKPOINT_INITIAL_STATE: ViewportBreakpointState = {
+  viewportWidth: 1440,
+  activeBreakpointId: null,
+}
+
+export const viewportBreakpointQueryOptions = () =>
+  queryOptions({
+    queryKey: ['viewport-breakpoint'] as const,
+    queryFn: async () => {
+      // Client-side only state - just return initial state
+      return VIEWPORT_BREAKPOINT_INITIAL_STATE
+    },
+    staleTime: Infinity, // Never refetch - we update via mutations only
+    gcTime: Infinity,
+  })

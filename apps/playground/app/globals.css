@@ -235,6 +235,7 @@
   --secondary-foreground: #0d0d0d;
   --secondary-hover: color-mix(in oklab, #0d0d0d 12%, transparent);
 
+  --input: #fff;
   --input-border: color-mix(in oklab, #0d0d0d 16%, transparent);
   --input-border-focus: color-mix(in oklab, #0d0d0d 35%, transparent);
   --input-shadow-focus: 0 0 0 1px var(--input-border-focus);
@@ -260,7 +261,6 @@
 
   --popover-shadow: 0 10px 15px -3px #0000001a,0 4px 6px -4px #0000001a;
   --popover-shadow-hairline: 0 0 0 .5px #0000001a;
-
 
 }
 
@@ -292,6 +292,7 @@
   --secondary-foreground: #fff;
   --secondary-hover: color-mix(in oklab, #fff 16%, transparent);
 
+  --input: #303030;
   --input-border: color-mix(in oklab, #fff 25%, transparent);
   --input-border-focus: color-mix(in oklab, #fff 35%, transparent);
   --input-shadow-focus: 0 0 0 1px var(--input-border-focus);

@@ -36,7 +36,14 @@ export const HTMLRenderer = ({ spec, viewportWidth, cssReset }: HTMLRendererProp
           cssReset={cssReset || ''}
           onLoad={handleIframeLoad}
         />
-        {isIframeReady && <InteractionLayer iframeRef={iframeRef} containerRef={containerRef} spec={spec} />}
+        {isIframeReady && (
+          <InteractionLayer
+            iframeRef={iframeRef}
+            containerRef={containerRef}
+            spec={spec}
+            viewportWidth={viewportWidth}
+          />
+        )}
       </div>
     </div>
   )

@@ -111,6 +111,7 @@
   letter-spacing: var(--tracking-tight);
   font-size: var(--text-sm);
   border-radius: 0;
+  min-width: calc(var(--spacing) * 24);
 
   &:hover {
     background-color: color-mix(in srgb, var(--interactive-bg-primary) 60%, transparent);

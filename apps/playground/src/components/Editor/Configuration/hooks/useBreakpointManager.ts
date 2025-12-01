@@ -2,21 +2,29 @@ import { Breakpoint } from '@/components/Editor/BreakpointManager/BreakpointMana
 import { UpdatePropertyFn } from '@/components/Editor/Configuration/types/elementProperties'
 import {
   createBreakpointId,
+  extractBreakpointWidth,
   parseBreakpointIndex,
   transformResponsiveStylesToBreakpoints,
 } from '@/components/Editor/Configuration/utils/breakpointHelpers'
+import { useViewportBreakpoint, useSyncBreakpointToViewport } from '@/hooks/queries/useViewportBreakpoint'
 import { ElementTreeNode, ResponsiveStyle } from '@/hooks/useElementTree'
-import { useState } from 'react'
 
 /**
  * Hook for managing responsive breakpoints on an element
  * Handles adding, removing, selecting breakpoints and transforming data for UI
+ * Uses shared react-query state for breakpoint selection and syncs viewport width
  */
 export const useBreakpointManager = (element: ElementTreeNode | null, updateProperty: UpdatePropertyFn) => {
-  const [activeBreakpointId, setActiveBreakpointId] = useState<string | null>(null)
+  const { data: viewportBreakpointState } = useViewportBreakpoint()
+  const activeBreakpointId = viewportBreakpointState?.activeBreakpointId ?? null
+  const syncBreakpointToViewport = useSyncBreakpointToViewport()
 
   const handleAddBreakpoint = (breakpoint: Omit<Breakpoint, 'id'>) => {
     if (!element) return
+
+    // Mobile-first approach: copy base styles into the new breakpoint
+    // This ensures the breakpoint starts with the current default styles
+    const baseStyles = element.styles ? { ...element.styles } : {}
 
     // Create responsive style using core schema structure
     const newBreakpoint: ResponsiveStyle = {
@@ -25,7 +33,7 @@ export const useBreakpointManager = (element: ElementTreeNode | null, updateProp
         value: breakpoint.value,
       },
       label: breakpoint.label,
-      styles: {},
+      styles: baseStyles,
     }
 
     const updatedResponsiveStyles = [...(element.responsiveStyles || []), newBreakpoint]
@@ -33,7 +41,14 @@ export const useBreakpointManager = (element: ElementTreeNode | null, updateProp
 
     // Auto-select the newly created breakpoint using index-based ID
     const newBreakpointId = createBreakpointId(updatedResponsiveStyles.length - 1)
-    setActiveBreakpointId(newBreakpointId)
+    const breakpointForUI: Breakpoint = {
+      id: newBreakpointId,
+      type: breakpoint.type,
+      value: breakpoint.value,
+      label: breakpoint.label,
+    }
+    const breakpointWidth = extractBreakpointWidth(breakpointForUI)
+    syncBreakpointToViewport(newBreakpointId, breakpointWidth)
   }
 
   const handleRemoveBreakpoint = (breakpointId: string) => {
@@ -45,12 +60,18 @@ export const useBreakpointManager = (element: ElementTreeNode | null, updateProp
 
     // Clear selection if the active breakpoint was removed
     if (activeBreakpointId === breakpointId) {
-      setActiveBreakpointId(null)
+      syncBreakpointToViewport(null, null)
     }
   }
 
   const handleSelectBreakpoint = (breakpointId: string | null) => {
-    setActiveBreakpointId(breakpointId)
+    // Find the breakpoint to extract its width
+    const breakpoints = transformResponsiveStylesToBreakpoints(element?.responsiveStyles)
+    const selectedBreakpoint = breakpointId ? breakpoints.find((bp) => bp.id === breakpointId) : null
+    const breakpointWidth = selectedBreakpoint ? extractBreakpointWidth(selectedBreakpoint) : null
+
+    // Sync breakpoint selection and viewport width
+    syncBreakpointToViewport(breakpointId, breakpointWidth)
   }
 
   // Transform responsive styles to breakpoint format for UI

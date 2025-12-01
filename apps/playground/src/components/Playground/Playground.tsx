@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/primitives/Badge/badge'
 import { Button } from '@/components/primitives/Button/button'
-import { useTheme } from '@/components/ThemeProvider'
+import { useTheme } from 'next-themes'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import MonacoEditor from '@monaco-editor/react'
 import { CopyIcon } from 'lucide-react'

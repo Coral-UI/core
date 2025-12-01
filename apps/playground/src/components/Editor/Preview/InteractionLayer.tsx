@@ -22,6 +22,7 @@ interface InteractionLayerProps {
   iframeRef: React.RefObject<HTMLIFrameElement>
   containerRef: React.RefObject<HTMLDivElement>
   spec: CoralRootNode
+  viewportWidth: number
 }
 
 /**
@@ -35,7 +36,7 @@ function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number)
   }) as T
 }
 
-export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionLayerProps) => {
+export const InteractionLayer = ({ iframeRef, containerRef, spec, viewportWidth }: InteractionLayerProps) => {
   const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const setSelectedElementId = useElementSelectionStore((state) => state.setSelectedElementId)
   const layerRef = useRef<HTMLDivElement>(null)
@@ -137,7 +138,7 @@ export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionL
     } catch (error) {
       console.warn('Could not calculate hit zones:', error)
     }
-  }, [iframeRef, elementIds, isReady, containerRef])
+  }, [iframeRef, elementIds, isReady, containerRef, viewportWidth])
 
   // Debounced version of calculateHitZones
   const debouncedCalculateHitZones = useMemo(() => debounce(() => calculateHitZones(), 100), [calculateHitZones])
@@ -298,6 +299,18 @@ export const InteractionLayer = ({ iframeRef, containerRef, spec }: InteractionL
       }
     }
   }, [isReady, elementIds, scheduleUpdate, debouncedCalculateHitZones, iframeRef, containerRef])
+
+  // Recalculate when viewportWidth changes (iframe size changes)
+  useEffect(() => {
+    if (!isReady) {
+      return
+    }
+    // Use a small delay to allow the iframe to resize
+    const timeoutId = setTimeout(() => {
+      scheduleUpdate()
+    }, 100)
+    return () => clearTimeout(timeoutId)
+  }, [viewportWidth, isReady, scheduleUpdate])
 
   // Recalculate when spec changes (iframe content regenerates)
   useEffect(() => {

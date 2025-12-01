@@ -4,10 +4,10 @@ import { AccessibilityPanel } from '@/components/Editor/AccessibilityPanel'
 import { EditorSidebar } from '@/components/Editor/ElementTree/EditorSidebar'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
 import { EditorPreviewPane } from '@/components/Editor/Preview/EditorPreviewPane'
-import { Card } from '@/components/primitives/Card/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/primitives/Empty/Empty'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/Tabs/Tabs'
 import { useComponent } from '@/hooks/queries/useComponents'
+import { useViewportBreakpoint } from '@/hooks/queries/useViewportBreakpoint'
 import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
@@ -25,7 +25,9 @@ import { CoralRootNode, CoralStyleType, transformHTMLToSpec } from '@reallygoodw
 import type { FormValues as ComponentFormValues } from './component-manager/formSchema'
 import type { StyleFormValues } from './style-manager/formSchema'
 import { ScrollArea } from '../primitives/ScrollArea/ScrollArea'
+import { BreakpointManager } from './BreakpointManager/BreakpointManager'
 import { ComponentForm } from './component-manager/componentForm'
+import { useSyncViewportToBreakpoint } from './Configuration/hooks/useSyncViewportToBreakpoint'
 import { StyleForm } from './style-manager/styleForm'
 
 interface EditorProps {
@@ -39,6 +41,8 @@ export const Editor = memo(({ componentId }: EditorProps) => {
   // const updateComponent = useUpdateComponent()
   const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const setSelectedElementId = useElementSelectionStore((state) => state.setSelectedElementId)
+  const { data: viewportBreakpointState } = useViewportBreakpoint()
+  const activeBreakpointId = viewportBreakpointState?.activeBreakpointId ?? null
   const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
   const [lastSavedSpec, setLastSavedSpec] = useState<string | null>(null)
@@ -79,15 +83,35 @@ export const Editor = memo(({ componentId }: EditorProps) => {
     return selectedElementId ? elements.find((el) => el.id === selectedElementId) : null
   }, [elements, selectedElementId])
 
+  // Sync viewport width changes to breakpoint selection
+  useSyncViewportToBreakpoint(selectedElement ?? null)
+
   // Convert element styles to form values for initial values
+  // If a breakpoint is selected, use that breakpoint's styles; otherwise use base styles
   const formInitialValues = useMemo(() => {
     if (!selectedElement) {
       return undefined
     }
 
-    const baseFormValues = selectedElement.styles
-      ? (convertCoralStylesToFormValues(selectedElement.styles as Record<string, unknown>) as Partial<StyleFormValues>)
-      : {}
+    // Determine which styles to use based on active breakpoint
+    let stylesToUse: Record<string, unknown> | undefined
+
+    if (activeBreakpointId) {
+      // Find the selected breakpoint and use its styles
+      const breakpointIndex = parseInt(activeBreakpointId.replace('breakpoint_', ''), 10)
+      const responsiveStyles = selectedElement.responsiveStyles || []
+      const selectedBreakpoint = responsiveStyles[breakpointIndex]
+      if (selectedBreakpoint?.styles) {
+        stylesToUse = selectedBreakpoint.styles as Record<string, unknown>
+      }
+    }
+
+    // Fall back to base styles if no breakpoint selected or breakpoint has no styles
+    if (!stylesToUse) {
+      stylesToUse = selectedElement.styles as Record<string, unknown> | undefined
+    }
+
+    const baseFormValues = stylesToUse ? (convertCoralStylesToFormValues(stylesToUse) as Partial<StyleFormValues>) : {}
 
     // Set default display value for inline elements if not already set in styles
     // This only affects the UI - showing 'inline' for elements like span, a, strong, etc.
@@ -101,7 +125,7 @@ export const Editor = memo(({ componentId }: EditorProps) => {
     }
 
     return baseFormValues
-  }, [selectedElement])
+  }, [selectedElement, activeBreakpointId])
 
   // Convert element properties to component form initial values
   const componentFormInitialValues = useMemo(() => {
@@ -116,9 +140,9 @@ export const Editor = memo(({ componentId }: EditorProps) => {
     } as Partial<ComponentFormValues>
   }, [selectedElement])
 
-  // Create a stable key for the form based only on element ID
-  // This ensures the form remounts when switching elements
-  const formKey = selectedElementId
+  // Create a stable key for the form based on element ID and active breakpoint
+  // This ensures the form remounts when switching elements or breakpoints
+  const formKey = `${selectedElementId}-${activeBreakpointId || 'base'}`
 
   // Handle style form changes - only merge the changed style
   const handleStyleChange = useCallback(
@@ -163,16 +187,41 @@ export const Editor = memo(({ componentId }: EditorProps) => {
         // selectedElement.styles as Record<string, unknown> | undefined,
       )
 
-      // Only merge the styles that were actually changed
-      const mergedStyles = {
-        ...(selectedElement.styles || {}),
-        ...coralStyles,
-      }
+      // Check if we're editing a breakpoint or base styles
+      if (activeBreakpointId) {
+        // Update the selected breakpoint's styles
+        const breakpointIndex = parseInt(activeBreakpointId.replace('breakpoint_', ''), 10)
+        const responsiveStyles = [...(selectedElement.responsiveStyles || [])]
+        const selectedBreakpoint = responsiveStyles[breakpointIndex]
 
-      // Update the element with merged styles
-      updateElement(selectedElementId, { styles: mergedStyles as CoralStyleType })
+        if (selectedBreakpoint) {
+          // Merge the changed styles into the breakpoint's existing styles
+          const mergedBreakpointStyles = {
+            ...(selectedBreakpoint.styles || {}),
+            ...coralStyles,
+          }
+
+          // Update the breakpoint with merged styles
+          responsiveStyles[breakpointIndex] = {
+            ...selectedBreakpoint,
+            styles: mergedBreakpointStyles as CoralStyleType,
+          }
+
+          // Update the element with the modified responsive styles
+          updateElement(selectedElementId, { responsiveStyles })
+        }
+      } else {
+        // Update base styles
+        const mergedStyles = {
+          ...(selectedElement.styles || {}),
+          ...coralStyles,
+        }
+
+        // Update the element with merged styles
+        updateElement(selectedElementId, { styles: mergedStyles as CoralStyleType })
+      }
     },
-    [selectedElementId, selectedElement, updateElement],
+    [selectedElementId, selectedElement, updateElement, activeBreakpointId],
   )
 
   // Handle component form changes
@@ -749,31 +798,39 @@ export const Editor = memo(({ componentId }: EditorProps) => {
             {selectedElement ? (
               <Tabs defaultValue="style" className="flex-1 flex flex-col">
                 <div className="px-1.5">
-                <TabsList className="!w-full">
-                  <TabsTrigger value="style">Style</TabsTrigger>
-                  <TabsTrigger value="component">Details</TabsTrigger>
-                </TabsList>
+                  <TabsList className="!w-full">
+                    <TabsTrigger value="style">Style</TabsTrigger>
+                    <TabsTrigger value="component">Details</TabsTrigger>
+                  </TabsList>
                 </div>
 
-                  <TabsContent value="component">
-
-                    <ComponentForm
-                      key={`component-form-${formKey || 'none'}`}
-                      onChange={handleComponentChange}
-                      {...(componentFormInitialValues ? { initialValues: componentFormInitialValues } : {})}
-                    />
-
-                  </TabsContent>
-                  <TabsContent value="style" className="flex-1 h-[calc(100dvh-5.5rem)] max-h-[calc(100dvh-5.5rem)] overflow-y-auto pb-6" style={{ scrollbarWidth: 'thin', scrollbarGutter: 'stable' }}>
+                <TabsContent value="component">
+                  <ComponentForm
+                    key={`component-form-${formKey || 'none'}`}
+                    onChange={handleComponentChange}
+                    {...(componentFormInitialValues ? { initialValues: componentFormInitialValues } : {})}
+                  />
+                </TabsContent>
+                <TabsContent
+                  value="style"
+                  className="flex-1 h-[calc(100dvh-5.5rem)] max-h-[calc(100dvh-5.5rem)] overflow-y-auto pb-6"
+                  style={{ scrollbarWidth: 'thin', scrollbarGutter: 'stable' }}
+                >
+                  <BreakpointManager
+                    element={selectedElement}
+                    updateProperty={(property, value) => {
+                      if (!selectedElementId) return
+                      updateElement(selectedElementId, { [property]: value } as Partial<ElementTreeNode>)
+                    }}
+                  />
                   {/* <ScrollArea innerClassName="" className="flex-1 pb-12"> */}
-                    <StyleForm
-                      key={`style-form-${formKey || 'none'}`}
-                      onChange={handleStyleChange}
-                      {...(formInitialValues ? { initialValues: formInitialValues } : {})}
-                    />
-                    {/* </ScrollArea> */}
-                  </TabsContent>
-
+                  <StyleForm
+                    key={`style-form-${formKey || 'none'}`}
+                    onChange={handleStyleChange}
+                    {...(formInitialValues ? { initialValues: formInitialValues } : {})}
+                  />
+                  {/* </ScrollArea> */}
+                </TabsContent>
               </Tabs>
             ) : (
               <div className="flex flex-col h-full flex-1">
