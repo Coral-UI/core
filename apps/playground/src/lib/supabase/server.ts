@@ -28,7 +28,7 @@ export async function createClient() {
         return cookieStore.getAll()
       },
       setAll(cookiesToSet) {
-        // Server Components are read-only, mutations should use middleware or Route Handlers
+        // Server Components are read-only, mutations should use Route Handlers
         // This will log a warning if mutations occur
         cookiesToSet.forEach(({ name, value, options }) => {
           cookieStore.set(name, value, options)
