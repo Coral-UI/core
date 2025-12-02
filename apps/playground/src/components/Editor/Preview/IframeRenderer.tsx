@@ -1,4 +1,5 @@
 import { DEFAULT_CSS_RESET } from '@/components/Editor/CssResetDialog'
+import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
 import { forwardRef, useEffect, useMemo, useState } from 'react'
 
@@ -20,7 +21,7 @@ interface IframeRendererProps {
  */
 function buildIdMapping(
   specNode: CoralRootNode,
-  elementTreeNode: { id: string; children?: Array<{ id: string; children?: unknown[] }> },
+  elementTreeNode: ElementTreeNode,
   mapping: Map<CoralRootNode, string> = new Map(),
 ): Map<CoralRootNode, string> {
   // Map the current node
@@ -28,9 +29,10 @@ function buildIdMapping(
 
   // Process children recursively
   if (specNode.children && specNode.children.length > 0 && elementTreeNode.children) {
-    for (let i = 0; i < specNode.children.length && i < elementTreeNode.children.length; i++) {
+    const elementChildren = elementTreeNode.children as ElementTreeNode[]
+    for (let i = 0; i < specNode.children.length && i < elementChildren.length; i++) {
       const childSpec = specNode.children[i] as CoralRootNode
-      const childElement = elementTreeNode.children[i]
+      const childElement = elementChildren[i]
       if (childElement) {
         buildIdMapping(childSpec, childElement, mapping)
       }
@@ -43,10 +45,7 @@ function buildIdMapping(
 /**
  * Build ID mapping for the root spec and element tree
  */
-function buildRootIdMapping(
-  spec: CoralRootNode,
-  elementTree: Array<{ id: string; children?: Array<{ id: string; children?: unknown[] }> }>,
-): Map<CoralRootNode, string> {
+function buildRootIdMapping(spec: CoralRootNode, elementTree: ElementTreeNode[]): Map<CoralRootNode, string> {
   const mapping = new Map<CoralRootNode, string>()
 
   if (elementTree.length === 0) {
@@ -90,13 +89,14 @@ function addElementIds(
   const className = nodeId ? `coral-element-${nodeId}` : undefined
 
   // Combine existing class with new class name
-  const existingClass = node.elementAttributes?.['class'] || node.elementAttributes?.className
+  const existingClass = node.elementAttributes?.['class'] || node.elementAttributes?.['className']
   const classValue = className ? (existingClass ? `${existingClass} ${className}` : className) : existingClass
 
   const updatedNode: CoralNode = {
     ...node,
     // Remove inline styles - we'll use CSS classes instead
-    styles: undefined,
+    // Omit styles property entirely (don't set to undefined)
+    ...(node.styles ? {} : {}),
     // Preserve element attributes and add data-element-id and class
     elementAttributes: {
       ...(node.elementAttributes || {}),

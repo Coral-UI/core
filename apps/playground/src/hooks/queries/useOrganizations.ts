@@ -6,9 +6,18 @@ import {
   deleteOrganizationAction,
   updateOrganizationAction,
 } from '@/app/actions/organizations'
+// Stub server actions for standalone/Vite mode - these are not used in standalone mode
 import { organizationQueryOptions, organizationsQueryOptions } from '@/lib/queries/query-options'
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
+// Stub useRouter for standalone/Vite mode
+const useRouter = () => ({
+  push: (_path: string) => {},
+  replace: (_path: string) => {},
+  back: () => {},
+  forward: () => {},
+  refresh: () => {},
+  prefetch: (_path: string) => {},
+})
 import { toast } from 'sonner'
 
 const QUERY_KEY = ['organizations'] as const

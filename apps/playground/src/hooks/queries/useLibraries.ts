@@ -1,10 +1,30 @@
 'use client'
 
 import type { CreateLibraryInput, UpdateLibraryInput } from '@/types'
-import { createLibraryAction, updateLibraryAction, updateLibraryCssResetAction, deleteLibraryAction } from '@/app/actions/libraries'
+// Stub server actions for standalone/Vite mode
+const createLibraryAction = async (_input: any) => {
+  throw new Error('Server actions not available in standalone mode')
+}
+const updateLibraryAction = async (_id: string, _input: any) => {
+  throw new Error('Server actions not available in standalone mode')
+}
+const updateLibraryCssResetAction = async (_id: string, _cssReset: string) => {
+  throw new Error('Server actions not available in standalone mode')
+}
+const deleteLibraryAction = async (_id: string) => {
+  throw new Error('Server actions not available in standalone mode')
+}
 import { librariesQueryOptions, libraryCssResetQueryOptions, libraryQueryOptions } from '@/lib/queries/query-options'
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
+// Stub useRouter for standalone/Vite mode
+const useRouter = () => ({
+  push: (_path: string) => {},
+  replace: (_path: string) => {},
+  back: () => {},
+  forward: () => {},
+  refresh: () => {},
+  prefetch: (_path: string) => {},
+})
 import { toast } from 'sonner'
 
 /**

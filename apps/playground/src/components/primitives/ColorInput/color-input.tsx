@@ -78,8 +78,8 @@ function ColorFormatHandler({
   onValueChange?: (value: string) => void
   currentValue?: string
 }) {
-  const color = useColorPicker((state: any) => state.color)
-  const format = useColorPicker((state: any) => state.format)
+  const color = useColorPicker((state) => state.color)
+  const format = useColorPicker((state) => state.format)
   const prevFormatRef = React.useRef(format)
   const isUpdatingRef = React.useRef(false)
 
@@ -111,7 +111,10 @@ function ColorFormatHandler({
 }
 
 // Helper function to format color value based on format
-function formatColorValue(color: { r: number; g: number; b: number; a: number }, format: 'hex' | 'rgb' | 'hsl' | 'hsb'): string {
+function formatColorValue(
+  color: { r: number; g: number; b: number; a: number },
+  format: 'hex' | 'rgb' | 'hsl' | 'hsb',
+): string {
   const rgbToHex = (c: { r: number; g: number; b: number }) => {
     const toHex = (n: number) => {
       const hex = Math.round(n).toString(16)

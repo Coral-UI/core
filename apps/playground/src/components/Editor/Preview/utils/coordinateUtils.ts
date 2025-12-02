@@ -84,7 +84,11 @@ export function transformIframeToParent(
   const finalY = iframeOffsetFromContainerY + elementInIframeContentY - containerScrollY
 
   // Debug: Log intermediate values
-  if (process.env['NODE_ENV'] === 'development') {
+  // Use import.meta.env.DEV for Vite, fallback to process.env for Next.js
+  const isDev =
+    (typeof import.meta !== 'undefined' && import.meta.env?.DEV) ||
+    (typeof process !== 'undefined' && process.env?.['NODE_ENV'] === 'development')
+  if (isDev) {
     console.log('Coordinate transform debug:', {
       elementRectLeft: elementRect.left,
       elementRectTop: elementRect.top,

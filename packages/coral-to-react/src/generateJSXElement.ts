@@ -1,6 +1,6 @@
 import type { CoralNode } from '@reallygoodwork/coral-core'
 
-import { stylesToInlineStyle } from './convertStyles'
+// import { stylesToInlineStyle } from './convertStyles'
 
 /**
  * List of self-closing HTML elements

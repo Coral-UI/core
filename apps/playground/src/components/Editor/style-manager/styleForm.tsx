@@ -459,205 +459,188 @@ const StyleFormLayout = withForm({
                   />
                 )}
               />
-
-
             </CardSection>
             <ConditionalSection watch="display" when="flex" legend="Flex">
-                <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2">
+                <form.AppField
+                  name="flexDirection"
+                  children={(field) => (
+                    <field.ToggleField
+                      label="Flex Direction"
+                      options={[
+                        {
+                          value: 'row',
+                          label: 'Row',
+                          icon: <FlexDirectionRow strokeWidth={1.25} />,
+                          tooltip: 'Row',
+                        },
+                        {
+                          value: 'column',
+                          label: 'Column',
+                          icon: <FlexDirectionColumn strokeWidth={1.25} />,
+                          tooltip: 'Column',
+                        },
+                        {
+                          value: 'row-reverse',
+                          label: 'Row Reverse',
+                          icon: <FlexDirectionRowReverse strokeWidth={1.25} />,
+                          tooltip: 'Row Reverse',
+                        },
+                        {
+                          value: 'column-reverse',
+                          label: 'Column Reverse',
+                          icon: <FlexDirectionColumnReverse strokeWidth={1.25} />,
+                          tooltip: 'Column Reverse',
+                        },
+                      ]}
+                    />
+                  )}
+                />
+                <form.AppField
+                  name="flexWrap"
+                  children={(field) => (
+                    <field.ToggleField
+                      label="Flex Wrap"
+                      options={[
+                        {
+                          value: 'nowrap',
+                          label: 'Nowrap',
+                          icon: <FlexWrapNoWrap strokeWidth={1.5} />,
+                          tooltip: 'No Wrap',
+                        },
+                        {
+                          value: 'wrap',
+                          label: 'Wrap',
+                          icon: <FlexWrapWrap strokeWidth={1.5} />,
+                          tooltip: 'Wrap',
+                        },
+                      ]}
+                    />
+                  )}
+                />
+                <form.AppField
+                  name="justifyContent"
+                  children={(field) => (
+                    <field.ToggleField
+                      label="Justify Content"
+                      options={[
+                        {
+                          value: 'flex-start',
+                          label: 'Flex Start',
+                          icon: <JustifyContentFlexStart strokeWidth={1.25} />,
+                          tooltip: 'Flex Start',
+                        },
+                        {
+                          value: 'flex-end',
+                          label: 'Flex End',
+                          icon: <JustifyContentFlexEnd strokeWidth={1.25} />,
+                          tooltip: 'Flex End',
+                        },
+                        {
+                          value: 'center',
+                          label: 'Center',
+                          icon: <JustifyContentCenter strokeWidth={1.25} />,
+                          tooltip: 'Center',
+                        },
+                        {
+                          value: 'space-between',
+                          label: 'Space Between',
+                          icon: <JustifyContentSpaceBetween strokeWidth={1.25} />,
+                          tooltip: 'Space Between',
+                        },
+                        {
+                          value: 'space-around',
+                          label: 'Space Around',
+                          icon: <JustifyContentSpaceAround strokeWidth={1.25} />,
+                          tooltip: 'Space Around',
+                        },
+                        {
+                          value: 'space-evenly',
+                          label: 'Space Evenly',
+                          icon: <JustifyContentSpaceEvenly strokeWidth={1.25} />,
+                          tooltip: 'Space Evenly',
+                        },
+                      ]}
+                    />
+                  )}
+                />
+                <form.AppField
+                  name="alignItems"
+                  children={(field) => (
+                    <field.ToggleField
+                      label="Align Items"
+                      options={[
+                        {
+                          value: 'flex-start',
+                          label: 'Flex Start',
+                          icon: <AlignItemsFlexStart strokeWidth={1.25} />,
+                          tooltip: 'Flex Start',
+                        },
+                        {
+                          value: 'flex-end',
+                          label: 'Flex End',
+                          icon: <AlignItemsFlexEnd strokeWidth={1.25} />,
+                          tooltip: 'Flex End',
+                        },
+                        {
+                          value: 'center',
+                          label: 'Center',
+                          icon: <AlignItemsCenter strokeWidth={1.25} />,
+                          tooltip: 'Center',
+                        },
+                        {
+                          value: 'baseline',
+                          label: 'Baseline',
+                          icon: <AlignItemsBaseline strokeWidth={1.25} />,
+                          tooltip: 'Baseline',
+                        },
+                        {
+                          value: 'stretch',
+                          label: 'Stretch',
+                          icon: <AlignItemsStretch strokeWidth={1.25} />,
+                          tooltip: 'Stretch',
+                        },
+                      ]}
+                    />
+                  )}
+                />
+                <form.AppField
+                  name="flexBasis"
+                  children={(field) => (
+                    <field.NumberInputField
+                      leadingIcon={<IconRuler strokeWidth={1.25} />}
+                      unitFieldName="flexBasisUnit"
+                      size="sm"
+                      label="Flex Basis"
+                      min={0}
+                      step={1}
+                      hideControls={true}
+                    />
+                  )}
+                />
+                <div className="flex gap-3">
                   <form.AppField
-                    name="flexDirection"
-                    children={(field) => (
-                      <field.ToggleField
-                        label="Flex Direction"
-                        options={[
-                          {
-                            value: 'row',
-                            label: 'Row',
-                            icon: <FlexDirectionRow strokeWidth={1.25} />,
-                            tooltip: 'Row',
-                          },
-                          {
-                            value: 'column',
-                            label: 'Column',
-                            icon: <FlexDirectionColumn strokeWidth={1.25} />,
-                            tooltip: 'Column',
-                          },
-                          {
-                            value: 'row-reverse',
-                            label: 'Row Reverse',
-                            icon: <FlexDirectionRowReverse strokeWidth={1.25} />,
-                            tooltip: 'Row Reverse',
-                          },
-                          {
-                            value: 'column-reverse',
-                            label: 'Column Reverse',
-                            icon: <FlexDirectionColumnReverse strokeWidth={1.25} />,
-                            tooltip: 'Column Reverse',
-                          },
-                        ]}
-                      />
-                    )}
-                  />
-                  <form.AppField
-                    name="flexWrap"
-                    children={(field) => (
-                      <field.ToggleField
-                        label="Flex Wrap"
-                        options={[
-                          {
-                            value: 'nowrap',
-                            label: 'Nowrap',
-                            icon: <FlexWrapNoWrap strokeWidth={1.5} />,
-                            tooltip: 'No Wrap',
-                          },
-                          {
-                            value: 'wrap',
-                            label: 'Wrap',
-                            icon: <FlexWrapWrap strokeWidth={1.5} />,
-                            tooltip: 'Wrap',
-                          },
-                        ]}
-                      />
-                    )}
-                  />
-                  <form.AppField
-                    name="justifyContent"
-                    children={(field) => (
-                      <field.ToggleField
-                        label="Justify Content"
-                        options={[
-                          {
-                            value: 'flex-start',
-                            label: 'Flex Start',
-                            icon: <JustifyContentFlexStart strokeWidth={1.25} />,
-                            tooltip: 'Flex Start',
-                          },
-                          {
-                            value: 'flex-end',
-                            label: 'Flex End',
-                            icon: <JustifyContentFlexEnd strokeWidth={1.25} />,
-                            tooltip: 'Flex End',
-                          },
-                          {
-                            value: 'center',
-                            label: 'Center',
-                            icon: <JustifyContentCenter strokeWidth={1.25} />,
-                            tooltip: 'Center',
-                          },
-                          {
-                            value: 'space-between',
-                            label: 'Space Between',
-                            icon: <JustifyContentSpaceBetween strokeWidth={1.25} />,
-                            tooltip: 'Space Between',
-                          },
-                          {
-                            value: 'space-around',
-                            label: 'Space Around',
-                            icon: <JustifyContentSpaceAround strokeWidth={1.25} />,
-                            tooltip: 'Space Around',
-                          },
-                          {
-                            value: 'space-evenly',
-                            label: 'Space Evenly',
-                            icon: <JustifyContentSpaceEvenly strokeWidth={1.25} />,
-                            tooltip: 'Space Evenly',
-                          },
-                        ]}
-                      />
-                    )}
-                  />
-                  <form.AppField
-                    name="alignItems"
-                    children={(field) => (
-                      <field.ToggleField
-                        label="Align Items"
-                        options={[
-                          {
-                            value: 'flex-start',
-                            label: 'Flex Start',
-                            icon: <AlignItemsFlexStart strokeWidth={1.25} />,
-                            tooltip: 'Flex Start',
-                          },
-                          {
-                            value: 'flex-end',
-                            label: 'Flex End',
-                            icon: <AlignItemsFlexEnd strokeWidth={1.25} />,
-                            tooltip: 'Flex End',
-                          },
-                          {
-                            value: 'center',
-                            label: 'Center',
-                            icon: <AlignItemsCenter strokeWidth={1.25} />,
-                            tooltip: 'Center',
-                          },
-                          {
-                            value: 'baseline',
-                            label: 'Baseline',
-                            icon: <AlignItemsBaseline strokeWidth={1.25} />,
-                            tooltip: 'Baseline',
-                          },
-                          {
-                            value: 'stretch',
-                            label: 'Stretch',
-                            icon: <AlignItemsStretch strokeWidth={1.25} />,
-                            tooltip: 'Stretch',
-                          },
-                        ]}
-                      />
-                    )}
-                  />
-                  <form.AppField
-                    name="flexBasis"
+                    name="flexGrow"
                     children={(field) => (
                       <field.NumberInputField
-                        leadingIcon={<IconRuler strokeWidth={1.25} />}
-                        unitFieldName="flexBasisUnit"
+                        leadingIcon={<IconArrowsDiagonal strokeWidth={1.25} />}
+                        unitFieldName="flexSizeUnit"
                         size="sm"
-                        label="Flex Basis"
+                        label="Flex Grow"
                         min={0}
                         step={1}
                         hideControls={true}
                       />
                     )}
                   />
-                  <div className="flex gap-3">
-                    <form.AppField
-                      name="flexGrow"
-                      children={(field) => (
-                        <field.NumberInputField
-                          leadingIcon={<IconArrowsDiagonal strokeWidth={1.25} />}
-                          unitFieldName="flexSizeUnit"
-                          size="sm"
-                          label="Flex Grow"
-                          min={0}
-                          step={1}
-                          hideControls={true}
-                        />
-                      )}
-                    />
-                    <form.AppField
-                      name="flexShrink"
-                      children={(field) => (
-                        <field.NumberInputField
-                          leadingIcon={<IconArrowsDiagonalMinimize strokeWidth={1.25} />}
-                          unitFieldName="flexSizeUnit"
-                          size="sm"
-                          label="Flex Shrink"
-                          min={0}
-                          step={1}
-                          hideControls={true}
-                        />
-                      )}
-                    />
-                  </div>
                   <form.AppField
-                    name="gap"
+                    name="flexShrink"
                     children={(field) => (
                       <field.NumberInputField
-                        leadingIcon={<IconSpacingHorizontal strokeWidth={1.25} />}
-                        unitFieldName="gapUnit"
+                        leadingIcon={<IconArrowsDiagonalMinimize strokeWidth={1.25} />}
+                        unitFieldName="flexSizeUnit"
                         size="sm"
-                        label="Gap"
+                        label="Flex Shrink"
                         min={0}
                         step={1}
                         hideControls={true}
@@ -665,7 +648,22 @@ const StyleFormLayout = withForm({
                     )}
                   />
                 </div>
-              </ConditionalSection>
+                <form.AppField
+                  name="gap"
+                  children={(field) => (
+                    <field.NumberInputField
+                      leadingIcon={<IconSpacingHorizontal strokeWidth={1.25} />}
+                      unitFieldName="gapUnit"
+                      size="sm"
+                      label="Gap"
+                      min={0}
+                      step={1}
+                      hideControls={true}
+                    />
+                  )}
+                />
+              </div>
+            </ConditionalSection>
 
             <OptionalSection enabledField="typographyEnabled" legend="Typography">
               <form.AppField

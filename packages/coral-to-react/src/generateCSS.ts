@@ -211,7 +211,7 @@ function generateBaseCSS(node: CoralNode, idMapping: Map<CoralNode, string>): st
 function extractBreakpointValueForSorting(breakpoint: ResponsiveStyle['breakpoint']): number {
   if ('value' in breakpoint && typeof breakpoint.value === 'string') {
     const match = breakpoint.value.match(/^([\d.]+)(px|rem|em)$/i)
-    if (match) {
+    if (match && match[1] && match[2]) {
       const num = parseFloat(match[1])
       const unit = match[2].toLowerCase()
       return unit === 'px' ? num : num * 16 // Convert rem/em to px

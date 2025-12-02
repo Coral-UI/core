@@ -151,7 +151,7 @@ type TreeItemProps = TreeProps & {
 const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
   (
     {
-      className,
+      className: _className,
       data,
       selectedItemId,
       handleSelectChange,
@@ -162,9 +162,8 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
       handleDrop,
       draggedItem,
       level = 1,
-      ...props
     },
-    ref,
+    _ref,
   ) => {
     if (!(data instanceof Array)) {
       data = [data]

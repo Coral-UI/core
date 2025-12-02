@@ -37,28 +37,27 @@ export const ImportCodeDialog = ({ open, onOpenChange, onImport }: ImportCodeDia
       description="Paste your HTML code below to import it into the editor"
     >
       <div className="flex flex-col gap-2.5">
-      <div className="flex-1 min-h-[400px] border border-border rounded-lg overflow-hidden flex flex-col">
-        <MonacoEditor
-          height={400}
-          value={code}
-          onChange={(value) => setCode(value || '')}
-          language="html"
-          theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
-          options={{
-            minimap: {
-              enabled: false,
-            },
-            lineNumbers: 'on',
-            fontSize: 12,
-            wordWrap: 'on',
-            useTabStops: false,
-            tabSize: 2,
-            contextmenu: false,
-          }}
-        />
-
-      </div>
-      <div className="flex justify-end gap-2">
+        <div className="flex-1 min-h-[400px] border border-border rounded-lg overflow-hidden flex flex-col">
+          <MonacoEditor
+            height={400}
+            value={code}
+            onChange={(value) => setCode(value || '')}
+            language="html"
+            theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
+            options={{
+              minimap: {
+                enabled: false,
+              },
+              lineNumbers: 'on',
+              fontSize: 12,
+              wordWrap: 'on',
+              useTabStops: false,
+              tabSize: 2,
+              contextmenu: false,
+            }}
+          />
+        </div>
+        <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>
@@ -66,7 +65,7 @@ export const ImportCodeDialog = ({ open, onOpenChange, onImport }: ImportCodeDia
             Import
           </Button>
         </div>
-        </div>
+      </div>
     </Dialog>
   )
 }

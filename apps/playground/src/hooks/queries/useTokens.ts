@@ -1,7 +1,13 @@
 'use client'
 
 import type { CreateDesignTokenInput } from '@/types'
-import { createTokenAction, deleteTokenAction } from '@/app/actions/tokens'
+// Stub server actions for standalone/Vite mode
+const createTokenAction = async (_input: any) => {
+  throw new Error('Server actions not available in standalone mode')
+}
+const deleteTokenAction = async (_id: string) => {
+  throw new Error('Server actions not available in standalone mode')
+}
 import { tokensQueryOptions } from '@/lib/queries/query-options'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'

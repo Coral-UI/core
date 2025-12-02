@@ -1,0 +1,16 @@
+{
+  "name": "Coral",
+  "id": "1423021972718554593",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/index.html",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": ["figma"],
+
+  "networkAccess": {
+    "reasoning": "This plugin needs to access the internet to load fonts and images.",
+    "allowedDomains": ["https://api.fontshare.com", "https://cdn.fontshare.com", "https://cdn.jsdelivr.net", "https://coral.design", "*"]
+  }
+}

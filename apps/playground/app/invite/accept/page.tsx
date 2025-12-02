@@ -7,7 +7,7 @@ import { useAcceptInvitation } from '@/hooks/queries/useInvitations'
 import { getInvitationByToken } from '@/lib/api/invitations'
 import { useAuthContext } from '@/lib/auth/auth-context'
 import { AuthGuard } from '@/lib/auth/auth-guard'
-import { getOrganizationServer } from '@/lib/queries/server-query-functions'
+// import { getOrganizationServer } from '@/lib/queries/server-query-functions' // Disabled for beta (server-only)
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -49,11 +49,12 @@ export default function AcceptInvitationPage() {
 
         setInvitation(inv)
 
-        // Get organization name
-        const org = await getOrganizationServer(inv.organizationId)
-        if (org) {
-          setOrganizationName(org.name)
-        }
+        // Get organization name - disabled for beta (requires server functions)
+        // const org = await getOrganizationServer(inv.organizationId)
+        // if (org) {
+        //   setOrganizationName(org.name)
+        // }
+        setOrganizationName('Organization') // Placeholder for beta
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to load invitation'
         setError(errorMessage)

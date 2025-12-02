@@ -1,7 +1,16 @@
 'use client'
 
 import type { Component, CreateComponentInput, UpdateComponentInput } from '@/types'
-import { createComponentAction, updateComponentAction, deleteComponentAction } from '@/app/actions/components'
+// Stub server actions for standalone/Vite mode
+const createComponentAction = async (_input: CreateComponentInput) => {
+  throw new Error('Server actions not available in standalone mode')
+}
+const updateComponentAction = async (_id: string, _input: UpdateComponentInput) => {
+  throw new Error('Server actions not available in standalone mode')
+}
+const deleteComponentAction = async (_id: string) => {
+  throw new Error('Server actions not available in standalone mode')
+}
 import { componentQueryOptions, componentsQueryOptions } from '@/lib/queries/query-options'
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'

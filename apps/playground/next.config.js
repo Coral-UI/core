@@ -8,7 +8,6 @@ const nextConfig = {
     '@reallygoodwork/react-to-coral',
   ],
   experimental: {
-    // Enable server actions
     serverActions: {
       bodySizeLimit: '2mb',
     },

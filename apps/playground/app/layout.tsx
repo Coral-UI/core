@@ -7,6 +7,7 @@ import { NavBar } from '@/components/NavBar'
 import { Suspense } from 'react'
 
 import { ClientProviders } from './client-providers'
+import { FathomAnalytics } from './fathom'
 import { Providers } from './providers'
 
 import './globals.css'
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://api.fontshare.com/v2/css?f[]=satoshi@1,2&display=swap" rel="stylesheet" />
       </head>
       <body>
+        <FathomAnalytics />
         <Providers>
           <ClientProviders>
             <NavBar />

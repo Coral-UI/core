@@ -68,6 +68,9 @@ export const Editor = memo(({ componentId }: EditorProps) => {
   const [isSaving, setIsSaving] = useState(false)
   const [isLoadingFromDb, setIsLoadingFromDb] = useState(false)
   const [isCheckingAccessibility, setIsCheckingAccessibility] = useState(false)
+  const [accessibilityResults, setAccessibilityResults] = useState<Component['accessibility']>(component?.accessibility)
+  const accessibilityCheckTimeoutRef = useRef<NodeJS.Timeout>()
+  const lastAccessibilitySpecRef = useRef<string | null>(null)
   const loadedComponentIdRef = useRef<string | null>(null)
   const justSavedRef = useRef(false)
   const saveTimeoutRef = useRef<NodeJS.Timeout>()
@@ -91,6 +94,10 @@ export const Editor = memo(({ componentId }: EditorProps) => {
     componentRef.current = component
     if (component?.spec) {
       componentSpecRef.current = component.spec
+    }
+    // Update accessibility results when component loads
+    if (component?.accessibility) {
+      setAccessibilityResults(component.accessibility)
     }
   }, [component])
   useEffect(() => {
@@ -749,6 +756,92 @@ export const Editor = memo(({ componentId }: EditorProps) => {
     }
   }, [component?.id, isInitialized, convertToCoralSpec])
 
+  // Run accessibility check regularly when component is loaded and in resting state
+  useEffect(() => {
+    // Don't run if:
+    // - Component not initialized
+    // - Currently checking accessibility
+    // - Currently saving or loading
+    // - An element is selected (wait for resting state)
+    if (!isInitialized || isCheckingAccessibility || isSaving || isLoadingFromDb || selectedElementId !== null) {
+      // Clear any pending accessibility check if conditions aren't met
+      if (accessibilityCheckTimeoutRef.current) {
+        clearTimeout(accessibilityCheckTimeoutRef.current)
+        accessibilityCheckTimeoutRef.current = undefined
+      }
+      return
+    }
+
+    // Calculate current spec
+    const currentSpec = convertToCoralSpec()
+    const currentSpecString = JSON.stringify(currentSpec)
+
+    // Skip if spec hasn't changed since last check
+    if (lastAccessibilitySpecRef.current === currentSpecString) {
+      return
+    }
+
+    // Clear any existing timeout
+    if (accessibilityCheckTimeoutRef.current) {
+      clearTimeout(accessibilityCheckTimeoutRef.current)
+    }
+
+    // Debounce accessibility check - wait 2 seconds of inactivity (resting state)
+    accessibilityCheckTimeoutRef.current = setTimeout(async () => {
+      // Double-check conditions before checking
+      if (!isInitialized || isCheckingAccessibility || isSaving || isLoadingFromDb || selectedElementId !== null) {
+        return
+      }
+
+      // Recalculate spec at check time
+      const spec = convertToCoralSpec()
+      const specString = JSON.stringify(spec)
+
+      // Skip if spec hasn't changed
+      if (lastAccessibilitySpecRef.current === specString) {
+        return
+      }
+
+      try {
+        setIsCheckingAccessibility(true)
+        const results = await checkAccessibility(spec)
+        setAccessibilityResults(results)
+        lastAccessibilitySpecRef.current = specString
+
+        // In standalone mode, just store locally
+        // In normal mode, also update the component
+        if (!isStandaloneMode && component) {
+          try {
+            await componentsApi.updateComponent(component.id, { accessibility: results })
+          } catch (error) {
+            // Don't block if update fails - we still have local results
+            console.error('Failed to update accessibility results:', error)
+          }
+        }
+      } catch (error) {
+        console.error('Accessibility check failed:', error)
+        // Don't show toast for background checks - only for manual saves
+      } finally {
+        setIsCheckingAccessibility(false)
+      }
+    }, 2000) // Wait 2 seconds of inactivity
+
+    return () => {
+      if (accessibilityCheckTimeoutRef.current) {
+        clearTimeout(accessibilityCheckTimeoutRef.current)
+      }
+    }
+  }, [
+    isInitialized,
+    isCheckingAccessibility,
+    isSaving,
+    isLoadingFromDb,
+    selectedElementId,
+    convertToCoralSpec,
+    component,
+    isStandaloneMode,
+  ])
+
   const handleImportCode = (code: string) => {
     try {
       const spec = transformHTMLToSpec(code)
@@ -872,8 +965,8 @@ export const Editor = memo(({ componentId }: EditorProps) => {
           elementType: spec.elementType || 'div',
           type: 'NODE',
           isExpanded: true,
-          styles: spec.styles,
-          responsiveStyles: spec.responsiveStyles,
+          ...(spec.styles ? { styles: spec.styles } : {}),
+          ...(spec.responsiveStyles ? { responsiveStyles: spec.responsiveStyles } : {}),
           children: [],
         }
 
@@ -1080,10 +1173,14 @@ export const Editor = memo(({ componentId }: EditorProps) => {
               <div className="flex flex-col h-full flex-1">
                 <ScrollArea innerClassName="flex flex-col gap-2.5 py-2.5" className="flex-1">
                   <div className="px-2.5 pb-2.5">
-                    <AccessibilityPanel
-                      {...(component?.accessibility ? { accessibility: component.accessibility } : {})}
-                      isChecking={isCheckingAccessibility}
-                    />
+                    {(() => {
+                      const accessibility = accessibilityResults || component?.accessibility
+                      return accessibility ? (
+                        <AccessibilityPanel accessibility={accessibility} isChecking={isCheckingAccessibility} />
+                      ) : (
+                        <AccessibilityPanel isChecking={isCheckingAccessibility} />
+                      )
+                    })()}
                   </div>
                   <div className="flex flex-col h-full">
                     <Empty>

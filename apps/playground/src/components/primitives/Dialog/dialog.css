@@ -41,8 +41,7 @@
       max-width: var(--container-2xl);
     }
 
-    &:[data-ending-style]
-    {
+    &:[data-ending-style] {
       animation: fade-out 0.15s ease-in-out;
     }
 
@@ -62,6 +61,7 @@
   .dialog-description {
     font-size: var(--text-sm);
     color: var(--caption);
+    max-width: 60ch;
 
     &:has(+ *) {
       margin-block-end: calc(var(--spacing) * 4);
