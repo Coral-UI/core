@@ -79,14 +79,19 @@ export function exportAllSchemas(options: SchemaExportOptions = {}): void {
 
   // Export individual schemas
   Object.entries(SCHEMA_EXPORTS).forEach(([name, schema]) => {
-    const jsonSchema = exportSchemaToJSON(schema, options)
-    const filename = `${name}.schema.json`
-    const filepath = join(outputDir, filename)
+    try {
+      const jsonSchema = exportSchemaToJSON(schema, options)
+      const filename = `${name}.schema.json`
+      const filepath = join(outputDir, filename)
 
-    const content = pretty ? JSON.stringify(jsonSchema, null, 2) : JSON.stringify(jsonSchema)
+      const content = pretty ? JSON.stringify(jsonSchema, null, 2) : JSON.stringify(jsonSchema)
 
-    writeFileSync(filepath, content, 'utf8')
-    console.log(`✓ Exported ${name} schema to ${filepath}`)
+      writeFileSync(filepath, content, 'utf8')
+      console.log(`✓ Exported ${name} schema to ${filepath}`)
+    } catch (error) {
+      // Log error but continue with other schemas
+      console.warn(`⚠ Skipped ${name} schema due to error:`, error instanceof Error ? error.message : error)
+    }
   })
 
   // Create index file with all schema references

@@ -34,26 +34,10 @@ export function InviteMemberDialog({ organizationId }: InviteMemberDialogProps) 
     onSubmit: async ({ value }) => {
       setIsSubmitting(true)
       try {
-        // Call API endpoint (auth handled via cookies in middleware)
-        const response = await fetch('/api/invite', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            organizationId,
-            email: value.email,
-            role: value.role,
-          }),
+        // API endpoint not available in standalone/Vite mode
+        toast.error('Invitations are not available in standalone mode', {
+          description: 'This feature requires server-side API endpoints',
         })
-
-        const data = await response.json()
-
-        if (!response.ok) {
-          throw new Error(data.error || data.message || 'Failed to send invitation')
-        }
-
-        toast.success('Invitation sent successfully')
         form.reset()
         setOpen(false)
       } catch (err) {

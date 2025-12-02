@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
+import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -35,6 +35,16 @@ export default defineConfig({
       // Transform workspace packages
       transformMixedEsModules: true,
       include: [/node_modules/],
+    },
+    rollupOptions: {
+      // Exclude API routes and server-only files from build
+      external: (id) => {
+        // Exclude Next.js API routes and server-only modules
+        if (id.includes('/api/') || id.includes('@vercel/node')) {
+          return true
+        }
+        return false
+      },
     },
   },
   server: {
