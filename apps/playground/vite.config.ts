@@ -37,14 +37,8 @@ export default defineConfig({
       include: [/node_modules/],
     },
     rollupOptions: {
-      // Exclude API routes and server-only files from build
-      external: (id) => {
-        // Exclude Next.js API routes and server-only modules
-        if (id.includes('/api/') || id.includes('@vercel/node')) {
-          return true
-        }
-        return false
-      },
+      // Don't externalize anything - bundle all client-side code
+      // Server-only files are already excluded via tsconfig.json
     },
   },
   server: {
