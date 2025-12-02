@@ -1,18 +1,10 @@
 /**
  * Supabase browser client for Client Components
  *
- * Creates a Supabase client for use in Client Components.
- * Environment variables should be set in .env.local:
- * - NEXT_PUBLIC_SUPABASE_URL
- * - NEXT_PUBLIC_SUPABASE_ANON_KEY
- *
- * In standalone/Vite mode, returns a mock client that doesn't connect to Supabase.
+ * Mock client for standalone/Vite mode - no Supabase imports
  */
 
 import type { Database } from './database.types'
-
-// Check if we're in standalone/Vite mode (no process.env available)
-const isStandaloneMode = typeof process === 'undefined' || typeof process.env === 'undefined'
 
 // Mock Supabase client for standalone mode
 const createMockQueryBuilder = () => ({
@@ -97,6 +89,7 @@ const mockClient = {
     signOut: async () => ({ error: null }),
     signInWithPassword: async () => ({ data: { user: null, session: null }, error: null }),
     signUp: async () => ({ data: { user: null, session: null }, error: null }),
+    signInWithOAuth: async () => ({ error: new Error('OAuth not available in standalone mode') }),
     onAuthStateChange: () => ({
       data: {
         subscription: {
@@ -110,29 +103,5 @@ const mockClient = {
   rpc: () => Promise.resolve({ data: null, error: null }),
 } as any
 
-let supabaseClient: any
-
-if (isStandaloneMode) {
-  // Use mock client for standalone/Vite mode
-  supabaseClient = mockClient
-} else {
-  // Real Supabase client for Next.js mode
-  try {
-    const { createBrowserClient } = require('@supabase/ssr')
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      // Fall back to mock if env vars are missing
-      supabaseClient = mockClient
-    } else {
-      supabaseClient = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
-    }
-  } catch {
-    // Fall back to mock if @supabase/ssr is not available
-    supabaseClient = mockClient
-  }
-}
-
-export const supabase = supabaseClient
+// Always use mock client in Vite/standalone mode
+export const supabase = mockClient

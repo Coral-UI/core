@@ -3,7 +3,7 @@
  */
 
 import type { Database } from '@/lib/supabase/database.types'
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@/lib/supabase/types'
 
 /**
  * Create a mock Supabase client for testing

@@ -2,7 +2,7 @@
  * Custom hook for auth state
  */
 
-import type { Session, User } from '@supabase/supabase-js'
+import type { Session, User } from '@/lib/supabase/types'
 import { supabase } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
 
@@ -156,18 +156,8 @@ export function useSignInWithGoogle() {
     setError(null)
 
     try {
-      const redirectTo = `${window.location.origin}/auth/callback`
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo,
-        },
-      })
-
-      if (oauthError) {
-        throw oauthError
-      }
-      // Note: signInWithOAuth redirects the user, so we don't need to handle success here
+      // Mock OAuth - not available in standalone mode
+      throw new Error('OAuth not available in standalone mode')
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err))
       setError(error)
@@ -191,18 +181,8 @@ export function useSignInWithFigma() {
     setError(null)
 
     try {
-      const redirectTo = `${window.location.origin}/auth/callback`
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: 'figma',
-        options: {
-          redirectTo,
-        },
-      })
-
-      if (oauthError) {
-        throw oauthError
-      }
-      // Note: signInWithOAuth redirects the user, so we don't need to handle success here
+      // Mock OAuth - not available in standalone mode
+      throw new Error('OAuth not available in standalone mode')
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err))
       setError(error)

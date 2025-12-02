@@ -4,6 +4,7 @@
 
 export { supabase } from './client'
 export type { Database, OrgRole } from './database.types'
+export type { User, Session, SupabaseClient } from './types'
 export type {
   ArrayElement,
   ComponentInsert,

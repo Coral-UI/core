@@ -1,6 +1,6 @@
 'use client'
 
-import type { Session, User } from '@supabase/supabase-js'
+import type { Session, User } from '@/lib/supabase/types'
 import type { ReactNode } from 'react'
 import { createContext, useContext } from 'react'
 

@@ -1,62 +1,37 @@
 /**
- * Custom types and type helpers for Supabase
+ * Local type definitions for Supabase types
+ * These are minimal types needed for the app to work without importing @supabase packages
  */
 
-import type { Database } from './database.types'
-
-export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
-export type Inserts<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
-export type Updates<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
-
-// Table-specific types
-export type OrganizationRow = Tables<'organizations'>
-export type OrganizationInsert = Inserts<'organizations'>
-export type OrganizationUpdate = Updates<'organizations'>
-
-export type OrganizationMemberRow = Tables<'organization_members'>
-export type OrganizationMemberInsert = Inserts<'organization_members'>
-export type OrganizationMemberUpdate = Updates<'organization_members'>
-
-export type LibraryRow = Tables<'libraries'>
-export type LibraryInsert = Inserts<'libraries'>
-export type LibraryUpdate = Updates<'libraries'>
-
-export type ComponentRow = Tables<'components'>
-export type ComponentInsert = Inserts<'components'>
-export type ComponentUpdate = Updates<'components'>
-
-export type DesignTokenRow = Tables<'design_tokens'>
-export type DesignTokenInsert = Inserts<'design_tokens'>
-export type DesignTokenUpdate = Updates<'design_tokens'>
-
-export type ThemeRow = Tables<'themes'>
-export type ThemeInsert = Inserts<'themes'>
-export type ThemeUpdate = Updates<'themes'>
-
-export type ThemeOptionRow = Tables<'theme_options'>
-export type ThemeOptionInsert = Inserts<'theme_options'>
-export type ThemeOptionUpdate = Updates<'theme_options'>
-
-export type TokenValueRow = Tables<'token_values'>
-export type TokenValueInsert = Inserts<'token_values'>
-export type TokenValueUpdate = Updates<'token_values'>
-
-// Re-export OrgRole from database types
-export type { OrgRole } from './database.types'
-
-/**
- * Type guard to check if a value is a valid OrgRole
- */
-export function isOrgRole(value: unknown): value is OrgRole {
-  return typeof value === 'string' && ['admin', 'editor', 'viewer'].includes(value)
+export interface User {
+  id: string
+  email?: string
+  [key: string]: unknown
 }
 
-/**
- * Helper type to extract array element type
- */
-export type ArrayElement<T> = T extends readonly (infer U)[] ? U : never
+export interface Session {
+  access_token: string
+  refresh_token: string
+  expires_in: number
+  expires_at?: number
+  token_type: string
+  user: User
+  [key: string]: unknown
+}
 
-/**
- * Helper type for non-nullable values
- */
-export type NonNullable<T> = T extends null | undefined ? never : T
+export interface SupabaseClient<T = any> {
+  auth: {
+    getUser: () => Promise<{ data: { user: User | null }; error: Error | null }>
+    getSession: () => Promise<{ data: { session: Session | null }; error: Error | null }>
+    signOut: () => Promise<{ error: Error | null }>
+    signInWithPassword: (credentials: { email: string; password: string }) => Promise<{ data: { user: User | null; session: Session | null }; error: Error | null }>
+    signUp: (credentials: { email: string; password: string }) => Promise<{ data: { user: User | null; session: Session | null }; error: Error | null }>
+    signInWithOAuth: (options: { provider: string; options?: { redirectTo?: string } }) => Promise<{ error: Error | null }>
+    onAuthStateChange: (callback: (event: string, session: Session | null) => void) => {
+      data: { subscription: { unsubscribe: () => void } }
+      error: Error | null
+    }
+  }
+  from: (table: string) => any
+  rpc: (fn: string, args?: any) => Promise<{ data: any; error: Error | null }>
+}

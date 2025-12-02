@@ -4,8 +4,7 @@
  * Provides type-safe wrappers around Supabase queries
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js'
-
+import type { SupabaseClient } from './types'
 import type { Database } from './database.types'
 
 type Client = SupabaseClient<Database>
