@@ -21,6 +21,16 @@ const componentCache = new Map<string, Component | null>()
  * Uses a stable cache to prevent re-renders when component data changes
  */
 export function useComponent(id: string) {
+  // Use regular useQuery for standalone mode to avoid Suspense errors
+  const isStandalone = id === 'standalone-mode'
+
+  if (isStandalone) {
+    return useQuery({
+      ...componentQueryOptions(id),
+      enabled: false, // Disable query
+    })
+  }
+
   return useSuspenseQuery({
     ...componentQueryOptions(id),
     refetchOnMount: false, // Don't refetch when component mounts

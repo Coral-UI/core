@@ -134,14 +134,3 @@ export function stylesToInlineStyle(styles?: CoralStyleType): string {
 
   return `{\n${styleEntries.join(',\n')}\n  }`
 }
-
-/**
- * Converts Coral style object to className string (for future Tailwind support)
- * @param _styles - Coral style object (unused for now)
- * @returns className string
- */
-export function stylesToClassName(_styles?: CoralStyleType): string {
-  // TODO: Implement Tailwind class generation
-  // For now, return empty string
-  return ''
-}

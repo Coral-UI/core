@@ -49,7 +49,28 @@ interface HSVColorValue {
 }
 
 function hexToRgb(hex: string, alpha?: number): ColorValue {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  // Remove # if present
+  const cleanHex = hex.replace(/^#/, '')
+
+  // Handle 3-digit hex colors by expanding to 6 digits
+  if (cleanHex.length === 3) {
+    const expanded = cleanHex
+      .split('')
+      .map((char) => char + char)
+      .join('')
+    const result = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(expanded)
+    return result
+      ? {
+          r: Number.parseInt(result[1] ?? '0', 16),
+          g: Number.parseInt(result[2] ?? '0', 16),
+          b: Number.parseInt(result[3] ?? '0', 16),
+          a: alpha ?? 1,
+        }
+      : { r: 0, g: 0, b: 0, a: alpha ?? 1 }
+  }
+
+  // Handle 6-digit hex colors
+  const result = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(cleanHex)
   return result
     ? {
         r: Number.parseInt(result[1] ?? '0', 16),
@@ -428,7 +449,16 @@ function createColorPickerStore(
       },
     setColor: (value: ColorValue) => {
       if (!stateRef.current) return
-      if (Object.is(stateRef.current.color, value)) return
+
+      // Check if color values actually changed (not just reference)
+      const currentColor = stateRef.current.color
+      const colorChanged =
+        currentColor.r !== value.r ||
+        currentColor.g !== value.g ||
+        currentColor.b !== value.b ||
+        currentColor.a !== value.a
+
+      if (!colorChanged) return
 
       const prevState = { ...stateRef.current }
       stateRef.current.color = value
@@ -442,7 +472,16 @@ function createColorPickerStore(
     },
     setHsv: (value: HSVColorValue) => {
       if (!stateRef.current) return
-      if (Object.is(stateRef.current.hsv, value)) return
+
+      // Check if HSV values actually changed (not just reference)
+      const currentHsv = stateRef.current.hsv
+      const hsvChanged =
+        currentHsv.h !== value.h ||
+        currentHsv.s !== value.s ||
+        currentHsv.v !== value.v ||
+        currentHsv.a !== value.a
+
+      if (!hsvChanged) return
 
       const prevState = { ...stateRef.current }
       stateRef.current.hsv = value
@@ -1295,11 +1334,12 @@ function ColorPickerInput(props: ColorPickerInputProps) {
 
 interface InputGroupItemProps extends React.ComponentProps<typeof Input> {}
 
-function InputGroupItem({ className, ...props }: InputGroupItemProps) {
+const InputGroupItem = React.forwardRef<HTMLInputElement, InputGroupItemProps>(({ className, ...props }, ref) => {
   return (
-    <Input data-slot="color-picker-input" className={cn('flex-1 !min-w-0', className)} {...props} small />
+    <Input data-slot="color-picker-input" className={cn('flex-1 !min-w-0', className)} ref={ref} {...props} small />
   )
-}
+})
+InputGroupItem.displayName = 'InputGroupItem'
 
 interface FormatInputProps extends ColorPickerInputProps {
   color: ColorValue
@@ -1313,16 +1353,48 @@ function HexInput(props: FormatInputProps) {
   const hexValue = rgbToHex(color)
   const alphaValue = Math.round((color?.a ?? 1) * 100)
 
+  // Local state to track input value while typing
+  const [localHexValue, setLocalHexValue] = React.useState(hexValue)
+  const lastSyncedValueRef = React.useRef(hexValue)
+  const inputRef = React.useRef<HTMLInputElement | null>(null)
+
+  // Sync local state when color prop changes externally (not from our own input)
+  React.useEffect(() => {
+    // Only sync if the value actually changed and it's different from what the user is typing
+    // Check if the input is focused - if so, don't sync (user is actively typing)
+    const isInputFocused = document.activeElement === inputRef.current
+    const valueChanged = hexValue !== lastSyncedValueRef.current
+
+    if (valueChanged && !isInputFocused) {
+      setLocalHexValue(hexValue)
+      lastSyncedValueRef.current = hexValue
+    }
+  }, [hexValue])
+
   const onHexChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value
+      // Update local state immediately so user can see what they're typing
+      setLocalHexValue(value)
+
+      // Only update the color if the value is valid
       const parsedColor = parseColorString(value)
       if (parsedColor) {
         onColorChange({ ...parsedColor, a: color?.a ?? 1 })
+        // Update the last synced value to prevent unnecessary resets
+        const newHexValue = rgbToHex({ ...parsedColor, a: color?.a ?? 1 })
+        lastSyncedValueRef.current = newHexValue
       }
     },
     [color, onColorChange],
   )
+
+  const onHexBlur = React.useCallback(() => {
+    // When input loses focus, sync with the current color value
+    // This ensures the input shows the correct formatted value (e.g., "#aabbcc" instead of "#abc")
+    setLocalHexValue(hexValue)
+    lastSyncedValueRef.current = hexValue
+  }, [hexValue])
 
   const onAlphaChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1337,13 +1409,15 @@ function HexInput(props: FormatInputProps) {
   if (withoutAlpha) {
     return (
       <InputGroupItem
+        ref={inputRef}
         aria-label="Hex color value"
 
         {...inputProps}
         placeholder="#000000"
         className={cn('font-mono', className)}
-        value={hexValue}
+        value={localHexValue}
         onChange={onHexChange}
+        onBlur={onHexBlur}
         disabled={context.disabled}
       />
     )
@@ -1352,13 +1426,15 @@ function HexInput(props: FormatInputProps) {
   return (
     <div data-slot="color-picker-input-wrapper" className={cn('flex items-center gap-1', className)}>
       <InputGroupItem
+        ref={inputRef}
         aria-label="Hex color value"
 
         {...inputProps}
         placeholder="#000000"
         className="flex-2 font-mono"
-        value={hexValue}
+        value={localHexValue}
         onChange={onHexChange}
+        onBlur={onHexBlur}
         disabled={context.disabled}
       />
       <InputGroupItem

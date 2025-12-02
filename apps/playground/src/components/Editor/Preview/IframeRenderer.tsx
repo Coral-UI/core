@@ -1,3 +1,4 @@
+import { DEFAULT_CSS_RESET } from '@/components/Editor/CssResetDialog'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
 import { forwardRef, useEffect, useMemo, useState } from 'react'
 
@@ -90,11 +91,7 @@ function addElementIds(
 
   // Combine existing class with new class name
   const existingClass = node.elementAttributes?.['class'] || node.elementAttributes?.className
-  const classValue = className
-    ? existingClass
-      ? `${existingClass} ${className}`
-      : className
-    : existingClass
+  const classValue = className ? (existingClass ? `${existingClass} ${className}` : className) : existingClass
 
   const updatedNode: CoralNode = {
     ...node,
@@ -185,9 +182,7 @@ export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-          * {
-            box-sizing: border-box;
-          }
+          ${cssReset || DEFAULT_CSS_RESET ? `/* CSS Reset */\n${cssReset || DEFAULT_CSS_RESET}\n\n` : ''}
           body {
             background-color: transparent;
             margin: 0;
@@ -201,7 +196,6 @@ export const IframeRenderer = forwardRef<HTMLIFrameElement, IframeRendererProps>
             margin: 0 auto;
             padding: 1rem;
           }
-          ${cssReset ? `/* Custom CSS Reset */\n${cssReset}` : ''}
           ${baseCSS ? `/* Base Styles */\n${baseCSS}\n\n` : ''}
           ${responsiveCSS ? `/* Responsive Styles */\n${responsiveCSS}` : ''}
         </style>

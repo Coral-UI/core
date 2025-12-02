@@ -235,7 +235,7 @@
   --secondary-foreground: #0d0d0d;
   --secondary-hover: color-mix(in oklab, #0d0d0d 12%, transparent);
 
-  --input: #fff;
+  --input: #fafafa;
   --input-border: color-mix(in oklab, #0d0d0d 16%, transparent);
   --input-border-focus: color-mix(in oklab, #0d0d0d 35%, transparent);
   --input-shadow-focus: 0 0 0 1px var(--input-border-focus);

@@ -1,9 +1,10 @@
 import * as parserBabel from 'prettier/parser-babel'
 import * as prettier from 'prettier/standalone'
 
-import type { CoralRootNode } from '@reallygoodwork/coral-core'
+import type { CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
 
 import type { Options } from './types'
+import { generateCSS } from './generateCSS'
 import { generateImports } from './generateImports'
 import { generateJSXElement } from './generateJSXElement'
 import { generateMethods } from './generateMethods'
@@ -14,13 +15,32 @@ import { generateStateHooks } from './generateStateHooks'
  * Generates a React component from a Coral specification
  * @param spec - Coral root node specification
  * @param options - Generation options
- * @returns React component code string
+ * @returns Object with reactCode and cssCode strings
  */
-export async function generateComponent(spec: CoralRootNode, options: Options = {}): Promise<string> {
-  const { componentFormat = 'function', includeTypes = true, indentSize = 2, prettier: usePrettier = false } = options
+export async function generateComponent(
+  spec: CoralRootNode,
+  options: Options = {},
+): Promise<{ reactCode: string; cssCode: string }> {
+  const {
+    componentFormat = 'function',
+    styleFormat = 'inline',
+    includeTypes = true,
+    indentSize = 2,
+    prettier: usePrettier = false,
+  } = options
 
   const componentName = spec.componentName || spec.name || 'Component'
   const indentStr = ' '.repeat(indentSize)
+  const useCSS = styleFormat === 'className'
+
+  // Generate ID mapping for CSS classes (shared between CSS and JSX generation)
+  const idMapping = new Map<CoralNode, string>()
+
+  // Generate CSS if using className format
+  let cssContent = ''
+  if (useCSS) {
+    cssContent = generateCSS(spec, idMapping)
+  }
 
   // Generate imports
   const imports = generateImports(spec.imports)
@@ -34,11 +54,16 @@ export async function generateComponent(spec: CoralRootNode, options: Options = 
   // Generate methods
   const methods = generateMethods(spec.methods)
 
-  // Generate JSX
-  const jsx = generateJSXElement(spec, 0)
+  // Generate JSX (using same ID mapping so classes match)
+  const jsx = generateJSXElement(spec, 0, idMapping)
 
   // Build component
   const parts: string[] = [imports]
+
+  // Add CSS import if using CSS classes
+  if (useCSS && cssContent) {
+    parts.push(`import './${componentName}.css'`)
+  }
 
   if (propsInterface) {
     parts.push('')
@@ -126,9 +151,10 @@ export async function generateComponent(spec: CoralRootNode, options: Options = 
   const code = parts.join('\n')
 
   // Format with Prettier if requested
+  let formattedCode = code
   if (usePrettier) {
     try {
-      return await prettier.format(code, {
+      formattedCode = await prettier.format(code, {
         parser: 'babel-ts',
         plugins: [parserBabel],
         semi: true,
@@ -140,9 +166,12 @@ export async function generateComponent(spec: CoralRootNode, options: Options = 
     } catch (error) {
       // If Prettier fails, return unformatted code
       console.warn('Prettier formatting failed:', error)
-      return code
+      formattedCode = code
     }
   }
 
-  return code
+  return {
+    reactCode: formattedCode,
+    cssCode: cssContent,
+  }
 }

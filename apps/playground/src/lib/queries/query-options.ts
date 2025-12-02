@@ -57,11 +57,14 @@ export const libraryQueryOptions = (id: string) =>
     queryFn: () => librariesApi.getLibrary(id),
   })
 
-export const libraryCssResetQueryOptions = (libraryId: string) =>
-  queryOptions({
+export const libraryCssResetQueryOptions = (libraryId: string) => {
+  const isStandalone = !libraryId || libraryId.trim() === '' || libraryId === 'standalone-mode'
+  return queryOptions({
     queryKey: ['libraries', libraryId, 'css-reset'],
     queryFn: () => librariesApi.getLibraryCssReset(libraryId),
+    enabled: !isStandalone, // Disable query in standalone mode
   })
+}
 
 // Components
 export const componentsQueryOptions = (libraryId: string) =>
@@ -70,11 +73,20 @@ export const componentsQueryOptions = (libraryId: string) =>
     queryFn: () => componentsApi.getComponents(libraryId),
   })
 
-export const componentQueryOptions = (id: string) =>
-  queryOptions({
+export const componentQueryOptions = (id: string) => {
+  const isStandalone = id === 'standalone-mode'
+  return queryOptions({
     queryKey: ['components', id],
-    queryFn: () => componentsApi.getComponent(id),
+    queryFn: () => {
+      // Skip database call in standalone mode - return null immediately
+      if (isStandalone) {
+        return Promise.resolve(null)
+      }
+      return componentsApi.getComponent(id)
+    },
+    enabled: !isStandalone, // Disable query for standalone mode
   })
+}
 
 // Design Tokens
 export const tokensQueryOptions = (libraryId: string) =>

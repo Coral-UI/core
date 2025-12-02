@@ -33,6 +33,12 @@
   height: calc(var(--spacing) * 4);
   flex-shrink: 0;
   margin-inline-end: calc(var(--spacing) * 2);
+  color: var(--muted-foreground);
+  position: relative;
+
+  .selected-tree-variant & {
+    color: var(--accent-foreground);
+  }
 }
 
 .tree-view {
@@ -50,7 +56,7 @@
   text-align: left;
   padding-block: calc(var(--spacing) * 2);
   cursor: pointer;
-  padding-inline-start: calc(var(--spacing) * 4 * var(--tree-level, 1));
+  padding-inline-start: calc(var(--spacing) * 5 * var(--tree-level, 1));
 }
 
 .tree-leaf-item-wrapper {

@@ -4,7 +4,6 @@ import { cn, omitUndefined } from '@/lib/utils'
 // import * as AccordionPrimitive from '@radix-ui/react-accordion'
 import { Accordion as BaseAccordion } from '@base-ui-components/react/accordion'
 import { IconChevronRight } from '@tabler/icons-react'
-import { cva } from 'class-variance-authority'
 import React from 'react'
 
 import './tree-view.css'
@@ -171,42 +170,40 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
       data = [data]
     }
     return (
-
-        <ul>
-          {data.map((item) => (
-            <li key={item.id}>
-              {item.children ? (
-                <TreeNode
-                  item={item}
-                  {...omitUndefined({
-                    selectedItemId,
-                    handleDragStart,
-                    handleDrop,
-                  })}
-                  expandedItemIds={expandedItemIds}
-                  handleSelectChange={handleSelectChange}
-                  defaultNodeIcon={defaultNodeIcon}
-                  defaultLeafIcon={defaultLeafIcon}
-                  draggedItem={draggedItem}
-                  level={level}
-                />
-              ) : (
-                <TreeLeaf
-                  item={item}
-                  {...omitUndefined({
-                    selectedItemId,
-                    handleDragStart,
-                    handleDrop,
-                  })}
-                  handleSelectChange={handleSelectChange}
-                  defaultLeafIcon={defaultLeafIcon}
-                  draggedItem={draggedItem}
-                />
-              )}
-            </li>
-          ))}
-        </ul>
-
+      <ul>
+        {data.map((item) => (
+          <li key={item.id}>
+            {item.children ? (
+              <TreeNode
+                item={item}
+                {...omitUndefined({
+                  selectedItemId,
+                  handleDragStart,
+                  handleDrop,
+                })}
+                expandedItemIds={expandedItemIds}
+                handleSelectChange={handleSelectChange}
+                defaultNodeIcon={defaultNodeIcon}
+                defaultLeafIcon={defaultLeafIcon}
+                draggedItem={draggedItem}
+                level={level}
+              />
+            ) : (
+              <TreeLeaf
+                item={item}
+                {...omitUndefined({
+                  selectedItemId,
+                  handleDragStart,
+                  handleDrop,
+                })}
+                handleSelectChange={handleSelectChange}
+                defaultLeafIcon={defaultLeafIcon}
+                draggedItem={draggedItem}
+              />
+            )}
+          </li>
+        ))}
+      </ul>
     )
   },
 )
@@ -289,18 +286,17 @@ const TreeNode = ({
             isOpen={value.includes(item.id)}
             {...(defaultNodeIcon !== undefined && { default: defaultNodeIcon })}
           />
-          <span
-            className={cn(
-              'tree-leaf-name',
-              selectedItemId === item.id ? 'selected' : '',
-            )}
-          >
-            {item.name}
-          </span>
+          <span className={cn('tree-leaf-name', selectedItemId === item.id ? 'selected' : '')}>{item.name}</span>
         </AccordionTrigger>
-        {selectedItemId === item.id && <TreeActions isSelected={selectedItemId === item.id}>{item.actions}</TreeActions>}
+        {selectedItemId === item.id && (
+          <TreeActions isSelected={selectedItemId === item.id}>{item.actions}</TreeActions>
+        )}
 
-        <AccordionContent className="tree-leaf-item-wrapper" level={level} style={{ '--tree-level': level } as React.CSSProperties}>
+        <AccordionContent
+          className="tree-leaf-item-wrapper"
+          level={level}
+          style={{ '--tree-level': level } as React.CSSProperties}
+        >
           <TreeItem
             className="tree-leaf-item"
             data={item.children ? item.children : item}
@@ -400,11 +396,7 @@ const TreeLeaf = React.forwardRef<
         onDrop={onDrop}
         {...props}
       >
-        <TreeIcon
-          item={item}
-          isSelected={true}
-          {...(defaultLeafIcon !== undefined && { default: defaultLeafIcon })}
-        />
+        <TreeIcon item={item} isSelected={true} {...(defaultLeafIcon !== undefined && { default: defaultLeafIcon })} />
         <span className={cn('tree-leaf-name', selectedItemId === item.id ? 'selected' : '')}>{item.name}</span>
         <TreeActions isSelected={selectedItemId === item.id && !item.disabled}>{item.actions}</TreeActions>
       </div>
@@ -418,11 +410,7 @@ const AccordionTrigger = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof BaseAccordion.Trigger>
 >(({ className, children, ...props }, ref) => (
   <BaseAccordion.Header className="tree-leaf-heading">
-    <BaseAccordion.Trigger
-      ref={ref}
-      className={cn('tree-leaf-trigger', className)}
-      {...props}
-    >
+    <BaseAccordion.Trigger ref={ref} className={cn('tree-leaf-trigger', className)} {...props}>
       <IconChevronRight />
       {children}
     </BaseAccordion.Trigger>
@@ -434,15 +422,7 @@ const AccordionContent = React.forwardRef<
   React.ElementRef<typeof BaseAccordion.Panel>,
   React.ComponentPropsWithoutRef<typeof BaseAccordion.Panel> & { level?: number }
 >(({ className, children, level = 0, ...props }, ref) => (
-  <BaseAccordion.Panel
-    ref={ref}
-    className={cn(
-      'tree-leaf-content',
-      className,
-    )}
-    data-level={level}
-    {...props}
-  >
+  <BaseAccordion.Panel ref={ref} className={cn('tree-leaf-content', className)} data-level={level} {...props}>
     {children}
   </BaseAccordion.Panel>
 ))

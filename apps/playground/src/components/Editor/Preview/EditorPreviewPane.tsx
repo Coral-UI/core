@@ -1,13 +1,14 @@
+import { DEFAULT_CSS_RESET } from '@/components/Editor/CssResetDialog'
 import { HTMLRenderer } from '@/components/Editor/Preview/HTMLRenderer'
 import { Button } from '@/components/primitives/Button/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/Tabs/Tabs'
 import { ToggleGroup } from '@/components/primitives/ToggleGroup/toggle-group'
-import { useLibraryCssReset } from '@/hooks/queries/useLibraries'
 import { useSetViewportWidth, useViewportBreakpoint } from '@/hooks/queries/useViewportBreakpoint'
 // import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { Editor } from '@monaco-editor/react'
 import {
   IconBracketsAngle,
+  IconCode,
   IconDeviceImac,
   IconDeviceIpad,
   IconDeviceMobile,
@@ -38,25 +39,31 @@ const VIEWPORT_PRESETS: ViewportPreset[] = [
 
 interface EditorPreviewPaneProps {
   spec: CoralRootNode
-  libraryId?: string
+  libraryId?: string | null
   setImportDialogOpen: (open: boolean) => void
+  setImportSpecDialogOpen: (open: boolean) => void
+  setCssResetDialogOpen: (open: boolean) => void
   handleUndo: () => void
   handleRedo: () => void
   handleSave: () => void
   isSaving: boolean
   hasUnsavedChanges: boolean
   componentName: string
+  cssReset?: string
 }
 
 export const EditorPreviewPane = ({
   spec,
-  libraryId,
+  libraryId: _libraryId,
   setImportDialogOpen,
+  setImportSpecDialogOpen,
+  setCssResetDialogOpen,
   handleUndo,
   handleRedo,
   handleSave,
   isSaving,
   hasUnsavedChanges,
+  cssReset = DEFAULT_CSS_RESET,
 }: EditorPreviewPaneProps) => {
   // const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
   const { theme } = useTheme()
@@ -65,7 +72,7 @@ export const EditorPreviewPane = ({
   const { data: viewportBreakpointState } = useViewportBreakpoint()
   const viewportWidth = viewportBreakpointState?.viewportWidth ?? VIEWPORT_PRESETS[2]?.width ?? 1440
   const setViewportWidth = useSetViewportWidth()
-  const { data: cssReset = '' } = useLibraryCssReset(libraryId || '')
+  const effectiveCssReset = cssReset || DEFAULT_CSS_RESET
 
   useEffect(() => {
     setSpecValue(JSON.stringify(spec, null, 2))
@@ -138,6 +145,24 @@ export const EditorPreviewPane = ({
           >
             <IconFileImport className="size-3.5" />
           </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setImportSpecDialogOpen(true)}
+            title="Import Coral Spec"
+            aria-label="Import Coral Spec"
+          >
+            <IconSchema className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setCssResetDialogOpen(true)}
+            title="CSS Reset"
+            aria-label="CSS Reset"
+          >
+            <IconCode className="size-3.5" />
+          </Button>
           <Button variant="ghost" size="icon-sm" onClick={handleUndo} title="Undo (⌘Z / Ctrl+Z)">
             <Undo className="size-3.5" />
           </Button>
@@ -151,7 +176,7 @@ export const EditorPreviewPane = ({
         <div className="h-full w-full">
           {spec && spec.name ? (
             <>
-              <HTMLRenderer spec={spec} viewportWidth={viewportWidth} cssReset={cssReset} />
+              <HTMLRenderer spec={spec} viewportWidth={viewportWidth} cssReset={effectiveCssReset} />
             </>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">
@@ -197,7 +222,7 @@ export const EditorPreviewPane = ({
       </TabsContent>
 
       <TabsContent value="code" className="flex flex-col h-full w-full flex-1 shrink-0 px-0 pb-2.5  pt-1.5 ">
-        <Sandbox specValue={spec} />
+        <Sandbox specValue={spec} cssReset={effectiveCssReset} />
       </TabsContent>
     </Tabs>
   )

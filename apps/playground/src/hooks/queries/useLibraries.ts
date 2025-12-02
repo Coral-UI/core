@@ -87,6 +87,16 @@ export function useDeleteLibrary() {
  * Query hook for fetching CSS reset for a library (with Suspense)
  */
 export function useLibraryCssReset(libraryId: string) {
+  // Use regular useQuery for standalone mode to avoid Suspense errors
+  const isStandalone = !libraryId || libraryId.trim() === '' || libraryId === 'standalone-mode'
+
+  if (isStandalone) {
+    return useQuery({
+      ...libraryCssResetQueryOptions(libraryId),
+      enabled: false,
+    })
+  }
+
   return useSuspenseQuery(libraryCssResetQueryOptions(libraryId))
 }
 

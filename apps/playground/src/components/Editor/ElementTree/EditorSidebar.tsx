@@ -5,9 +5,24 @@ import { ElementTreeNode } from '@/hooks/useElementTree'
 import { useElementTreeQuery } from '@/hooks/useElementTreeQuery'
 import { useElementSelectionStore } from '@/stores/useElementSelectionStore'
 import { canContain } from '@/utils/elementHierarchy'
+import { ELEMENT_TYPE_DEFINITIONS } from '@/utils/elementTypes'
 import { IconCheck } from '@tabler/icons-react'
 import { Minus, Plus } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
+
+// Helper function to get icon component type for element type
+// The icons in ELEMENT_TYPE_DEFINITIONS are JSX elements, but TreeView needs component types
+// We extract the component type from the JSX element's type
+const getElementIcon = (elementType: string): React.ElementType | undefined => {
+  const elementDef = ELEMENT_TYPE_DEFINITIONS.find((def) => def.type === elementType)
+  if (!elementDef?.icon) return undefined
+
+  // Extract the component type from the JSX element
+  // The icon is a JSX element like <SquareMousePointerIcon className="..." />
+  // We need to get the component type (SquareMousePointerIcon)
+  const iconElement = elementDef.icon as React.ReactElement
+  return iconElement.type as React.ElementType
+}
 
 // Convert ElementTreeNode to TreeDataItem
 const convertToTreeDataItem = (
@@ -20,10 +35,12 @@ const convertToTreeDataItem = (
   const hasChildren = element.children && element.children.length > 0
   const isSelected = selectedElementId === element.id
   const canDelete = element.id !== 'root' // Don't allow deleting root
+  const elementIcon = getElementIcon(element.elementType)
 
   const treeItem: TreeDataItem = {
     id: element.id,
     name: element.name || element.elementType,
+    ...(elementIcon && { icon: elementIcon }),
     draggable: element.id !== 'root',
     droppable: true,
     onClick: () => onSelect(element.id),

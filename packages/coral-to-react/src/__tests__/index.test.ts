@@ -17,13 +17,13 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec)
-    expect(result).toContain("import React from 'react'")
-    expect(result).toContain('export function div')
-    expect(result).toContain('<div>')
-    expect(result).toContain('<p>')
-    expect(result).toContain('Hello, World!')
-    expect(result).toContain('</p>')
-    expect(result).toContain('</div>')
+    expect(result.reactCode).toContain("import React from 'react'")
+    expect(result.reactCode).toContain('export function div')
+    expect(result.reactCode).toContain('<div>')
+    expect(result.reactCode).toContain('<p>')
+    expect(result.reactCode).toContain('Hello, World!')
+    expect(result.reactCode).toContain('</p>')
+    expect(result.reactCode).toContain('</div>')
   })
 
   it('should handle component with custom name', async () => {
@@ -35,10 +35,10 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec)
-    expect(result).toContain('export function Button')
-    expect(result).toContain('<button>')
-    expect(result).toContain('Click me')
-    expect(result).toContain('</button>')
+    expect(result.reactCode).toContain('export function Button')
+    expect(result.reactCode).toContain('<button>')
+    expect(result.reactCode).toContain('Click me')
+    expect(result.reactCode).toContain('</button>')
   })
 
   it('should handle self-closing tags', async () => {
@@ -62,8 +62,8 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec)
-    expect(result).toContain('<img src="test.jpg" alt="Test" />')
-    expect(result).toContain('<br />')
+    expect(result.reactCode).toContain('<img src="test.jpg" alt="Test" />')
+    expect(result.reactCode).toContain('<br />')
   })
 
   it('should generate props interface when componentProperties exist', async () => {
@@ -85,10 +85,10 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec)
-    expect(result).toContain('interface ButtonProps')
-    expect(result).toContain('label: string')
-    expect(result).toContain('onClick?: function')
-    expect(result).toContain('export function Button(props: ButtonProps)')
+    expect(result.reactCode).toContain('interface ButtonProps')
+    expect(result.reactCode).toContain('label: string')
+    expect(result.reactCode).toContain('onClick?: function')
+    expect(result.reactCode).toContain('export function Button(props: ButtonProps)')
   })
 
   it('should generate state hooks', async () => {
@@ -108,7 +108,7 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec)
-    expect(result).toContain('const [count, setCount] = useState<number>(0)')
+    expect(result.reactCode).toContain('const [count, setCount] = useState<number>(0)')
   })
 
   it('should generate methods', async () => {
@@ -127,8 +127,8 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec)
-    expect(result).toContain('function handleClick()')
-    expect(result).toContain('console.log("clicked")')
+    expect(result.reactCode).toContain('function handleClick()')
+    expect(result.reactCode).toContain('console.log("clicked")')
   })
 
   it('should handle inline styles', async () => {
@@ -148,10 +148,10 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec)
-    expect(result).toContain('style={{')
-    expect(result).toContain('fontSize: 16')
-    expect(result).toContain("padding: '20px'")
-    expect(result).toContain("color: '#333'")
+    expect(result.reactCode).toContain('style={{')
+    expect(result.reactCode).toContain('fontSize: 16')
+    expect(result.reactCode).toContain("padding: '20px'")
+    expect(result.reactCode).toContain("color: '#333'")
   })
 
   it('should handle element attributes', async () => {
@@ -167,9 +167,9 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec)
-    expect(result).toContain('id="main"')
-    expect(result).toContain('className="container"')
-    expect(result).toContain('data-testid="test"')
+    expect(result.reactCode).toContain('id="main"')
+    expect(result.reactCode).toContain('className="container"')
+    expect(result.reactCode).toContain('data-testid="test"')
   })
 
   it('should handle nested children', async () => {
@@ -197,14 +197,14 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec)
-    expect(result).toContain('<section>')
-    expect(result).toContain('<h1>')
-    expect(result).toContain('Title')
-    expect(result).toContain('</h1>')
-    expect(result).toContain('<p>')
-    expect(result).toContain('Content')
-    expect(result).toContain('</p>')
-    expect(result).toContain('</section>')
+    expect(result.reactCode).toContain('<section>')
+    expect(result.reactCode).toContain('<h1>')
+    expect(result.reactCode).toContain('Title')
+    expect(result.reactCode).toContain('</h1>')
+    expect(result.reactCode).toContain('<p>')
+    expect(result.reactCode).toContain('Content')
+    expect(result.reactCode).toContain('</p>')
+    expect(result.reactCode).toContain('</section>')
   })
 
   it('should generate arrow function component when specified', async () => {
@@ -216,8 +216,8 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec, { componentFormat: 'arrow' })
-    expect(result).toContain('export const Button = () => {')
-    expect(result).not.toContain('export function Button')
+    expect(result.reactCode).toContain('export const Button = () => {')
+    expect(result.reactCode).not.toContain('export function Button')
   })
 
   it('should handle imports', async () => {
@@ -242,9 +242,9 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec)
-    expect(result).toContain("import React from 'react'")
-    expect(result).toContain("import { useState } from 'react'")
-    expect(result).toContain("import helper, { util } from './utils'")
+    expect(result.reactCode).toContain("import React from 'react'")
+    expect(result.reactCode).toContain("import { useState } from 'react'")
+    expect(result.reactCode).toContain("import helper, { util } from './utils'")
   })
 
   it('should handle component without props', async () => {
@@ -256,7 +256,7 @@ describe('coralToReact', () => {
     }
 
     const result = await coralToReact(coralSpec)
-    expect(result).toContain('export function Simple() {')
+    expect(result.reactCode).toContain('export function Simple() {')
   })
 
   it('should format code with Prettier when enabled', async () => {
@@ -269,9 +269,9 @@ describe('coralToReact', () => {
 
     const result = await coralToReact(coralSpec, { prettier: true })
     // Prettier should format the code properly
-    expect(result).toMatch(/\n/)
+    expect(result.reactCode).toMatch(/\n/)
     // Check that it's properly formatted (no extra spaces, proper indentation)
-    expect(result).toContain("import React from 'react'")
-    expect(result).toContain('export function Button()')
+    expect(result.reactCode).toContain("import React from 'react'")
+    expect(result.reactCode).toContain('export function Button()')
   })
 })

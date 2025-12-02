@@ -1,6 +1,7 @@
-import { CoralColorType, CoralNode, CoralRootNode } from '@reallygoodwork/coral-core'
+import { CoralColorType, CoralNode, CoralRootNode, Dimension } from '@reallygoodwork/coral-core'
 
 import { isCoralColor } from '../../types'
+import { isDimension } from '../../export/assert/isDimension'
 import { isInlineElement } from '../assert/isInlineElement'
 import { convertCoralColorToRGB, getColorOpacity } from '../color/convertCoralColorToRGB'
 import { applyBorderFromNode } from '../styles/applyBorder'
@@ -111,6 +112,39 @@ async function createComponentSetWithVariants(
 
   const componentSet = figma.combineAsVariants(variants, tempFrame)
   componentSet.name = spec.name
+
+  // Rename the variant property to "breakpoint"
+  // When combineAsVariants is called, Figma creates a variant property based on component name differences
+  // We need to find and rename it to "breakpoint"
+  const propertyDefinitions = componentSet.componentPropertyDefinitions
+  if (propertyDefinitions) {
+    // Find the variant property (it's the one with type 'VARIANT')
+    const variantPropertyKey = Object.keys(propertyDefinitions).find(
+      (key) => propertyDefinitions[key].type === 'VARIANT',
+    )
+
+    if (variantPropertyKey && variantPropertyKey !== 'breakpoint') {
+      // Get the property definition
+      const variantProperty = propertyDefinitions[variantPropertyKey]
+
+      // Delete the old property
+      delete propertyDefinitions[variantPropertyKey]
+
+      // Create the new property with name "breakpoint"
+      propertyDefinitions.breakpoint = variantProperty
+
+      // Update all variant instances to use the new property name
+      for (const variant of componentSet.children) {
+        if (variant.type === 'COMPONENT' && variant.variantProperties) {
+          const oldValue = variant.variantProperties[variantPropertyKey]
+          if (oldValue !== undefined) {
+            delete variant.variantProperties[variantPropertyKey]
+            variant.variantProperties.breakpoint = oldValue
+          }
+        }
+      }
+    }
+  }
 
   // Component set is now a child of tempFrame, which is NOT on the page
   // When we append componentSet to figma.currentPage in code.ts, it will
@@ -1007,9 +1041,42 @@ async function createSimpleTextNode(
     textNode.fontSize = fontSize
   }
 
-  const lineHeight = extractStyleValue(node.styles?.['lineHeight'])
-  if (lineHeight !== undefined) {
-    textNode.lineHeight = { value: lineHeight, unit: 'PIXELS' }
+  // Handle line height with special logic for em units
+  const lineHeightValue = node.styles?.['lineHeight']
+  if (lineHeightValue !== undefined) {
+    // Check if it's a Dimension object with em unit
+    if (isDimension(lineHeightValue)) {
+      const dimension = lineHeightValue as Dimension
+      if (dimension.unit === 'em') {
+        // If line height is 1em, set to AUTO in Figma
+        if (dimension.value === 1) {
+          textNode.lineHeight = {
+            unit: 'AUTO',
+            value: 0, // AUTO unit requires value to be 0
+          }
+        } else {
+          // For other em values (e.g., 1.2em), multiply by font size
+          const currentFontSize = fontSize || 16 // Use fontSize from above, default to 16px
+          const lineHeightInPixels = dimension.value * currentFontSize
+          textNode.lineHeight = {
+            unit: 'PIXELS',
+            value: lineHeightInPixels,
+          }
+        }
+      } else {
+        // For non-em units, use the standard extraction
+        const lineHeight = extractStyleValue(lineHeightValue)
+        if (lineHeight !== undefined) {
+          textNode.lineHeight = { value: lineHeight, unit: 'PIXELS' }
+        }
+      }
+    } else {
+      // For non-dimension values, use standard extraction
+      const lineHeight = extractStyleValue(lineHeightValue)
+      if (lineHeight !== undefined) {
+        textNode.lineHeight = { value: lineHeight, unit: 'PIXELS' }
+      }
+    }
   }
 
   const letterSpacing = extractStyleValue(node.styles?.['letterSpacing'])

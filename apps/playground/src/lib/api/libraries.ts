@@ -54,6 +54,11 @@ export async function getLibraries(organizationId: string): Promise<Library[]> {
  * Get a single library by ID
  */
 export async function getLibrary(id: string): Promise<Library | null> {
+  // Return null early if id is empty or invalid (standalone mode)
+  if (!id || id.trim() === '' || id === 'standalone-mode') {
+    return null
+  }
+
   const { data, error } = await supabase.from('libraries').select('*').eq('id', id).maybeSingle()
 
   if (error) {
@@ -235,6 +240,11 @@ export async function deleteLibrary(id: string): Promise<void> {
  * Get CSS reset for a library (decompressed)
  */
 export async function getLibraryCssReset(libraryId: string): Promise<string> {
+  // Return empty string early if libraryId is empty or invalid (standalone mode)
+  if (!libraryId || libraryId.trim() === '' || libraryId === 'standalone-mode') {
+    return ''
+  }
+
   const library = await getLibrary(libraryId)
   if (!library || !library.cssReset) {
     return ''

@@ -109,6 +109,39 @@ export const createComponentWithVariants = async (
   const componentSet = figma.combineAsVariants(variantComponents, figma.currentPage)
   componentSet.name = spec.name
 
+  // Rename the variant property to "breakpoint"
+  // When combineAsVariants is called, Figma creates a variant property based on component name differences
+  // We need to find and rename it to "breakpoint"
+  const propertyDefinitions = componentSet.componentPropertyDefinitions
+  if (propertyDefinitions) {
+    // Find the variant property (it's the one with type 'VARIANT')
+    const variantPropertyKey = Object.keys(propertyDefinitions).find(
+      (key) => propertyDefinitions[key].type === 'VARIANT',
+    )
+
+    if (variantPropertyKey && variantPropertyKey !== 'breakpoint') {
+      // Get the property definition
+      const variantProperty = propertyDefinitions[variantPropertyKey]
+
+      // Delete the old property
+      delete propertyDefinitions[variantPropertyKey]
+
+      // Create the new property with name "breakpoint"
+      propertyDefinitions.breakpoint = variantProperty
+
+      // Update all variant instances to use the new property name
+      for (const variant of componentSet.children) {
+        if (variant.type === 'COMPONENT' && variant.variantProperties) {
+          const oldValue = variant.variantProperties[variantPropertyKey]
+          if (oldValue !== undefined) {
+            delete variant.variantProperties[variantPropertyKey]
+            variant.variantProperties.breakpoint = oldValue
+          }
+        }
+      }
+    }
+  }
+
   // Find the tallest variant to ensure the component set is tall enough
   const maxHeight = Math.max(...variantComponents.map((v) => v.height))
 

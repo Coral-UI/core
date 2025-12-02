@@ -1,8 +1,16 @@
 'use client'
 
+import type { Component } from '@/types'
 import { AccessibilityPanel } from '@/components/Editor/AccessibilityPanel'
+import {
+  computeBreakpointStyleDifferences,
+  getComputedStylesForBreakpoint,
+  normalizeResponsiveStyles,
+} from '@/components/Editor/Configuration/utils/styleInheritance'
+import { CssResetDialog, DEFAULT_CSS_RESET } from '@/components/Editor/CssResetDialog'
 import { EditorSidebar } from '@/components/Editor/ElementTree/EditorSidebar'
 import { ImportCodeDialog } from '@/components/Editor/ImportCodeDialog'
+import { ImportSpecDialog } from '@/components/Editor/ImportSpecDialog'
 import { EditorPreviewPane } from '@/components/Editor/Preview/EditorPreviewPane'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/primitives/Empty/Empty'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/Tabs/Tabs'
@@ -31,12 +39,20 @@ import { useSyncViewportToBreakpoint } from './Configuration/hooks/useSyncViewpo
 import { StyleForm } from './style-manager/styleForm'
 
 interface EditorProps {
-  componentId: string
+  componentId?: string // Optional for standalone/beta mode
 }
 
 export const Editor = memo(({ componentId }: EditorProps) => {
-  // Use select to only subscribe to the data we need, preventing re-renders on other changes
-  const { data: component, isLoading: componentLoading } = useComponent(componentId)
+  // Skip database loading in standalone/beta mode (when componentId is not provided)
+  const isStandaloneMode = !componentId
+
+  // Only use component query if componentId is provided
+  // In standalone mode, component will be null and componentLoading will be false
+  // Note: useComponent uses SuspenseQuery which requires the query to be enabled
+  // We use a dummy ID in standalone mode to avoid SuspenseQuery errors
+  const componentQuery = isStandaloneMode ? { data: null, isLoading: false, isError: false } : useComponent(componentId)
+  const component: Component | null = componentQuery.data ?? null
+  const componentLoading = componentQuery.isLoading
   // Don't use the mutation hook - it causes re-renders. Call API directly instead.
   // const updateComponent = useUpdateComponent()
   const selectedElementId = useElementSelectionStore((state) => state.selectedElementId)
@@ -44,6 +60,9 @@ export const Editor = memo(({ componentId }: EditorProps) => {
   const { data: viewportBreakpointState } = useViewportBreakpoint()
   const activeBreakpointId = viewportBreakpointState?.activeBreakpointId ?? null
   const [importDialogOpen, setImportDialogOpen] = useState(false)
+  const [importSpecDialogOpen, setImportSpecDialogOpen] = useState(false)
+  const [cssResetDialogOpen, setCssResetDialogOpen] = useState(false)
+  const [cssReset, setCssReset] = useState<string>(DEFAULT_CSS_RESET)
   const [isInitialized, setIsInitialized] = useState(false)
   const [lastSavedSpec, setLastSavedSpec] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -94,20 +113,16 @@ export const Editor = memo(({ componentId }: EditorProps) => {
     }
 
     // Determine which styles to use based on active breakpoint
+    // Use computed styles (base + all applicable breakpoints) for display
     let stylesToUse: Record<string, unknown> | undefined
 
     if (activeBreakpointId) {
-      // Find the selected breakpoint and use its styles
       const breakpointIndex = parseInt(activeBreakpointId.replace('breakpoint_', ''), 10)
-      const responsiveStyles = selectedElement.responsiveStyles || []
-      const selectedBreakpoint = responsiveStyles[breakpointIndex]
-      if (selectedBreakpoint?.styles) {
-        stylesToUse = selectedBreakpoint.styles as Record<string, unknown>
-      }
-    }
-
-    // Fall back to base styles if no breakpoint selected or breakpoint has no styles
-    if (!stylesToUse) {
+      // Get computed styles (base + all breakpoints up to and including this one)
+      const computedStyles = getComputedStylesForBreakpoint(selectedElement, breakpointIndex)
+      stylesToUse = computedStyles as Record<string, unknown>
+    } else {
+      // Use base styles
       stylesToUse = selectedElement.styles as Record<string, unknown> | undefined
     }
 
@@ -195,20 +210,35 @@ export const Editor = memo(({ componentId }: EditorProps) => {
         const selectedBreakpoint = responsiveStyles[breakpointIndex]
 
         if (selectedBreakpoint) {
-          // Merge the changed styles into the breakpoint's existing styles
-          const mergedBreakpointStyles = {
-            ...(selectedBreakpoint.styles || {}),
+          // Get the current computed styles for this breakpoint (base + all previous breakpoints)
+          const currentComputedStyles = getComputedStylesForBreakpoint(selectedElement, breakpointIndex)
+
+          // Merge the changed styles into the computed styles
+          const newComputedStyles = {
+            ...currentComputedStyles,
             ...coralStyles,
           }
 
-          // Update the breakpoint with merged styles
+          // Compute only the differences from accumulated styles (base + previous breakpoints)
+          const differences = computeBreakpointStyleDifferences(
+            selectedElement,
+            breakpointIndex,
+            newComputedStyles as CoralStyleType,
+          )
+
+          // Update the breakpoint with only the differences
           responsiveStyles[breakpointIndex] = {
             ...selectedBreakpoint,
-            styles: mergedBreakpointStyles as CoralStyleType,
+            styles: differences,
           }
 
-          // Update the element with the modified responsive styles
-          updateElement(selectedElementId, { responsiveStyles })
+          // Normalize all responsive styles to remove duplicates
+          const normalizedStyles = normalizeResponsiveStyles(selectedElement.styles, responsiveStyles)
+
+          // Update the element with normalized responsive styles
+          const updateData: Partial<ElementTreeNode> =
+            normalizedStyles.length > 0 ? { responsiveStyles: normalizedStyles } : {}
+          updateElement(selectedElementId, updateData)
         }
       } else {
         // Update base styles
@@ -217,8 +247,20 @@ export const Editor = memo(({ componentId }: EditorProps) => {
           ...coralStyles,
         }
 
-        // Update the element with merged styles
-        updateElement(selectedElementId, { styles: mergedStyles as CoralStyleType })
+        // Normalize responsive styles after base change
+        const normalizedStyles = normalizeResponsiveStyles(
+          mergedStyles as CoralStyleType,
+          selectedElement.responsiveStyles,
+        )
+
+        // Update the element with merged base styles and normalized responsive styles
+        const updateData: Partial<ElementTreeNode> = {
+          styles: mergedStyles as CoralStyleType,
+        }
+        if (normalizedStyles.length > 0) {
+          updateData.responsiveStyles = normalizedStyles
+        }
+        updateElement(selectedElementId, updateData)
       }
     },
     [selectedElementId, selectedElement, updateElement, activeBreakpointId],
@@ -335,6 +377,98 @@ export const Editor = memo(({ componentId }: EditorProps) => {
 
   // Load component spec ONLY when component ID changes (not when component object changes)
   useEffect(() => {
+    // In standalone mode, initialize with empty div if not already initialized
+    if (isStandaloneMode) {
+      if (!isInitialized || elements.length === 0) {
+        const textElement: ElementTreeNode = {
+          name: 'text',
+          elementType: 'p',
+          id: 'text',
+          parentId: 'root',
+          type: 'NODE',
+          textContent: 'Start building your component',
+          styles: {
+            fontSize: {
+              value: 3.25,
+              unit: 'rem',
+            },
+            color: {
+              hex: '#f5f6f7',
+              rgb: {
+                r: 245,
+                g: 246,
+                b: 247,
+                a: 1,
+              },
+              hsl: {
+                h: 210,
+                s: 11,
+                l: 96,
+                a: 1,
+              },
+            },
+            textAlign: 'center',
+            lineHeight: {
+              value: 1.2,
+              unit: 'em',
+            },
+            fontWeight: '700',
+            letterSpacing: {
+              value: -18,
+              unit: '%',
+            },
+          },
+        }
+        const emptyRoot: ElementTreeNode = {
+          name: 'hero',
+          elementType: 'div',
+          id: 'root',
+          type: 'NODE',
+          styles: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingInlineStart: {
+              value: 0,
+              unit: 'rem',
+            },
+            paddingInlineEnd: {
+              value: 0,
+              unit: 'rem',
+            },
+            paddingBlockStart: {
+              value: 4,
+              unit: 'rem',
+            },
+            paddingBlockEnd: {
+              value: 4,
+              unit: 'rem',
+            },
+            backgroundColor: {
+              hex: '#27301f',
+              rgb: {
+                r: 39,
+                g: 48,
+                b: 31,
+                a: 1,
+              },
+              hsl: {
+                h: 92,
+                s: 22,
+                l: 15,
+                a: 1,
+              },
+            },
+          },
+          children: [textElement],
+        }
+        replaceAllElements([emptyRoot, textElement])
+        setIsInitialized(true)
+        setLastSavedSpec(null)
+      }
+      return
+    }
+
     // Don't load if:
     // - Still loading initial data
     // - Already initialized for this component ID
@@ -371,7 +505,7 @@ export const Editor = memo(({ componentId }: EditorProps) => {
 
     setIsLoadingFromDb(true)
     isLoadingFromDbRef.current = true
-    const currentComponentId = componentId
+    const currentComponentId = componentId || null
     loadedComponentIdRef.current = currentComponentId
     const specToLoad = componentSpecRef.current
     const convertCoralToElements = (node: CoralRootNode, parentId?: string): ElementTreeNode[] => {
@@ -450,7 +584,7 @@ export const Editor = memo(({ componentId }: EditorProps) => {
     setIsLoadingFromDb(false)
     isLoadingFromDbRef.current = false
     justSavedRef.current = false // Reset save flag after loading
-  }, [componentId, componentLoading, replaceAllElements])
+  }, [componentId, componentLoading, replaceAllElements, isStandaloneMode, isInitialized, elements.length])
 
   // Reset initialization and saved state when componentId changes
   useEffect(() => {
@@ -469,7 +603,12 @@ export const Editor = memo(({ componentId }: EditorProps) => {
   }, [componentId])
 
   // Save function - call API directly to avoid React Query mutation re-renders
+  // In standalone mode, skip database saving
   const handleSave = useCallback(async () => {
+    if (isStandaloneMode) {
+      toast.success('Component saved locally (database saving disabled in beta mode)')
+      return
+    }
     if (!component || !isInitialized || isSaving) return
 
     // Use startTransition to prevent immediate re-render flash
@@ -684,9 +823,106 @@ export const Editor = memo(({ componentId }: EditorProps) => {
     }
   }
 
+  const handleImportSpec = useCallback(
+    (spec: CoralRootNode) => {
+      try {
+        // Convert the coral spec to ElementTreeNode format
+        const convertCoralToElements = (node: CoralRootNode, parentId?: string): ElementTreeNode[] => {
+          const id = `element_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+          const element: ElementTreeNode = {
+            id,
+            parentId,
+            name: node.name || node.elementType,
+            elementType: node.elementType,
+            type: node.type || 'NODE',
+            isExpanded: true,
+          }
+
+          if (node.textContent) {
+            element.textContent = node.textContent
+          }
+          if (node.elementAttributes) {
+            element.elementAttributes = node.elementAttributes
+          }
+          if (node.styles) {
+            element.styles = node.styles
+          }
+          if (node.responsiveStyles) {
+            element.responsiveStyles = node.responsiveStyles
+          }
+
+          let allElements = [element]
+
+          if (node.children && node.children.length > 0) {
+            node.children.forEach((child: CoralRootNode) => {
+              const childElements = convertCoralToElements(child, id)
+              allElements = [...allElements, ...childElements]
+            })
+          }
+
+          return allElements
+        }
+
+        const importedElements = convertCoralToElements(spec)
+
+        // Create root element from the spec
+        const rootElement: ElementTreeNode = {
+          id: 'root',
+          name: spec.name || 'Root',
+          elementType: spec.elementType || 'div',
+          type: 'NODE',
+          isExpanded: true,
+          styles: spec.styles,
+          responsiveStyles: spec.responsiveStyles,
+          children: [],
+        }
+
+        // Ensure all top-level imported elements have root as parent
+        const elementsWithRootParent = importedElements.map((el) => {
+          // If element has no parentId or parentId is undefined, set it to 'root'
+          if (!el.parentId) {
+            return { ...el, parentId: 'root' as string }
+          }
+          return el
+        })
+
+        // Combine root element with imported elements
+        const newElements = [rootElement, ...elementsWithRootParent]
+
+        // Replace all elements with imported ones
+        replaceAllElements(newElements)
+        setSelectedElementId(null)
+        setIsInitialized(true)
+        setLastSavedSpec(null)
+        toast.success('Spec imported successfully')
+      } catch (error) {
+        console.error('Failed to import spec:', error)
+        toast.error('Failed to import spec. Please check the format.')
+      }
+    },
+    [replaceAllElements, setSelectedElementId],
+  )
+
   // Handle delete element
   const handleDelete = useCallback(() => {
     if (!selectedElementId) return
+
+    // Don't delete if focus is in an input, select, textarea, or other form element
+    const activeElement = document.activeElement
+    if (activeElement) {
+      const tagName = activeElement.tagName.toLowerCase()
+      const isFormElement =
+        tagName === 'input' ||
+        tagName === 'select' ||
+        tagName === 'textarea' ||
+        tagName === 'button' ||
+        (activeElement instanceof HTMLElement && activeElement.isContentEditable)
+
+      if (isFormElement) {
+        // Allow normal text editing behavior
+        return
+      }
+    }
 
     // Can't delete root element
     if (selectedElementId === 'root') {
@@ -763,7 +999,8 @@ export const Editor = memo(({ componentId }: EditorProps) => {
     )
   }
 
-  if (!component) {
+  // In standalone mode, skip the component check - we'll initialize with empty div
+  if (!isStandaloneMode && !component) {
     return (
       <div className="flex items-center justify-center h-[calc(100dvh-2.5rem)] mt-10">
         <div className="text-center">
@@ -778,19 +1015,26 @@ export const Editor = memo(({ componentId }: EditorProps) => {
     <div className="flex flex-col w-full h-[calc(100dvh-3rem)] bg-background">
       <div className="flex flex-1 h-[calc(100dvh-2.5rem)] max-h-[calc(100dvh-2.5rem)] overflow-hidden">
         <aside className="w-64 flex flex-col h-full overflow-hidden">
-          <EditorSidebar componentName={component.name} hasUnsavedChanges={hasUnsavedChanges} isSaving={isSaving} />
+          <EditorSidebar
+            componentName={component?.name || 'Component'}
+            hasUnsavedChanges={hasUnsavedChanges}
+            isSaving={isSaving}
+          />
         </aside>
         <main className="bg-area-background flex-1 overflow-hidden pt-2 px-4 rounded-t-lg shadow-hairline border border-border border-b-0">
           <EditorPreviewPane
             spec={spec}
-            libraryId={component?.libraryId}
+            libraryId={component?.libraryId ?? null}
             setImportDialogOpen={setImportDialogOpen}
+            setImportSpecDialogOpen={setImportSpecDialogOpen}
+            setCssResetDialogOpen={setCssResetDialogOpen}
             handleUndo={handleUndo}
             handleRedo={handleRedo}
             handleSave={handleSave}
             isSaving={isSaving}
             hasUnsavedChanges={hasUnsavedChanges}
-            componentName={component.name}
+            componentName={component?.name || 'Component'}
+            cssReset={cssReset}
           />
         </main>
         <aside className="w-72 h-[calc(100dvh-3rem)] max-h-[calc(100dvh-3rem)] flex flex-col">
@@ -859,6 +1103,18 @@ export const Editor = memo(({ componentId }: EditorProps) => {
         </aside>
       </div>
       <ImportCodeDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportCode} />
+      <ImportSpecDialog
+        open={importSpecDialogOpen}
+        onOpenChange={setImportSpecDialogOpen}
+        onImport={handleImportSpec}
+      />
+      {/* CSS Reset Dialog - works in standalone mode but shows message that saving is disabled */}
+      <CssResetDialog
+        open={cssResetDialogOpen}
+        onOpenChange={setCssResetDialogOpen}
+        value={cssReset}
+        onChange={setCssReset}
+      />
     </div>
   )
 })

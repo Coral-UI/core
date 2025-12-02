@@ -64,7 +64,7 @@ const colorToCSS = (color: CoralColorType): string => {
 }
 
 // Helper function to convert style values to CSS strings
-const styleValueToCSS = (value: unknown): string => {
+const styleValueToCSS = (key: string, value: unknown): string => {
   if (isDimension(value)) {
     return dimensionToCSS(value)
   }
@@ -72,9 +72,21 @@ const styleValueToCSS = (value: unknown): string => {
     return colorToCSS(value)
   }
   if (typeof value === 'number') {
+    // Font weight should be unitless (no px)
+    if (key === 'fontWeight') {
+      return String(value)
+    }
+    // Other numeric values default to px
     return `${value}px`
   }
   if (typeof value === 'string') {
+    // Add sans-serif fallback when font family contains "inter" (case-insensitive)
+    if (key === 'fontFamily' && /inter/i.test(value)) {
+      // Check if sans-serif is already in the font stack
+      if (!/sans-serif/i.test(value)) {
+        return `${value}, sans-serif`
+      }
+    }
     return value
   }
   return String(value)
@@ -89,7 +101,7 @@ const formatStyles = (styles: CoralStyleType): string => {
     })
     .map(([key, value]) => {
       const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase()
-      const cssValue = styleValueToCSS(value)
+      const cssValue = styleValueToCSS(key, value)
       return `${cssKey}: ${cssValue}`
     })
 

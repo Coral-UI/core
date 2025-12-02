@@ -6,6 +6,7 @@ import {
   parseBreakpointIndex,
   transformResponsiveStylesToBreakpoints,
 } from '@/components/Editor/Configuration/utils/breakpointHelpers'
+import { normalizeResponsiveStyles } from '@/components/Editor/Configuration/utils/styleInheritance'
 import { useViewportBreakpoint, useSyncBreakpointToViewport } from '@/hooks/queries/useViewportBreakpoint'
 import { ElementTreeNode, ResponsiveStyle } from '@/hooks/useElementTree'
 
@@ -22,21 +23,21 @@ export const useBreakpointManager = (element: ElementTreeNode | null, updateProp
   const handleAddBreakpoint = (breakpoint: Omit<Breakpoint, 'id'>) => {
     if (!element) return
 
-    // Mobile-first approach: copy base styles into the new breakpoint
-    // This ensures the breakpoint starts with the current default styles
-    const baseStyles = element.styles ? { ...element.styles } : {}
-
-    // Create responsive style using core schema structure
+    // Create responsive style with empty styles initially
+    // Styles will be added when user edits them, and only differences will be stored
     const newBreakpoint: ResponsiveStyle = {
       breakpoint: {
         type: breakpoint.type,
         value: breakpoint.value,
       },
       label: breakpoint.label,
-      styles: baseStyles,
+      styles: {}, // Start with empty styles - CSS inheritance will use base styles
     }
 
     const updatedResponsiveStyles = [...(element.responsiveStyles || []), newBreakpoint]
+
+    // Don't normalize when adding - keep the breakpoint even if it has no styles yet
+    // Normalization will happen when styles are actually edited
     updateProperty('responsiveStyles', updatedResponsiveStyles)
 
     // Auto-select the newly created breakpoint using index-based ID
