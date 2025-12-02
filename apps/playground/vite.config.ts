@@ -13,6 +13,17 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    // Ensure workspace packages are resolved correctly
+    dedupe: ['@reallygoodwork/coral-core'],
+  },
+  optimizeDeps: {
+    // Pre-bundle workspace packages
+    include: [
+      '@reallygoodwork/coral-core',
+      '@reallygoodwork/coral-to-html',
+      '@reallygoodwork/coral-to-react',
+      '@reallygoodwork/react-to-coral',
+    ],
   },
   build: {
     outDir: 'dist',
@@ -20,6 +31,11 @@ export default defineConfig({
     sourcemap: false,
     minify: 'esbuild', // Use esbuild for faster builds, avoids CSS minification issues
     cssMinify: 'esbuild', // Use esbuild for CSS minification instead of cssnano
+    commonjsOptions: {
+      // Transform workspace packages
+      transformMixedEsModules: true,
+      include: [/node_modules/],
+    },
   },
   server: {
     port: 3000,

@@ -9,6 +9,9 @@
     "README.md",
     "LICENSE"
   ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "bin": {
     "coral-schemas": "bin/coral-schemas.js"
   },
