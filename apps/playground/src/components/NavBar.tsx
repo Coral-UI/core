@@ -126,6 +126,22 @@ export const NavBar = () => {
           >
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
+                <p className="text-base font-medium">Who made this?</p>
+                <p className="text-caption text-sm">
+                  Coral is a project by Drew Minns from{' '}
+                  <a href="https://reallygoodwork.com" className="text-accent underline hover:no-underline">
+                    Really Good Work
+                  </a>
+                  . You can read more about it <a href="https://coralui.com" className="text-accent underline hover:no-underline">here</a> until I get a proper docs site up.  It's an exploration into the future of UI development tooling. If you're interested in my efforts,
+                  or would like to make this a part of your team's workflow, please reach out to me at{' '}
+                  <a href="mailto:drew@reallygoodwork.com" className="text-accent underline hover:no-underline">
+                    drew@reallygoodwork.com
+                  </a>
+                  .
+                </p>
+              </div>
+              
+              <div className="flex flex-col gap-2">
                 <p className="text-base font-medium">How to use the Coral Beta Playground</p>
                 <ul className="text-sm text-caption list-disc list-outside pl-4 space-y-1">
                   <li>Explore the editor to change values and see how a spec is generated.</li>
