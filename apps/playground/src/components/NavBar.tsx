@@ -126,16 +126,23 @@ export const NavBar = () => {
           >
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <p className="text-base font-medium">Who made this?</p>
+                <p className="text-base font-medium">Huh?</p>
                 <p className="text-caption text-sm">
-                  Coral is a project by Drew Minns from{' '}
-                  <a href="https://reallygoodwork.com" className="text-accent underline hover:no-underline">
-                    Really Good Work
-                  </a>
-                  . You can read more about it <a href="https://coralui.com" className="text-accent underline hover:no-underline">here</a> until I get a proper docs site up.  It's an exploration into the future of UI development tooling. If you're interested in my efforts,
+                  Basically, what if there was a single file to describe a component, and it served as a common interface schema between design and code. It's basically a Figma to Code workflow that also works in reverse. You can read more about it <a href="https://coralui.com" className="text-accent underline hover:no-underline">here</a> until I get a proper docs site up.  It's an exploration into the future of UI development tooling. If you're interested in my efforts,
                   or would like to make this a part of your team's workflow, please reach out to me at{' '}
                   <a href="mailto:drew@reallygoodwork.com" className="text-accent underline hover:no-underline">
                     drew@reallygoodwork.com
+                  </a>
+                  .
+                </p>
+              </div>
+              
+              <div className="flex flex-col gap-2">
+                <p className="text-base font-medium">Who made this?</p>
+                <p className="text-caption text-sm">
+                  Me. I did. Coral is a project by me, Drew Minns from{' '}
+                  <a href="https://reallygoodwork.com" className="text-accent underline hover:no-underline">
+                    Really Good Work
                   </a>
                   .
                 </p>
@@ -160,18 +167,9 @@ export const NavBar = () => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <p className="text-base font-medium">Who made this?</p>
+                <p className="text-base font-medium">What's next?</p>
                 <p className="text-caption text-sm">
-                  Coral is a project by Drew Minns from{' '}
-                  <a href="https://reallygoodwork.com" className="text-accent underline hover:no-underline">
-                    Really Good Work
-                  </a>
-                  . It's an exploration into the future of UI development tooling. If you're interested in my efforts,
-                  or would like to make this a part of your team's workflow, please reach out to me at{' '}
-                  <a href="mailto:drew@reallygoodwork.com" className="text-accent underline hover:no-underline">
-                    drew@reallygoodwork.com
-                  </a>
-                  .
+                  New editor interface, teams and projects, gradients and images.
                 </p>
               </div>
             </div>
